@@ -292,10 +292,12 @@
 </div><!-- ./#modaldisabledRecurso -->   
 
 <!-- modal nuevo recurso -->
-{{ $modalAdd            or '' }}
-{{ $modalEdit           or '' }}
-{{ $modalEditGrupo      or ''}}
-{{ $modalAddSupervisor  or ''}}
+{{ $modalAdd                    or '' }}
+{{ $modalEdit                   or '' }}
+{{ $modalEditGrupo              or '' }}
+{{ $modalAddSupervisor          or '' }}
+{{ $modalConfirmaBajaSupervisor or '' }}
+
 
 <!-- ./ nuevo recurso -->
 @stop
