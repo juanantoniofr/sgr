@@ -146,7 +146,7 @@
                                 {{$recurso->id_lugar}}
                             </td>
                             <td>
-                                <a id="addsupervisor" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="establecer usuarios con roles uspervisor, tecnico y validador"><i class="fa fa-user-plus fa-fw"></i></a>
+                                
                              
                                 <!-- editar -->
                                 <a href="{{route('editarecurso.html',array('id' => $recurso->id))}}" title="Editar recurso" class="linkEditrecurso" data-idrecurso="{{$recurso->id}}"><i class="fa fa-pencil fa-fw"></i></a>
@@ -177,13 +177,22 @@
                             </td>
                             <td>{{$recurso->tipoGestionReservas()}}</td>
                              @if (Auth::user()->capacidad == 4)
-                            <td>
+                            <td><a id="addsupervisor" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="establecer usuarios con roles uspervisor, tecnico y validador" class="pull-right"><i class="fa fa-user-plus fa-fw"></i></a><hr />
                                 <span><b>Supervisores:</b></span><br />
                                 @foreach($recurso->supervisores as $supervisor)
                                     <a href="" title='eliminar supervisor' class="bajasupervisor" data-username="{{$supervisor->username}}" data-iduser="{{$supervisor->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
                                    {{$supervisor->nombre}} {{$supervisor->apellidos}}.<br /> 
                                 @endforeach
-                                
+                                <span><b>Validadores:</b></span><br />
+                                @foreach($recurso->validadores as $validador)
+                                    <a href="" title='eliminar validador' class="bajasupervisor" data-username="{{$validador->username}}" data-iduser="{{$validador->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
+                                   {{$validador->nombre}} {{$validador->apellidos}}.<br /> 
+                                @endforeach
+                                <span><b>Técnicos:</b></span><br />
+                                @foreach($recurso->tecnicos as $tecnico)
+                                    <a href="" title='eliminar tecnico' class="bajasupervisor" data-username="{{$tecnico->username}}" data-iduser="{{$tecnico->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
+                                   {{$tecnico->nombre}} {{$tecnico->apellidos}}.<br /> 
+                                @endforeach
                             </td>
                             @endif
                         </tr>

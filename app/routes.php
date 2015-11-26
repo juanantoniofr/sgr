@@ -68,8 +68,8 @@ Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersCont
 
 //Gestión supervisores: rol -> admin (4)
 Route::get('admin/supervisores.html',array('as' => 'supervisores','uses' => 'recursosController@supervisores','before' => array('auth','capacidad:4,msg')));	
-Route::post('admin/addsupervisor',array('uses' => 'recursosController@addsupervisor','before' => array('auth','auth_ajax','capacidad:4,msg')));
-Route::post('admin/quitasupervisor',array('uses' => 'recursosController@quitasupervisor','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::post('admin/addsupervisor',array('uses' => 'recursosController@addUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::post('admin/quitasupervisor',array('uses' => 'recursosController@removeUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
 
 //routes gestión de usuarios

@@ -89,8 +89,8 @@ class recursosController extends BaseController{
     return View::make('admin.supervisores')->with(compact('recurso','supervisores','sortby','order','offset','search'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menu','admin.menuSupervisores',['idRecurso' => $recurso->id, 'recurso' => $recurso->nombre])->nest('modalAddSupervisor','admin.supervisorModalAdd',['recurso' => $recurso])->nest('modalConfirmaBajaSupervisor','admin.supervisorModalBaja');
   }
 
-  //añade supervisores a un recurso
-  public function addsupervisor(){
+  //añade relación usuario recurso
+  public function addUserWithRol(){
     
     //input
     $idRecurso = Input::get('idRecurso','');
@@ -131,25 +131,62 @@ class recursosController extends BaseController{
        return $respuesta;
     }
 
-    $supervisores = Recurso::find($idRecurso)->supervisores;
-    $idUser = User::where('username','=',$username)->first()->id;
-    if ($supervisores->contains($idUser)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es supervisor de este recurso.';
-      return $respuesta;
-    }
+    
 
     $recurso = Recurso::find($idRecurso);
-    if ($rol == '2'){ 
-      $recurso->supervisores()->attach($idUser);
-      $respuesta['error'] = false;
-      $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como supervisor con éxito.';
+    switch ($rol) {
+      //tecnicos
+      case '1':
+        $tecnicos = Recurso::find($idRecurso)->tecnicos;
+        $idUser = User::where('username','=',$username)->first()->id;
+        if ($tecnicos->contains($idUser)){
+          $respuesta['error'] = true;
+          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recurso.';
+          return $respuesta;
+        }
+        $recurso->tecnicos()->attach($idUser);
+        $respuesta['error'] = false;
+        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>técnico</b></i> con éxito.';
+        break;
+      //Supervisor
+      case '2':
+        $supervisores = Recurso::find($idRecurso)->supervisores;
+        $idUser = User::where('username','=',$username)->first()->id;
+        if ($supervisores->contains($idUser)){
+          $respuesta['error'] = true;
+          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
+          return $respuesta;
+        }
+        $recurso->supervisores()->attach($idUser);
+        $respuesta['error'] = false;
+        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>supervisor</b></i> con éxito.';
+        break;
+      //Validador
+      case '3':
+        $validadores = Recurso::find($idRecurso)->validadores;
+        $idUser = User::where('username','=',$username)->first()->id;
+        if ($validadores->contains($idUser)){
+          $respuesta['error'] = true;
+          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
+          return $respuesta;
+        }
+        $recurso->validadores()->attach($idUser);
+        $respuesta['error'] = false;
+        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
+        break;
+      
+      default:
+        $respuesta['error'] = false;
+        $respuesta['msg'] = 'Identificador de rol del esperado: ' . $rol;
+        break;
     }
+
+    
 
     return $respuesta;
   }
-  //quita el supervisor $idUser del recurso $idRecurso
-  public function quitasupervisor(){
+  //elimina la relación 
+  public function removeUserWithRol(){
     
     //input
     $idRecurso  = Input::get('idrecurso','');
