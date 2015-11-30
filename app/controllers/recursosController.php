@@ -333,7 +333,7 @@ class recursosController extends BaseController{
     $recurso = Recurso::find($id);
     
     $modo = 0;//Con validación
-    if (ACL::automaticAuthorization($id)) $modo = 1;//sin validación
+    if (!$recurso->validacion()) $modo = 1;//sin validación
     
     $permisos = json_decode($recurso->acl,true);
     $capacidades = $permisos['r']; //array con los valores de la capacidades con acceso

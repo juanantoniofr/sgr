@@ -70,7 +70,7 @@ $(function(e){
 				$('#datepickerFinicio').val(firstDayAviable());
 				$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide'); });
 				setInitValueForModalAdd('8:30',firstDayAviable());
-				$('#myModal').modal('show');
+				$('#modalAdd').modal('show');
 			}
 		});
 
@@ -380,7 +380,7 @@ $(function(e){
 			$('a.linkMasEvents').on('click',onMoreEvents);
 		}
 		//Always
-		$('#myModal').on('hidden.bs.modal', function (e) {
+		$('#modalAdd').on('hidden.bs.modal', function (e) {
   			$('button#save').show();
   			$('#inputRepeticion').hide();
   			$('#newReservaRepetir option[value=SR]').prop('selected','selected');
@@ -470,7 +470,7 @@ $(function(e){
 
 				setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
 				$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
-				$('#myModal').modal('show');
+				$('#modalAdd').modal('show');
 			}
 		});
 	}
@@ -605,14 +605,14 @@ $(function(e){
 					$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
 					
  		       		printCalendar();
-					$("#myModal").modal('hide');
+					$("#modalAdd").modal('hide');
 					$('#actionType').val('');
  		       	}
  		       	else {
  		       		$('.has-error').removeClass('has-error');
  		       		$('.is_slide').each(function(){$(this).slideUp();});
  		       		resetMsgErrors();
- 		       		console.log(respuesta['msgErrors']);
+ 		       		//console.log(respuesta['msgErrors']);
  		       		$.each(respuesta['msgErrors'],function(key,value){
 
  		       			$('#'+key).addClass('has-error');
@@ -708,7 +708,7 @@ $(function(e){
 			 			$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
 				 		printCalendar();
 				 				 		   					 		       		
-						$("#myModal").modal('hide');
+						$("#modalAdd").modal('hide');
 						$('#actionType').val('');
 						
 				 	}
@@ -730,7 +730,7 @@ $(function(e){
 				}
 	      	});
 		}
-		else $("#myModal").modal('hide');
+		else $("#modalAdd").modal('hide');
 	}
 
 	/*
@@ -980,7 +980,7 @@ $(function(e){
 			initModalEdit($idEvento,$idSerie);
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
 			
-			$('#myModal').modal('show');
+			$('#modalAdd').modal('show');
 		});
 	}
 	

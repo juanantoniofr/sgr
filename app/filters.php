@@ -71,11 +71,11 @@ Route::filter('capacidad',function($ruta,$peticion,$capacidad,$redirect) {
 		return Redirect::to($redirect)->with(compact('title','msg'));
 	}
 });
-//Comprobar si el sistema permite a los usarios registrar reservas.
 
+//Comprobar si el sistema permite a los usarios registrar reservas.
 Route::filter('inicioCurso',function(){
 
-	if (ACL::isUser() || ACL::isAvanceUser()){
+	if (Auth::user()->isUser() || Auth::user()->isAvanceUser()){
 		$hoy = strtotime('today');
 		$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
 		if ($diaInicio > $hoy) {
@@ -85,16 +85,7 @@ Route::filter('inicioCurso',function(){
 		}
 	}
 });
-//Comprobar si el sistema permite a los usarios registrar reservas.
 
-Route::filter('inicioCurso',function(){
-
-	if (ACL::isUser() || ACL::isAvanceUser()){
-		$hoy = strtotime('today');
-		$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
-		if ($diaInicio > $hoy) return Redirect::to('user/msg');
-	}
-});
 
 Route::filter('auth.basic', function()
 {

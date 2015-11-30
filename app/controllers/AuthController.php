@@ -37,9 +37,7 @@ class AuthController extends BaseController {
                 //-> login en laravel
                 Auth::loginUsingId($user->id); 
                 //-> ir a página de inicio de su perfil
-                //$msg = ACL::gethome();
-                //return View::make('loginError')->with(compact('msg'));
-                return Redirect::to(ACL::getHome());
+                return Redirect::to(Auth::user()->home());
             }
             
             else {

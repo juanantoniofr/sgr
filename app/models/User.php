@@ -16,9 +16,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
         return $this->belongsToMany('Recurso','recurso_supervisor');
     }
 
-
-    
-
     //devuelve los recurso que atiende (gestiona reservas)
 	public function atiende()
     {
@@ -37,6 +34,33 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		return $this->hasMany('Evento','user_id');
 	
 	}
+
+	/**
+	 * Implementa requisito: usuarios del perfil alumno (capacidad = 1) pueden reservar como másimo 12 horas a la semana.
+ 	 * 
+	 *	@param void
+	 *	@return $nh int	Número de horas reservadas por el usuario logueado en la semana reservable inmediatemente siguiente a la actual (perfil alumno) 
+	*/
+
+	public function numHorasReservadas(){
+		
+		$nh = 0;
+
+		$fristMonday = Calendar::fristMonday(); //devuelve timestamp
+		$lastFriday = Calendar::lastFriday(); //devuelve timestamp	
+
+		$fm = date('Y-m-d',$fristMonday); //formato para la consulta sql (fechaIni en Inglés)
+		$lf = date('Y-m-d',$lastFriday); //formato para la consulta sql (fechaFin en Inglés)
+
+		$events = $this->userEvents()->where('fechaEvento','>=',$fm)->where('fechaEvento','<=',$lf)->get();
+
+		foreach ($events as $key => $event) {
+			$nh = $nh + Date::diffHours($event->horaInicio,$event->horaFin);
+		}
+		
+		return $nh;
+	}	
+
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -125,10 +149,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	}
 
 	
-	public function getHome(){
+	public function home(){
 		
 		switch ($this->capacidad) {
-			case '6': //validador
+			case '6': //Supervisor
 				return route('recursos');
 			case '5': //validador
 				return route('validadorHome.html');
@@ -145,7 +169,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 			}
 
 	}
-
+	
 	public function dropdownMenu(){
 		
 		switch ($this->capacidad) {
@@ -164,6 +188,21 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 			default:
 				return 'emptydropdown';
 			}
+	}
+
+	/**
+	 * Implementa requisito: Alumnos no pueden hacer reservas periodicas
+	 * @param void
+	 * @return $repetir boolean true si el usuario puede hacer reservas periodicas (usuarios con capacidad 1, alumnos, no pueden)
+	*/
+	public function puedePeriodica(){
+		
+		$repetir = true;
+
+		//Perfil alumno: -> No puede realizar reservas periodicas
+		if ($this->isUser()) $repetir = false; 
+
+		return $repetir;
 	}
 
 	//Alumnos

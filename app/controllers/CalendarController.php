@@ -205,22 +205,17 @@ class CalendarController extends BaseController {
 		$year = Input::get('year',date('Y'));
 		$uvus = INput::get('uvus','');
 
-		
-
-
-
 		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
-		$nh = ACL::numHorasReservadas();
+		$nh = Auth::user()->numHorasReservadas();
 		$msg = '';
-		if (ACL::isUser() && $nh >=12 ){
+		if (Auth::user()->isUser() && $nh >=12 ){
 			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
 		}	
 
-				
+		//Calendar::fristMonday() -> devuelve el timestamp del primer lunes disponible para reserva
+		$tsPrimerLunes = Calendar::fristMonday();
 		if(empty($input)){
-			//ACL::fristMonday() -> devuelve el timestamp del primer lunes disponible para reserva
-			
-			$datefirstmonday = getdate(ACL::fristMonday());
+			$datefirstmonday = getdate($tsPrimerLunes);
 			$numMonth = $datefirstmonday['mon'];//Representación númerica del mes del 1 al 12
 			$year = $datefirstmonday['year']; //Representación numérica del año cuatro dígitos
 			$nameMonth = Date::getNameMonth($numMonth,$year); //representación textual del mes (enero,febrero.... etc)
@@ -234,19 +229,19 @@ class CalendarController extends BaseController {
 		$tBody = Calendar::getBodytableMonth($numMonth,$year);
 		
 		//Se obtinen todos los grupos de recursos
-		$grupos = DB::table('recursos')->select('id', 'acl', 'grupo','grupo_id')->groupby('grupo')->get();
-		
+		//$grupos = DB::table('recursos')->select('id', 'acl', 'grupo','grupo_id')->groupby('grupo')->get();
+		$grupos = Recurso::groupby('grupo')->get();
 		//se filtran para obtener sólo aquellos con acceso para el usuario logeado
 		$groupWithAccess = array();
 		foreach ($grupos as $grupo) {
-			if (ACL::canReservation($grupo->id,$grupo->acl))
+			if ($grupo->visible())
 				$groupWithAccess[] = $grupo;
 		}
 		
 		
-		$dropdown = Auth::user()->dropdownMenu();		
+		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva');
 	}
 
 	//Ajax functions
@@ -319,7 +314,7 @@ class CalendarController extends BaseController {
 			$html .='</option>';
 			$selected = '';
 			}	
-		if (!ACL::isUser() && $recursos[0]->tipo != 'espacio'){
+		if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio'){
 			$disabled = 0;
 			if ($itemsdisabled == $recursos->count() ) $disabled = 1;
 			$html .= '<option '.$selected.' value="0" data-disabled="'.$disabled.'">Todos los '.$recursos[0]->tipo.'s</option>';
@@ -387,7 +382,7 @@ class CalendarController extends BaseController {
 			}
 
 			//notificar a validadores si espacio requiere validación
-			if (!ACL::automaticAuthorization($event->recursoOwn->id)){
+			if ( $event->recursoOwn->validacion() ){
 				$sgrMail = new sgrMail();
 				$sgrMail->notificaNuevoEvento($event);
 			}
@@ -541,7 +536,7 @@ class CalendarController extends BaseController {
 		else{
 			
 			//si el usuario es alumno: comprobamos req2 (MAX HORAS = 12 a la semana en cualquier espacio o medio )	
-			if (ACL::isUser() && $this->superaHoras()){
+			if (Auth::user()->isUser() && $this->superaHoras()){
 				$result['error'] = true;
 				$error = array('hFin' =>'Se supera el máximo de horas a la semana.. (12h)');	
 				$result['msgErrors'] = $error;	
@@ -571,7 +566,7 @@ class CalendarController extends BaseController {
 					$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
 				
 				//notificar a validadores si espacio requiere validación
-				if (!ACL::automaticAuthorization($event->recursoOwn->id)){
+				if ( $event->recursoOwn->validacion() ){
 					$sgrMail = new sgrMail();
 					$sgrMail->notificaEdicionEvento($newEvent);
 				}
@@ -617,7 +612,7 @@ class CalendarController extends BaseController {
 		$supera = false;
 
 		//Número de horas ya reservadas en global
-		$nh = ACL::numHorasReservadas();
+		$nh = Auth::user()->numHorasReservadas();
 		
 		//número de horas del evento a modificar (hay que restarlas de $nh)
 		$event = Evento::find(Input::get('idEvento'));
@@ -728,8 +723,8 @@ class CalendarController extends BaseController {
 		$estado = 'denegada';
 
 		
-		//si modo automatico	
-		if(ACL::automaticAuthorization($idRecurso)){
+		//si modo automatico validacion = false	
+		if( !Recurso::find($idRecurso)->validacion() ){
 			//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
 			$condicionEstado = 'aprobada';
 			//$currentFecha tiene formato d-m-Y
@@ -761,7 +756,7 @@ class CalendarController extends BaseController {
 			else{
 				//si libre
 				// Validadores realizan reservas no solicitudes
-				if (!ACL::isValidador())
+				if (!Auth::user()->isValidador())
 					$estado = 'pendiente';
 				else
 					$estado = 'aprobada';
@@ -772,5 +767,9 @@ class CalendarController extends BaseController {
 		return $estado;
 
 	}
+
+	
+	
+
 	
 }//fin del controlador

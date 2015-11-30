@@ -143,7 +143,7 @@ class ValidacionController extends BaseController {
 		$recursos = Recurso::all();
 
 		foreach ($recursos as $recurso) {
-			if (!ACL::automaticAuthorization($recurso->id)) $idsEspaciosConValidacion[]=$recurso->id;
+			if ( !$recurso->validacion() ) $idsEspaciosConValidacion[]=$recurso->id;
 		}
 		return $idsEspaciosConValidacion;
 

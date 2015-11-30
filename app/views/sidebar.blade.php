@@ -18,5 +18,5 @@
   </form>
 
   <div><label>Fecha:</label></div>
-  <div id="datepicker" value="{{date('d-m-Y',ACL::fristMonday())}}" style="width:190px" ></div>
+  <div id="datepicker" value="{{date('d-m-Y',$tsPrimerLunes)}}" style="width:190px" ></div>
 </div>

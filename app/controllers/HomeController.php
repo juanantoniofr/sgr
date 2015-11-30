@@ -18,7 +18,7 @@ class HomeController extends BaseController {
 	public function showWellcome(){
 		
 		if (!Cas::isAuthenticated() || !Auth::check()) return View::make('wellcome');
-   		else return Redirect::to(ACL::getHome());
+   		else return Redirect::to(Auth::user()->home());
     }
 
 	public function sendmailcontact(){

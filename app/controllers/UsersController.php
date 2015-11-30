@@ -61,7 +61,7 @@ class UsersController extends BaseController {
 
   public function hometecnico(){
       $dropdown = Auth::user()->dropdownMenu();
-      return View::make('tecnico.index')->nest('dropdown',$dropdown)->nest('addModal','tecnico.addReservaModal');
+      return View::make('tecnico.index')->nest('dropdown',$dropdown)->nest('addModal','ModalAddReserva');
   }
  
   public function newUser(){

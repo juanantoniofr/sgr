@@ -18,12 +18,16 @@ class Evento extends Eloquent{
  	public function atencion(){
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
-
+ 	/**
+ 	 * Implementa requisito: ofrecer sumatorio de puestos o equipos en la vista Calendario y en la vista de impresión.
+ 	 * 
+ 	 * @param void
+ 	 * @return $total int número total de puestos o equipos reservados por un usuario en una determinada fecha $this->fechaEvento entre $this->horaInicio y $this->horaFin
+ 	*/
  	public function total(){
  		$total = '';
  		if ($this->recursoOwn->tipo != 'espacio') $total = Evento::where('evento_id','=',$this->evento_id)->where('horaInicio','=',$this->horaInicio)->where('fechaEvento','=',$this->fechaEvento)->count();
  		
-
 			//Bug PODController, quitar el año q viene
 			$userPOD = User::where('username','=','pod')->first(); 
 			//$eventoTest = Evento::whereIn('recurso_id',$alist_id)->where('fechaEvento','=',$strDate)->orderBy('horaInicio','asc')->groupby('evento_id')->first();
@@ -44,7 +48,6 @@ class Evento extends Eloquent{
  		return $total;
  	}
 	
-
 
  	private $rules = array (
 			'titulo' 			=>	'required',
@@ -96,22 +99,20 @@ class Evento extends Eloquent{
     
     public function validate($data)
     	{
-
-        
     	//mensages
     	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
-    	if (ACL::isUser()){
+    	if (Auth::user()->isUser()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',ACL::lastFriday()) .'</strong><br />';
+    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',Calendar::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',Calendar::lastFriday()) .'</strong><br />';
     	}
 
     	
-    	if (ACL::isAvanceUser()){
+    	if (Auth::user()->isAvanceUser()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong><br />';
+    		$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',Calendar::fristMonday()) . '</strong><br />';
     	}
 
-    	if (ACL::isTecnico() || ACL::isSupervisor() || ACL::isValidador()){
+    	if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
     		$tsToday = strtotime('today');
     		$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
@@ -172,8 +173,8 @@ class Evento extends Eloquent{
 	   //req1: alumno solo pueden reservar entre firstMonday y lastFriday  
 	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
-				if (ACL::isUser()) {
-					if ( ACL::fristMonday() > Date::getTimeStamp($data['fInicio'])  || ACL::lastFriday()  < Date::getTimeStamp($data['fInicio'])) return true;
+				if (Auth::user()->isUser()) {
+					if ( Calendar::fristMonday() > Date::getTimeStamp($data['fInicio'])  || Calendar::lastFriday()  < Date::getTimeStamp($data['fInicio'])) return true;
 				}
 			});
 		}
@@ -183,8 +184,8 @@ class Evento extends Eloquent{
 		if (!empty($data['hFin']) && !empty($data['hInicio']) && empty($data['action'])){
 			
 			$v->sometimes('hFin','req2',function($data){
-				if (ACL::isUser()){
-					$nh = ACL::numHorasReservadas();//Número de horas ya reservadas
+				if (Auth::user()->isUser()){
+					$nh = Auth::user()->numHorasReservadas();//Número de horas ya reservadas
 					$nh2 = Date::diffHours($data['hInicio'],$data['hFin']);//números de horas que se quiere reservar
 					$maximo = Config::get('options.max_horas');
 					$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
@@ -204,7 +205,7 @@ class Evento extends Eloquent{
 						//si modo automatico
 						//$ocupado = false;
 						$id_recurso = $recurso->id;	
-						if(ACL::automaticAuthorization($id_recurso)){
+						if(!$recurso->validacion()){
 							//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
 							$estado = 'aprobada';
 							//$currentFecha tiene formato d-m-Y
@@ -228,9 +229,9 @@ class Evento extends Eloquent{
 					}
 				}
 				else{
-					//si modo automatico
+					//si modo automatico = si no necesita validacion
 					//$ocupado = false;	
-					if(ACL::automaticAuthorization($data['id_recurso'])){
+					if( !Recurso::find($data['id_recurso'])->validacion() ){
 						//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
 						$estado = 'aprobada';
 						//$currentFecha tiene formato d-m-Y
@@ -269,8 +270,8 @@ class Evento extends Eloquent{
 		// --> alumnos y pdi (capacidades 1 y 2): solo pueden reservar a partir de firstmonday 
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req5',function($data){
-				if (ACL::isAvanceUser()) {
-					if ( ACL::fristMonday() > Date::getTimeStamp($data['fInicio']) ) return true;
+				if (Auth::user()->isAvanceUser()) {
+					if ( Calendar::fristMonday() > Date::getTimeStamp($data['fInicio']) ) return true;
 				}
 			}); 
 		}	
@@ -279,7 +280,7 @@ class Evento extends Eloquent{
 		// --> tecnicos  (capacidad 3, 4 y 5): reservas a partir del día de hoy (para mañana)
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req6',function($data){
-				if (ACL::isTecnico() || ACL::isSupervisor() || ACL::isValidador()) {
+				if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()) {
 					if ( strtotime('today') > Date::getTimeStamp($data['fInicio']) ) return true;
 				}
 			}); 

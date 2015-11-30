@@ -791,17 +791,17 @@ class Calendar {
 	
 	private function isDayAviable($day,$mon,$year,$view = 'month'){
 		$isAviable = false;
-
+		$self = new self();
 		$capacidad = Auth::user()->capacidad;
 		switch ($capacidad) {
 				case '1': //alumnos
-					$intfristMondayAviable = ACL::fristMonday();
-					$intlastFridayAviable = ACL::lastFriday();
+					$intfristMondayAviable = $self->fristMonday();
+					$intlastFridayAviable = $self->lastFriday();
 					$intCurrentDate = mktime(0,0,0,$mon,$day,$year);
 					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
 					break;	
 				case '2': //pdi & pas administración
-					$intfristMondayAviable = ACL::fristMonday(); //Primer lunes disponible
+					$intfristMondayAviable = $self->fristMonday(); //Primer lunes disponible
 					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
 					break;
@@ -862,31 +862,61 @@ class Calendar {
 	}
 
 	
- /*
-    private $aMonth = array ('1' => 'Enero',
-							'2' => 'Febrero',
-							'3' => 'Marzo',
-							'4' => 'Abril',
-							'5' => 'Mayo',
-							'6' => 'Junio',
-							'7' => 'Julio',
-							'8' => 'Agosto',
-							'9' => 'Septiembre',
-							'10' => 'Octubre',
-							'11' => 'Noviembre',
-							'12' => 'Diciembre');
+ 	/**
+	 *
+	 *		@param void 
+	 *		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
+	*/
+	public static function fristMonday(){
+		
+		$l = '';
+		//Parámetros
+		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
+		$n = Config::get('options.ant_minSemanas'); 
+		//día actual
+		$today = date('Y-m-d');
+		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
+		
+		//Si es de lunes a jueves 
+		if ($numWeekCurrentDay <= $lastDay){
+	   		// y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
+	   		$l = strtotime('next monday ' . $today ); //lunes semana siguiente
+		}
+		else {
+			// y si la reserva está entre las fechas de 2ª semana posterior a la actual 
+			$l = strtotime('next monday ' . $today .' +1 week'); //lunes de la 2ª semana siguiente
+	   	}
 
-    private $aAbrNameMonth = array ('1' => 'Ene',
-									'2' => 'Feb',
-									'3' => 'Mar',
-									'4' => 'Abr',
-									'5' => 'May',
-									'6' => 'Jun',
-									'7' => 'Jul',
-									'8' => 'Ago',
-									'9' => 'Sep',
-									'10' => 'Oct',
-									'11' => 'Nov',
-									'12' => 'Dic');
-*/
+	   return $l;
+	
+	}
+
+	/**
+	 *		@param void 
+	 *		@return  $v timestamp del viernes de la primera semana reservable a partir del día actual
+	*/
+	
+	public static function lastFriday(){
+
+		$v = '';
+		//Parámetros
+		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
+		$n = Config::get('options.ant_minSemanas'); 
+		//día actual
+		$today = date('Y-m-d');
+		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
+		
+		//Si es de lunes a jueves 
+		if ($numWeekCurrentDay <= $lastDay){
+		   // y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
+		   $v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes semana siguinte
+		// si es viernes, sabado o domingo   
+		}
+		else {
+		  	$v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes la n-esima semana siguinte
+		}
+
+		return $v;
+
+	}
 }
