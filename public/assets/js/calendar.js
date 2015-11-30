@@ -684,13 +684,15 @@ $(function(e){
 
 		//si el usuario ha cambiado algún dato -> se guarda en el servidor.
 		//en caso contrario -> cerramos la ventana.
+		console.log('asdasd');
 		$.ajax({
     	   	type: "POST",
 			url: "getajaxeventbyId",
 			//data: $('form#addEvent').serialize(),
 			data: {'id':$idEvento},
         	success: function(respuesta){
-        		$respuesta = respuesta[0];},
+        		$respuesta = respuesta[0];
+        		console.log($respuesta);},
         	error: function(xhr, ajaxOptions, thrownError){
 					hideGifEspera();
 					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
@@ -698,6 +700,7 @@ $(function(e){
         	});
 		
 		if (hasnewdata($respuesta)){
+
 			$.ajax({
 		    	type: "POST",
 				url: "editajaxevent",
@@ -815,7 +818,11 @@ $(function(e){
 			//data: $('form#addEvent').serialize(),
 			data: {'id':$idEvento},
         	success: function(respuesta){
-        		$respuesta = respuesta[0];
+        		$respuesta = respuesta['event'];
+        		$reservadoPara = respuesta['reservadoPara'];
+				$reservadoPor = respuesta['reservadoPor'];
+        		
+        		console.log($respuesta + $reservadoPara);
 				//titulo
 				$('form#addEvent input#newReservaTitle').val($respuesta.titulo);
 				//Actividad
@@ -823,6 +830,9 @@ $(function(e){
 					if ($(this).val() == $respuesta.actividad) $(this).prop('selected',true);
 					else $(this).prop('selected',false);
 				});
+
+				$('form#addEvent input#reservadoPara').val($reservadoPara);
+				$('form#addEvent input#reservadoPor').val($reservadoPor);
 				//Fecha inicio: campo día
 								//hora inicio
 				$('select[name|="hInicio"] option').each(function(){
@@ -970,12 +980,9 @@ $(function(e){
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
+			console.log($idEvento);
 			$('#editOption1').data('idEvento',$idEvento);
 			$('#editOption1').data('idSerie',$idSerie);
-			//$('#editOption2').data('idEvento',$idEvento);
-			//$('#editOption2').data('idSerie',$idSerie);
-			//$('#editOption3').data('idEvento',$idEvento);
-			//$('#editOption3').data('idSerie',$idSerie);		
 			//Cargar datos del evento en al ventana Modal para editar el evento
 			initModalEdit($idEvento,$idSerie);
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');

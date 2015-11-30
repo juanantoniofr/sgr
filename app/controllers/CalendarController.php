@@ -241,7 +241,7 @@ class CalendarController extends BaseController {
 		
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva');
 	}
 
 	//Ajax functions
@@ -289,10 +289,21 @@ class CalendarController extends BaseController {
 		return $eventos;
 	}
 
+	/**
+	 * @param void
+	 * @return $result array $event = datos de evento identificado por id, $reservadopara = username (UVUS) del usuario propietario del evento  
+	*/
 	public function getajaxeventbyId(){
-		//$evento_id = Input::get('evento_id');
-		$event = Evento::where('id','=',Input::get('id'))->get();
-		return $event;
+		$result = array('event' 		=> '',
+						'reservadoPara' => '',
+						'reservadoPor' => '',
+						);
+		//$event = Evento::where('id','=',Input::get('id'))->get();
+		$event = Evento::find(Input::get('id'));
+		$result['event'] = $event->toArray();
+		$result['reservadoPara'] = $event->userOwn->username; 
+		$result['reservadoPor'] = User::find($event->reservadoPor)->username; 
+		return $result;
 	}
 	
 	public function getRecursosByAjax(){
