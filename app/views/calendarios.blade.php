@@ -21,14 +21,12 @@
       <hr />
 
       <div class="form-inline pull-left" role="form">
-        
         <div class="form-group">
           <button class="btn btn-danger" data-toggle="modal" data-target=".myModal-sm" id="btnNuevaReserva" data-fristday="{{date('d-m-Y',$tsPrimerLunes)}}"><i class="fa fa-calendar fa-fw" ></i>
            Nueva reserva
           </button>
           <a class="btn btn-warning" id="infoButton" alt="Muestra descripción del recurso..." style="display:none" > <i class="fa fa-eye fa-fw" ></i>Descripción</a>
         </div>
-
       </div>  
 
       
@@ -44,7 +42,7 @@
           <button class="btn btn-warning" data-calendar-view="week">semana</button>
           <!--<button class="btn btn-warning" data-calendar-view="day">Day</button>-->
           <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" data-container='body' title="Agenda" data-calendar-view="agenda">
-          <i class="glyphicon glyphicon-list-alt"></i> Mi Agenda
+          <i class="fa fa-list fa-fw"></i> Mi Agenda
           </button>
         </div>
         <div class = "btn-group"  >
@@ -57,18 +55,18 @@
 
       
 
-          
+      <div class="pull-left col-md-12">          
       @if(isset($msg) && !empty($msg))
-        <div class="alert alert-danger col-md-12 text-center" role="alert" id="alert_msg" data-nh="{{$nh}}"><strong>{{$msg}}</strong></div> 
+        <div class="alert alert-danger text-center" role="alert" id="alert_msg" data-nh="{{$nh}}"><strong>{{$msg}}</strong></div> 
       @else
-        <div class="alert alert-danger col-md-12 text-center" role="alert" id="alert"><strong> Por favor, seleccione espacio o medio a reservar</strong></div> 
+        <div class="alert alert-danger text-center" role="alert" id="alert"><strong> Por favor, seleccione espacio o medio a reservar</strong></div> 
        
       @endif
       <div style = "display:none" class="alert alert-info col-md-12 text-center" role="alert" id="msg"></div> 
       <div style = "display:none" class="alert alert-success col-md-12 text-center" role="alert" id="message"></div>
       <div style = "display:none" class="alert alert-warning col-md-12 text-center" role="alert" id="warning"></div>
     
-
+    </div>
 
       
       <div id="loadCalendar">  
