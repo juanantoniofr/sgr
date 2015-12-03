@@ -127,7 +127,7 @@ class CalendarController extends BaseController {
 		$atencionEvento->evento_id = $evento->id;
 		$atencionEvento->user_id = $evento->userOwn->id;
 		$atencionEvento->tecnico_id = Auth::user()->id;
-		$atencionEvento->momento = time();//momento actual
+		$atencionEvento->momento = date('Y-m-d H:i:s',time());//momento actual
 		$atencionEvento->observaciones = Input::get('observaciones','');
 		
 		
@@ -283,8 +283,7 @@ class CalendarController extends BaseController {
 	}
 
 	public function geteventbyajax(){
-
-		//$evento_id = Input::get('evento_id');
+		
 		$eventos = Evento::where('evento_id','=',Input::get('evento_id'))->get();
 		return $eventos;
 	}
