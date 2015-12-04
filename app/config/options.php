@@ -39,6 +39,8 @@ return array (
 	'gestionAtendida' 	=> 'Atendida (requiere validación)',
 	'gestionDesatendida' => 'Desatendida (sin validación)', 
 	'colectivos' => array('PAS','PDI','Alumno'),
+	'tipoReserva' => array ( '1'	=>	'Reserva periódica',
+							 '0'	=>	'Reserva puntual',),
 
 	);
 	
