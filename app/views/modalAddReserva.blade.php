@@ -170,10 +170,17 @@
                     </div>             
             </div>
 
-            <div class="form-group" id="por">
+            <div class="form-group" id="reservarPara" >
                     <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
                     <div class = "col-md-10">  
                         <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
+                    </div>             
+            </div>
+
+            <div class="form-group" id="atendidoPor" >
+                    <label for="atendidoPor"  class="control-label col-md-2" >Atendido por</label>   
+                    <div class = "col-md-10">  
+                        <input type="text" name = "atendidoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  id = "atendidoPor"  />
                     </div>             
             </div>
            

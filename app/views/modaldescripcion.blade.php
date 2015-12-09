@@ -28,7 +28,7 @@
             <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
           </div>
         </div><!-- ./modal-footer -->
-       </form> 
+      
        
       </div><!-- ./modal-content -->
     </div><!-- ./modal-dialog -->

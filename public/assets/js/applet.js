@@ -141,6 +141,9 @@ $(function(e){
 				
 				//Uvus ->reservadoPor
 				$('input[name|="reservadoPor"]').val($reservadoPorUvus);
+				$('#reservarPara').fadeOut('slow');
+				$('#reservadoPor').fadeIn('slow');
+				$('#atenidoPor').fadeIn('slow');
 				$('#uvusModal').html($reservadoPorUvus);
 				setResumen();
 				

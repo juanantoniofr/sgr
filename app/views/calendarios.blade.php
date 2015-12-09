@@ -147,8 +147,10 @@
 <!-- ./modal print -->
 
 
-
+ {{$modalfinalizareserva or ''}}
   {{$modaldescripcion or ''}}
+ 
+  {{$modalliberareserva or ''}}
 
  @stop
 @section('js')

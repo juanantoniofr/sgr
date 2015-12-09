@@ -112,30 +112,7 @@ class CalendarController extends BaseController {
 		return $event;
 	}
 
-	public function saveAtencion(){
-		
-		$idEvento = Input::get('eventoid','');
-		if (empty($idEvento)) return 'error';
-
-		$evento = Evento::find($idEvento);
-		$atencionEvento = new AtencionEvento;
-		if (isset($evento->atencion->id)) $atencionEvento = AtencionEvento::find($evento->atencion->id);
-		
-		
-		
-		$atencionEvento->evento_idSerie = $evento->evento_id;
-		$atencionEvento->evento_id = $evento->id;
-		$atencionEvento->user_id = $evento->userOwn->id;
-		$atencionEvento->tecnico_id = Auth::user()->id;
-		$atencionEvento->momento = date('Y-m-d H:i:s',time());//momento actual
-		$atencionEvento->observaciones = Input::get('observaciones','');
-		
-		
-		$atencionEvento->save();
-		$evento->atendida = true;
-		$evento->save();		
-		return 'success';
-	}
+	
 
 	//Datos de un evento para un validador
 	public function ajaxDataEvent(){
@@ -241,7 +218,7 @@ class CalendarController extends BaseController {
 		
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva');
 	}
 
 	//Ajax functions
@@ -282,28 +259,8 @@ class CalendarController extends BaseController {
 	    return $table;
 	}
 
-	public function geteventbyajax(){
-		
-		$eventos = Evento::where('evento_id','=',Input::get('evento_id'))->get();
-		return $eventos;
-	}
-
-	/**
-	 * @param void
-	 * @return $result array $event = datos de evento identificado por id, $reservadopara = username (UVUS) del usuario propietario del evento  
-	*/
-	public function getajaxeventbyId(){
-		$result = array('event' 		=> '',
-						'reservadoPara' => '',
-						'reservadoPor' => '',
-						);
-		//$event = Evento::where('id','=',Input::get('id'))->get();
-		$event = Evento::find(Input::get('id'));
-		$result['event'] = $event->toArray();
-		$result['reservadoPara'] = $event->userOwn->username; 
-		$result['reservadoPor'] = User::find($event->reservadoPor)->username; 
-		return $result;
-	}
+	
+	
 	
 	public function getRecursosByAjax(){
 		
@@ -333,291 +290,8 @@ class CalendarController extends BaseController {
 		return $html;
 	}
 
-	//del
-	public function delEventbyajax(){
-
-		$result = '';
-
-		$result = $this->delEvents();
-		return $result;
-	} 
-	
-	private function delEvents(){
-		$result = '';
-		$eventToDel = Evento::find(Input::get('idEvento'))->first();
-		//$actions = Config::get('options.required_mail');
-		//cMail::sendMail($actions['del'],$eventToDel->recursoOwn->id,$eventToDel->evento_id);
-		
-
-		$event = Evento::find(Input::get('idEvento'));
-		if (Input::get('id_recurso') == 0){
-			Evento::where('evento_id','=',Input::get('idSerie'))->delete();
-		}
-		else {
-			Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->delete();
-		}
-		
-		
-		return $result;
-		
-	}
-
-	//Save
-	public function eventsavebyajax(){
-
-		$result = array('error' => false,
-						'ids' => array(),
-						'idsSolapamientos' => array(),
-						'msgErrors' => array(),
-						'msgSuccess' => '');
-		$testDataForm = new Evento();
-		
-				
-		if(!$testDataForm->validate(Input::all())){
-			$result['error'] = true;
-			$result['msgErrors'] = $testDataForm->errors();
-
-		}
-		else {
-			$result['idEvents'] = $this->saveEvents(Input::all());
-
-			//Msg confirmación al usuario (add reserva)
-			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
-			if ($event->estado == 'aprobada'){
-				$result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-
-			}
-			if ($event->estado == 'pendiente'){
-				$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-			}
-
-			//notificar a validadores si espacio requiere validación
-			if ( $event->recursoOwn->validacion() ){
-				$sgrMail = new sgrMail();
-				$sgrMail->notificaNuevoEvento($event);
-			}
-
-		}
-		
-		
-
-		return $result;
-		
-	}
-
-	private function saveEvents($data){
-		
-		$dias = $data['dias']; //1->lunes...., 5->viernes
-		$respuesta = array();
-		$evento_id = $this->getIdUnique();
-	
-		foreach ($dias as $dWeek) {
-			if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-			else $nRepeticiones = Date::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
-			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-				$currentfecha = Date::currentFecha($startDate,$j);
-				$respuesta[] =$this->saveEvent($data,$currentfecha,$evento_id);
-			}
-		}
-		return $evento_id;
-		
-	}
-
-	private function saveEvent($data,$currentfecha,$evento_id){
-
-		//Si reservar todos los puestos o equipos
-		if ($data['id_recurso'] == 0){
-			$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
-			foreach($recursos as $recurso){
-				$id_recurso = $recurso->id;
-				$sucess = true;
-				$evento = new Evento();
-			
-				//obtener estado (pendiente|aprobada)
-				$hInicio = date('H:i:s',strtotime($data['hInicio']));
-				$hFin = date('H:i:s',strtotime($data['hFin']));
-				$evento->estado = $this->setEstado($id_recurso,$currentfecha,$hInicio,$hFin);
-			
-				$repeticion = 1;
-				$evento->fechaFin = Date::toDB($data['fFin'],'-');
-				$evento->fechaInicio = Date::toDB($data['fInicio'],'-');
-				$evento->diasRepeticion = json_encode($data['dias']);
-			
-				if ($data['repetir'] == 'SR') {
-					$repeticion = 0;
-					$evento->fechaFin = Date::toDB($currentfecha,'-');
-					$evento->fechaInicio = Date::toDB($currentfecha,'-');
-					$evento->diasRepeticion = json_encode(array(date('N',Date::getTimeStamp($currentfecha))));
-				}
-			
-				$evento->evento_id = $evento_id;
-				$evento->titulo = $data['titulo'];
-				$evento->actividad = $data['actividad'];
-				$evento->recurso_id = $id_recurso;
-				$evento->fechaEvento = Date::toDB($currentfecha,'-');
-				$evento->repeticion = $repeticion;
-				$evento->dia = date('N',Date::getTimeStamp($currentfecha));
-				$evento->horaInicio = $data['hInicio'];
-				$evento->horaFin = $data['hFin'];
-				$evento->reservadoPor = Auth::user()->id;//Persona que reserva
-				
-				//Propietaria de la reserva
-				$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
-				
-				//U otro usuario
-				$uvus = Input::get('reservarParaUvus','');
-				if (!empty($uvus)) {
-					$user = User::where('username','=',$uvus)->first();
-					if ($user->count() > 0) $evento->user_id = $user->id;
-				}
-				
-				if ($evento->save()) $result = $evento->id;
-			}
-		}
-		//reserva de un solo puesto o equipo
-		else{
-			$sucess = true;
-			$evento = new Evento();
-			
-			//obtener estado (pendiente|aprobada)
-			$hInicio = date('H:i:s',strtotime($data['hInicio']));
-			$hFin = date('H:i:s',strtotime($data['hFin']));
-			$evento->estado = $this->setEstado($data['id_recurso'],$currentfecha,$hInicio,$hFin);
-			
-
-			
-			$repeticion = 1;
-			$evento->fechaFin = Date::toDB($data['fFin'],'-');
-			$evento->fechaInicio = Date::toDB($data['fInicio'],'-');
-			$evento->diasRepeticion = json_encode($data['dias']);
-			
-			if ($data['repetir'] == 'SR') {
-				$repeticion = 0;
-				$evento->fechaFin = Date::toDB($currentfecha,'-');
-				$evento->fechaInicio = Date::toDB($currentfecha,'-');
-				$evento->diasRepeticion = json_encode(array(date('N',Date::getTimeStamp($currentfecha))));
-			}
-			
-			$evento->evento_id = $evento_id;
-			$evento->titulo = $data['titulo'];
-			$evento->actividad = $data['actividad'];
-			$evento->recurso_id = $data['id_recurso'];
-			$evento->fechaEvento = Date::toDB($currentfecha,'-');
-			$evento->repeticion = $repeticion;
-			$evento->dia = date('N',Date::getTimeStamp($currentfecha));
-			$evento->horaInicio = $data['hInicio'];
-			$evento->horaFin = $data['hFin'];
-			$evento->reservadoPor = Auth::user()->id;//Persona que reserva
-
-					
-			//Propietaria de la reserva:
-			//  --> Puede ser la persona que reserva
-			$evento->user_id = Auth::user()->id;
-				
-			//  --> U otro usuario
-			$uvus = Input::get('reservarParaUvus','');
-			if (!empty($uvus)) {
-				$user = User::where('username','=',$uvus)->first();
-				if ($user->count() > 0) $evento->user_id = $user->id;
-			}
-				
-			if ($evento->save()) $result = $evento->id;
-		
-		}
-		return $result;
-	}
-
-
-	//Edit
-	public function editEventbyajax(){
-
-		$result = array('error' => false,
-						'msgSuccess' => '',
-						'idsDeleted' => array(),
-						'msgErrors' => array());
-		//Controlar errores en el formulario
-		$testDataForm = new Evento();
-		if(!$testDataForm->validate(Input::all())){
-				$result['error'] = true;
-				$result['msgErrors'] = $testDataForm->errors();
-			}
-		//Si no hay errores
-		else{
-			
-			//si el usuario es alumno: comprobamos req2 (MAX HORAS = 12 a la semana en cualquier espacio o medio )	
-			if (Auth::user()->isUser() && $this->superaHoras()){
-				$result['error'] = true;
-				$error = array('hFin' =>'Se supera el máximo de horas a la semana.. (12h)');	
-				$result['msgErrors'] = $error;	
-			}
-			else {
-				
-				$idSerie = Input::get('idSerie');
-
-				
-				$fechaInicio = Input::get('fInicio');
-				$fechaFin = Input::get('fFin');
-				//Borrar todos los eventos a modificar
-				$event = Evento::find(Input::get('idEvento'));
-				if (Input::get('id_recurso') == 0){
-					Evento::where('evento_id','=',Input::get('idSerie'))->delete();
-				}
-				else {
-					Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->delete();
-				}
-				//Añadir los nuevos
-				$result['idEvents'] = $this->editEvents($fechaInicio,$fechaFin,$idSerie);
-
-				//Msg confirmación al usuario (edición de evento)
-				$newEvent = Evento::Where('evento_id','=',$idSerie)->first();
-				if ($newEvent->estado == 'aprobada') $result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-				if ($newEvent->estado == 'pendiente')
-					$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-				
-				//notificar a validadores si espacio requiere validación
-				if ( $event->recursoOwn->validacion() ){
-					$sgrMail = new sgrMail();
-					$sgrMail->notificaEdicionEvento($newEvent);
-				}
-				
-
-			} //fin else	
-		}
-		
-		return $result;			
-	} 
-		
-	private function editEvents($fechaInicio,$fechaFin,$idSerie){
-		
-		$result = '';
-		
-		$repetir = Input::get('repetir');	
-		$dias = Input::get('dias'); //1->lunes...., 5->viernes
-		if ($repetir == 'SR') { //SR == sin repetición (no periódico)
-			$dias = array(Date::getDayWeek($fechaInicio));
-			$fechaFin = $fechaInicio;
-		}
-							
-		foreach ($dias as $dWeek) {
-							
-			if (Input::get('repetir') == 'SR') $nRepeticiones = 1;
-			else { $nRepeticiones = Date::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
-							
-			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = Date::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);
-				$currentfecha = Date::currentFecha($startDate,$j);
-				$result = $this->saveEvent(Input::all(),$currentfecha,$idSerie);
-			}
-						
-		}				
-
-		
-		return $result;
-	}
-
 	//Auxiliares
-	private function superaHoras(){
+	/*private function superaHoras(){
 		
 		$supera = false;
 
@@ -643,25 +317,8 @@ class CalendarController extends BaseController {
 		//$supera = 'nh='.$nh.',$nhnewEvent='.$nhnewEvent.',nhcurrentEvent='.$nhcurrentEvent;
 		return $supera;
 	}
-
-
-
-	private function uniqueId(){
-		
-		$idSerie = $this->getIdUnique();
-		return $idSerie;
-	}
-
-	private function getIdUnique(){
-		do {
-			$evento_id = md5(microtime());
-		} while (Evento::where('evento_id','=',$evento_id)->count() > 0);
-		
-		return $evento_id;
-	}
-
-
-	private function updateDias($oldIdSerie = '',$newIdSerie = ''){
+	*/
+	/*private function updateDias($oldIdSerie = '',$newIdSerie = ''){
 		
 		//$oldIdSerie = Input::get('idSerie');
 		if (!empty($oldIdSerie)){//isset(Input::get('idSerie'))){
@@ -678,8 +335,8 @@ class CalendarController extends BaseController {
 			foreach ($events as $event)	$aDias2[] = $event->dia;
 			Evento::where('evento_id','=',$newIdSerie)->update(array('diasRepeticion' => json_encode($aDias2)));
 		}
-	}
-
+	}*/
+/*
 	private function updatePeriocidad($newIdSerie = '',$oldIdSerie = ''){
 		
 		
@@ -729,54 +386,7 @@ class CalendarController extends BaseController {
 		}
 
 	}
-	private function setEstado($idRecurso,$currentfecha,$hi,$hf){
-		$estado = 'denegada';
-
-		
-		//si modo automatico validacion = false	
-		if( !Recurso::find($idRecurso)->validacion() ){
-			//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-			$condicionEstado = 'aprobada';
-			//$currentFecha tiene formato d-m-Y
-			$numEvents = Calendar::getNumSolapamientos($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
-	
-			//si ocupado
-			if($numEvents > 0){
-				//si ocupado
-				$estado = 'denegada';
-				//$msg = 'su reserva no se puede realizar, existen solapamientos con otras reservas ya aprobadas (ver detalles)';
-			}
-			//si libre
-			else{
-				$estado = 'aprobada';
-				//$msg = 'Su reserva se realizado con éxito. (imprimir justificacante)'
-			}
-
-		}
-		//si modo no automático (necesita validación)
-		else{
-			//ocupado??; estado = aprobado | pendiente | solapada (cualquiera de los posibles)
-			$condicionEstado = '';
-			$numEvents = Calendar::getNumSolapamientos($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
-			if($numEvents > 0){
-				//si ocupado
-				$estado = 'pendiente';
-				//$msg = 'su reserva está pendiente de validación. Existen solapamientos con otras peticiones (ver detalles)';
-			}
-			else{
-				//si libre
-				// Validadores realizan reservas no solicitudes
-				if (!Auth::user()->isValidador())
-					$estado = 'pendiente';
-				else
-					$estado = 'aprobada';
-				
-			}
-		}
-
-		return $estado;
-
-	}
+*/	
 
 	
 	

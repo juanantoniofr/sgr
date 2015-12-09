@@ -1,5 +1,4 @@
 <?php
-//use Carbon\Carbon;
 
 class Calendar {
   
@@ -667,6 +666,7 @@ class Calendar {
         		$class_danger = 'text-success';
 				$alert = '<span data-toggle="tooltip" title="Solicitud aprobada" class=" fa fa-check fa-fw text-success" aria-hidden="true"></span>';
         	}
+        	
         	else {
 				$hi = date('H:i:s',strtotime($event->horaInicio));
 				$hf = date('H:i:s',strtotime('+1 hour',strtotime($event->horaInicio)));
@@ -760,22 +760,24 @@ class Calendar {
         	}*/
         	
         	//Si usuario autenticado puede liberar evento (anular por técnico)
-        	if ($self->puedeAnular($event)) {
+        	/*if ($self->puedeAnular($event)) {
         		$contenido .= htmlentities('
         				
-        				<a  href="#" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Liberar reserva"><span class="fa fa-remove fa-fw text-warning" aria-hidden="true"></span></a>
+        				<a  href="#"  class="libera" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Liberar reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
         				|
-        				<a  href="#" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-check fa-fw text-warning" aria-hidden="true"></span></a>');	
+        				<a  href="#" class="finaliza" id="finaliza_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>');	
+
+        	}*/
+        	if ($self->puedeFinalizar($event)) {
+        		$contenido .= htmlentities('
+        				<a  href="#" class="finaliza" id="finaliza_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>');	
 
         	}
         	
         	
-        	
         	$html .= '<div class="divEvent" data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.substr($event->horaInicio,0,2).'" >';
         	
-        	
-        	//$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.' '.$classPuedeEditar.' '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
-			$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.'  '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
+        	$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.'  '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
         	
         	$html .='</div>';
         }//fin del foreach ($events as $event)
@@ -787,12 +789,39 @@ class Calendar {
 		return $html;
 	}//getContentTD
 
+	private function puedeFinalizar($event){
+		$puede = false;
+		$self = new self();
+		if ($self->userPuedeFinalizar($event->recursoOwn->id) && $self->eventoEsFinalizable($event->horaInicio,$event->horaFin)) $puede = true;
+		return $puede;
+	}
+
+	private function userPuedeFinalizar($idrecurso){
+		$userPuedeFinalizar = false;
+		
+		//Auth::user tiene que atender las reservas en el recurso donde se realiza el evento
+		$recursos = Auth::user()->atiende;
+		if ($recursos->contains($idrecurso)) {
+			$userPuedeFinalizar = true;
+		}
+
+		return $userPuedeFinalizar;
+	}
+
+	private function eventoEsFinalizable($horaInicio,$horaFin){
+		$eventoEsFinalizable = false;
+		
+		if ((strtotime($horaInicio) + (20*60)) < strtotime(date('H:i')) && strtotime($horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
+		
+		return $eventoEsFinalizable;
+	}
+
 
 	private function puedeAnular($event){
 		$puede = false;
 
 		//$recurso = $event->recursoOwn->id;
-		$recursos = Auth::user()->supervisa;
+		$recursos = Auth::user()->atiende;
 
 		if ($recursos->contains($event->recursoOwn->id)) {
 			$puede = true;

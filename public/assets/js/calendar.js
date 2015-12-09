@@ -512,7 +512,6 @@ $(function(e){
 		setResumen();
 	}
 
-	
 	function resetMsgErrors(){
 		
 		var $labels = new Array('titulo','fInicio','hFin','fFin','dias','fEvento');
@@ -570,6 +569,7 @@ $(function(e){
 					if ($viewActive == 'agenda') {
 						setLinkDeleteEvent();
 						}
+					
 					hideGifEspera();
 					},
 					error: function(xhr, ajaxOptions, thrownError){
@@ -581,7 +581,6 @@ $(function(e){
 		}
 
 	}
-	
 
 	/*Action: 1. save new event
 		********************************************************************************
@@ -684,15 +683,16 @@ $(function(e){
 
 		//si el usuario ha cambiado algún dato -> se guarda en el servidor.
 		//en caso contrario -> cerramos la ventana.
-		console.log('asdasd');
+		//console.log('asdasd');
 		$.ajax({
-    	   	type: "POST",
-			url: "getajaxeventbyId",
+    	   	type: "GET",
+			url: "geteventbyId",
 			//data: $('form#addEvent').serialize(),
 			data: {'id':$idEvento},
         	success: function(respuesta){
-        		$respuesta = respuesta[0];
-        		console.log($respuesta);},
+        		$respuesta = respuesta['event'];
+        		//console.log($respuesta);
+        	},
         	error: function(xhr, ajaxOptions, thrownError){
 					hideGifEspera();
 					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
@@ -742,7 +742,7 @@ $(function(e){
 		//********************************************************************************
 	*/
 	
-	function hasnewdata($idEvento){
+	function hasnewdata($respuesta){
 		
 		$newdata = false;
 
@@ -813,8 +813,8 @@ $(function(e){
 		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
 		resetMsgErrors();
 		$.ajax({
-    	   	type: "POST",
-			url: "getajaxeventbyId",
+    	   	type: "GET",
+			url: "geteventbyId",
 			//data: $('form#addEvent').serialize(),
 			data: {'id':$idEvento},
         	success: function(respuesta){
@@ -822,7 +822,7 @@ $(function(e){
         		$reservadoPara = respuesta['reservadoPara'];
 				$reservadoPor = respuesta['reservadoPor'];
         		
-        		console.log($respuesta + $reservadoPara);
+        		//console.log($respuesta + $reservadoPara);
 				//titulo
 				$('form#addEvent input#newReservaTitle').val($respuesta.titulo);
 				//Actividad
@@ -925,8 +925,6 @@ $(function(e){
 		});
 	}
 
-	
-
 	//popover 
 	function setPopOver($item){
 		$item.popover(); 
@@ -960,10 +958,48 @@ $(function(e){
 			$elem.popover();
 			setLinkEditEvent($elem.data('id'));
 			setLinkDeleteEvent();
-
+			activarLinkFinalizaReserva($elem.data('id'));
 
 		});
 	}
+	//Programa evento onCLick en el link finalizar de la ventana popover
+	function activarLinkFinalizaReserva($id){
+		
+		$('#finaliza_'+$id).click(function(e){
+			e.preventDefault();
+			$('span#titulofinaliza').html($(this).data('titulo'));
+			$('span#usuariofinaliza').html($(this).data('usuario'));
+			$('#buttonModalFinaliza').data('idevento',$id);
+			$('#finaliza_'+$id).parents('.divEvent').find('a.linkpopover').popover('hide');
+			$("#modalFinalizareserva").modal('show');
+		});
+	}
+
+	$('#buttonModalFinaliza').on('click',function(e){
+		e.preventDefault();
+		
+		$('#message').fadeOut("slow");
+		$.ajax({
+    	   	type: "POST",
+			url: "finalizaevento",
+			data: {'idevento' : $(this).data('idevento'), 'observaciones' : $('#finalizaObservaciones').val() },
+        	success: function(respuesta){
+        		//alert(respuesta);
+        		if (respuesta['error'] == false){
+ 		       		$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+					printCalendar();
+				}
+ 		       	else {
+ 		       		$('#alert_msg').fadeOut('slow').html(respuesta['msgError']).fadeIn("slow");
+ 		       		}
+ 		        },
+				error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+					}
+      			});
+		$("#modalFinalizareserva").modal('hide');
+	});
 
 	//Programa evento onCLick en el link editar de la ventana popover
 	function setLinkEditEvent($id){
@@ -980,7 +1016,7 @@ $(function(e){
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
-			console.log($idEvento);
+			//console.log($idEvento);
 			$('#editOption1').data('idEvento',$idEvento);
 			$('#editOption1').data('idSerie',$idSerie);
 			//Cargar datos del evento en al ventana Modal para editar el evento
@@ -1007,25 +1043,11 @@ $(function(e){
 			$idSerie = $this.data('idSerie');
 			$('#option1').data('idEvento',$idEvento);
 			$('#option1').data('idSerie',$idSerie);
-			//$('#option2').data('idEvento',$idEvento);
-			//$('#option2').data('idSerie',$idSerie);
-			//$('#option3').data('idEvento',$idEvento);
-			//$('#option3').data('idSerie',$idSerie);		
-			//Si el evento es periódico se muestra ventana modal
+			
 			
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
-				$('#deleteOptionsModal').modal('show');
+			$('#deleteOptionsModal').modal('show');
 
-			//if ($this.data('periodica')) {
-			//	$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
-			//	$('#deleteOptionsModal').modal('show');
-			//}
-			// Si el evento no es periodico se borra sin pedir confirmación
-			//else {
-				//$('#msg').html('').fadeOut();
-			//	deleteEvents(1,$idEvento,$idSerie);
-				//deleteEventView($idEvento);
-			//}//fin if - else	
 		});
 	}
 	

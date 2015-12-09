@@ -10,7 +10,7 @@
       </div>
         
 
-      <div class="modal-body" style = "min-height:100px">
+      <div class="modal-body" style = "min-height:10%">
         <div  class="col-md-12 alert alert-danger text-center" rol="alert" >¿Seguro que desea eliminar el evento?</div>
       </div>
     
@@ -20,7 +20,7 @@
           <button type="button" class="btn btn-primary optiondel" id="option1" data-id-serie="" data-id-evento="">Eliminar evento/s</button><br />
         </div>  
       
-        <div class="col-lg-12" style="margin-top:10px">
+        <div class="col-md-12" style="margin-top:10px">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         </div>
     

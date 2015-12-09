@@ -132,7 +132,7 @@ Route::get('tecnico/informes.html',array('as' => 'informes','uses' => 'InformesC
 
 Route::get('tecnico/search',array(	'uses' => 'CalendarController@search','before' => array('auth','capacidad:3-4,msg')));
 Route::get('tecnico/getDataEvent',array(	'uses' => 'CalendarController@getDataEvent','before' => array('auth','capacidad:3-4,msg')));
-Route::post('tecnico/saveAtencion',array(	'uses' => 'CalendarController@saveAtencion','before' => array('auth','capacidad:3-4,msg')));
+
 
 //Todos los perfiles
 Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth','inicioCurso')));
@@ -143,12 +143,23 @@ Route::get('ajaxGetRecursoByGroup',array('as' => 'getRecursoByAjax','uses' => 'C
 //Evento: cambio recurso seleccionado
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
 
+
+
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
-Route::post('saveajaxevent',array('uses' => 'CalendarController@eventsavebyajax','before' => array('auth','ajax_check')));		
-Route::get('getajaxevent',array('uses' => 'CalendarController@getajaxeventbyId','before' => array('auth','ajax_check')));
-Route::post('delajaxevent',array('uses' => 'CalendarController@delEventbyajax','before' => array('auth','ajax_check')));
-Route::post('getajaxeventbyId',array('uses' => 'CalendarController@getajaxeventbyId','before' => array('auth','ajax_check')));
-Route::post('editajaxevent',array('uses' => 'CalendarController@editEventbyajax','before' => array('auth','ajax_check')));
+
+
+//EventoController
+Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
+Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
+Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
+Route::post('finalizaevento',array('uses' => 'EventoController@finaliza','before' => array('auth','ajax_check')));
+Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atiende','before' => array('auth','capacidad:3-4,msg')));
+
+
+
+
+
 Route::post('admin/ajaxActiveUser',array('uses' => 'UsersController@activeUserbyajax','before' => array('auth','ajax_check')));
 Route::post('admin/ajaxDesactiveUser',array('uses' => 'UsersController@desactiveUserbyajax','before' => array('auth','ajax_check')));
 Route::post('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
@@ -178,23 +189,18 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	$fechaInicio = '2015-11-23';
-	$minimodias = Config::get('options.ant_minDias');
-	$tsMinimoDiasAntelacion = $minimodias * 24 * 60 * 60;
-	$numSemanasMinimasDeAntelacion = Config::get('options.ant_minSemanas');
-	//var_dump(Config::get('options.ant_minSemanas'));
-	echo strtotime('today');
-	echo strtotime($fechaInicio);
-	echo "<br />";
-	echo "num semana hoy: " . date('W');
-	echo ", num semana " . $fechaInicio .": " .date('W',strtotime($fechaInicio));
-	echo "<br />";
-	//echo "minimo semanas antelación: ". $numSemanasMinimasDeAntelacion;
-	if (  (strtotime($fechaInicio) - strtotime('today') ) <= $tsMinimoDiasAntelacion )
-		echo "hay menos de tres días entre hoy y fecha evento";
-	if ( (date('W',strtotime($fechaInicio)) - date('W') ) < $numSemanasMinimasDeAntelacion ) 
-		echo "fecha evento y hoy son de la misma semana"; 	
-	echo "<br />fin.";
+	$event = Evento::find('9');
+
+	$horaInicio = $event->horaInicio;
+	$horaFin = $event->horaFin;
+
+	if ((strtotime($horaInicio) + (20*60)) < strtotime('H:i') && strtotime($horaFin) > strtotime('H:i') ) echo 'ok';
+
+	echo '<br />' .'1ASDASD: '. (strtotime($horaInicio) + (20*60)) . '--1--';
+	echo '<br />' .'2: '. strtotime(date('H:i')) . '--2--';
+	echo '<br />' .'3: '. strtotime($horaFin) . '--3--';
+	echo '<br />' .'4: '. strtotime('H:i'). '--4--';
+
  }));
 
 
