@@ -11,6 +11,11 @@ class Evento extends Eloquent{
  		return $this->belongsTo('User','user_id','id');
  	}	
 
+ 	public function reservadoPor(){
+		
+ 		return $this->belongsTo('User','reservadoPor_id','id');
+ 	}	
+
  	public function recursoOwn(){
  		return $this->belongsTo('Recurso','recurso_id','id');
  	} 
@@ -22,7 +27,7 @@ class Evento extends Eloquent{
  	 * Implementa requisito: ofrecer sumatorio de puestos o equipos en la vista Calendario y en la vista de impresión.
  	 * 
  	 * @param void
- 	 * @return $total int número total de puestos o equipos reservados por un usuario en una determinada fecha $this->fechaEvento entre $this->horaInicio y $this->horaFin
+ 	 * @return $total int número total de puestos o equipos asociados a una misma reserva 
  	*/
  	public function total(){
  		$total = '';
@@ -82,7 +87,7 @@ class Evento extends Eloquent{
 			
 			'titulo.required' 		=>	' El campo <strong>título</strong> es obligatorio.',
 			'titulo.req3' 			=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
-			'titulo.existeuvus'		=>	' No es posible añadir reservas para usuarios no registrados.',			
+			'reservarParaUvus.existeuvus' => '',
 			);	
 	
     private $errors = array();
@@ -128,9 +133,9 @@ class Evento extends Eloquent{
     		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
     	}
 
-    	/*if (!empty($data['reservarParaUvus'])){
-    		$this->messages['titulo.existeuvus'] = 'No es posible añadir reservas para usuarios no registrados.';
-    	}*/
+    	if (!empty($data['reservarParaUvus'])){
+    		$this->messages['reservarParaUvus.existeuvus'] = 'Usuario "'. $data['reservarParaUvus'] .'" no registrado.';
+    	}
     	
     	//fin mensages
        
@@ -140,7 +145,7 @@ class Evento extends Eloquent{
    
    		//requisito: reserva para otro usuario -> debe de existir en la Base de Datos
         if (!empty($data['reservarParaUvus'])){
-        	$v->sometimes('titulo','existeuvus',function($data){
+        	$v->sometimes('reservarParaUvus','existeuvus',function($data){
   				if (User::where('username','=',$data['reservarParaUvus'])->count() == 0) return true;      		
         	});	
         }

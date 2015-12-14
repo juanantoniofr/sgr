@@ -1,8 +1,8 @@
 <?php
 
-class AtencionEvento extends Eloquent{
+class FinalizarEvento extends Eloquent{
 
- 	protected $table = 'atencionEventos';
+ 	protected $table = 'finalizarEventos';
 
  	protected $fillable = array('evento_id','user_id','tecnico_id','momento','observaciones');
 
@@ -11,4 +11,4 @@ class AtencionEvento extends Eloquent{
  	}
 	
 
- }// fin clase AtencionEvento
+ }// fin clase FinalizarEvento

@@ -10,17 +10,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	//protected $hidden = array('password');
 
 	//devuelve los recurso que supervisa (gestiona recurso -> añade/elimina/edita/deshabilita)
-	public function supervisa()
-    {
+	public function supervisa(){
     	//if ($this->isAdmin()) return Recurso::all(); 	
         return $this->belongsToMany('Recurso','recurso_supervisor');
-    }
+    	}
 
     //devuelve los recurso que atiende (gestiona reservas)
-	public function atiende()
-    {
+	public function atiende(){
         return $this->belongsToMany('Recurso','recurso_tecnico');
-    }
+    	}
     
     //devuelve los recurso que valida (aprueba//deniega reservas)
 	public function valida()
@@ -61,6 +59,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		return $nh;
 	}	
 
+
+	
 	/**
 	 * Get the unique identifier for the user.
 	 *

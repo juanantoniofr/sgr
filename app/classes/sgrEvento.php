@@ -99,7 +99,7 @@ class sgrEvento {
 				$evento->dia = date('N',Date::getTimeStamp($currentfecha));
 				$evento->horaInicio = $data['hInicio'];
 				$evento->horaFin = $data['hFin'];
-				$evento->reservadoPor = Auth::user()->id;//Persona que reserva
+				$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
 				
 				//Propietaria de la reserva
 				$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
@@ -147,7 +147,7 @@ class sgrEvento {
 			$evento->dia = date('N',Date::getTimeStamp($currentfecha));
 			$evento->horaInicio = $data['hInicio'];
 			$evento->horaFin = $data['hFin'];
-			$evento->reservadoPor = Auth::user()->id;//Persona que reserva
+			$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
 
 					
 			//Propietaria de la reserva:
@@ -254,6 +254,33 @@ class sgrEvento {
 		return $result;
 	}
 
+	
+	private function superaHoras(){
+		
+		$supera = false;
+
+		//Número de horas ya reservadas en global
+		$nh = Auth::user()->numHorasReservadas();
+		
+		//número de horas del evento a modificar (hay que restarlas de $nh)
+		$event = Evento::find(Input::get('idEvento'));
+		$nhcurrentEvent = Date::diffHours($event->horaInicio,$event->horaFin);
+		
+		//Actualiza el valor de horas ya reservadas quitando las del evento que se modifica
+		$nh = $nh - $nhcurrentEvent;
+
+		//Estas son las horas que se quieren reservar 
+		$nhnewEvent = Date::diffHours(Input::get('hInicio'),Input::get('hFin'));
+		
+		//máximo de horas a la semana	
+		$maximo = Config::get('options.max_horas');
+
+		//credito = máximo (12) menos horas ya reservadas (nh)
+		$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
+		if ($credito < $nhnewEvent) $supera = true;
+		//$supera = 'nh='.$nh.',$nhnewEvent='.$nhnewEvent.',nhcurrentEvent='.$nhcurrentEvent;
+		return $supera;
+	}
 
 	//del
 	public function del(){

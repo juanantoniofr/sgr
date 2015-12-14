@@ -84,24 +84,9 @@ class CalendarController extends BaseController {
 		return $descripcion;
 	}	
 
-	//Buscar eventos por uvus
-	public function search(){
-
-		
-		$username = Input::get('username','');
-
-		if(empty($username)) return '-1';
-		
-						
-		$user = User::where('username','=',$username)->first();
-		$today = date('Y-m-d');
-		if (empty($user)) return '1';//false
-		
-		$events = Evento::where('user_id','=',$user->id)->where('fechaFin','>=',$today)->groupby('evento_id')->orderby('fechaEvento','asc')->orderby('recurso_id','asc')->get();
-		return View::make('tecnico.resultSearch',compact('events','username'));
-	}
 	
-	public function getDataEvent(){
+	
+	/*public function getDataEvent(){
 
 		$fechaEvento = Input::get('fechaEvento','');
 		$idEvento = Input::get('idEvento','');
@@ -110,7 +95,7 @@ class CalendarController extends BaseController {
 		$event = Evento::where('id','=',$idEvento)->where('fechaEvento','=',$fechaEvento)->first();
 
 		return $event;
-	}
+	}*/
 
 	
 
@@ -291,32 +276,7 @@ class CalendarController extends BaseController {
 	}
 
 	//Auxiliares
-	/*private function superaHoras(){
-		
-		$supera = false;
-
-		//Número de horas ya reservadas en global
-		$nh = Auth::user()->numHorasReservadas();
-		
-		//número de horas del evento a modificar (hay que restarlas de $nh)
-		$event = Evento::find(Input::get('idEvento'));
-		$nhcurrentEvent = Date::diffHours($event->horaInicio,$event->horaFin);
-		
-		//Actualiza el valor de horas ya reservadas quitando las del evento que se modifica
-		$nh = $nh - $nhcurrentEvent;
-
-		//Estas son las horas que se quieren reservar 
-		$nhnewEvent = Date::diffHours(Input::get('hInicio'),Input::get('hFin'));
-		
-		//máximo de horas a la semana	
-		$maximo = Config::get('options.max_horas');
-
-		//credito = máximo (12) menos horas ya reservadas (nh)
-		$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
-		if ($credito < $nhnewEvent) $supera = true;
-		//$supera = 'nh='.$nh.',$nhnewEvent='.$nhnewEvent.',nhcurrentEvent='.$nhcurrentEvent;
-		return $supera;
-	}
+	/*
 	*/
 	/*private function updateDias($oldIdSerie = '',$newIdSerie = ''){
 		

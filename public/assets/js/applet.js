@@ -34,7 +34,7 @@ $(function(e){
 		
 		$.ajax({
 				type: "GET",
-				url: "search",
+				url: "getUserEvents",
 				data: {username:getUvus()},
 
 				success: function(respuesta){
@@ -60,9 +60,8 @@ $(function(e){
 													e.preventDefault();
 													if ($(this).hasClass('disabled')) {
 														$('#update').modal('show');
-														//$('#btnUpdateList').fadeOut('slow').fadeIn('slow');
 													}
-													else launchDataModal($(this).data('idevento'),$(this).data('idserie'),$(this).data('fechaevento'),$(this).data('uvus'),$(this).data('recurso'),$(this).data('observaciones'));													
+													else launchDataModal($(this).data('idevento'),$(this).data('observaciones'));													
 												});
 					}
 					 
@@ -74,47 +73,47 @@ $(function(e){
 	  });
 	}
 
-	function launchDataModal($idEvento,$idSerie,$fechaEvento,$reservadoPorUvus,$recursoReservado,$observaciones){
+	function launchDataModal($idEvento,$observaciones){
 		$('#success').fadeOut('slow');
 		$('#error').fadeOut('slow');
 		$('#errorgetEvents').fadeOut('slow');
 		$.ajax({
 			type: "GET",
-			url: "getDataEvent",
-			data: {idEvento:$idEvento,idSerie:$idSerie,fechaEvento:$fechaEvento},
-			success: function($respuesta){
-				//console.log($respuesta);
-				
+			url: "geteventbyId",
+			data: {id:$idEvento},//,idSerie:$idSerie,fechaEvento:$fechaEvento},
+			success: function(respuesta){
+				console.log(respuesta);
+				$evento = respuesta['event'];
 				//titulo
-				$('input[name|="titulo"]').val($respuesta.titulo);
+				$('input[name|="titulo"]').val($evento.titulo);
 				//recurso
-				$('input[name|="recurso"]').val($recursoReservado);
+				$('input[name|="recurso"]').val(respuesta['nombreRecursoReservado']);
 				//Actividad
 				$('select[name|="actividad"] option').each(function(){
-					if ($(this).val() == $respuesta.actividad) $(this).prop('selected',true);
+					if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
 					else $(this).prop('selected',false);
 				});
 				//Fecha inicio: campo día
 								//hora inicio
 				$('select[name|="hInicio"] option').each(function(){
-					if (compareTime($(this).val(),$respuesta.horaInicio) == 0) $(this).prop('selected',true);
+					if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
 					else $(this).prop('selected',false);
 				});
 				//hora fin
 				$('select[name|="hFin"] option').each(function(){
-					if (compareTime($(this).val(),$respuesta.horaFin) == 0) $(this).prop('selected',true);
+					if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
 					else $(this).prop('selected',false);
 				});
 				
 
 				//repetir
 				$('select[name|="repetir"]').val('CS');
-				if ($respuesta.repeticion == '1'){
+				if ($evento.repeticion == '1'){
 					$('select[name|="repetir"]').val('CS');
-					$('#datepickerFinicio').val(dateToformatES($respuesta.fechaEvento));
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
 					$('#datepickerFinicio').prop('disabled',true);
-					$('#datepickerFevento').val(dateToformatES($respuesta.fechaInicio));
-					$('#datepickerFfin').val(dateToformatES($respuesta.fechaFin));
+					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
 					$aDias = eval($respuesta.diasRepeticion);
 					$("input:checkbox").each(function(index,value){
 						$(this).prop('checked',false);
@@ -125,12 +124,12 @@ $(function(e){
 					}
 				else{
 					$('select[name|="repetir"]').val('SR');
-					$('#datepickerFinicio').val(dateToformatES($respuesta.fechaEvento));
-					$('#datepickerFevento').val(dateToformatES($respuesta.fechaInicio));
-					$('#datepickerFfin').val(dateToformatES($respuesta.fechaFin));
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
+					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
 					$("input:checkbox").each(function(index,value){
 						$(this).prop('checked',false);
-						if ( $(this).val() == $respuesta.dia )  $(this).prop('checked',true);
+						if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
 					});
 
 					$('#inputRepeticion').hide();
@@ -140,11 +139,11 @@ $(function(e){
 				$('textarea[name|="observaciones"]').val($observaciones);
 				
 				//Uvus ->reservadoPor
-				$('input[name|="reservadoPor"]').val($reservadoPorUvus);
-				$('#reservarPara').fadeOut('slow');
-				$('#reservadoPor').fadeIn('slow');
-				$('#atenidoPor').fadeIn('slow');
-				$('#uvusModal').html($reservadoPorUvus);
+				$('input[name|="reservadoPor"]').val(respuesta['usernameReservadoPor']);
+				//$('#reservarPara').fadeOut('slow');
+				//$('#reservadoPor').fadeIn('slow');
+				//$('#atenidoPor').fadeIn('slow');
+				$('#uvusModal').html(respuesta['usernameReservadoPor']);
 				setResumen();
 				
 				//id evento (hidden)

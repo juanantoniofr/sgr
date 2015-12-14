@@ -700,6 +700,7 @@ class Calendar {
 
         	
         	$muestraItem = '';
+        	$numRecursos = 0;
         	if ($event->recursoOwn->tipo != 'espacio') {
         		$numRecursos = $event->total();//Evento::where('evento_id','=',$event->evento_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->count();
         		
@@ -722,8 +723,7 @@ class Calendar {
 				}
 				//fin del bug
 
-        		if ($numRecursos > 0) {
-        			$muestraItem =  ' ('.($numRecursos + 1). ' ' .$event->recursoOwn->tipo.'s)';}
+        		if ($numRecursos > 0) $muestraItem =  ' ('.($numRecursos). ' ' . $event->recursoOwn->tipo.'/s)';
         		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
         	}
 			
@@ -741,9 +741,9 @@ class Calendar {
         	$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);
 
         	//Si usuario autenticado puede editar el evento:
-        	if($self->puedeEditar(Auth::user()->id,$event->user_id) && $self->isDayAviable($day,$mon,$year)){
-        		$contenido .= htmlentities('<hr />
-        				
+        	$contenido .= htmlentities('<hr />');
+        	if($self->puedeEditar(Auth::user()->id,$event->user_id,$event->reservadoPor_id) && $self->isDayAviable($day,$mon,$year)){
+        		$contenido .= htmlentities('
         				<a class = "comprobante" href="'.URL::route('justificante',array('idEventos' => $event->evento_id)).'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Comprobante" target="_blank"><span class="fa fa-file-pdf-o fa-fw text-success" aria-hidden="true"></span></a>
         				 |
         				<a href="#" id="edit_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Editar reserva"><span class="fa fa-pencil fa-fw text-success" aria-hidden="true"></span></a>
@@ -792,7 +792,7 @@ class Calendar {
 	private function puedeFinalizar($event){
 		$puede = false;
 		$self = new self();
-		if ($self->userPuedeFinalizar($event->recursoOwn->id) && $self->eventoEsFinalizable($event->horaInicio,$event->horaFin)) $puede = true;
+		if ($self->userPuedeFinalizar($event->recursoOwn->id) && $self->eventoEsFinalizable($event->fechaEvento,$event->horaInicio,$event->horaFin)) $puede = true;
 		return $puede;
 	}
 
@@ -808,10 +808,10 @@ class Calendar {
 		return $userPuedeFinalizar;
 	}
 
-	private function eventoEsFinalizable($horaInicio,$horaFin){
+	private function eventoEsFinalizable($fechaEvento,$horaInicio,$horaFin){
 		$eventoEsFinalizable = false;
 		
-		if ((strtotime($horaInicio) + (20*60)) < strtotime(date('H:i')) && strtotime($horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
+		if ( strtotime($fechaEvento) == strtotime(date('Y-m-d')) && (strtotime($horaInicio) + Config::get('options.tiempocortesia')) < strtotime(date('H:i')) && strtotime($horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
 		
 		return $eventoEsFinalizable;
 	}
@@ -830,13 +830,19 @@ class Calendar {
 		return $puede;
 	}
 
-	private function puedeEditar($idUser,$idUserEvent){
+	private function puedeEditar($id_currentloginuser,$id_reservadoPara,$id_reservadoPor){
 		$puede = false;
-		if($idUser == $idUserEvent) $puede = true;//User es propietario de la reserva
+		//User es propietario de la reserva
+		if($id_currentloginuser == $id_reservadoPara) $puede = true;
+		//fin
+		//user es administrador y reserva es de POD
 		$userPOD = User::where('username','=','pod')->first();
 		$idUserPOD = 0;
 		if (!empty($userPOD)) $idUserPOD=$userPOD->id;
-		if(User::find($idUser)->capacidad == 4 && User::find($idUserEvent)->id == $idUserPOD) $puede = true;//user es administrador y reserva es de POD
+		if(User::find($id_currentloginuser)->capacidad == 4 && $id_reservadoPor == $idUserPOD) $puede = true;
+		//fin
+		//UserAuth es técnico (capacidad 3) y realizó la reserva para otro usuario
+		if(User::find($id_currentloginuser)->capacidad == 3 &&  $id_currentloginuser == $id_reservadoPor) $puede = true;
 		return $puede;
 	}
 

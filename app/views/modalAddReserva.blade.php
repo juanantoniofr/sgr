@@ -18,6 +18,7 @@
              <!-- Errores --> 
             <div id = 'errorsModalAdd' class = "col-md-12 alert alert-danger text-center is_slide" style = "display:none">  
               <p id="titulo_Error" class="col-md-12" style=""></p>
+              <p id="reservarParaUvus_Error" class="col-md-12" style=""></p>
               <p id="fInicio_Error" class="col-md-12" style=""></p>
               <p id="hFin_Error" class="col-md-12" style=""></p>
               <p id="fEvento_Error" class="col-md-12" style=""></p>
@@ -30,7 +31,7 @@
             <div class="form-group" id="titulo">
               <label for="titulo"  class="control-label col-sm-2" >Título: </label>   
               <div class = "col-sm-10" >  
-                <input type="text" name="titulo" class="form-control" id = "newReservaTitle" placeholder="Introducir título de la reserva"  />
+                <input type="text" name="titulo" class="form-control" id = "newReservaTitle" placeholder="Introducir título de la reserva" value="" />
               </div>             
             </div>
             
@@ -161,7 +162,7 @@
            
           </div>  
 
-          @if(Auth::user()->capacidad == 3 || Auth::user()->capacidad == 4)
+          @if(Auth::user()->capacidad == 3 || Auth::user()->capacidad == 4 || Auth::user()->capacidad == 6)
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva diaria</h4>
               <div class="form-group" id="reservadoPor">
                     <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
@@ -170,20 +171,20 @@
                     </div>             
             </div>
 
-            <div class="form-group" id="reservarPara" >
+            <div class="form-group" id="reservarParaUvus" >
                     <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
                     <div class = "col-md-10">  
                         <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
                     </div>             
             </div>
-
+            <!--
             <div class="form-group" id="atendidoPor" >
                     <label for="atendidoPor"  class="control-label col-md-2" >Atendido por</label>   
                     <div class = "col-md-10">  
                         <input type="text" name = "atendidoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  id = "atendidoPor"  />
                     </div>             
             </div>
-           
+           -->
             <!-- observaciones -->  
             <div class="form-group">
               <label for="observaciones"  class="control-label col-md-2" >Observaciones</label> 

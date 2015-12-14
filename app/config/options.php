@@ -42,7 +42,13 @@ return array (
 	'tipoReserva' => array ( '1'	=>	'Reserva periódica',
 							 '0'	=>	'Reserva puntual',),
 
+	'estadoEventos' => array(	'0' =>	'denegada',
+								'1'	=>	'aprobada',
+								'2'	=>	'pendiente',
+								'3'	=>	'finalizada',
+								'4'	=>	'anulada',
+								'5'	=>	'liberada',),
+	//tiempo cortesia para liberar una reserva (20 minutos) en segundos
+	'tiempocortesia'	=> '1200',
 	);
-	
-
 ?>
