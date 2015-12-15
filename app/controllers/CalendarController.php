@@ -68,37 +68,6 @@ class CalendarController extends BaseController {
    		return Response::make($result)->header('Content-Type', 'application/pdf');
 	}
 
-
-	//Devuelve el campo descripción dado un id_recurso
-	public function getDescripcion(){
-
-		$idRecurso = Input::get('idrecurso','');
-		if (empty($idRecurso)) return '-1';
-
-		$descripcion = '';
-		$recurso = Recurso::find($idRecurso);
-		$descripcion = $recurso->descripcion; //descripción del elemento
-		
-		if (empty($descripcion)) $descripcion = $recurso->descripcionGrupo; //descripción general de todos los espacios,equipos o puestos del grupo
-		
-		return $descripcion;
-	}	
-
-	
-	
-	/*public function getDataEvent(){
-
-		$fechaEvento = Input::get('fechaEvento','');
-		$idEvento = Input::get('idEvento','');
-		$idSerie = Input::get('idSerie','');
-
-		$event = Evento::where('id','=',$idEvento)->where('fechaEvento','=',$fechaEvento)->first();
-
-		return $event;
-	}*/
-
-	
-
 	//Datos de un evento para un validador
 	public function ajaxDataEvent(){
 
@@ -244,10 +213,7 @@ class CalendarController extends BaseController {
 	    return $table;
 	}
 
-	
-	
-	
-	public function getRecursosByAjax(){
+	/*public function getRecursosByAjax(){
 		
 		$html = '';
 
@@ -273,7 +239,7 @@ class CalendarController extends BaseController {
 		}
 		//$html .= '<option  value="546546">'.$grupo.'</option>';
 		return $html;
-	}
+	}*/
 
 	//Auxiliares
 	/*

@@ -2,6 +2,22 @@
 
 class recursosController extends BaseController{
 
+  
+  //Devuelve el campo descripción dado un id_recurso
+  public function getDescripcion(){
+
+    $idRecurso = Input::get('idrecurso','');
+    if (empty($idRecurso)) return '-1';
+
+    $descripcion = '';
+    $recurso = Recurso::find($idRecurso);
+    $descripcion = $recurso->descripcion; //descripción del elemento
+    
+    if (empty($descripcion)) $descripcion = $recurso->descripcionGrupo; //descripción general de todos los espacios,equipos o puestos del grupo
+    
+    return $descripcion;
+  } 
+  
   public function getrecurso(){
     $result = array('atributos' => '',
                     'visibilidad' => array());
@@ -469,7 +485,6 @@ class recursosController extends BaseController{
     $aACL['r'] = $listIdRolesConAcceso;
 
     return json_encode($aACL);
-
   }
 
 
