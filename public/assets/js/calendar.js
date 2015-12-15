@@ -132,7 +132,7 @@ $(function(e){
 			//$('form#selectRecurse ').serialize());
 			$.ajax({
 				type:"GET",
-				url:"ajaxGetRecursoByGroup",
+				url:"recursoByGroup",
 				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
 				success: function(respuesta){
 					$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});

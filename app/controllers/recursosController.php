@@ -2,7 +2,6 @@
 
 class recursosController extends BaseController{
 
-  
   //Devuelve el campo descripción dado un id_recurso
   public function getDescripcion(){
 
@@ -17,7 +16,8 @@ class recursosController extends BaseController{
     
     return $descripcion;
   } 
-  
+
+  //devuelve el recurso dado id y su visibilidad
   public function getrecurso(){
     $result = array('atributos' => '',
                     'visibilidad' => array());
@@ -30,6 +30,33 @@ class recursosController extends BaseController{
     return $result;
   }
 
+  //Devuelve los recursos de una misma agrupación o grupo
+  public function getRecursos(){
+    
+    $html = '';
+
+    $grupo = Input::get('groupID','');
+    $recursos = Recurso::where('grupo_id','=',$grupo)->get();
+    $selected = 'selected';
+    $itemsdisabled = 0;
+    foreach ($recursos as $recurso) {
+
+      //Falta: if puede reservar => seguimos
+      $html .= '<option '.$selected.' value="'.$recurso->id.'" data-disabled="'.$recurso->disabled.'">'.$recurso->nombre;
+      if ($recurso->disabled) {
+        $itemsdisabled++;
+        $html .= ' (Deshabilitado)';
+      } 
+      $html .='</option>';
+      $selected = '';
+      } 
+    if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio'){
+      $disabled = 0;
+      if ($itemsdisabled == $recursos->count() ) $disabled = 1;
+      $html .= '<option '.$selected.' value="0" data-disabled="'.$disabled.'">Todos los '.$recursos[0]->tipo.'s</option>';
+    }
+    return $html;
+  }
 
   public function eliminar(){
  

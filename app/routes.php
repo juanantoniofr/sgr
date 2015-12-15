@@ -139,7 +139,7 @@ Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'Calend
 
 //Ajax function
 //Evento: cambio grupo de recursos
-//Route::get('ajaxGetRecursoByGroup',array('as' => 'getRecursoByAjax','uses' => 'CalendarController@getRecursosByAjax','before' => array('auth','ajax_check')));
+Route::get('recursoByGroup',array('as' => 'getRecursos','uses' => 'recursosController@getRecursosByAjax','before' => array('auth','ajax_check')));
 //Evento: cambio recurso seleccionado
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
 
