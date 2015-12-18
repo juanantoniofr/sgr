@@ -138,7 +138,7 @@ Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'Calend
 
 //Ajax function
 //Evento: cambio grupo de recursos
-Route::get('ajaxGetRecursoByGroup',array('as' => 'getRecursoByAjax','uses' => 'CalendarController@getRecursosByAjax','before' => array('auth','ajax_check')));
+Route::get('recursoByGroup',array('as' => 'getRecursos','uses' => 'recursosController@getRecursosByAjax','before' => array('auth','ajax_check')));
 //Evento: cambio recurso seleccionado
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
 
@@ -167,7 +167,7 @@ Route::post('admin/ajaxActiveUser',array('uses' => 'UsersController@activeUserby
 Route::post('admin/ajaxDesactiveUser',array('uses' => 'UsersController@desactiveUserbyajax','before' => array('auth','ajax_check')));
 Route::post('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
 
-Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'CalendarController@getDescripcion','before' => array('auth','ajax_check')));
+Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 
 
 

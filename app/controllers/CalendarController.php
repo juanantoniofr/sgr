@@ -68,37 +68,6 @@ class CalendarController extends BaseController {
    		return Response::make($result)->header('Content-Type', 'application/pdf');
 	}
 
-
-	//Devuelve el campo descripción dado un id_recurso
-	public function getDescripcion(){
-
-		$idRecurso = Input::get('idrecurso','');
-		if (empty($idRecurso)) return '-1';
-
-		$descripcion = '';
-		$recurso = Recurso::find($idRecurso);
-		$descripcion = $recurso->descripcion; //descripción del elemento
-		
-		if (empty($descripcion)) $descripcion = $recurso->descripcionGrupo; //descripción general de todos los espacios,equipos o puestos del grupo
-		
-		return $descripcion;
-	}	
-
-	
-	
-	/*public function getDataEvent(){
-
-		$fechaEvento = Input::get('fechaEvento','');
-		$idEvento = Input::get('idEvento','');
-		$idSerie = Input::get('idSerie','');
-
-		$event = Evento::where('id','=',$idEvento)->where('fechaEvento','=',$fechaEvento)->first();
-
-		return $event;
-	}*/
-
-	
-
 	//Datos de un evento para un validador
 	public function ajaxDataEvent(){
 
@@ -244,36 +213,7 @@ class CalendarController extends BaseController {
 	    return $table;
 	}
 
-	
-	
-	
-	public function getRecursosByAjax(){
-		
-		$html = '';
 
-		$grupo = Input::get('groupID','');
-		$recursos = Recurso::where('grupo_id','=',$grupo)->get();
-		$selected = 'selected';
-		$itemsdisabled = 0;
-		foreach ($recursos as $recurso) {
-
-			//Falta: if puede reservar => seguimos
-			$html .= '<option '.$selected.' value="'.$recurso->id.'" data-disabled="'.$recurso->disabled.'">'.$recurso->nombre;
-			if ($recurso->disabled) {
-				$itemsdisabled++;
-				$html .= ' (Deshabilitado)';
-			}	
-			$html .='</option>';
-			$selected = '';
-			}	
-		if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio'){
-			$disabled = 0;
-			if ($itemsdisabled == $recursos->count() ) $disabled = 1;
-			$html .= '<option '.$selected.' value="0" data-disabled="'.$disabled.'">Todos los '.$recursos[0]->tipo.'s</option>';
-		}
-		//$html .= '<option  value="546546">'.$grupo.'</option>';
-		return $html;
-	}
 
 	//Auxiliares
 	/*
