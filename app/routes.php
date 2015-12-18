@@ -133,17 +133,12 @@ Route::get('tecnico/informes.html',array('as' => 'informes','uses' => 'InformesC
 //Route::get('tecnico/getDataEvent',array(	'uses' => 'CalendarController@getDataEvent','before' => array('auth','capacidad:3-4,msg')));
 
 
-//Todos los perfiles
+//Calendarios
 Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth','inicioCurso')));
-
-//Ajax function
-//Evento: cambio grupo de recursos
-Route::get('recursoByGroup',array('as' => 'getRecursos','uses' => 'recursosController@getRecursosByAjax','before' => array('auth','ajax_check')));
-//Evento: cambio recurso seleccionado
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
 
 
-
+Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
 
 

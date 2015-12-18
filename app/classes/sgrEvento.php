@@ -315,7 +315,7 @@ class sgrEvento {
 		
 		$result = array('error' => false,
 						'msgError' => '',
-						'msgSuccess' => 'Evento finalizado con éxito...');
+						'msgSuccess' => '');
 
 		$idEvento = Input::get('idevento','');
 		if (empty($idEvento)) {
@@ -340,6 +340,8 @@ class sgrEvento {
 		$evento->finalizada = true;
 		$evento->horaFin = date('H:i',mktime(date('H'),30));
 		$evento->save();
+
+		$result['msgSuccess'] = 'Evento finalizado con éxito...';
 
 		return $result;
 	}

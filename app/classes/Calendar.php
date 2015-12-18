@@ -759,15 +759,12 @@ class Calendar {
         		$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);// $strhi.' '.$own->apellidos.', '.$own->nombre;
         	}*/
         	
-        	//Si usuario autenticado puede liberar evento (anular por técnico)
-        	/*if ($self->puedeAnular($event)) {
-        		$contenido .= htmlentities('
-        				
-        				<a  href="#"  class="libera" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Liberar reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
-        				|
-        				<a  href="#" class="finaliza" id="finaliza_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>');	
+        	//Si usuario autenticado puede liberar evento 
+        	if ($self->puedeAnular($event)) {
+        		$contenido .= htmlentities('        				
+        				<a  href="#"  class="libera" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>');	
 
-        	}*/
+        	}
         	if ($self->puedeFinalizar($event)) {
         		$contenido .= htmlentities('
         				<a  href="#" class="finaliza" id="finaliza_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>');	
@@ -816,17 +813,27 @@ class Calendar {
 		return $eventoEsFinalizable;
 	}
 
-
+	//El usuario puede anular su reserva si fechaEvento está en la semana en curso
 	private function puedeAnular($event){
 		$puede = false;
 
-		//$recurso = $event->recursoOwn->id;
+		$lunes = strtotime('last monday');
+		$viernes = strtotime('next friday');
+		$hoy = strtotime('today');
+		$fechaEvento = strtotime($event->fechaEvento);
+		$horaActual = strtotime(date('H:i'));
+		$horaInicio = strtotime($event->horaInicio);
+		$horaFin = strtotime($event->horaFin);
+
+		if ( $event->userOwn->id == Auth::user()->id && $lunes <= $fechaEvento  && $fechaEvento <= $viernes  && $fechaEvento >= $hoy && $horaActual < $horaInicio) $puede = true;
+		/*
+		$recurso = $event->recursoOwn->id;
 		$recursos = Auth::user()->atiende;
 
 		if ($recursos->contains($event->recursoOwn->id)) {
 			$puede = true;
 		}
-
+		*/
 		return $puede;
 	}
 

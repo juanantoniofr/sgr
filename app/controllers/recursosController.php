@@ -19,43 +19,33 @@ class recursosController extends BaseController{
 
   //devuelve el recurso dado id y su visibilidad
   public function getrecurso(){
-    $result = array('atributos' => '',
-                    'visibilidad' => array());
+    
+    $respuesta = array( 'atributos' => '',
+                        'visibilidad' => array());
     $id = Input::get('id','');
     $recurso = Recurso::find($id)->toArray();
-    $result['atributos'] = $recurso;
+    $respuesta['atributos'] = $recurso;
     $acl = json_decode($recurso['acl']);
-    $result['visibilidad'] = explode(',',$acl->r);
-    //$result['acl'] = $acl->r;
-    return $result;
+    $respuesta['visibilidad'] = explode(',',$acl->r);
+    
+    return $respuesta;
   }
 
-  //Devuelve los recursos de una misma agrupación o grupo
+  //Devuelve los recursos de una misma agrupación/grupo
   public function getRecursos(){
     
-    $html = '';
+    $respuesta = array( 'recursos' => '',
+                        'optionTodos' => false,
+                        'tipoRecurso' => '');
 
     $grupo = Input::get('groupID','');
     $recursos = Recurso::where('grupo_id','=',$grupo)->get();
-    $selected = 'selected';
-    $itemsdisabled = 0;
-    foreach ($recursos as $recurso) {
+    $respuesta['recursos'] = $recursos->toArray();
+    if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio') $respuesta['optionTodos'] = true;
+    $respuesta['tipoRecurso'] = $recursos[0]->tipo;
+    
 
-      //Falta: if puede reservar => seguimos
-      $html .= '<option '.$selected.' value="'.$recurso->id.'" data-disabled="'.$recurso->disabled.'">'.$recurso->nombre;
-      if ($recurso->disabled) {
-        $itemsdisabled++;
-        $html .= ' (Deshabilitado)';
-      } 
-      $html .='</option>';
-      $selected = '';
-      } 
-    if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio'){
-      $disabled = 0;
-      if ($itemsdisabled == $recursos->count() ) $disabled = 1;
-      $html .= '<option '.$selected.' value="0" data-disabled="'.$disabled.'">Todos los '.$recursos[0]->tipo.'s</option>';
-    }
-    return $html;
+    return $respuesta;
   }
 
   public function eliminar(){
