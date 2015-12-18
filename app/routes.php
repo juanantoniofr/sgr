@@ -130,8 +130,7 @@ Route::get('tecnico/home.html',array('as' => 'tecnicoHome.html','uses' => 'Users
 Route::get('tecnico/espacios.html',array('as' => 'recursosAtendidos','uses' => 'recursosController@recursosAtendidos','before' => array('auth','capacidad:3-4,msg')));
 Route::get('tecnico/informes.html',array('as' => 'informes','uses' => 'InformesController@index','before' => array('auth','capacidad:3-4,msg')));
 
-Route::get('tecnico/search',array(	'uses' => 'CalendarController@search','before' => array('auth','capacidad:3-4,msg')));
-Route::get('tecnico/getDataEvent',array(	'uses' => 'CalendarController@getDataEvent','before' => array('auth','capacidad:3-4,msg')));
+//Route::get('tecnico/getDataEvent',array(	'uses' => 'CalendarController@getDataEvent','before' => array('auth','capacidad:3-4,msg')));
 
 
 //Todos los perfiles
@@ -151,10 +150,14 @@ Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDat
 //EventoController
 Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
 Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
+
 Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+
 Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
 Route::post('finalizaevento',array('uses' => 'EventoController@finaliza','before' => array('auth','ajax_check')));
 Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atiende','before' => array('auth','capacidad:3-4,msg')));
+Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
 
 
 
