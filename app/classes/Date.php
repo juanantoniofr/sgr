@@ -2,7 +2,13 @@
 
 class Date{
 	
-
+	/**
+	 * calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
+ 	 * 
+ 	 * @param $h1 string formato H:m
+ 	 * @param $h2 string formato H:m
+ 	 * @return $diff int número de horas de una reserva: diferencia entre $h1 y $h2
+	*/
 	public static function diffHours($h1,$h2){ 
 	    //In: $h1,$h2 -> horas en formato H:m:s
 	    $tsh1 = strtotime($h1); //número de segundos desde 1 enero de 1970
@@ -14,70 +20,50 @@ class Date{
 
 		}  
 	
-	public static function nextDay($currentDate){
-		$nextDay = '';
-
-		$self = new self();
-		$nextDayTimeStamp = strtotime('+1 day',$self->getTimeStampEN($currentDate,'-'));
-		$nextDay = date('Y-m-d',$nextDayTimeStamp);
-		return $nextDay;
-	}
-
-	public static function prevDay($currentDate){
-		$prevDay = '';
-
-		$self = new self();
-		$prevDayTimeStamp = strtotime('-1 day',$self->getTimeStampEN($currentDate,'-'));
-		$prevDay = date('Y-m-d',$prevDayTimeStamp);
-		return $prevDay;
-	}
-
-	public static function dateToHuman($strDate,$format = 'EN',$delimiter = '-'){
-		$humanDate = '';
-		$error = false;
-		$self = new self();
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$error = true;}
-		if(!$error){
-		switch ($format) {
-			case 'EN':
-					$timestamp = $self->getTimeStampEN($strDate,$delimiter);
-					$humanDate = ucfirst(strftime('%a %d de %b',$timestamp));// . $nameMonth;
-				break;
-			default:
-				$humanDate = 'Error al generar fecha para humanos.....';
-				break;
-		}
-		}
-		else $humanDate = "error al establecer locales";
-		return $humanDate;
-	}
-	
-	/*
-		Recibe una fecha en formato ES (d-m-Y)
-		devuelve el timeStamp correspondiente a esa fecha.
+	/**
+	 * Devuelve la fecha en formato Y-m-d del día siguiente a $fecha
+ 	 * 
+ 	 * @param $fecha string fecha en formato Y-m-d
+ 	 * @return $fechadiasiguiente string fecha en formato Y-m-d
 	*/
-	public static function getTimeStamp($fecha,$delimiter = '-'){
+	public static function nextDay($fecha){
+		$fechadiasiguiente = '';
 
-		$f = explode($delimiter,$fecha);
-		//formato: mktime(hours,minutes,segundos,mes,día,año);
-		$result = mktime(0,0,0,$f[1],$f[0],$f[2]);
+		$fechadiasiguiente = date('Y-m-d',strtotime('+1 day',strtotime($fecha)));
 
-		return $result;
+		return $fechadiasiguiente;
 	}
+
+	/**
+	 * Devuelve la fecha en formato Y-m-d del día anterior a $fecha
+ 	 * 
+ 	 * @param $fecha string fecha en formato Y-m-d
+ 	 * @return $fechadiaanterior string fecha en formato Y-m-d
+	*/
+	public static function prevDay($fecha){
+		$fecha = '';
+
+		$fechadiaanterior = date('Y-m-d',strtotime('-1 day',strtotime($fecha)));
+
+		return $fechadiaanterior;
+	}
+
+	/**
+	 * Devuelve Timestamp de $fecha con $formato
+ 	 * 
+ 	 * @param $fecha string fecha
+ 	 * @param $formato string indica el formato de $fecha (por ejemplo d-m-Y) 
+ 	 * @return $timestamp int Timestamp de $fecha
+	*/
+	public static function gettimestamp($fecha,$formato){
+
+		$timestamp = '';
+		$date = DateTime::createFromFormat($formato,$fecha);
+		$timestamp = $date->getTimestamp();
+		return $timestamp;
+	}
+
 	
-	public static function getTimeStampEN($fecha_EN,$delimiter='-'){
-
-		$f = explode($delimiter,$fecha_EN);
-		//formato: mktime(hours,minutes,segundos,mes,día,año);
-		$result = mktime(0,0,0,$f[1],$f[2],$f[0]);
-
-		return $result;
-	}
-
-	public static function timeStamp($day,$mon,$year){
-		return mktime(0,0,0,$mon,$day,$year);
-	}
 
 	public static function timefirstMonday($day,$month,$year){
 		$timefirstMonday = '';
@@ -108,20 +94,11 @@ class Date{
 		Out: $result = fecha en formato EN yy-mm-dd
 		*/
 		$self = new self();
-		$timeStamp = $self->getTimeStamp($fecha_ES,$delimiter);// mktime(0,0,0,$items[1],$items[0],$items[2]); 
-		
+		$timeStamp = $self->gettimestamp($fecha_ES,'d-m-Y');// mktime(0,0,0,$items[1],$items[0],$items[2]); 
  		$result = date('Y-m-d',$timeStamp); // ej: 2014-09-01
 		return $result;
 	}
 
-	public static function datetoES($fecha_EN,$delimiter = '-'){
-		
-		$self = new self();
-		$timeStamp = $self->getTimeStampEN($fecha_EN,$delimiter);// mktime(0,0,0,$items[1],$items[0],$items[2]); 
-		$result = date('d-m-Y',$timeStamp); // ej: 01-09-2014
-		return $result;
-	}
-	
 	//	Devuelve la representación textual de $month->(1-12)
 	public static function getNameMonth ($month = '',$year = ''){
 
@@ -251,8 +228,8 @@ class Date{
 		$aDaysWeek = array('0' => 'Sunday', '1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
 		$self = new self();
 					
-		$startTime = strtotime($aDaysWeek[$dWeek],$self->getTimeStamp($fInicio,'-'));
-		$endTime = $self->getTimeStamp($fFin,'-');
+		$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($fInicio,'d-m-Y'));
+		$endTime = $self->gettimestamp($fFin,'Y-m-d');
 		$currentTime = $startTime;
 		//$nextTime = strtotime('Next ' . $aDaysWeek[$dWeek],$currentTime);
 		//if ($startTime == $self->getTimeStamp($fInicio,'-')) $numRepeticiones++;
@@ -272,7 +249,7 @@ class Date{
 	public static function timeStamp_fristDayNextToDate($f,$dWeek){
 		$aDaysWeek = array('0' => 'Sunday','1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
 		$self = new self();
-		$startTime = strtotime($aDaysWeek[$dWeek],$self->getTimeStamp($f,'-'));
+		$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($f,'d-m-Y'));
 		return date('j-n-Y',$startTime);
 	}
 	
@@ -288,7 +265,7 @@ class Date{
 				
 		$self = new self();
 		if ($numRepeticion == 0) return $fInicio;
-		$currentTime = strtotime('+ '.$numRepeticion.' Week',$self->getTimeStamp($fInicio,'-'));
+		$currentTime = strtotime('+ '.$numRepeticion.' Week',$self->gettimestamp($fInicio,'d-m-Y'));
 		$fecha = date('j-n-Y',$currentTime);
 		return $fecha;
 	
@@ -298,9 +275,10 @@ class Date{
 		//format $date1=$date2 = d-m-Y
 		$result = '';
 		$self = new self();
-		if ($self->getTimeStamp($date1) < $self->getTimeStamp($date2)) $result = -1;
-		else if ($self->getTimeStamp($date1) == $self->getTimeStamp($date2)) $result = 0;
-		else if ($self->getTimeStamp($date1) > $self->getTimeStamp($date2)) $result = 1;
+		$format = 'd-m-Y';
+		if ($self->gettimestamp($date1,'d-m-Y') < $self->gettimestamp($date2,$format)) $result = -1;
+		else if ($self->gettimestamp($date1,$format) == $self->gettimestamp($date2,$format)) $result = 0;
+		else if ($self->gettimestamp($date1,$format) > $self->gettimestamp($date2,$format)) $result = 1;
 		//return   -1 -> 	$date1 < $date2
 		//			0 -> 	$date1 = $date2
 		//			1 -> 	$date1 > $date2
@@ -312,7 +290,7 @@ class Date{
 		$day = '';
 
 		$self = new self();
-		$stamp = $self->getTimeStamp($fecha);
+		$stamp = $self->gettimestamp($fecha,'d-m-Y');
 		$day = date('N',$stamp);
 
 		return $day; 

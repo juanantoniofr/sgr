@@ -7,13 +7,11 @@ class Evento extends Eloquent{
  	protected $fillable = array('titulo', 'recurso_id','fechaEvento','fechaInicio','repeticion', 'dia','diasRepeticion','fechaFin','user_id','created_at','user_id');
 
 	public function userOwn(){
-		
- 		return $this->belongsTo('User','user_id','id');
+		return $this->belongsTo('User','user_id','id');
  	}	
 
  	public function reservadoPor(){
-		
- 		return $this->belongsTo('User','reservadoPor_id','id');
+		return $this->belongsTo('User','reservadoPor_id','id');
  	}	
 
  	public function recursoOwn(){
@@ -24,7 +22,7 @@ class Evento extends Eloquent{
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
  	/**
- 	 * Implementa requisito: ofrecer sumatorio de puestos o equipos en la vista Calendario y en la vista de impresión.
+ 	 * Implementa requisito: ofrecer sumatorio de puestos o equipos reservados
  	 * 
  	 * @param void
  	 * @return $total int número total de puestos o equipos asociados a una misma reserva 
@@ -52,6 +50,8 @@ class Evento extends Eloquent{
 			//fin del bug
  		return $total;
  	}
+	
+	
 	
 
  	private $rules = array (
@@ -179,7 +179,7 @@ class Evento extends Eloquent{
 	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
 				if (Auth::user()->isUser()) {
-					if ( Calendar::fristMonday() > Date::getTimeStamp($data['fInicio'])  || Calendar::lastFriday()  < Date::getTimeStamp($data['fInicio'])) return true;
+					if ( Calendar::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y')  || Calendar::lastFriday()  < Date::gettimestamp($data['fInicio'],'d-m-Y')) return true;
 				}
 			});
 		}
@@ -276,7 +276,7 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req5',function($data){
 				if (Auth::user()->isAvanceUser()) {
-					if ( Calendar::fristMonday() > Date::getTimeStamp($data['fInicio']) ) return true;
+					if ( Calendar::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
 				}
 			}); 
 		}	
@@ -286,7 +286,7 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req6',function($data){
 				if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()) {
-					if ( strtotime('today') > Date::getTimeStamp($data['fInicio']) ) return true;
+					if ( strtotime('today') > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
 				}
 			}); 
 		}	
@@ -294,8 +294,8 @@ class Evento extends Eloquent{
  		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false ){
         	
 	        
-		        $intFinicio = Date::getTimeStamp($data['fInicio'],'-');
-		        $intNow = Date::getTimeStamp(date('d-m-Y'),'-');
+		        $intFinicio = Date::gettimestamp($data['fInicio'],'d-m-Y');
+		        $intNow = Date::gettimestamp(date('d-m-Y'),'d-m-Y');
 	        	$intDiaAnterior = strtotime('-1 day',$intFinicio);
 			    //fecha posterior al día actual
 			    $v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){

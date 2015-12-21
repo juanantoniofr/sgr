@@ -52,7 +52,7 @@ class Calendar {
 								break;
 						}
 						$classLink = '';
-						if (Date::isPrevTodayByTimeStamp(Date::getTimeStampEN($currentDate))) {
+						if (Date::isPrevTodayByTimeStamp(strtotime($currentDate))) {
 							$class = "alert alert-warning";
 							$classLink = 'disabled';
 						}

@@ -87,7 +87,7 @@ class sgrEvento {
 					$repeticion = 0;
 					$evento->fechaFin = Date::toDB($currentfecha,'-');
 					$evento->fechaInicio = Date::toDB($currentfecha,'-');
-					$evento->diasRepeticion = json_encode(array(date('N',Date::getTimeStamp($currentfecha))));
+					$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
 				}
 			
 				$evento->evento_id = $evento_id;
@@ -96,7 +96,7 @@ class sgrEvento {
 				$evento->recurso_id = $id_recurso;
 				$evento->fechaEvento = Date::toDB($currentfecha,'-');
 				$evento->repeticion = $repeticion;
-				$evento->dia = date('N',Date::getTimeStamp($currentfecha));
+				$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
 				$evento->horaInicio = $data['hInicio'];
 				$evento->horaFin = $data['hFin'];
 				$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
@@ -135,7 +135,7 @@ class sgrEvento {
 				$repeticion = 0;
 				$evento->fechaFin = Date::toDB($currentfecha,'-');
 				$evento->fechaInicio = Date::toDB($currentfecha,'-');
-				$evento->diasRepeticion = json_encode(array(date('N',Date::getTimeStamp($currentfecha))));
+				$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
 			}
 			
 			$evento->evento_id = $evento_id;
@@ -144,7 +144,7 @@ class sgrEvento {
 			$evento->recurso_id = $data['id_recurso'];
 			$evento->fechaEvento = Date::toDB($currentfecha,'-');
 			$evento->repeticion = $repeticion;
-			$evento->dia = date('N',Date::getTimeStamp($currentfecha));
+			$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
 			$evento->horaInicio = $data['hInicio'];
 			$evento->horaFin = $data['hFin'];
 			$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
@@ -371,7 +371,25 @@ class sgrEvento {
 		return 'success';
 	}
 
-	//Auxiliares
+	//private functions
+	
+	/**
+	 * calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
+ 	 * 
+ 	 * @param void
+ 	 * @return $numerohorasreservadas int número de horas de una reserva: diferencia entre horaInicio y horaFin
+	*/
+	private function diffHours($h1,$h2){ 
+	    //In: $h1,$h2 -> horas en formato H:m:s
+	    $tsh1 = strtotime($h1); //número de segundos desde 1 enero de 1970
+	    $tsh2 = strtotime($h2); //número de segundos desde 1 enero de 1970
+
+	    $diff = ($tsh2 - $tsh1) / (60 * 60) ; //diferencia en horas
+		
+		return $diff;
+	}  
+
+
 	private function uniqueId(){
 		
 		$idSerie = $this->getIdUnique();
