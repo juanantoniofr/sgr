@@ -79,14 +79,14 @@ class sgrEvento {
 				$evento->estado = $this->setEstado($id_recurso,$currentfecha,$hInicio,$hFin);
 			
 				$repeticion = 1;
-				$evento->fechaFin = Date::toDB($data['fFin'],'-');
-				$evento->fechaInicio = Date::toDB($data['fInicio'],'-');
+				$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
+				$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 				$evento->diasRepeticion = json_encode($data['dias']);
 			
 				if ($data['repetir'] == 'SR') {
 					$repeticion = 0;
-					$evento->fechaFin = Date::toDB($currentfecha,'-');
-					$evento->fechaInicio = Date::toDB($currentfecha,'-');
+					$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+					$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 					$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
 				}
 			
@@ -94,7 +94,7 @@ class sgrEvento {
 				$evento->titulo = $data['titulo'];
 				$evento->actividad = $data['actividad'];
 				$evento->recurso_id = $id_recurso;
-				$evento->fechaEvento = Date::toDB($currentfecha,'-');
+				$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 				$evento->repeticion = $repeticion;
 				$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
 				$evento->horaInicio = $data['hInicio'];
@@ -127,14 +127,14 @@ class sgrEvento {
 
 			
 			$repeticion = 1;
-			$evento->fechaFin = Date::toDB($data['fFin'],'-');
-			$evento->fechaInicio = Date::toDB($data['fInicio'],'-');
+			$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
+			$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 			$evento->diasRepeticion = json_encode($data['dias']);
 			
 			if ($data['repetir'] == 'SR') {
 				$repeticion = 0;
-				$evento->fechaFin = Date::toDB($currentfecha,'-');
-				$evento->fechaInicio = Date::toDB($currentfecha,'-');
+				$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+				$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 				$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
 			}
 			
@@ -142,7 +142,7 @@ class sgrEvento {
 			$evento->titulo = $data['titulo'];
 			$evento->actividad = $data['actividad'];
 			$evento->recurso_id = $data['id_recurso'];
-			$evento->fechaEvento = Date::toDB($currentfecha,'-');
+			$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 			$evento->repeticion = $repeticion;
 			$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
 			$evento->horaInicio = $data['hInicio'];

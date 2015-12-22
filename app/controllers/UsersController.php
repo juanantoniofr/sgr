@@ -90,7 +90,7 @@ class UsersController extends BaseController {
       $user->capacidad = $rol;
       $user->observaciones = $observaciones;
       if (empty($caducidad)) $caduca = date('Y-m-d');
-      else $caduca = Date::toDB($caducidad);
+      else $caduca = Date::parsedatetime($caducidad,'d-m-Y','Y-m-d');
       $user->caducidad = $caduca;
       $user->save();
 
@@ -150,7 +150,7 @@ class UsersController extends BaseController {
       $user->observaciones = $observaciones;
       
       if (empty($caducidad)) $caduca = date('Y-m-d');
-      else $caduca = Date::toDB($caducidad);
+      else $caduca = Date::parsedatetime($caducidad,'d-m-Y','Y-m-d');
       $user->caducidad = $caduca;
       $user->save();
 

@@ -49,7 +49,7 @@ class Date{
 	}
 
 	/**
-	 * Devuelve Timestamp de $fecha con $formato
+	 * Devuelve timestamp de $fecha con $formato
  	 * 
  	 * @param $fecha string fecha
  	 * @param $formato string indica el formato de $fecha (por ejemplo d-m-Y) 
@@ -62,122 +62,62 @@ class Date{
 		$timestamp = $date->getTimestamp();
 		return $timestamp;
 	}
-
 	
-
-	public static function timefirstMonday($day,$month,$year){
-		$timefirstMonday = '';
+	/**
+	 * Devuelve timestamp del lunes inmediatamente anterior a fecha=$day-$month-$year
+ 	 * 
+ 	 * @param $day string
+ 	 * @param $month string
+ 	 * @param $year string
+ 	 * @return $timestamp int timestamp lunes inmediatamente anterior a $day-$month-$year
+	*/
+	public static function timestamplunesanterior($day,$month,$year){
+		
+		$timestamp = '';
 		
 		$time = mktime(0,0,0,$month,$day,$year);
-		if (1 == date('N',$time)) $timefirstMonday = $time;
+		if (1 == date('N',$time)) $timestamp = $time;
 		else {
 			do {
 				$time = strtotime('-1 day', $time);
 			} while(date('N',$time)!=1);
-			$timefirstMonday = $time;
-		} //$timefirstMonday = strtotime('previous monday'. $year .'-'.$month .'-'.$day,$time);
-
-		return $timefirstMonday;
+			$timestamp = $time;
+		} 
+		return $timestamp;
 	}
+  
+  	/**
+	 * Devuelve $fecha en formato $farmatosalida
+ 	 * 
+ 	 * @param $fecha datetime 
+ 	 * @param $formatoentrada string formato de entrada de $fecha
+ 	 * @param $formatosalida string formato de salida para $fecha
+ 	 * @return $result datetime formateado según $formatosalida
+	*/
+	public static function parsedatetime($fecha,$formatoentrada,$formatosalida){
+		
+		$result = '';
 
-	   
-	/*
-		Recibe como entrada una fecha en formato ES: dia # mes # año
-	 	donde # es el delimitador que puede ser / o -
-
-	 	devuelve la fecha en formato para mysql: año (cuatro cifras) - mes (01-12) - dia (01-31)
-	 */
-	public static function toDB($fecha_ES,$delimiter = '-'){
-		/*
-		In: $fecha_ES = fecha en formato dd?mm?yy donde es $delimiter
-			$delimiter = delimitador, normalmente - o /
-		Out: $result = fecha en formato EN yy-mm-dd
-		*/
-		$self = new self();
-		$timeStamp = $self->gettimestamp($fecha_ES,'d-m-Y');// mktime(0,0,0,$items[1],$items[0],$items[2]); 
- 		$result = date('Y-m-d',$timeStamp); // ej: 2014-09-01
+		$date = DateTime::createFromFormat($formatoentrada,$fecha);
+		$result = $date->format($formatosalida);
 		return $result;
 	}
+	
+	/**
+	 * Devuelve nombre del mes en español
+ 	 * 
+ 	 * @param $month int Número del mes, 1=enero... 12=diciembre
+ 	 * @return $mes string Mes en español
+	*/
+	public static function nombremes ($month = ''){
 
-	//	Devuelve la representación textual de $month->(1-12)
-	public static function getNameMonth ($month = '',$year = ''){
-
-		$nameNonth = '';
+		$mes = '';
 		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$nameNonth="error setlocale";}
-		
-		$time = mktime(0,0,0,$month,1,$year);
-		$nameNonth = ucfirst(strftime('%B',$time));
+			  		$nombremes="Error setlocale";}
 
-		return $nameNonth;
-	}
-
-	public static function getstrHour($hour){
-		$aHour = explode(':',$hour);
-		$time = mktime($aHour[0],$aHour[1]);
-		return date('G:i',$time);
-	}
-
-	/*Recibe:
-				$month: numérico (1-12)
-				$year: cuatro dígitos
-	devuelve un array de semanas, donde cada semana es un array de días, con el siguiente formato:
-
-		week[j][i] 	-> si es igual a 0 entonces el dia i de la semana j no pertenece al mes
-					-> si tiene un valor entre (1-31), entonces el día i de la semana j pertenece al mes
-		valores de i:
-			i = 1 -> lunes,
-			i = 2 -> martes,
-			i = 3 -> miércoles,
-			i = 4 -> jueves,
-			i = 5 -> viernes,
-			i = 6 -> sabado,
-			i = 7 -> domingo,*/
-	public static function getDays($month,$year){
-
-		// Falta por escribir la función validDate
-		// if (!validDate($month,$year)) return false;
-
-		$daysMonth = array();
-
-		$timestamp = mktime(0,0,0,$month,1,$year);
-		$maxday = date("t",$timestamp); // número de días de $month
-		$thismonth = getdate($timestamp); //$thismonth = array con información sobre la fecha $timestamp
-		
-		// día de la semana en la que se inicia el mes $month.  siendo: 0 -> lunes, 1 -> martes,...., 6 -> domingo
-		$startday = $thismonth['wday'] - 1 ;
-		if ( $startday == -1 )	$startday = 6;
-		
-		$j = 0; //inic. indice semana del mes $month
-		$i = 0; //inic. indice dia de la semana
-		for ($currentDay=0; $currentDay<($maxday+$startday); $currentDay++) {
-    		if( $currentDay != 0 && ($currentDay % 7) == 0 ){
-    			$j++; // inc indice de semana
-    			$i = 0; // inicia indice días de nueva semana
-    		} 
-    		if($currentDay < $startday) $daysMonth[$j][$i] = 0;
-    		else $daysMonth[$j][$i] = $currentDay - $startday + 1;
-    		$i++; //inc indice día semana en curso ($j)
-    	}
-
-    	//completar última semana con ceros los días que no son del mes $month
-    	$numDaysLastWeek = count($daysMonth[$j]);
-    	$inc = 1;
-    	if ( $numDaysLastWeek < 7 ){
-    		while ( $numDaysLastWeek < 7) {
-    			$daysMonth[$j][$numDaysLastWeek] = $maxday + $inc;
-    			$inc++;
-    			$numDaysLastWeek++;	
-    		} 
-    	}
-
-    	return $daysMonth;
-	}
-
-	public static function daysMonth($month,$year){
-		$timestamp = mktime(0,0,0,$month,1,$year);
-		$daysMonth = date("t",$timestamp);
-		return $daysMonth;
+		$timestamp = strtotime('1970-'.$month.'-1');
+		$mes = ucfirst(strftime('%B',$timestamp));
+		return $mes;
 	}
 
 	public static function isDomingo($day,$mon,$year){

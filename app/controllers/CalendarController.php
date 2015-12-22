@@ -149,7 +149,7 @@ class CalendarController extends BaseController {
 			$datefirstmonday = getdate($tsPrimerLunes);
 			$numMonth = $datefirstmonday['mon'];//Representación númerica del mes del 1 al 12
 			$year = $datefirstmonday['year']; //Representación numérica del año cuatro dígitos
-			$nameMonth = Date::getNameMonth($numMonth,$year); //representación textual del mes (enero,febrero.... etc)
+			$nameMonth = Date::nombremes($numMonth); //representación textual del mes (enero,febrero.... etc)
 			$day = $datefirstmonday['mday']; //Representación númerica del dia del mes: 1 - 31	
 		} 
 		//else -> los métodos getCaption, getHead y getBodytableMonth optiene los valores de fecha directamente desde el array de entrada post.

@@ -10,10 +10,7 @@ class Calendar {
 	public static function getBodyTableAgenda($day,$month,$year){
 		
 		$html = '';
-
-		$date = $day .'-'. $month .'-'. $year;
-		$startDate = Date::toDB($date,'-');
-		
+		$startDate = $year . '-' . $month .'-'. $day;
 		$haveEvents = false;
 		//si hay eventos
 		if (Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->count() > 0){
@@ -115,7 +112,7 @@ class Calendar {
 
 		$self = new self();
 		$html = '';		
-		$daysOfMonth = Date::getDays($mon,$year);
+		$daysOfMonth = sgrCalendario::dias($mon,$year);
 		foreach ($daysOfMonth as $week) {
       		$html .= '<tr class="fila">';
       			foreach($week as $day){
@@ -149,7 +146,7 @@ class Calendar {
 
 		$self = new self();
 		$html = '';		
-		$daysOfMonth = Date::getDays($mon,$year);
+		$daysOfMonth = sgrCalendario::dias($mon,$year);
 		$diaSemanaPrimerDiaMesActual = date('N',mktime(0,0,0,$mon,'1',$year));//1 -> lunes... 7->domingo
 		$currentDiaUltimaSemanaMesAnterior = 0;
 		$numeroDediasPrimeraSemanaMesAnterior = $diaSemanaPrimerDiaMesActual - 1; //puede ser cero si el mes empieza en lunes
@@ -249,7 +246,7 @@ class Calendar {
         	$tipoReserva = 'Reserva Periódica';
         	if ($event->repeticion == 0) $tipoReserva = 'Reserva Puntual';
 
-        	($view != 'week') ? $strhi = Date::getstrHour($event->horaInicio).'-'. Date::getstrHour($event->horaFin) : $strhi = '';
+        	($view != 'week') ? $strhi = Date::parsedatetime($event->horaInicio,'H:i:s','g:i').'-'. Date::parsedatetime($event->horaFin,'H:i:s','g:i') : $strhi = '';
         	$classPuedeEditar = '';
         	
         	$own = Evento::find($event->id)->userOwn;
@@ -357,7 +354,7 @@ class Calendar {
 		$self = new self();
 
 		//timeStamp lunes semana de $day - $month -$year seleccionado por el usuario
-		$timefirstMonday = Date::timefirstMonday($day,$month,$year);
+		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
 	
@@ -407,7 +404,7 @@ class Calendar {
 		$self = new self();
 
 		//timeStamp lunes semana de $day - $month -$year seleccionado por el usuario
-		$timefirstMonday = Date::timefirstMonday($day,$month,$year);
+		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
 	
@@ -450,7 +447,7 @@ class Calendar {
 
 	public static function getCaption($day = '',$month = '',$year = ''){
 
-		$caption = '<span id="alternate">'.Date::getNameMonth($month,$year).' / '.$year.'</span>';
+		$caption = '<span id="alternate">'.Date::nombremes($month).' / '.$year.'</span>';
 		return $caption;
 	}
 
@@ -476,7 +473,7 @@ class Calendar {
 					    </tr>';
 			    break;
 			case 'week':
-				$timefirstMonday = Date::timefirstMonday($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
+				$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
 				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
 				//$month = date('n',$timefirstMonday);
 				//$year = date('Y',$timefirstMonday);
@@ -528,7 +525,7 @@ class Calendar {
 					    </tr>';
 			    break;
 			case 'week':
-				$timefirstMonday = Date::timefirstMonday($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
+				$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
 				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
 				//$month = date('n',$timefirstMonday);
 				//$year = date('Y',$timefirstMonday);
@@ -600,7 +597,7 @@ class Calendar {
 		if (!empty($idSerie) && $action == 'edit') $excludeEvento = " and evento_id != '".$idSerie."'";
 
 
-		$where  =	"fechaEvento = '".Date::toDB($currentfecha,'-')."' and ";
+		$where  =	"fechaEvento = '".Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d')."' and ";
 		if (!empty($condicionEstado))	$where .=	"estado = '".$condicionEstado."' and ";	
 		$where .= 	" (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
 		$where .= 	" or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
@@ -732,9 +729,9 @@ class Calendar {
         	//if ($event->repeticion == 0) $tipoReserva = 'Reserva Puntual';
         	$tipoReserva = Config::get('options.tiporeserva')[$event->repeticion];
 
-        	$contenido = htmlentities('<p style="width=100%;text-align:center" class="'.$classEstado.'">Estado:<strong> '.ucfirst($event->estado).'</strong>'.$muestraItem.'</p><p style="width=100%;text-align:center">'.ucfirst(strftime('%a, %d de %B, ',$time)). Date::getstrHour($event->horaInicio).' - ' .Date::getstrHour($event->horaFin) .'</p><p style="width=100%;text-align:center">'.$event->actividad.'</p><p style="width=100%;text-align:center">'.$tipoReserva.'</p><p style="width=100%;text-align:center">'.$event->userOwn->nombre .' ' .$event->userOwn->apellidos. '</p>');
+        	$contenido = htmlentities('<p style="width=100%;text-align:center" class="'.$classEstado.'">Estado:<strong> '.ucfirst($event->estado).'</strong>'.$muestraItem.'</p><p style="width=100%;text-align:center">'.ucfirst(strftime('%a, %d de %B, ',$time)). Date::parsedatetime($event->horaInicio,'H:i:s','g:i').' - ' .Date::parsedatetime($event->horaFin,'H:i:s','g:i') .'</p><p style="width=100%;text-align:center">'.$event->actividad.'</p><p style="width=100%;text-align:center">'.$tipoReserva.'</p><p style="width=100%;text-align:center">'.$event->userOwn->nombre .' ' .$event->userOwn->apellidos. '</p>');
         	
-        	($view != 'week') ? $strhi = Date::getstrHour($event->horaInicio).'-'. Date::getstrHour($event->horaFin) : $strhi = '';
+        	($view != 'week') ? $strhi = Date::parsedatetime($event->horaInicio,'H:i:s','g:i').'-'. Date::parsedatetime($event->horaFin,'H:i:s','g:i') : $strhi = '';
         	$classPuedeEditar = '';
         	
         	//Default text link

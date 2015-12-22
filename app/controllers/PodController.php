@@ -95,13 +95,13 @@ class PodController extends BaseController {
 				
 				$evento->evento_id = $evento_id;
 				//fechas de inicio y fin
-				$evento->fechaFin = Date::toDB(Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'-');//¿por que, no es $fechaDesde ya calculado??
-				$evento->fechaInicio = Date::toDB(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'-');
+				$evento->fechaFin = Date::parsedatetime(Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'d-m-Y','Y-m-d');//¿por que, no es $fechaDesde ya calculado??
+				$evento->fechaInicio = Date::parsedatetime(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'d-m-Y','Y-m-d');
 				
 				//fecha Evento
 				$startDate = Date::timeStamp_fristDayNextToDate(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA']);
 				$currentfecha = Date::currentFecha($startDate,$j);
-				$evento->fechaEvento = Date::toDB($currentfecha,'-');
+				$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 
 				//horario
 				$evento->horaInicio = $data['INI'];
@@ -208,8 +208,8 @@ class PodController extends BaseController {
 				$filafechaHasta = Date::dateCSVtoSpanish($datosfila['F_HASTA_HORARIO1']);//d-m-Y
 				$filahoraInicio = $datosfila['INI'];
 				$filahoraFin = $datosfila['FIN'];
-				if (strtotime(Date::toDB($fechaDesde,'-')) <= strtotime(Date::toDB($filafechaHasta,'-')) &&
-					strtotime(Date::toDB($fechaHasta,'-')) >= strtotime(Date::toDB($filafechaDesde,'-')) ){
+				if (strtotime(Date::parsedatetime($fechaDesde,'d-m-Y','Y-m-d')) <= strtotime(Date::parsedatetime($filafechaHasta,'d-m-Y','Y-m-d')) &&
+					strtotime(Date::parsedatetime($fechaHasta,'d-m-Y','Y-m-d')) >= strtotime(Date::parsedatetime($filafechaDesde,'d-m-Y','Y-m-d')) ){
 						//posible solapamiento
 						if(strtotime($horaInicio) < strtotime($filahoraFin) && strtotime($horaFin) > strtotime($filahoraInicio)){
 							//hay solapamiento
