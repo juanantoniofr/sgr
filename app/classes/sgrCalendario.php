@@ -1,30 +1,110 @@
 <?php
 
 class sgrCalendario {
+	
+	private $numeroMes;
+	private $nombreMes;
+	private $year;
+	private $ultimodiasmes;
+	private $diasMes;
+	
+	
+	
+
+	function __construct($numMes = '',$year = ''){
+		
+		$this->setNumeroMes($numMes);
+		$this->setYear($year);
+		$this->setUltimoDiaMes();//28|29|30|31
+		$this->setNombreMes($numMes);//establece el nombre del mes en español
+		$this->setDias();//construye un array con los días del mes
+		
+		return $this;
+	}
+
+	//public functions
+	
+	public function dias(){
+		
+		return $this->diasMes;
+	}
+
+	public function numeroMes(){
+		
+		return $this->numeroMes;
+	}
+
+	public function getYear(){
+		
+		return $this->year;
+	}
+
+	public function nombreMes(){
+		
+		return $this->nombreMes;
+	}
+
+	public function ultimoDia(){
+
+		return $this->ultimodiasmes;
+	}
 
 	/**
-	 * Devuelve un array con los días del mes de $month-$year, con ceros en la primera y última fila que no son del mes:
-	 *week[j][i] 	-> si es igual a 0 entonces el dia i de la semana j no pertenece al mes
-	 *				-> si tiene un valor entre (1-31), entonces el día i de la semana j pertenece al mes
-	 *	valores de i:
-	 *		i = 1 -> lunes,
-	 *		i = 2 -> martes,
-	 *		i = 3 -> miércoles,
-	 *		i = 4 -> jueves,
-	 *		i = 5 -> viernes,
-	 *		i = 6 -> sabado,
-	 *		i = 7 -> domingo,
+	 * Devuelve el objeto sgrDia cuyo numero de dia es $numDia si existe, en caso contrario devuelve false
  	 * 
- 	 * @param $month int Número del mes, 1=enero... 12=diciembre
- 	 * @param $year int Año en cuatro dígitos
+ 	 * @param $numDia int Número del día mes [1-31]
+ 	 * @return Obj sgrDia | false
+	*/
+	public function dia($numDia){
+		/*$result = false;
+		foreach ($this->diasMes as $key => $semana) {
+			foreach ($semana as $key => $sgrDia) {
+				if ($sgrDia->numeroDia() == $numDia) return $sgrDia;
+			}
+			
+		}*/
+		if (array_key_exists($numDia, $this->diasmes))	return $this->diasmes[$numDia];
+		return false;
+	}
+
+	//private functions
+	private function setUltimoDiaMes(){
+		
+		return $this->ultimodiasmes = (int) date('t', mktime(0,0,0,$this->numeroMes,1,$this->year));
+	}
+	
+
+	private function setNumeroMes($numeroMes){
+		if (empty($numeroMes)) $numeroMes = date('m');
+		return $this->numeroMes = (int) $numeroMes;
+	}
+
+	private function setYear($year){
+		if (empty($year)) $year = date('Y');
+		return $this->year = (int) $year;
+	}
+
+	/**
+	 * Genera un array con indice los días del mes y valor objetos sgrDia
+ 	 * 
  	 * @return $diasmes array 
 	*/
-	public static function dias($month,$year){
+	private function setDias(){
 
 		// Falta por escribir la función validDate
 		// if (!validDate($month,$year)) return false;
 
 		$diasmes = array();
+		$timestamp = mktime(0,0,0,$this->numeroMes,1,$this->year);
+		$maxday = date("t",$timestamp); // número de días de $month
+		for($i=1;$i<=$maxday;$i++) {
+			$timestamp = mktime(0,0,0,$this->numeroMes,$i,$this->year);
+			$diasmes[$i] = new sgrDia($timestamp);
+		}
+
+		return $this->diasMes = $diasmes;
+		/*$diasmes = array();
+
 
 		$timestamp = mktime(0,0,0,$month,1,$year);
 		$maxday = date("t",$timestamp); // número de días de $month
@@ -37,12 +117,20 @@ class sgrCalendario {
 		$j = 0; //inic. indice semana del mes $month
 		$i = 0; //inic. indice dia de la semana
 		for ($currentDay=0; $currentDay<($maxday+$startday); $currentDay++) {
+    		
     		if( $currentDay != 0 && ($currentDay % 7) == 0 ){
     			$j++; // inc indice de semana
     			$i = 0; // inicia indice días de nueva semana
     		} 
-    		if($currentDay < $startday) $diasmes[$j][$i] = 0;
-    		else $diasmes[$j][$i] = $currentDay - $startday + 1;
+    		if($currentDay < $startday){
+    			$dia = 0;
+    			//$festivo = false;
+    			$diasmes[$j][$i] = new sgrDia($dia,'hola radiola...');	
+    		} 
+    		else {
+    			$dia = $currentDay - $startday + 1;
+    			$diasmes[$j][$i] = new sgrDia($dia,$this->esFestivo($dia));
+    		}
     		$i++; //inc indice día semana en curso ($j)
     	}
 
@@ -51,13 +139,31 @@ class sgrCalendario {
     	$inc = 1;
     	if ( $numDaysLastWeek < 7 ){
     		while ( $numDaysLastWeek < 7) {
-    			$diasmes[$j][$numDaysLastWeek] = $maxday + $inc;
+    			$dia = $maxday + $inc;
+    			$diasmes[$j][$numDaysLastWeek] = new sgrDia(0,$this->esFestivo(0));
     			$inc++;
     			$numDaysLastWeek++;	
     		} 
     	}
 
-    	return $diasmes;
+    	return $this->diasMes = $diasmes;*/
+	}
+	
+	/**
+	 * Establece el nombre del mes en español
+ 	 * 
+ 	 * @param $month int Número del mes, 1=enero... 12=diciembre
+ 	 * @return $mes string Mes en español
+	*/
+	private function setNombreMes ($month = ''){
+
+		$mes = '';
+		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
+			  		$nombremes="Error setlocale";}
+
+		$timestamp = strtotime('1970-'.$month.'-1');
+		$mes = ucfirst(strftime('%B',$timestamp));
+		return $this->nombreMes = $mes;
 	}
 }
 

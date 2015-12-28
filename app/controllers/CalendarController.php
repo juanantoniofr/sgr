@@ -22,6 +22,8 @@ class CalendarController extends BaseController {
 		$total = Input::get('total',false);
 		$data = array('titulo' => $titulo,'nombre' => $nombre,'colectivo' => $colectivo,'total' => $total);
 		
+		$sgrCalendario = new sgrCalendario($month,$year);
+
 		$table = array( 'tHead' => '',
 						'tBody' => '');
 		
@@ -30,12 +32,12 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
 				break;
 			case 'month':
-				$table['tCaption'] = Calendar::getCaption($day,$month,$year);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
 				$table['tHead'] = Calendar::getPrintHead('month',$day,$month,$year);
 				$table['tBody'] = Calendar::getPrintBodytableMonth($data,$month,$year,$id_recurso);	
 				break;
 			case 'week':
-				$table['tCaption'] = Calendar::getCaption($day,$month,$year);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
 			  	$table['tHead'] = Calendar::getPrintHead('week',$day,$month,$year);
 				$table['tBody']= Calendar::getPrintBodytableWeek($data,$day,$month,$year,$id_recurso);
 				break;
@@ -43,7 +45,7 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo.....</p>';	
 				break;
 			case 'agenda':
-				$table['tCaption'] = Calendar::getCaption($day,$month,$year);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
 				//$table['tHead'] = Calendar::gettHead('agenda',$input['day'],$input['month'],$input['year']);
 				$table['tBody'] = Calendar::getBodytableAgenda($day,$month,$year);
 				break;
@@ -136,6 +138,8 @@ class CalendarController extends BaseController {
 		$year = Input::get('year',date('Y'));
 		$uvus = INput::get('uvus','');
 
+		$sgrCalendario = new sgrCalendario($numMonth,$year);
+
 		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
 		$nh = Auth::user()->numHorasReservadas();
 		$msg = '';
@@ -149,16 +153,16 @@ class CalendarController extends BaseController {
 			$datefirstmonday = getdate($tsPrimerLunes);
 			$numMonth = $datefirstmonday['mon'];//Representación númerica del mes del 1 al 12
 			$year = $datefirstmonday['year']; //Representación numérica del año cuatro dígitos
-			$nameMonth = Date::nombremes($numMonth); //representación textual del mes (enero,febrero.... etc)
+			$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
 			$day = $datefirstmonday['mday']; //Representación númerica del dia del mes: 1 - 31	
 		} 
 		//else -> los métodos getCaption, getHead y getBodytableMonth optiene los valores de fecha directamente desde el array de entrada post.
 		
 		$viewActive = 'month'; //vista por defecto
-		$tCaption = Calendar::getCaption($day,$numMonth,$year);
+		$tCaption = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
 		$tHead = Calendar::gettHead($viewActive,$day,$numMonth,$year);
 		$tBody = Calendar::getBodytableMonth($numMonth,$year);
-		
+				
 		//Se obtinen todos los grupos de recursos
 		//$grupos = DB::table('recursos')->select('id', 'acl', 'grupo','grupo_id')->groupby('grupo')->get();
 		$grupos = Recurso::groupby('grupo')->get();
@@ -183,18 +187,21 @@ class CalendarController extends BaseController {
 		$table = array( 'tHead' => '',
 						'tBody' => '');
 		
-       	//$input['month'],$input['year'],$input['viewActive']
+       	$sgrCalendario = new sgrCalendario($input['month'],$input['year']);
+
 		switch ($input['viewActive']) {
 			case 'year':
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
 				break;
 			case 'month':
-				$table['tCaption'] = Calendar::getCaption($input['day'],$input['month'],$input['year']);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);// . '--' .$input['month'] .' - ' .$input['year'];
 				$table['tHead'] = Calendar::gettHead('month',$input['day'],$input['month'],$input['year']);
+				
 				$table['tBody'] = Calendar::getBodytableMonth($input['month'],$input['year'],$input['id_recurso']);	
+				
 				break;
 			case 'week':
-				$table['tCaption'] = Calendar::getCaption($input['day'],$input['month'],$input['year']);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);
 			  	$table['tHead'] = Calendar::gettHead('week',$input['day'],$input['month'],$input['year']);
 				$table['tBody']= Calendar::getBodytableWeek($input['day'],$input['month'],$input['year'],$input['id_recurso']);
 				break;
@@ -202,7 +209,7 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo.....</p>';	
 				break;
 			case 'agenda':
-				$table['tCaption'] = Calendar::getCaption($input['day'],$input['month'],$input['year']);
+				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);
 				//$table['tHead'] = Calendar::gettHead('agenda',$input['day'],$input['month'],$input['year']);
 				$table['tBody'] = Calendar::getBodytableAgenda($input['day'],$input['month'],$input['year']);
 				break;

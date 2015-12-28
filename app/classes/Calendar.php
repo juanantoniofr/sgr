@@ -108,37 +108,53 @@ class Calendar {
 		return $html;
 	}
 
-	public static function getBodytableMonth($mon,$year,$id_recurso = ''){
+	public static function getBodytableMonth($mon='',$year='',$id_recurso = ''){
 
 		$self = new self();
-		$html = '';		
-		$daysOfMonth = sgrCalendario::dias($mon,$year);
-		foreach ($daysOfMonth as $week) {
-      		$html .= '<tr class="fila">';
-      			foreach($week as $day){
-	       			$html .= '<td class="celda">';
-       				if ($self->isDayOtherMonth($day)) $html .= $self->getContentDisable_td($day,$mon,$year);
-       				else {
-        					if($self->isFestivo($day,$mon,$year)) $html .= $self->getContentTDFestivo($day,$mon,$year);
-        					else{
+		$html = '';	
+		$sgrCalendario = new sgrCalendario($mon,$year);
+		$days = $sgrCalendario->dias();
+		//N -> Representación numérica ISO-8601 del día de la semana (añadido en PHP 5.1.0):
+		// 1 (para lunes) hasta 7 (para domingo)
+		$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
+		//$daysOfMonth = sgrCalendario::dias($mon,$year);
+		//foreach ($daysOfMonth as $week) {
+		$diaActual = 1;
+		$j=1;
+		//for ($j=1;$j<=$sgrCalendario->numeroSemanaUltimoDiaMes();$j++) {
+		while (mktime(0,0,0,$mon,$sgrCalendario->ultimoDia(),$year) >= mktime(0,0,0,$mon,$diaActual,$year) ){
+			//una fila por cada semana del mes
+			$html .= '<tr class="fila">';
+			for($i=1;$i<=7;$i++){
+				//Una celda por cada día de la semama
+				$html .= '<td class="celda">';
+					//días de la primera semana y de la última que no son del mes $mon-$year.
+					if (($diaSemanaPimerDiaMes > $i && $j == 1) || $diaActual > $sgrCalendario->ultimoDia()) $html .= $self->getContentDisable_td(0,$mon,$year);
+					else {
+						//Para los días de $mon-$year
+						if($days[$diaActual]->festivo()) $html .= $self->getContentTDFestivo($diaActual,$mon,$year);
+							else{
         						//No es un día de otro mes y no es festivo: entonces
-        						if($self->isDayAviable($day,$mon,$year)){ //Depende del rol
-        							$events = $self->getEvents($day,$mon,$year,$id_recurso);
+        						if($self->isDayAviable($diaActual,$mon,$year)){ //Depende del rol
+        							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
 									$enabled = true;
-									$html .= $self->getContentTD($day,$mon,$year,$id_recurso,$events,$enabled);
+									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
         						}
         						else {
         							//$html .= $self->getCellDisable($day);	
-		   							$events = $self->getEvents($day,$mon,$year,$id_recurso);
+		   							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
 		   							$enabled = false;
-									$html .= $self->getContentTD($day,$mon,$year,$id_recurso,$events,$enabled);
+									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
         						}         						
         					}
-        				}
-        			$html .= '</td>';
-        		}
-        	$html .= '</tr>';
-        }	
+        				$diaActual++;		
+					}//fin else linea 131
+				$html .= '</td>';
+				
+			}
+			$html .= '</tr>';
+			$j++;
+		}
  		return $html;
 	}//getBodyTableMonth
 
@@ -146,7 +162,9 @@ class Calendar {
 
 		$self = new self();
 		$html = '';		
-		$daysOfMonth = sgrCalendario::dias($mon,$year);
+		//$daysOfMonth = sgrCalendario::dias($mon,$year);
+		$sgrCalendario = new sgrCalendario($mon,$year);
+		$daysOfMonth = $sgrCalendario->dias();
 		$diaSemanaPrimerDiaMesActual = date('N',mktime(0,0,0,$mon,'1',$year));//1 -> lunes... 7->domingo
 		$currentDiaUltimaSemanaMesAnterior = 0;
 		$numeroDediasPrimeraSemanaMesAnterior = $diaSemanaPrimerDiaMesActual - 1; //puede ser cero si el mes empieza en lunes
@@ -164,7 +182,7 @@ class Calendar {
        					$html .= '</td>';
       				}
       				else {
-      					if($self->isFestivo($day,$mon,$year)) {
+      					if($day->festivo()) {
       						$ancho = '3%';
         					$html .= '<td width="'.$ancho.'" >';
         					$html .= $self->getContentTDFestivo($day,$mon,$year);
@@ -192,8 +210,9 @@ class Calendar {
 		$aColorLink = array();
 
 		
-        if ($view == 'month' && $day <= Date::daysMonth($mon,$year)) $html .= '<small>'. $day .'</small>' ;
-        
+        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $html .= '<small>'. $day .'</small>' ;
+        if ($view == 'month') $html .= '<small>'. $day .'</small>' ;
+
         
         
        foreach($events as $event){
@@ -357,7 +376,7 @@ class Calendar {
 		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
-	
+		$sgrCalendario = new sgrCalendario($month,$year);
 		for($j=0;$j<count($self->aHour)-1;$j++) {
 
 			$hour = // $itemsHours[0];
@@ -367,15 +386,17 @@ class Calendar {
       		$html .= '</td>';
       		$currentTime = $timefirstMonday;
       		for($i=0;$i<7;$i++){
+      			
       			$html .= '<td class="celda">';
       			//$currentTime = mktime(0,0,0,$month,($firstMonday + $i),$year);
       			
       			//$currentDay = $firstMonday + $i;
       			//$html .= $currentDay;
       			$currentDay = date('j',$currentTime);
+      			$sgrDia = $sgrCalendario->dia($currentDay);
       			$currentMon = date('n',$currentTime);
       			$currentYear = date('Y',$currentTime);
-				if($self->isFestivo($currentDay,$currentMon,$currentYear)) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
+				if($sgrDia->festivo()) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
 				//else $html .= '<div>'.$hour.'</div>';
 				else{	
 					//Los días disponibles para reserva depende del rol de usuario
@@ -407,7 +428,7 @@ class Calendar {
 		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
-	
+		$sgrCalendario = new sgrCalendario($month,$year);
 		for($j=0;$j<count($self->aHour)-1;$j++) {
 
 			$hour = // $itemsHours[0];
@@ -420,9 +441,10 @@ class Calendar {
       			$html .= '<td>';
       			
       			$currentDay = date('j',$currentTime);
+      			$sgrDia = $sgrCalendario->dia($currentDay);
       			$currentMon = date('n',$currentTime);
       			$currentYear = date('Y',$currentTime);
-				if($self->isFestivo($currentDay,$currentMon,$currentYear)) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
+				if($sgrDia->festivo()) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
 				//else $html .= '<div>'.$hour.'</div>';
 				else{	
 					//Los días disponibles para reserva depende del rol de usuario
@@ -445,9 +467,9 @@ class Calendar {
 		return $html;
 	}//getPrintBodyTableWeek
 
-	public static function getCaption($day = '',$month = '',$year = ''){
+	public static function getCaption($nombremes = '',$year = ''){
 
-		$caption = '<span id="alternate">'.Date::nombremes($month).' / '.$year.'</span>';
+		$caption = '<span id="alternate">'.$nombremes.' / '.$year.'</span>';
 		return $caption;
 	}
 
@@ -619,12 +641,6 @@ class Calendar {
 		return $hour;
 	} 
 
-	private  function isFestivo($day,$mon,$year){
-		$isfestivo = false;
-		if ( Date::isDomingo($day,$mon,$year) || Date::isSabado($day,$mon,$year) ) $isfestivo = true;
-        return $isfestivo;
-	}
-	
 	public static function testgetContentTD($day,$mon,$year,$id_recurso){
 		$self = new self();
 		$events = Evento::where('recurso_id','=',$id_recurso)->get();
@@ -642,7 +658,8 @@ class Calendar {
 		
 		$html .= '<div class = "'.$class.'" id = '.date('jnYGi',mktime($hour,$min,0,$mon,$day,$year)).' data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.date('G:i',mktime($hour,$min,0,$mon,$day,$year)).'">';
 
-        if ($view == 'month' && $day <= Date::daysMonth($mon,$year)) $strTitle = '<small>'. $day .'</small>';
+        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $strTitle = '<small>'. $day .'</small>';
+        if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
         else $strTitle = '';
         
         $html .= '<div class="titleEvents">'.$strTitle.'</div>';
@@ -852,7 +869,7 @@ class Calendar {
 
 	private function isDayOtherMonth($day){
 		$otherMonth = false;
-		if($day == 0) $otherMonth = true;
+		if($day->numeroDia() == 0) $otherMonth = true;
 		return $otherMonth;
 	}
 
@@ -890,9 +907,10 @@ class Calendar {
 	
 	private function getContentDisable_td($day,$mon,$year){
 		$html = '';
-		$lastDay = Date::daysMonth($mon,$year);
+		//$lastDay = sgrCalendario::dias($mon,$year);
+		//$lastDay = sgrCalendario::dias($mon,$year);
 		$html = '<div  class = "day disable">';
-		if ($day <= $lastDay && 0 != $day) $html .=  '<small>'. $day .'</small>';
+		if (0 != $day) $html .=  '<small>'. $day .'</small>';
 		$html .= '</div>';
 		return $html;
 	}
@@ -906,7 +924,7 @@ class Calendar {
 
 	private function getContentTDFestivo($day,$mon,$year,$view='month'){
 		$idfecha = date('jnY',mktime(0,0,0,$mon,$day,$year));
-		if ($view == 'month' && $day <= Date::daysMonth($mon,$year)) $strTitle = '<small>'. $day .'</small>';
+		if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
         else $strTitle = '';
 		$html = '<div  id='.$idfecha.' class = "day '.$view.' festivo disable hidden-print"  data-fecha="'.date('j-n-Y',mktime(0,0,0,$mon,$day,$year)).'">'. $strTitle .'</div>';
 		return $html;

@@ -103,34 +103,9 @@ class Date{
 		return $result;
 	}
 	
-	/**
-	 * Devuelve nombre del mes en español
- 	 * 
- 	 * @param $month int Número del mes, 1=enero... 12=diciembre
- 	 * @return $mes string Mes en español
-	*/
-	public static function nombremes ($month = ''){
+	
 
-		$mes = '';
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$nombremes="Error setlocale";}
-
-		$timestamp = strtotime('1970-'.$month.'-1');
-		$mes = ucfirst(strftime('%B',$timestamp));
-		return $mes;
-	}
-
-	public static function isDomingo($day,$mon,$year){
-		$isDomingo = false;
-		if (date('N',mktime(0,0,0,$mon,$day,$year)) == '7') $isDomingo = true; 
-		return $isDomingo;
-	}
-
-	public static function isSabado($day,$mon,$year){
-		$isSabado = false;
-		if (date('N',mktime(0,0,0,$mon,$day,$year)) == '6') $isSabado = true; 
-		return $isSabado;
-	}
+	
 
 	public static function isPrevToday($day,$mon,$year){
 		$isPrevToday = false;
