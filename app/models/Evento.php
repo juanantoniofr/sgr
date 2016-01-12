@@ -108,13 +108,13 @@ class Evento extends Eloquent{
     	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
     	if (Auth::user()->isUser()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',Calendar::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',Calendar::lastFriday()) .'</strong><br />';
+    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',Calendar::lastFriday()) .'</strong><br />';
     	}
 
     	
     	if (Auth::user()->isAvanceUser()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',Calendar::fristMonday()) . '</strong><br />';
+    		$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong><br />';
     	}
 
     	if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()){
@@ -276,7 +276,7 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req5',function($data){
 				if (Auth::user()->isAvanceUser()) {
-					if ( Calendar::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
+					if ( sgrCalendario::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
 				}
 			}); 
 		}	
@@ -321,7 +321,7 @@ class Evento extends Eloquent{
         if (!empty($data['fFin'])){
 			$v->sometimes('fFin','datefincurso',function($data){
 		    	$fechaFinCurso = Config::get('options.fin_cursoAcademico');
-		    	if (strtotime(Date::toDB($data['fFin'])) > strtotime($fechaFinCurso)) return true;
+		    	if (strtotime(Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
 			    });
         }
 

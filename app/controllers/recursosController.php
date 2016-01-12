@@ -40,6 +40,11 @@ class recursosController extends BaseController{
 
     $grupo = Input::get('groupID','');
     $recursos = Recurso::where('grupo_id','=',$grupo)->get();
+    //se filtran para obtener sólo aquellos con acceso para el usuario logeado
+    $recursos = $recursos->filter(function($recurso){
+        return $recurso->visible();
+    });
+    
     $respuesta['recursos'] = $recursos->toArray();
     if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio') $respuesta['optionTodos'] = true;
     $respuesta['tipoRecurso'] = $recursos[0]->tipo;

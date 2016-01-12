@@ -34,7 +34,7 @@ class Calendar {
 				
 					$html .= '<td width="10%">';
 					$html .= '<div style="color:blue">';
-					$html .= 	Date::dateTohuman($currentDate,'EN','-');
+					$html .= 	date('d-m-Y',strtotime($currentDate));//Date::dateTohuman($currentDate,'EN','-');
 					$html .= '</div>';
 					$html .= '</td>';
 					$html .= '<td width="90%">';
@@ -95,7 +95,7 @@ class Calendar {
 			$html .= '<tr style="">';
 			$html .= '<td colspan="2">';
 			$html .= '<div class="alert alert-success" role="alert">';
-			$html .= 	'Se muestran los eventos programados hasta el <strong>'. Date::dateTohuman($lastDate,'EN','-').'</strong>';
+			$html .= 	'Se muestran los eventos programados hasta el <strong>'. date('d-m-Y',strtotime($lastDate)).'</strong>';
 			$html .= ' [ <a href=""  class="alert-link" id="agendaVerMas" data-date="'.Date::nextDay($lastDate).'">Ver más</a> ]';
 			$html .= '</div>';
 			$html .= '</td>';
@@ -467,12 +467,12 @@ class Calendar {
 		return $html;
 	}//getPrintBodyTableWeek
 
-	public static function getCaption($nombremes = '',$year = ''){
+/*	public static function getCaption($nombremes = '',$year = ''){
 
 		$caption = '<span id="alternate">'.$nombremes.' / '.$year.'</span>';
 		return $caption;
 	}
-
+*/
 	public static function gettHead($viewActive='month',$day='',$month='',$year=''){
 
 		
@@ -880,13 +880,13 @@ class Calendar {
 		$capacidad = Auth::user()->capacidad;
 		switch ($capacidad) {
 				case '1': //alumnos
-					$intfristMondayAviable = $self->fristMonday();
+					$intfristMondayAviable = sgrCalendario::fristMonday();
 					$intlastFridayAviable = $self->lastFriday();
 					$intCurrentDate = mktime(0,0,0,$mon,$day,$year);
 					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
 					break;	
 				case '2': //pdi & pas administración
-					$intfristMondayAviable = $self->fristMonday(); //Primer lunes disponible
+					$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
 					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
 					break;
@@ -953,7 +953,7 @@ class Calendar {
 	 *		@param void 
 	 *		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
 	*/
-	public static function fristMonday(){
+	/*public static function fristMonday(){
 		
 		$l = '';
 		//Parámetros
@@ -975,7 +975,7 @@ class Calendar {
 
 	   return $l;
 	
-	}
+	}*/
 
 	/**
 	 *		@param void 

@@ -13,6 +13,9 @@ class sgrCalendario {
 
 	function __construct($numMes = '',$year = ''){
 		
+		if (empty($numMes)) $numMes = date('m');//mes actual
+		if (empty($year)) $year = date('Y');//año actual
+
 		$this->setNumeroMes($numMes);
 		$this->setYear($year);
 		$this->setUltimoDiaMes();//28|29|30|31
@@ -56,15 +59,41 @@ class sgrCalendario {
  	 * @return Obj sgrDia | false
 	*/
 	public function dia($numDia){
-		/*$result = false;
-		foreach ($this->diasMes as $key => $semana) {
-			foreach ($semana as $key => $sgrDia) {
-				if ($sgrDia->numeroDia() == $numDia) return $sgrDia;
-			}
-			
-		}*/
-		if (array_key_exists($numDia, $this->diasmes))	return $this->diasmes[$numDia];
+		
+		if (array_key_exists($numDia, $this->diasMes))	return $this->diasMes[$numDia];
 		return false;
+	}
+
+
+	//static functions
+
+	/**
+	 *
+	 *		@param void 
+	 *		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
+	*/
+	public static function fristMonday(){
+		
+		$l = '';
+		//Parámetros
+		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
+		$n = Config::get('options.ant_minSemanas'); 
+		//día actual
+		$today = date('Y-m-d');
+		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
+		
+		//Si es de lunes a jueves 
+		if ($numWeekCurrentDay <= $lastDay){
+	   		// y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
+	   		$l = strtotime('next monday ' . $today ); //lunes semana siguiente
+		}
+		else {
+			// y si la reserva está entre las fechas de 2ª semana posterior a la actual 
+			$l = strtotime('next monday ' . $today .' +1 week'); //lunes de la 2ª semana siguiente
+	   	}
+
+	   return $l;
+	
 	}
 
 	//private functions

@@ -44,7 +44,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		
 		$nh = 0;
 
-		$fristMonday = Calendar::fristMonday(); //devuelve timestamp
+		$fristMonday = sgrCalendario::fristMonday(); //devuelve timestamp
 		$lastFriday = Calendar::lastFriday(); //devuelve timestamp	
 
 		$fm = date('Y-m-d',$fristMonday); //formato para la consulta sql (fechaIni en Inglés)
@@ -58,8 +58,35 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		
 		return $nh;
 	}	
+	/**
+	*
+	* @return grupos de recursos con acceso para el usuario logueado?? 
+	* --Revisar:devuelve el objeto recurso, cuando solo necesita el nombre del grupo--
+	*/
+	public function gruposRecursos(){
+		
+		$conAcceso = array();
+		$visible = array();
+		$result = array();
 
+		$recursos = Recurso::all();
+		//se filtran para obtener sólo aquellos con acceso para el usuario logeado
+		$recursos = $recursos->filter(function($recurso){
+    		return $recurso->visible();
+		});
+		
+		
+		//Nos quedamos con los grupos sin repeticiones
+		foreach ($recursos as $recurso) {
+			if (in_array($recurso->grupo_id,$conAcceso) === false){
+				$conAcceso[] = $recurso->grupo_id;
+				$result[] = $recurso;	
+			} 
+				
+		}
 
+		return $result;
+	}
 	
 	/**
 	 * Get the unique identifier for the user.

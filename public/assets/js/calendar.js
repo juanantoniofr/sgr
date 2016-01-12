@@ -141,7 +141,7 @@ $(function(e){
     					var $itemsdisabled = 0;
     					var $recursos = respuesta['recursos'];
     					var $html = '';
-    					console.log(respuesta);
+    					
     					$.each($recursos,function(key,$recurso){
       						$html = $html + '<option ' + $selected + ' value="' + $recurso.id + '" data-disabled="' + $recurso.disabled + '">' + $recurso.nombre;
       						if ($recurso.disabled) {
@@ -581,6 +581,7 @@ $(function(e){
 					else $('#warning').fadeOut('fast');
 
 					$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
+					
 					$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
 					$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
 					

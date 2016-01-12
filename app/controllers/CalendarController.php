@@ -32,12 +32,12 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
 				break;
 			case 'month':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 				$table['tHead'] = Calendar::getPrintHead('month',$day,$month,$year);
 				$table['tBody'] = Calendar::getPrintBodytableMonth($data,$month,$year,$id_recurso);	
 				break;
 			case 'week':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 			  	$table['tHead'] = Calendar::getPrintHead('week',$day,$month,$year);
 				$table['tBody']= Calendar::getPrintBodytableWeek($data,$day,$month,$year,$id_recurso);
 				break;
@@ -45,7 +45,7 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo.....</p>';	
 				break;
 			case 'agenda':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 				//$table['tHead'] = Calendar::gettHead('agenda',$input['day'],$input['month'],$input['year']);
 				$table['tBody'] = Calendar::getBodytableAgenda($day,$month,$year);
 				break;
@@ -132,51 +132,44 @@ class CalendarController extends BaseController {
 	//Se carga la vista por defecto: Mensual
 	public function showCalendarViewMonth(){
 		
-		$input = Input::all();
+		$viewActive = 'month'; //vista por defecto
+		$uvus = Input::get('uvus','');
+		$msg = '';
+		$nh = Auth::user()->numHorasReservadas();//Número de horas reservadas
+
+			
 		$day = Input::get('day',date('d'));
-		$numMonth = Input::get('numMonth',date('m'));
-		$year = Input::get('year',date('Y'));
-		$uvus = INput::get('uvus','');
+		$numMonth = Input::get('numMonth','');
+		$year = Input::get('year','');
+		
+		if (empty($numMonth) || empty($year)){
+			$tsPrimerLunes = sgrCalendario::fristMonday();//timestamp primer lunes reservable...
+			$datefirstmonday = getdate($tsPrimerLunes);
+			$numMonth = $datefirstmonday['mon'];//Representación númerica del mes del 1 al 12
+			$year = $datefirstmonday['year']; //Representación numérica del año cuatro dígitos
+			$day = $datefirstmonday['mday']; //Representación númerica del dia del mes: 1 - 31	
+		}
+
 
 		$sgrCalendario = new sgrCalendario($numMonth,$year);
-
+		$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
+		
 		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
-		$nh = Auth::user()->numHorasReservadas();
-		$msg = '';
 		if (Auth::user()->isUser() && $nh >=12 ){
 			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
 		}	
 
-		//Calendar::fristMonday() -> devuelve el timestamp del primer lunes disponible para reserva
-		$tsPrimerLunes = Calendar::fristMonday();
-		if(empty($input)){
-			$datefirstmonday = getdate($tsPrimerLunes);
-			$numMonth = $datefirstmonday['mon'];//Representación númerica del mes del 1 al 12
-			$year = $datefirstmonday['year']; //Representación numérica del año cuatro dígitos
-			$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-			$day = $datefirstmonday['mday']; //Representación númerica del dia del mes: 1 - 31	
-		} 
-		//else -> los métodos getCaption, getHead y getBodytableMonth optiene los valores de fecha directamente desde el array de entrada post.
 		
-		$viewActive = 'month'; //vista por defecto
-		$tCaption = Calendar::getCaption($sgrCalendario->nombreMes(),$year);
 		$tHead = Calendar::gettHead($viewActive,$day,$numMonth,$year);
 		$tBody = Calendar::getBodytableMonth($numMonth,$year);
-				
-		//Se obtinen todos los grupos de recursos
-		//$grupos = DB::table('recursos')->select('id', 'acl', 'grupo','grupo_id')->groupby('grupo')->get();
-		$grupos = Recurso::groupby('grupo')->get();
-		//se filtran para obtener sólo aquellos con acceso para el usuario logeado
-		$groupWithAccess = array();
-		foreach ($grupos as $grupo) {
-			if ($grupo->visible())
-				$groupWithAccess[] = $grupo;
-		}
+		
+		$gruposderecursos = Auth::user()->gruposRecursos();		
+		
 		
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tCaption',$tCaption)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $groupWithAccess,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()));
 	}
 
 	//Ajax functions
@@ -194,14 +187,14 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
 				break;
 			case 'month':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);// . '--' .$input['month'] .' - ' .$input['year'];
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 				$table['tHead'] = Calendar::gettHead('month',$input['day'],$input['month'],$input['year']);
 				
 				$table['tBody'] = Calendar::getBodytableMonth($input['month'],$input['year'],$input['id_recurso']);	
 				
 				break;
 			case 'week':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 			  	$table['tHead'] = Calendar::gettHead('week',$input['day'],$input['month'],$input['year']);
 				$table['tBody']= Calendar::getBodytableWeek($input['day'],$input['month'],$input['year'],$input['id_recurso']);
 				break;
@@ -209,7 +202,7 @@ class CalendarController extends BaseController {
 				$table['tBody'] = '<p>Aún en desarrollo.....</p>';	
 				break;
 			case 'agenda':
-				$table['tCaption'] = Calendar::getCaption($sgrCalendario->nombreMes(),$input['year']);
+				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 				//$table['tHead'] = Calendar::gettHead('agenda',$input['day'],$input['month'],$input['year']);
 				$table['tBody'] = Calendar::getBodytableAgenda($input['day'],$input['month'],$input['year']);
 				break;
