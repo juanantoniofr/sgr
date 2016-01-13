@@ -5,7 +5,7 @@ class Calendar {
     private $aHour = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
     private $aDaysWeek = array('lunes','martes','miércoles','jueves','viernes','sabado','domingo');
 	
-	private $aAbrNameDaysWeek = array('1'=>'Lun','2'=>'Mar','3'=>'Mie','4'=>'Jue','5'=>'Vie','6'=>'Sab','7'=>'Dom');
+	//private $aAbrNameDaysWeek = array('1'=>'Lun','2'=>'Mar','3'=>'Mie','4'=>'Jue','5'=>'Vie','6'=>'Sab','7'=>'Dom');
 
 	public static function getBodyTableAgenda($day,$month,$year){
 		
@@ -114,14 +114,11 @@ class Calendar {
 		$html = '';	
 		$sgrCalendario = new sgrCalendario($mon,$year);
 		$days = $sgrCalendario->dias();
-		//N -> Representación numérica ISO-8601 del día de la semana (añadido en PHP 5.1.0):
-		// 1 (para lunes) hasta 7 (para domingo)
+		//N -> Representación numérica ISO-8601 del día de la semana (añadido en PHP 5.1.0): 1 (para lunes) hasta 7 (para domingo)
 		$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
 		//$daysOfMonth = sgrCalendario::dias($mon,$year);
-		//foreach ($daysOfMonth as $week) {
 		$diaActual = 1;
 		$j=1;
-		//for ($j=1;$j<=$sgrCalendario->numeroSemanaUltimoDiaMes();$j++) {
 		while (mktime(0,0,0,$mon,$sgrCalendario->ultimoDia(),$year) >= mktime(0,0,0,$mon,$diaActual,$year) ){
 			//una fila por cada semana del mes
 			$html .= '<tr class="fila">';
@@ -129,20 +126,26 @@ class Calendar {
 				//Una celda por cada día de la semama
 				$html .= '<td class="celda">';
 					//días de la primera semana y de la última que no son del mes $mon-$year.
-					if (($diaSemanaPimerDiaMes > $i && $j == 1) || $diaActual > $sgrCalendario->ultimoDia()) $html .= $self->getContentDisable_td(0,$mon,$year);
+					if (($diaSemanaPimerDiaMes > $i && $j == 1) || $diaActual > $sgrCalendario->ultimoDia()){
+						$html .= (string) View::make('calendario.tdFestivo');
+						
+					}
 					else {
 						//Para los días de $mon-$year
-						if($days[$diaActual]->festivo()) $html .= $self->getContentTDFestivo($diaActual,$mon,$year);
+						if($days[$diaActual]->festivo()){
+							$idfecha = date('jnY',mktime(0,0,0,$mon,$diaActual,$year)); 
+							$fecha = date('j-n-Y',mktime(0,0,0,$mon,$diaActual,$year));
+							$html .= (string) View::make('calendario.tdFestivo')->with('idfecha',$idfecha)->with('fecha',$fecha)->with('view','month')->with('day',$diaActual)->with('festivo','festivo');
+						} 
 							else{
         						//No es un día de otro mes y no es festivo: entonces
-        						if($self->isDayAviable($diaActual,$mon,$year)){ //Depende del rol
+        						if(Auth::user()->isDayAviable($diaActual,$mon,$year)){ //Depende del rol
         							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
 									$enabled = true;
 									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
         						}
         						else {
-        							//$html .= $self->getCellDisable($day);	
-		   							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
+        							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
 		   							$enabled = false;
 									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
         						}         						
@@ -163,45 +166,57 @@ class Calendar {
 		$self = new self();
 		$html = '';		
 		//$daysOfMonth = sgrCalendario::dias($mon,$year);
+		
+		//return  $mon ;
 		$sgrCalendario = new sgrCalendario($mon,$year);
-		$daysOfMonth = $sgrCalendario->dias();
-		$diaSemanaPrimerDiaMesActual = date('N',mktime(0,0,0,$mon,'1',$year));//1 -> lunes... 7->domingo
-		$currentDiaUltimaSemanaMesAnterior = 0;
-		$numeroDediasPrimeraSemanaMesAnterior = $diaSemanaPrimerDiaMesActual - 1; //puede ser cero si el mes empieza en lunes
-		foreach ($daysOfMonth as $week) {
-      		$html .= '<tr>';
-      			foreach($week as $day){
-      				$ancho ='18%';
-      				if ($day == 0) {
-      					$currentDiaUltimaSemanaMesAnterior++;
-      					$diff = $currentDiaUltimaSemanaMesAnterior - $diaSemanaPrimerDiaMesActual;
-      					$diaSemana = date('N',strtotime($diff . ' days',mktime(0,0,0,$mon,'1',$year)));
-      					if ($diaSemana == '6' || $diaSemana == '7') $ancho = '3%';
-      					$html .= '<td width="'.$ancho.'" >';
-       					$html .= $self->getContentDisable_td($day,$mon,$year);
-       					$html .= '</td>';
-      				}
-      				else {
-      					if($day->festivo()) {
-      						$ancho = '3%';
-        					$html .= '<td width="'.$ancho.'" >';
-        					$html .= $self->getContentTDFestivo($day,$mon,$year);
-        					$html .= '</td>';
-        				}
-        				else{
-        					$html .= '<td width="'.$ancho.'">';
-        					$events = $self->getEvents($day,$mon,$year,$id_recurso);
-		   					$enabled = false;
-							$html .= $self->getContentTDtoPrint($data,$day,$mon,$year,$id_recurso,$events,$enabled);
-        					$html .= '</td>';
-        					}
-        				}
-        			
-        		}
-        	$html .= '</tr>';
-        }	
- 		return $html;
+		$days = $sgrCalendario->dias();
+		//$diaSemanaPrimerDiaMesActual = date('N',mktime(0,0,0,$mon,'1',$year));//1 -> lunes... 7->domingo
+		$diaSemanaPrimerDiaMes = date('N',$days[1]->timestamp());
+		$diaActual = 1;
+		$j=1;
+		while (mktime(0,0,0,$mon,$sgrCalendario->ultimoDia(),$year) >= mktime(0,0,0,$mon,$diaActual,$year) ){
+			$html .= '<tr>';
+			for($i=1;$i<=7;$i++){
+				$ancho = '18%'; //ancho de celda por defecto
+				
+				//Una celda por cada día de la semama
+				
+				//días de la primera semana y de la última que no son del mes $mon-$year.
+				if (($diaSemanaPrimerDiaMes > $i && $j == 1) || $diaActual > $sgrCalendario->ultimoDia()){
+					if (isset($days[$diaActual]) && $days[$diaActual]->festivo()) $ancho = '3%';//si es festivo el ancho es 3%
+					if ($diaActual > $sgrCalendario->ultimoDia()) $ancho = '3%';
+      				
+      				$html .= '<td width="'.$ancho.'" >';
+      				$html .= (string) View::make('calendario.tdFestivo');
+					$html .= '</td>';
+				}
+				else {
+					if($days[$diaActual]->festivo()){
+						$idfecha = date('jnY',mktime(0,0,0,$mon,$diaActual,$year)); 
+						$fecha = date('j-n-Y',mktime(0,0,0,$mon,$diaActual,$year));
+						$ancho = '3%';//si es festivo el ancho es 3%
+						$html .= '<td width="'.$ancho.'" >';
+						$html .= (string) View::make('calendario.tdFestivo')->with('idfecha',$idfecha)->with('fecha',$fecha)->with('view','month')->with('day',$diaActual)->with('festivo','festivo');
+						$html .= '</td>';
+					}
+					else{
+						//No es un día de otro mes y no es festivo: entonces
+        				$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
+						$html .= '<td width="'.$ancho.'" >';
+						$html .= $self->getContentTDtoPrint($data,$diaActual,$mon,$year,$id_recurso,$events);
+						$html .= '</td>';
+        			}
+        			$diaActual++;
+				}//fin else
+				
+				
+			}//fin for
+			$html .= '</tr>';
+			$j++;
+		}//fin while
+		return $html;
 	}
+
 
 	private function getContentTDtoPrint($data,$day,$mon,$year,$id_recurso,$events,$hour=0,$min=0,$view='month',$enabled='false')	{
 		
@@ -373,7 +388,7 @@ class Calendar {
 		$self = new self();
 
 		//timeStamp lunes semana de $day - $month -$year seleccionado por el usuario
-		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
+		$timefirstMonday = sgrDate::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
 		$sgrCalendario = new sgrCalendario($month,$year);
@@ -396,11 +411,14 @@ class Calendar {
       			$sgrDia = $sgrCalendario->dia($currentDay);
       			$currentMon = date('n',$currentTime);
       			$currentYear = date('Y',$currentTime);
-				if($sgrDia->festivo()) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
-				//else $html .= '<div>'.$hour.'</div>';
+				if($sgrDia->festivo()) {
+					$idfecha = date('jnY',mktime(0,0,0,$currentMon,$currentDay,$currentYear)); 
+					$fecha = date('j-n-Y',mktime(0,0,0,$currentMon,$currentDay,$currentYear));
+					$html .= (string) View::make('calendario.tdFestivo')->with('idfecha',$idfecha)->with('fecha',$fecha)->with('view','week')->with('festivo','festivo');
+				}
 				else{	
 					//Los días disponibles para reserva depende del rol de usuario
-					if( $self->isDayAviable($currentDay,$currentMon,$currentYear) ){
+					if( Auth::user()->isDayAviable($currentDay,$currentMon,$currentYear) ){
 					
 						$startHour = $self->aHour[$j];
 						$itemsHours = explode(':',$startHour);
@@ -408,7 +426,9 @@ class Calendar {
 						$events = $self->getEventsViewWeek($currentDay,$currentMon,$currentYear,$id_recurso,$hour,30);
 						$html .= $self->getContentTD($currentDay,$currentMon,$currentYear,$id_recurso,$events,$hour,30,'week'); 
 					}
-					else { $html .= $self->getCellDisable($currentDay,'week');}
+					else { //$html .= $self->getCellDisable($currentDay,'week');
+							$html .= (string) View::make('calendario.tdFestivo')->with('view','week');
+					}
 					
 				}
 				$html .='</td>';
@@ -425,7 +445,7 @@ class Calendar {
 		$self = new self();
 
 		//timeStamp lunes semana de $day - $month -$year seleccionado por el usuario
-		$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);
+		$timefirstMonday = sgrDate::timestamplunesanterior($day,$month,$year);
 		//número de día del mes del lunes de la semana seleccionada
 		$firstMonday = date('j',$timefirstMonday);
 		$sgrCalendario = new sgrCalendario($month,$year);
@@ -444,11 +464,15 @@ class Calendar {
       			$sgrDia = $sgrCalendario->dia($currentDay);
       			$currentMon = date('n',$currentTime);
       			$currentYear = date('Y',$currentTime);
-				if($sgrDia->festivo()) $html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
-				//else $html .= '<div>'.$hour.'</div>';
+				if($sgrDia->festivo()){
+					$idfecha = date('jnY',mktime(0,0,0,$currentMon,$currentDay,$currentYear)); 
+					$fecha = date('j-n-Y',mktime(0,0,0,$currentMon,$currentDay,$currentYear));
+					$html .= (string) View::make('calendario.tdFestivo')->with('idfecha',$idfecha)->with('fecha',$fecha)->with('view','week')->with('festivo','festivo');
+					$html .= $self->getContentTDFestivo($currentDay,$currentMon,$currentYear,'week');
+				}
 				else{	
 					//Los días disponibles para reserva depende del rol de usuario
-					if( $self->isDayAviable($currentDay,$currentMon,$currentYear) ){
+					if( Auth::user()->isDayAviable($currentDay,$currentMon,$currentYear) ){
 					
 						$startHour = $self->aHour[$j];
 						$itemsHours = explode(':',$startHour);
@@ -456,7 +480,9 @@ class Calendar {
 						$events = $self->getEventsViewWeek($currentDay,$currentMon,$currentYear,$id_recurso,$hour,30);
 						$html .= $self->getContentTDtoPrint($data,$currentDay,$currentMon,$currentYear,$id_recurso,$events,$hour,30,'week'); 
 					}
-					else { $html .= $self->getCellDisable($currentDay,'week');}
+					else { //$html .= $self->getCellDisable($currentDay,'week');
+							$html .= (string) View::make('calendario.tdFestivo')->with('view','week');
+					}
 					
 				}
 				$html .='</td>';
@@ -467,115 +493,7 @@ class Calendar {
 		return $html;
 	}//getPrintBodyTableWeek
 
-/*	public static function getCaption($nombremes = '',$year = ''){
-
-		$caption = '<span id="alternate">'.$nombremes.' / '.$year.'</span>';
-		return $caption;
-	}
-*/
-	public static function gettHead($viewActive='month',$day='',$month='',$year=''){
-
-		
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$table['tBody']="error setlocale";}
-
-		$self = new self();	  		
-		
-		$html = '';
-		switch ($viewActive) {
-			case 'month':
-				$html .='<tr>
-					        <th>Lunes</th>
-					        <th>Martes</th>
-					        <th>Miércoles</th>
-					        <th>Jueves</th>
-					        <th>Viernes</th> 
-					        <th class="hidden-print">Sabado</th>
-					        <th class="hidden-print">Domingo</th>
-					    </tr>';
-			    break;
-			case 'week':
-				$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
-				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
-				//$month = date('n',$timefirstMonday);
-				//$year = date('Y',$timefirstMonday);
-				$html .='<tr><th></th>';
-				for($i=0;$i<7;$i++){
-					//$time = Date::timeStamp(($numOfMonday + $i),$month,$year);
-					$time = strtotime('+'.$i.' day',$timefirstMonday);	
-					//strftime('%a, %d/%b',$time)
-					$text = $self->aAbrNameDaysWeek[date('N',$time)] . ', '.strftime('%d/%b',$time);
-					$html .= '<th style = "white-space:nowrap;font-size-adjust:none">'.$text.'</th>';
-				}
-				$html .='</tr>';
-			    break;
-			case 'agenda':
-				$html .='<tr>
-							<th>Fecha</th>
-							<th>Horario</th>
-							<th>información</th>
-			         	</tr>';
-				break;
-			default:
-				$html = 'error al generar cabecera de tabla';
-			break;
-		}
-		
-		
-		return $html;
-	}
-
-	public static function getPrintHead($viewActive='month',$day='',$month='',$year=''){
-
-		
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$table['tBody']="error setlocale";}
-
-		$self = new self();	  		
-		
-		$html = '';
-		switch ($viewActive) {
-			case 'month':
-				$html .='<tr >
-					        <th style="border:1px solid green;height:40px" width="18%">Lunes</th>
-					        <th style="border:1px solid green;height:40px" width="18%">Martes</th>
-					        <th style="border:1px solid green;height:40px" width="18%">Miércoles</th>
-					        <th style="border:1px solid green;height:40px" width="18%">Jueves</th>
-					        <th style="border:1px solid green;height:40px" width="18%">Viernes</th> 
-					        <th style="border:1px solid green;height:40px" width="3%">S</th> 
-					        <th style="border:1px solid green;height:40px" width="3%">D</th> 
-					    </tr>';
-			    break;
-			case 'week':
-				$timefirstMonday = Date::timestamplunesanterior($day,$month,$year);// strtotime('Monday this week',mktime(0,0,0,$month,$day,$year));	
-				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
-				//$month = date('n',$timefirstMonday);
-				//$year = date('Y',$timefirstMonday);
-				$html .='<tr><th style="width:80px;height:20px">Hora</th>';
-				for($i=0;$i<5;$i++){
-					//$time = Date::timeStamp(($numOfMonday + $i),$month,$year);
-					$time = strtotime('+'.$i.' day',$timefirstMonday);	
-					//strftime('%a, %d/%b',$time)
-					$text = $self->aAbrNameDaysWeek[date('N',$time)] . ', '.strftime('%d/%b',$time);
-					$html .= '<th>'.$text.'</th>';
-				}
-				$html .='</tr>';
-			    break;
-			case 'agenda':
-				$html .='<tr>
-							<th>Fecha</th>
-							<th>Horario</th>
-							<th>información</th>
-			         	</tr>';
-				break;
-			default:
-				$html = 'error al generar cabecera de tabla';
-			break;
-		}
-		
-		
-		return $html;
-	}//getPrintHead
+	
 
 	public static function hasSolapamientos($evento_id,$id_recurso){
 		
@@ -653,7 +571,7 @@ class Calendar {
 		$aColorLink = array();
 
 		//Establece el estilo de las diferentes celdas del calendario
-		if(Date::isPrevToday($day,$mon,$year) || !$self->isDayAviable($day,$mon,$year)) $class = 'day '.$view.' disable';
+		if(Date::isPrevToday($day,$mon,$year) || !Auth::user()->isDayAviable($day,$mon,$year)) $class = 'day '.$view.' disable';
         else { 	$class = 'day '.$view.' formlaunch';}
 		
 		$html .= '<div class = "'.$class.'" id = '.date('jnYGi',mktime($hour,$min,0,$mon,$day,$year)).' data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.date('G:i',mktime($hour,$min,0,$mon,$day,$year)).'">';
@@ -756,7 +674,7 @@ class Calendar {
 
         	//Si usuario autenticado puede editar el evento:
         	$contenido .= htmlentities('<hr />');
-        	if($self->puedeEditar(Auth::user()->id,$event->user_id,$event->reservadoPor_id) && $self->isDayAviable($day,$mon,$year)){
+        	if($self->puedeEditar(Auth::user()->id,$event->user_id,$event->reservadoPor_id) && Auth::user()->isDayAviable($day,$mon,$year)){
         		$contenido .= htmlentities('
         				<a class = "comprobante" href="'.URL::route('justificante',array('idEventos' => $event->evento_id)).'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Comprobante" target="_blank"><span class="fa fa-file-pdf-o fa-fw text-success" aria-hidden="true"></span></a>
         				 |
@@ -867,142 +785,4 @@ class Calendar {
 		return $puede;
 	}
 
-	private function isDayOtherMonth($day){
-		$otherMonth = false;
-		if($day->numeroDia() == 0) $otherMonth = true;
-		return $otherMonth;
-	}
-
-	
-	private function isDayAviable($day,$mon,$year,$view = 'month'){
-		$isAviable = false;
-		$self = new self();
-		$capacidad = Auth::user()->capacidad;
-		switch ($capacidad) {
-				case '1': //alumnos
-					$intfristMondayAviable = sgrCalendario::fristMonday();
-					$intlastFridayAviable = $self->lastFriday();
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year);
-					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
-					break;	
-				case '2': //pdi & pas administración
-					$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
-					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
-					break;
-				case '3': //Técnicos MAV
-				case '4': //administradores SGR
-				case '5': //Validadores
-				case '6': //Supervisores (EE MAV)
-					$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
-					if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
-					break;
-		}
-		
-
-		
-		return $isAviable;
-	}
-	
-	private function getContentDisable_td($day,$mon,$year){
-		$html = '';
-		//$lastDay = sgrCalendario::dias($mon,$year);
-		//$lastDay = sgrCalendario::dias($mon,$year);
-		$html = '<div  class = "day disable">';
-		if (0 != $day) $html .=  '<small>'. $day .'</small>';
-		$html .= '</div>';
-		return $html;
-	}
-	
-	private function getCellDisable($day,$view = 'month'){
-		if ($view == 'month') $strTitle = $day;
-        else $strTitle = '';
-		$html = '<div  class = "day '.$view.' disable">'. $strTitle .'</div>';
-		return $html;
-	}
-
-	private function getContentTDFestivo($day,$mon,$year,$view='month'){
-		$idfecha = date('jnY',mktime(0,0,0,$mon,$day,$year));
-		if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
-        else $strTitle = '';
-		$html = '<div  id='.$idfecha.' class = "day '.$view.' festivo disable hidden-print"  data-fecha="'.date('j-n-Y',mktime(0,0,0,$mon,$day,$year)).'">'. $strTitle .'</div>';
-		return $html;
-	}
-	
-	private function randomColor() {
-	    $str = '#';
-	    for($i = 0 ; $i < 6 ; $i++) {
-	        $randNum = rand(0 , 15);
-	        switch ($randNum) {
-	            case 10: $randNum = 'A'; break;
-	            case 11: $randNum = 'B'; break;
-	            case 12: $randNum = 'C'; break;
-	            case 13: $randNum = 'D'; break;
-	            case 14: $randNum = 'E'; break;
-	            case 15: $randNum = 'F'; break;
-	        }
-	        $str .= $randNum;
-	    }
-	    return $str;
-	}
-
-	
- 	/**
-	 *
-	 *		@param void 
-	 *		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
-	*/
-	/*public static function fristMonday(){
-		
-		$l = '';
-		//Parámetros
-		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
-		$n = Config::get('options.ant_minSemanas'); 
-		//día actual
-		$today = date('Y-m-d');
-		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
-		
-		//Si es de lunes a jueves 
-		if ($numWeekCurrentDay <= $lastDay){
-	   		// y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
-	   		$l = strtotime('next monday ' . $today ); //lunes semana siguiente
-		}
-		else {
-			// y si la reserva está entre las fechas de 2ª semana posterior a la actual 
-			$l = strtotime('next monday ' . $today .' +1 week'); //lunes de la 2ª semana siguiente
-	   	}
-
-	   return $l;
-	
-	}*/
-
-	/**
-	 *		@param void 
-	 *		@return  $v timestamp del viernes de la primera semana reservable a partir del día actual
-	*/
-	
-	public static function lastFriday(){
-
-		$v = '';
-		//Parámetros
-		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
-		$n = Config::get('options.ant_minSemanas'); 
-		//día actual
-		$today = date('Y-m-d');
-		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
-		
-		//Si es de lunes a jueves 
-		if ($numWeekCurrentDay <= $lastDay){
-		   // y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
-		   $v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes semana siguinte
-		// si es viernes, sabado o domingo   
-		}
-		else {
-		  	$v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes la n-esima semana siguinte
-		}
-
-		return $v;
-
-	}
 }

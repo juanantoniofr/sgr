@@ -72,7 +72,7 @@
       <div id="loadCalendar">  
         <table class="pull-left " style = "table-layout: fixed;width: 100%;" id="tableCalendar" >
           <caption id="tableCaption">{{$viewCaption}}</caption>
-          <thead id="tableHead">{{$tHead}}</thead>
+          <thead id="tableHead">{{$viewHead}}</thead>
           <tbody id="tableBody">{{$tBody}}</tbody>
         </table>
       </div>

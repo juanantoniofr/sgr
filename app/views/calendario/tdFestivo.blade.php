@@ -1,0 +1,1 @@
+<div  id="{{ $idfecha or ''}}" class = "day {{ $view or ''}} {{ $festivo or ''}} disable"   data-fecha="{{ $fecha or ''}}"><small> {{ $day  or '' }}</small></div>

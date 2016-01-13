@@ -33,12 +33,21 @@ class CalendarController extends BaseController {
 				break;
 			case 'month':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
-				$table['tHead'] = Calendar::getPrintHead('month',$day,$month,$year);
+				$table['tHead'] = (string) View::make('calendario.printHeadMonth');//Calendar::getPrintHead('month',$day,$month,$year);
 				$table['tBody'] = Calendar::getPrintBodytableMonth($data,$month,$year,$id_recurso);	
 				break;
 			case 'week':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
-			  	$table['tHead'] = Calendar::getPrintHead('week',$day,$month,$year);
+			  	
+
+				$timefirstMonday = sgrDate::timestamplunesanterior($day,$month,$year);
+				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
+				for($i=0;$i<5;$i++){
+					$time = strtotime('+'.$i.' day',$timefirstMonday);	
+					$text[$i] = sgrDate::abrDiaSemana($time) . ', '.strftime('%d/%b',$time);
+				}
+				$table['tHead'] = (string) View::make('calendario.headWeek')->with('text',$text)->with('hora','Hora');
+
 				$table['tBody']= Calendar::getPrintBodytableWeek($data,$day,$month,$year,$id_recurso);
 				break;
 			case 'day':
@@ -159,8 +168,24 @@ class CalendarController extends BaseController {
 			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
 		}	
 
+		switch ($viewActive) {
+			case 'month':
+				$tHead = (string) View::make('calendario.headMonth');
+				break;
+			case 'week':
+				$timefirstMonday = sgrDate::timestamplunesanterior($day,$numMonth,$year);
+				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
+				for($i=0;$i<7;$i++){
+					$time = strtotime('+'.$i.' day',$timefirstMonday);	
+					$text[$i] = sgrDate::abrDiaSemana($time) . ', '.strftime('%d/%b',$time);
+				}
+				$tHead = (string) View::make('calendario.headWeek')->with('text',$text);
+				break;
+			default:
+				break;
+		}
+
 		
-		$tHead = Calendar::gettHead($viewActive,$day,$numMonth,$year);
 		$tBody = Calendar::getBodytableMonth($numMonth,$year);
 		
 		$gruposderecursos = Auth::user()->gruposRecursos();		
@@ -169,7 +194,7 @@ class CalendarController extends BaseController {
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()));
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
 	}
 
 	//Ajax functions
@@ -188,14 +213,22 @@ class CalendarController extends BaseController {
 				break;
 			case 'month':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
-				$table['tHead'] = Calendar::gettHead('month',$input['day'],$input['month'],$input['year']);
+				$table['tHead'] = (string) View::make('calendario.headMonth');//Calendar::gettHead('month',$input['day'],$input['month'],$input['year']);
 				
 				$table['tBody'] = Calendar::getBodytableMonth($input['month'],$input['year'],$input['id_recurso']);	
 				
 				break;
 			case 'week':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
-			  	$table['tHead'] = Calendar::gettHead('week',$input['day'],$input['month'],$input['year']);
+			  	
+			  	$timefirstMonday = sgrDate::timestamplunesanterior($input['day'],$input['month'],$input['year']);
+				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
+				for($i=0;$i<7;$i++){
+					$time = strtotime('+'.$i.' day',$timefirstMonday);	
+					$text[$i] = sgrDate::abrDiaSemana($time) . ', '.strftime('%d/%b',$time);
+				}
+				$table['tHead'] = (string) View::make('calendario.headWeek')->with('text',$text);
+				
 				$table['tBody']= Calendar::getBodytableWeek($input['day'],$input['month'],$input['year'],$input['id_recurso']);
 				break;
 			case 'day':
@@ -213,83 +246,4 @@ class CalendarController extends BaseController {
 	    return $table;
 	}
 
-
-
-	//Auxiliares
-	/*
-	*/
-	/*private function updateDias($oldIdSerie = '',$newIdSerie = ''){
-		
-		//$oldIdSerie = Input::get('idSerie');
-		if (!empty($oldIdSerie)){//isset(Input::get('idSerie'))){
-		 	
-			$events = Evento::select('dia')->where('evento_id','=',$oldIdSerie)->groupby('dia')->get();
-			if(count($events) > 0){
-				foreach ($events as $event)	$aDias[] = $event->dia;
-				Evento::where('evento_id','=',$oldIdSerie)->update(array('diasRepeticion' => json_encode($aDias)));
-			}
-		}
-
-		if (!empty($newIdSerie)){
-			$events = Evento::select('dia')->where('evento_id','=',$newIdSerie)->groupby('dia')->get();
-			foreach ($events as $event)	$aDias2[] = $event->dia;
-			Evento::where('evento_id','=',$newIdSerie)->update(array('diasRepeticion' => json_encode($aDias2)));
-		}
-	}*/
-/*
-	private function updatePeriocidad($newIdSerie = '',$oldIdSerie = ''){
-		
-		
-		if (!empty($oldIdSerie)){
-			$oldIdSerie = Input::get('idSerie');
-			$numEvents = Evento::where('evento_id','=',$oldIdSerie)->count();
-			if ($numEvents == 1) Evento::where('evento_id','=',$oldIdSerie)->update(array('repeticion' => 0));
-		}
-		
-		if(!empty($newIdSerie)){
-			$numEvents = Evento::where('evento_id','=',$newIdSerie)->count();
-			if ($numEvents == 1) Evento::where('evento_id','=',$newIdSerie)->update(array('repeticion' => 0));
-		}
-	}
-
-	private function updateFInicio($newIdSerie = '',$oldIdSerie = ''){
-		
-		if (!empty($oldIdSerie)){
-			$fechaPrimerEvento = Evento::where('evento_id','=',$oldIdSerie)->min('fechaEvento');
-			if (!empty($fechaPrimerEvento)){
-				Evento::where('evento_id','=',$oldIdSerie)->update(array('fechaInicio' => $fechaPrimerEvento));
-			}
-		}
-			
-		if (!empty($newIdSerie)){
-			$fechaPrimerEvento = Evento::where('evento_id','=',$newIdSerie)->min('fechaEvento');
-			if (!empty($fechaPrimerEvento)){
-				Evento::where('evento_id','=',$newIdSerie)->update(array('fechaInicio' => $fechaPrimerEvento));
-			}
-		}
-	}
-
-	private function updateFfin($newIdSerie = '',$oldIdSerie = ''){
-		
-		if (!empty($oldIdSerie)){
-			$fechaUltimoEvento = Evento::where('evento_id','=',$oldIdSerie)->max('fechaEvento');
-			if (!empty($fechaUltimoEvento)){
-				Evento::where('evento_id','=',$oldIdSerie)->update(array('fechaFin' => $fechaUltimoEvento));
-			}
-		}
-		
-		if (!empty($newIdSerie)){
-			$fechaUltimoEvento = Evento::where('evento_id','=',$newIdSerie)->max('fechaEvento');
-			if (!empty($fechaUltimoEvento)){
-				Evento::where('evento_id','=',$newIdSerie)->update(array('fechaFin' => $fechaUltimoEvento));
-			}
-		}
-
-	}
-*/	
-
-	
-	
-
-	
 }//fin del controlador

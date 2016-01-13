@@ -108,7 +108,7 @@ class Evento extends Eloquent{
     	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
     	if (Auth::user()->isUser()){
     		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',Calendar::lastFriday()) .'</strong><br />';
+    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',sgrCalendario::lastFriday()) .'</strong><br />';
     	}
 
     	
@@ -179,7 +179,7 @@ class Evento extends Eloquent{
 	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
 				if (Auth::user()->isUser()) {
-					if ( Calendar::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y')  || Calendar::lastFriday()  < Date::gettimestamp($data['fInicio'],'d-m-Y')) return true;
+					if ( sgrCalendario::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y')  || sgrCalendario::lastFriday()  < Date::gettimestamp($data['fInicio'],'d-m-Y')) return true;
 				}
 			});
 		}

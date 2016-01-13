@@ -63,28 +63,7 @@ class Date{
 		return $timestamp;
 	}
 	
-	/**
-	 * Devuelve timestamp del lunes inmediatamente anterior a fecha=$day-$month-$year
- 	 * 
- 	 * @param $day string
- 	 * @param $month string
- 	 * @param $year string
- 	 * @return $timestamp int timestamp lunes inmediatamente anterior a $day-$month-$year
-	*/
-	public static function timestamplunesanterior($day,$month,$year){
-		
-		$timestamp = '';
-		
-		$time = mktime(0,0,0,$month,$day,$year);
-		if (1 == date('N',$time)) $timestamp = $time;
-		else {
-			do {
-				$time = strtotime('-1 day', $time);
-			} while(date('N',$time)!=1);
-			$timestamp = $time;
-		} 
-		return $timestamp;
-	}
+	
   
   	/**
 	 * Devuelve $fecha en formato $farmatosalida
@@ -323,7 +302,7 @@ class Date{
 	public static function currentDay(){
 		return date('d');
 	}
-	//devuelve el número del mes (cuatro dígitos) de la fecha actual (hoy)
+	//devuelve el número del mes (dos dígitos) de la fecha actual (hoy)
 	public static function currentMonth(){
 		return date('n');
 	}

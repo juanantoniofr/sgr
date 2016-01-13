@@ -33,6 +33,35 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	
 	}
 
+	public function isDayAviable($day,$mon,$year){
+		$isAviable = false;
+		//$self = new self();
+		$capacidad = $this->capacidad;
+		switch ($capacidad) {
+				case '1': //alumnos
+					$intfristMondayAviable = sgrCalendario::fristMonday();
+					$intlastFridayAviable = sgrCalendario::lastFriday();
+					$intCurrentDate = mktime(0,0,0,$mon,$day,$year);
+					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
+					break;	
+				case '2': //pdi & pas administración
+					$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
+					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+					break;
+				case '3': //Técnicos MAV
+				case '4': //administradores SGR
+				case '5': //Validadores
+				case '6': //Supervisores (EE MAV)
+					$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
+					if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+					break;
+		}
+
+		return $isAviable;
+	}
+	
 	/**
 	 * Implementa requisito: usuarios del perfil alumno (capacidad = 1) pueden reservar como másimo 12 horas a la semana.
  	 * 
@@ -45,7 +74,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		$nh = 0;
 
 		$fristMonday = sgrCalendario::fristMonday(); //devuelve timestamp
-		$lastFriday = Calendar::lastFriday(); //devuelve timestamp	
+		$lastFriday = sgrCalendario::lastFriday(); //devuelve timestamp	
 
 		$fm = date('Y-m-d',$fristMonday); //formato para la consulta sql (fechaIni en Inglés)
 		$lf = date('Y-m-d',$lastFriday); //formato para la consulta sql (fechaFin en Inglés)

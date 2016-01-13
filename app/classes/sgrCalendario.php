@@ -96,6 +96,35 @@ class sgrCalendario {
 	
 	}
 
+	/**
+	 *		@param void 
+	 *		@return  $v timestamp del viernes de la primera semana reservable a partir del día actual
+	*/
+	
+	public static function lastFriday(){
+
+		$v = '';
+		//Parámetros
+		$lastDay = Config::get('options.ant_ultimodia'); //por defecto el jueves (dia 4 de la semana)
+		$n = Config::get('options.ant_minSemanas'); 
+		//día actual
+		$today = date('Y-m-d');
+		$numWeekCurrentDay = date('N');//,strtotime($today));//1 lunes,... 7 domingo
+		
+		//Si es de lunes a jueves 
+		if ($numWeekCurrentDay <= $lastDay){
+		   // y si la fecha de realización de la reserva está entre las fechas de la semana siguiente a la actual
+		   $v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes semana siguinte
+		// si es viernes, sabado o domingo   
+		}
+		else {
+		  	$v = strtotime('next friday ' . $today . '+'.$n.' week');//viernes la n-esima semana siguinte
+		}
+
+		return $v;
+
+	}
+
 	//private functions
 	private function setUltimoDiaMes(){
 		
@@ -132,50 +161,7 @@ class sgrCalendario {
 		}
 
 		return $this->diasMes = $diasmes;
-		/*$diasmes = array();
-
-
-		$timestamp = mktime(0,0,0,$month,1,$year);
-		$maxday = date("t",$timestamp); // número de días de $month
-		$thismonth = getdate($timestamp); //$thismonth = array con información sobre la fecha $timestamp
 		
-		// día de la semana en la que se inicia el mes $month.  siendo: 0 -> lunes, 1 -> martes,...., 6 -> domingo
-		$startday = $thismonth['wday'] - 1 ;
-		if ( $startday == -1 )	$startday = 6;
-		
-		$j = 0; //inic. indice semana del mes $month
-		$i = 0; //inic. indice dia de la semana
-		for ($currentDay=0; $currentDay<($maxday+$startday); $currentDay++) {
-    		
-    		if( $currentDay != 0 && ($currentDay % 7) == 0 ){
-    			$j++; // inc indice de semana
-    			$i = 0; // inicia indice días de nueva semana
-    		} 
-    		if($currentDay < $startday){
-    			$dia = 0;
-    			//$festivo = false;
-    			$diasmes[$j][$i] = new sgrDia($dia,'hola radiola...');	
-    		} 
-    		else {
-    			$dia = $currentDay - $startday + 1;
-    			$diasmes[$j][$i] = new sgrDia($dia,$this->esFestivo($dia));
-    		}
-    		$i++; //inc indice día semana en curso ($j)
-    	}
-
-    	//completar última semana con ceros los días que no son del mes $month
-    	$numDaysLastWeek = count($diasmes[$j]);
-    	$inc = 1;
-    	if ( $numDaysLastWeek < 7 ){
-    		while ( $numDaysLastWeek < 7) {
-    			$dia = $maxday + $inc;
-    			$diasmes[$j][$numDaysLastWeek] = new sgrDia(0,$this->esFestivo(0));
-    			$inc++;
-    			$numDaysLastWeek++;	
-    		} 
-    	}
-
-    	return $this->diasMes = $diasmes;*/
 	}
 	
 	/**
@@ -189,8 +175,8 @@ class sgrCalendario {
 		$mes = '';
 		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
 			  		$nombremes="Error setlocale";}
-
-		$timestamp = strtotime('1970-'.$month.'-1');
+		$m = (int) $month;	  		
+		$timestamp = strtotime('1970-'.$m.'-1');
 		$mes = ucfirst(strftime('%B',$timestamp));
 		return $this->nombreMes = $mes;
 	}
