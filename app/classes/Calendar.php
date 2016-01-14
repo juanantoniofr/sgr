@@ -161,6 +161,134 @@ class Calendar {
  		return $html;
 	}//getBodyTableMonth
 
+	private function getContentTD($day,$mon,$year,$id_recurso,$events,$hour=0,$min=0,$view='month',$enabled='false'){
+		$html = '';
+
+		//Demasiados eventos para la altura de la celda??
+		$muchosEventos = false;
+		($view == 'week') ? $limit = 4 : $limit = 4;
+        count($events) > $limit ? $classLink='mas' : $classLink='';       
+       	
+       	if (count($events) > $limit) $muchosEventos=true;
+       	//fin
+
+		$html = (string) View::make('calendario.td')->with('view',$view)->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('hour',$hour)->with('min',$min)->with('mon',$mon)->with('day',$day)->with('year',$year)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events);
+
+		return $html;
+
+		//Establece el estilo de las diferentes celdas del calendario
+		//if(Date::isPrevToday($day,$mon,$year) || !Auth::user()->isDayAviable($day,$mon,$year)) $class = 'day '.$view.' disable';
+        //else { 	$class = 'day '.$view.' formlaunch';}
+		
+		//$html .= '<div class = "'.$class.'" id = '.date('jnYGi',mktime($hour,$min,0,$mon,$day,$year)).' data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.date('G:i',mktime($hour,$min,0,$mon,$day,$year)).'">';
+
+        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $strTitle = '<small>'. $day .'</small>';
+       // if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
+        //else $strTitle = '';
+        
+        //$html .= '<div class="titleEvents">'.$strTitle.'</div>';
+       // $html .= '<div class="divEvents" data-numero-de-eventos="'.count($events).'">';
+        
+        //condición ? si true : si false
+        //($view == 'week') ? $limit = 4 : $limit = 4;
+        //count($events) > $limit ? $classLink='mas' : $classLink='';       
+       	
+       	//if (count($events) > $limit) $html .= '<a style="display:none" class="cerrar" href="">Cerrar</a>';
+        foreach($events as $event){
+
+        	if ($event->estado == 'denegada'){
+        		$class_danger = 'text-warning';
+			//	$alert = '<span data-toggle="tooltip" title="Solicitud denegada" class=" fa fa-ban fa-fw text-warning" aria-hidden="true"></span>';
+        	}
+        	else if ($event->estado == 'aprobada'){
+        		$class_danger = 'text-success';
+			//	$alert = '<span data-toggle="tooltip" title="Solicitud aprobada" class=" fa fa-check fa-fw text-success" aria-hidden="true"></span>';
+        	}
+        	
+        	else {
+				//$hi = date('H:i:s',strtotime($event->horaInicio));
+				//$hf = date('H:i:s',strtotime('+1 hour',strtotime($event->horaInicio)));
+	        	//$where  = "fechaEvento = '".date('Y-m-d',mktime(0,0,0,$mon,$day,$year))."' and ";
+	        	//$where .= "estado != 'denegada' and ";
+	        	//$where .= "evento_id != '".$event->evento_id."' and ";
+				//$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
+				//$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
+				//$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
+				//$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
+				//$nSolapamientos = Recurso::find($id_recurso)->events()->whereRaw($where)->count();
+	        	$nSolapamientos = 0;
+				if ($nSolapamientos > 0){
+
+					$class_danger = 'text-danger';
+					//$alert = '<span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>';
+				}
+				else {
+
+					$class_danger = 'text-info';
+					$alert = '<span data-toggle="tooltip" title="Solicitud pendiente de validación" class="fa fa-question fa-fw text-info" aria-hidden="true"></span>';				
+				}
+			} 
+
+        	$title = htmlentities($alert . ' <span class = "title_popover '.$class_danger.' ">' . htmlentities($event->titulo) . '</span><span><a href="" class="closePopover"> X </a></span>');
+        	$time = mktime($hour,$min,0,$mon,$day,$year);
+        	
+        	
+        	
+        	$muestraItem = '';
+        	$numRecursos = 0;
+        	if ($event->recursoOwn->tipo != 'espacio') {
+        		$numRecursos = $event->total();
+        		
+
+				//Bug PODController, quitar el año q viene
+				$userPOD = User::where('username','=','pod')->first(); 
+				//$eventoTest = Evento::whereIn('recurso_id',$alist_id)->where('fechaEvento','=',$strDate)->orderBy('horaInicio','asc')->groupby('evento_id')->first();
+				$idPOD = $userPOD->id;
+				$iduser = 0;
+				$iduser = $event->user_id;
+				if ( $iduser == $idPOD ) {
+					$recursos = Recurso::where('grupo_id','=',$event->recursoOwn->grupo_id)->get();
+					$alist_id = array();
+					foreach($recursos as $recurso){
+						$alist_id[] = $recurso->id;
+					}
+
+					$numRecursos = Evento::whereIn('recurso_id',$alist_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->where('titulo','=',$event->titulo)->count();
+
+				}
+				//fin del bug
+
+        		if ($numRecursos > 0) $muestraItem =  ' ('.($numRecursos). ' ' . $event->recursoOwn->tipo.'/s)';
+        		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
+        	}
+			
+
+        	($view != 'week') ? $strhi = Date::parsedatetime($event->horaInicio,'H:i:s','G:i').'-'. Date::parsedatetime($event->horaFin,'H:i:s','G:i') : $strhi = '';
+
+        	//Si usuario autenticado puede editar el evento:
+        	$sgrEvento = new sgrEvento;
+
+        	$contenido = htmlentities((string) View::make('calendario.tooltip')->with('time',$time)->with('event',$event)->with('esEditable',$sgrEvento->esEditable(Auth::user()->id,$event))->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('esAnulable',$sgrEvento->puedeAnular(Auth::user()->id,$event))->with('esFinalizable',(Auth::user()->atiendeRecurso($event->recursoOwn->id) && $event->esFinalizable())));
+        	$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);
+        	
+        	
+        	
+        	
+        	
+        	$html .= '<div class="divEvent" data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.substr($event->horaInicio,0,2).'" >';
+        	
+        	$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.'  '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
+        	
+        	$html .='</div>';
+        }//fin del foreach ($events as $event)
+        
+        $html .= '</div>'; //Cierre div.divEvents
+ 		 if (count($events) > $limit) $html .= '<a class="linkMasEvents" href=""> + '.(count($events)-$limit).'  más </a>';
+		$html .='</div>'; //Cierra div con id = idfecha
+
+		return $html;
+	}//getContentTD
+
 	public static function getPrintBodytableMonth($data,$mon,$year,$id_recurso = ''){
 
 		$self = new self();
@@ -565,224 +693,21 @@ class Calendar {
 		return $self->getContentTD($day,$mon,$year,$id_recurso,$events,0,0,$view='month',$enabled='false');
 	}
 
-	private function getContentTD($day,$mon,$year,$id_recurso,$events,$hour=0,$min=0,$view='month',$enabled='false'){
-		$html = '';
-		$self = new self();
-		$aColorLink = array();
+	
 
-		//Establece el estilo de las diferentes celdas del calendario
-		if(Date::isPrevToday($day,$mon,$year) || !Auth::user()->isDayAviable($day,$mon,$year)) $class = 'day '.$view.' disable';
-        else { 	$class = 'day '.$view.' formlaunch';}
-		
-		$html .= '<div class = "'.$class.'" id = '.date('jnYGi',mktime($hour,$min,0,$mon,$day,$year)).' data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.date('G:i',mktime($hour,$min,0,$mon,$day,$year)).'">';
-
-        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $strTitle = '<small>'. $day .'</small>';
-        if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
-        else $strTitle = '';
-        
-        $html .= '<div class="titleEvents">'.$strTitle.'</div>';
-        $html .= '<div class="divEvents" data-numero-de-eventos="'.count($events).'">';
-        
-        //condición ? si true : si false
-        ($view == 'week') ? $limit = 4 : $limit = 4;
-        count($events) > $limit ? $classLink='mas' : $classLink='';       
-       	
-       	if (count($events) > $limit) $html .= '<a style="display:none" class="cerrar" href="">Cerrar</a>';
-        foreach($events as $event){
-
-        	if ($event->estado == 'denegada'){
-        		$class_danger = 'text-warning';
-				$alert = '<span data-toggle="tooltip" title="Solicitud denegada" class=" fa fa-ban fa-fw text-warning" aria-hidden="true"></span>';
-        	}
-        	else if ($event->estado == 'aprobada'){
-        		$class_danger = 'text-success';
-				$alert = '<span data-toggle="tooltip" title="Solicitud aprobada" class=" fa fa-check fa-fw text-success" aria-hidden="true"></span>';
-        	}
-        	
-        	else {
-				$hi = date('H:i:s',strtotime($event->horaInicio));
-				$hf = date('H:i:s',strtotime('+1 hour',strtotime($event->horaInicio)));
-	        	$where  = "fechaEvento = '".date('Y-m-d',mktime(0,0,0,$mon,$day,$year))."' and ";
-	        	$where .= "estado != 'denegada' and ";
-	        	$where .= "evento_id != '".$event->evento_id."' and ";
-				$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
-				$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
-				$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
-				$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
-				$nSolapamientos = Recurso::find($id_recurso)->events()->whereRaw($where)->count();
-	        	
-				if ($nSolapamientos > 0){
-
-					$class_danger = 'text-danger';
-					$alert = '<span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>';
-				}
-				else {
-
-					$class_danger = 'text-info';
-					$alert = '<span data-toggle="tooltip" title="Solicitud pendiente de validación" class="fa fa-question fa-fw text-info" aria-hidden="true"></span>';				
-				}
-			} 
-
-        	$title = htmlentities($alert . ' <span class = "title_popover '.$class_danger.' ">' . htmlentities($event->titulo) . '</span><span><a href="" class="closePopover"> X </a></span>');
-        	$time = mktime($hour,$min,0,$mon,$day,$year);
-        	
-        	$classEstado = '';
-        	if($event->estado == 'aprobada')  $classEstado = "alert alert-success";
-        	if($event->estado == 'pendiente') $classEstado = "alert alert-danger";
-
-        	
-        	$muestraItem = '';
-        	$numRecursos = 0;
-        	if ($event->recursoOwn->tipo != 'espacio') {
-        		$numRecursos = $event->total();//Evento::where('evento_id','=',$event->evento_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->count();
-        		
-
-				//Bug PODController, quitar el año q viene
-				$userPOD = User::where('username','=','pod')->first(); 
-				//$eventoTest = Evento::whereIn('recurso_id',$alist_id)->where('fechaEvento','=',$strDate)->orderBy('horaInicio','asc')->groupby('evento_id')->first();
-				$idPOD = $userPOD->id;
-				$iduser = 0;
-				$iduser = $event->user_id;
-				if ( $iduser == $idPOD ) {
-					$recursos = Recurso::where('grupo_id','=',$event->recursoOwn->grupo_id)->get();
-					$alist_id = array();
-					foreach($recursos as $recurso){
-						$alist_id[] = $recurso->id;
-					}
-
-					$numRecursos = Evento::whereIn('recurso_id',$alist_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->where('titulo','=',$event->titulo)->count();
-
-				}
-				//fin del bug
-
-        		if ($numRecursos > 0) $muestraItem =  ' ('.($numRecursos). ' ' . $event->recursoOwn->tipo.'/s)';
-        		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
-        	}
-			
-
-        	//$tipoReserva = 'Reserva Periódica';
-        	//if ($event->repeticion == 0) $tipoReserva = 'Reserva Puntual';
-        	$tipoReserva = Config::get('options.tiporeserva')[$event->repeticion];
-
-        	$contenido = htmlentities('<p style="width=100%;text-align:center" class="'.$classEstado.'">Estado:<strong> '.ucfirst($event->estado).'</strong>'.$muestraItem.'</p><p style="width=100%;text-align:center">'.ucfirst(strftime('%a, %d de %B, ',$time)). Date::parsedatetime($event->horaInicio,'H:i:s','g:i').' - ' .Date::parsedatetime($event->horaFin,'H:i:s','g:i') .'</p><p style="width=100%;text-align:center">'.$event->actividad.'</p><p style="width=100%;text-align:center">'.$tipoReserva.'</p><p style="width=100%;text-align:center">'.$event->userOwn->nombre .' ' .$event->userOwn->apellidos. '</p>');
-        	
-        	($view != 'week') ? $strhi = Date::parsedatetime($event->horaInicio,'H:i:s','g:i').'-'. Date::parsedatetime($event->horaFin,'H:i:s','g:i') : $strhi = '';
-        	$classPuedeEditar = '';
-        	
-        	//Default text link
-        	$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);
-
-        	//Si usuario autenticado puede editar el evento:
-        	$contenido .= htmlentities('<hr />');
-        	if($self->puedeEditar(Auth::user()->id,$event->user_id,$event->reservadoPor_id) && Auth::user()->isDayAviable($day,$mon,$year)){
-        		$contenido .= htmlentities('
-        				<a class = "comprobante" href="'.URL::route('justificante',array('idEventos' => $event->evento_id)).'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Comprobante" target="_blank"><span class="fa fa-file-pdf-o fa-fw text-success" aria-hidden="true"></span></a>
-        				 |
-        				<a href="#" id="edit_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Editar reserva"><span class="fa fa-pencil fa-fw text-success" aria-hidden="true"></span></a>
-        				 |
-        				<a href="#" id="delete" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Eliminar reserva"><span class="fa fa-trash fa-fw text-success" aria-hidden="true"></span></a>
-        				|');
-        		//$classPuedeEditar = 'puedeEditar';
-        		$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);
-        	}
-        	/*
-        	else{
-        		//$classPuedeEditar = 'noEdit';
-        		$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);// $strhi.' '.$own->apellidos.', '.$own->nombre;
-        	}*/
-        	
-        	//Si usuario autenticado puede liberar evento 
-        	if ($self->puedeAnular($event)) {
-        		$contenido .= htmlentities('        				
-        				<a  href="#"  class="libera" id="libera_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>');	
-
-        	}
-        	if ($self->puedeFinalizar($event)) {
-        		$contenido .= htmlentities('
-        				<a  href="#" class="finaliza" id="finaliza_'.$event->id.'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-titulo="'.$event->titulo.'" data-usuario="'.$event->userOwn->nombre.'" data-periodica="'.$event->repeticion.'" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>');	
-
-        	}
-        	
-        	
-        	$html .= '<div class="divEvent" data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.substr($event->horaInicio,0,2).'" >';
-        	
-        	$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.'  '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
-        	
-        	$html .='</div>';
-        }//fin del foreach ($events as $event)
-        
-        $html .= '</div>'; //Cierre div.divEvents
- 		 if (count($events) > $limit) $html .= '<a class="linkMasEvents" href=""> + '.(count($events)-$limit).'  más </a>';
-		$html .='</div>'; //Cierra div con id = idfecha
-
-		return $html;
-	}//getContentTD
-
-	private function puedeFinalizar($event){
+	/*private function puedeFinalizar($event){
 		$puede = false;
 		$self = new self();
-		if ($self->userPuedeFinalizar($event->recursoOwn->id) && $self->eventoEsFinalizable($event->fechaEvento,$event->horaInicio,$event->horaFin)) $puede = true;
+		if (Auth::user()->puedeFinalizar($event->recursoOwn->id) && $event->esFinalizable()) $puede = true;
 		return $puede;
-	}
+	}*/
 
-	private function userPuedeFinalizar($idrecurso){
-		$userPuedeFinalizar = false;
-		
-		//Auth::user tiene que atender las reservas en el recurso donde se realiza el evento
-		$recursos = Auth::user()->atiende;
-		if ($recursos->contains($idrecurso)) {
-			$userPuedeFinalizar = true;
-		}
+	
 
-		return $userPuedeFinalizar;
-	}
+	
 
-	private function eventoEsFinalizable($fechaEvento,$horaInicio,$horaFin){
-		$eventoEsFinalizable = false;
-		
-		if ( strtotime($fechaEvento) == strtotime(date('Y-m-d')) && (strtotime($horaInicio) + Config::get('options.tiempocortesia')) < strtotime(date('H:i')) && strtotime($horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
-		
-		return $eventoEsFinalizable;
-	}
+	
 
-	//El usuario puede anular su reserva si fechaEvento está en la semana en curso
-	private function puedeAnular($event){
-		$puede = false;
-
-		$lunes = strtotime('last monday');
-		$viernes = strtotime('next friday');
-		$hoy = strtotime('today');
-		$fechaEvento = strtotime($event->fechaEvento);
-		$horaActual = strtotime(date('H:i'));
-		$horaInicio = strtotime($event->horaInicio);
-		$horaFin = strtotime($event->horaFin);
-
-		if ( $event->userOwn->id == Auth::user()->id && $lunes <= $fechaEvento  && $fechaEvento <= $viernes  && $fechaEvento >= $hoy && $horaActual < $horaInicio) $puede = true;
-		/*
-		$recurso = $event->recursoOwn->id;
-		$recursos = Auth::user()->atiende;
-
-		if ($recursos->contains($event->recursoOwn->id)) {
-			$puede = true;
-		}
-		*/
-		return $puede;
-	}
-
-	private function puedeEditar($id_currentloginuser,$id_reservadoPara,$id_reservadoPor){
-		$puede = false;
-		//User es propietario de la reserva
-		if($id_currentloginuser == $id_reservadoPara) $puede = true;
-		//fin
-		//user es administrador y reserva es de POD
-		$userPOD = User::where('username','=','pod')->first();
-		$idUserPOD = 0;
-		if (!empty($userPOD)) $idUserPOD=$userPOD->id;
-		if(User::find($id_currentloginuser)->capacidad == 4 && $id_reservadoPor == $idUserPOD) $puede = true;
-		//fin
-		//UserAuth es técnico (capacidad 3) y realizó la reserva para otro usuario
-		if(User::find($id_currentloginuser)->capacidad == 3 &&  $id_currentloginuser == $id_reservadoPor) $puede = true;
-		return $puede;
-	}
+	
 
 }

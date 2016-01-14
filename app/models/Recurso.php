@@ -76,7 +76,6 @@ class Recurso extends Eloquent {
         return $validacion;
 
     }
-
     
     public function scopetipoDesc($query)
     {
@@ -98,7 +97,6 @@ class Recurso extends Eloquent {
           $perfiles[] = $aPerfilesSGR[$capacidad]; 
         }
         return $perfiles;
-        
     }
 
     public function tipoGestionReservas(){
@@ -118,7 +116,6 @@ class Recurso extends Eloquent {
         }
         
         return $result;
-
     }
 
 }

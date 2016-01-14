@@ -21,6 +21,43 @@ class Evento extends Eloquent{
  	public function atencion(){
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
+
+ 	/**
+ 	* Determina si un evento tiene solape 
+ 	* @param $mon mes dos dígitos
+ 	* @param $day día dos dígitos
+ 	* @param $year año cuatro dígitos
+ 	* @return $solapado boolean
+ 	*/
+ 	public function solape($mon,$day,$year){
+ 		$solapado = false;
+		$hi = date('H:i:s',strtotime($this->horaInicio));
+		$hf = date('H:i:s',strtotime('+1 hour',strtotime($this->horaInicio)));
+	    $where  = "fechaEvento = '".date('Y-m-d',mktime(0,0,0,$mon,$day,$year))."' and ";
+	    $where .= "estado != 'denegada' and ";
+	    $where .= "evento_id != '".$this->evento_id."' and ";
+		$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
+		$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
+		$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
+		$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
+		//$nSolapamientos = Recurso::find($this->recurso_id)->events()->whereRaw($where)->count();
+		$nSolapamientos = $this->recursoOwn->events()->whereRaw($where)->count();
+ 		if ($nSolapamientos > 0) $solapado = true;
+ 		return $solapado;
+ 	}
+ 	
+ 	/**
+ 	* determina si un evento puede ser finalizado 
+ 	* @return boolean
+ 	*/
+	public function esFinalizable(){
+		$eventoEsFinalizable = false;
+		
+		if ( strtotime($this->fechaEvento) == strtotime(date('Y-m-d')) && (strtotime($this->horaInicio) + Config::get('options.tiempocortesia')) < strtotime(date('H:i')) && strtotime($this->horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
+		
+		return $eventoEsFinalizable;
+	}
+
  	/**
  	 * Implementa requisito: ofrecer sumatorio de puestos o equipos reservados
  	 * 

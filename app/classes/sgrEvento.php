@@ -2,6 +2,48 @@
 
 class sgrEvento {
 
+	/**
+	* Determina si un evento se puede anular -> (Criterios a determinar aún: fechaEvento está en la semana en curso, userid es propietario del evento, el evento no se ha iniciado y el evento es al menos para mañana)
+	*/
+	//
+	public function puedeAnular($userid,$event){
+		$puede = false;
+
+		$lunes = strtotime('last monday');
+		$viernes = strtotime('next friday');
+		$hoy = strtotime('today');
+		$fechaEvento = strtotime($event->fechaEvento);
+		$horaActual = strtotime(date('H:i'));
+		$horaInicio = strtotime($event->horaInicio);
+		$horaFin = strtotime($event->horaFin);
+
+		if ( $event->userOwn->id == $userid && $lunes <= $fechaEvento  && $fechaEvento <= $viernes  && $fechaEvento >= $hoy && $horaActual < $horaInicio) $puede = true;
+		
+		return $puede;
+	}
+
+	/**
+	*
+	*/
+	public function esEditable($iduser,$evento){
+		
+		$esEditable = false;
+		//User es propietario de la reserva
+		if($iduser == $evento->user_id) $esEditable = true;
+		//fin
+
+		//User es administrador y reserva es de POD
+		$userPOD = User::where('username','=','pod')->first();
+		$idUserPOD = 0;
+		if (!empty($userPOD)) $idUserPOD=$userPOD->id;
+		if(User::find($iduser)->capacidad == 4 && $evento->reservadoPor_id == $idUserPOD) $esEditable = true;
+		//fin
+		
+		//User es técnico (capacidad 3) y realizó la reserva para otro usuario
+		if(User::find($iduser)->capacidad == 3 &&  $iduser == $evento->reservadoPor_id) $esEditable = true;
+		
+		return $esEditable;
+	}
 
 	//Save
 	public function save(){

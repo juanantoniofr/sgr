@@ -60,10 +60,14 @@ $(function(e){
 		
 		//1.5 When click button "nueva reserva"
 		$('#btnNuevaReserva').click(function(e){
+			var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
 			if ($('#alert_msg').data('nh') > 12){
 					$('#alert_msg').fadeOut('slow');
 					$('#alert_msg').fadeIn('slow');		
 				}
+			else if (0 == $id_recurso){
+				$('#alert').fadeOut();$('#alert').fadeIn();
+			}
 			else {
 				$('#editOptions').hide();
 				resetMsgErrors();
@@ -566,8 +570,8 @@ $(function(e){
 		if 	($('select#recurse option:selected').data('disabled'))	$('#btnNuevaReserva').toggleClass('disabled');
 		
 
-		
-		if ($id_recurso == '') {$('#alert').fadeOut();$('#alert').fadeIn();}
+		//console.log($id_recurso);
+		if ($id_recurso == 0) {$('#alert').fadeOut();$('#alert').fadeIn();}
 		else {
 			showGifEspera();
 			
@@ -817,7 +821,7 @@ $(function(e){
 			url: "geteventbyId",
 			data: {'id':$idEvento},
         	success: function($respuesta){
-        		console.log($respuesta);
+        		//console.log($respuesta);
         		$evento = $respuesta['event'];
         		$usernameReservadoPara = $respuesta['usernameReservadoPara'];
         		$usernameReservadoPor = $respuesta['usernameReservadoPor'];

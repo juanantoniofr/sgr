@@ -33,6 +33,26 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	
 	}
 
+	/**
+	*	user puede finalizar las reservas de los recursos que atiende
+	*	@param $idrecurso
+	* 	@return boolean
+	*/
+	public function atiendeRecurso($idrecurso){
+		$userPuedeFinalizar = false;
+		
+		//Auth::user tiene que atender las reservas en el recurso donde se realiza el evento
+		$recursos = $this->atiende;
+		if ($recursos->contains($idrecurso)) {
+			$userPuedeFinalizar = true;
+		}
+
+		return $userPuedeFinalizar;
+	}
+	/**
+	*	determina si un día es un dia disponible para que el usuario añada reservas: se habilita la celda en el calendario para que pueda añadir reservas
+	*/
+
 	public function isDayAviable($day,$mon,$year){
 		$isAviable = false;
 		//$self = new self();
