@@ -23,6 +23,34 @@ class Evento extends Eloquent{
  	}
 
  	/**
+ 	* Devevelve el número de recurso (equipos o espacios reservados por un evento)
+ 	*/
+ 	public function numeroRecursos(){
+ 		$muestraItem = '';
+        $numRecursos = 0;
+        if ($this->recursoOwn->tipo != 'espacio') {
+        	$numRecursos = $event->total();
+        		
+
+			//Bug PODController, quitar el año q viene
+			$userPOD = User::where('username','=','pod')->first(); 
+			$idPOD = $userPOD->id;
+			$iduser = 0;
+			$iduser = $event->user_id;
+			if ( $iduser == $idPOD ) {
+				$recursos = Recurso::where('grupo_id','=',$this->recursoOwn->grupo_id)->get();
+				$alist_id = array();
+				foreach($recursos as $recurso){
+					$alist_id[] = $recurso->id;
+				}
+				$numRecursos = Evento::whereIn('recurso_id',$alist_id)->where('recurso_id','!=',$this->recurso_id)->where('fechaEvento','=',$this->fechaEvento)->where('horaInicio','=',$this->horaInicio)->where('titulo','=',$this->titulo)->count();
+
+			}
+			//fin del bug
+        }
+        return $numRecursos;
+ 	}
+ 	/**
  	* Determina si un evento tiene solape 
  	* @param $mon mes dos dígitos
  	* @param $day día dos dígitos

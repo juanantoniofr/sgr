@@ -119,7 +119,14 @@ class Calendar {
 		//$daysOfMonth = sgrCalendario::dias($mon,$year);
 		$diaActual = 1;
 		$j=1;
-		while (mktime(0,0,0,$mon,$sgrCalendario->ultimoDia(),$year) >= mktime(0,0,0,$mon,$diaActual,$year) ){
+		$mon = (int) $mon;
+		$year = (int) $year;
+		//$html = '';
+		$html = (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$mon)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('muchosEventos',false);
+		return $html;
+
+
+		while (mktime(0,0,0,(int) $mon,(int) $sgrCalendario->ultimoDia(),(int) $year) >= mktime(0,0,0,(int) $mon,$diaActual,(int) $year) ){
 			//una fila por cada semana del mes
 			$html .= '<tr class="fila">';
 			for($i=1;$i<=7;$i++){
@@ -137,19 +144,12 @@ class Calendar {
 							$fecha = date('j-n-Y',mktime(0,0,0,$mon,$diaActual,$year));
 							$html .= (string) View::make('calendario.tdFestivo')->with('idfecha',$idfecha)->with('fecha',$fecha)->with('view','month')->with('day',$diaActual)->with('festivo','festivo');
 						} 
-							else{
-        						//No es un día de otro mes y no es festivo: entonces
-        						if(Auth::user()->isDayAviable($diaActual,$mon,$year)){ //Depende del rol
-        							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
-									$enabled = true;
-									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
-        						}
-        						else {
-        							$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
-		   							$enabled = false;
-									$html .= $self->getContentTD($diaActual,$mon,$year,$id_recurso,$events,$enabled);
-        						}         						
-        					}
+						else{
+        					//No es un día de otro mes y no es festivo: entonces
+        					$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
+							(count($events) > 4) ? $muchosEventos=true : $muchosEventos=false;
+							$html .= (string) View::make('calendario.td')->with('view','month')->with('isDayAviable',Auth::user()->isDayAviable($diaActual,$mon,$year))->with('hour',0)->with('min',0)->with('mon',$mon)->with('day',$diaActual)->with('year',$year)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events)->with('time',mktime(0,0,0,$mon,$diaActual,$year));
+        				}
         				$diaActual++;		
 					}//fin else linea 131
 				$html .= '</td>';
@@ -161,133 +161,7 @@ class Calendar {
  		return $html;
 	}//getBodyTableMonth
 
-	private function getContentTD($day,$mon,$year,$id_recurso,$events,$hour=0,$min=0,$view='month',$enabled='false'){
-		$html = '';
-
-		//Demasiados eventos para la altura de la celda??
-		$muchosEventos = false;
-		($view == 'week') ? $limit = 4 : $limit = 4;
-        count($events) > $limit ? $classLink='mas' : $classLink='';       
-       	
-       	if (count($events) > $limit) $muchosEventos=true;
-       	//fin
-
-		$html = (string) View::make('calendario.td')->with('view',$view)->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('hour',$hour)->with('min',$min)->with('mon',$mon)->with('day',$day)->with('year',$year)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events);
-
-		return $html;
-
-		//Establece el estilo de las diferentes celdas del calendario
-		//if(Date::isPrevToday($day,$mon,$year) || !Auth::user()->isDayAviable($day,$mon,$year)) $class = 'day '.$view.' disable';
-        //else { 	$class = 'day '.$view.' formlaunch';}
-		
-		//$html .= '<div class = "'.$class.'" id = '.date('jnYGi',mktime($hour,$min,0,$mon,$day,$year)).' data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.date('G:i',mktime($hour,$min,0,$mon,$day,$year)).'">';
-
-        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $strTitle = '<small>'. $day .'</small>';
-       // if ($view == 'month') $strTitle = '<small>'. $day .'</small>';
-        //else $strTitle = '';
-        
-        //$html .= '<div class="titleEvents">'.$strTitle.'</div>';
-       // $html .= '<div class="divEvents" data-numero-de-eventos="'.count($events).'">';
-        
-        //condición ? si true : si false
-        //($view == 'week') ? $limit = 4 : $limit = 4;
-        //count($events) > $limit ? $classLink='mas' : $classLink='';       
-       	
-       	//if (count($events) > $limit) $html .= '<a style="display:none" class="cerrar" href="">Cerrar</a>';
-        foreach($events as $event){
-
-        	if ($event->estado == 'denegada'){
-        		$class_danger = 'text-warning';
-			//	$alert = '<span data-toggle="tooltip" title="Solicitud denegada" class=" fa fa-ban fa-fw text-warning" aria-hidden="true"></span>';
-        	}
-        	else if ($event->estado == 'aprobada'){
-        		$class_danger = 'text-success';
-			//	$alert = '<span data-toggle="tooltip" title="Solicitud aprobada" class=" fa fa-check fa-fw text-success" aria-hidden="true"></span>';
-        	}
-        	
-        	else {
-				//$hi = date('H:i:s',strtotime($event->horaInicio));
-				//$hf = date('H:i:s',strtotime('+1 hour',strtotime($event->horaInicio)));
-	        	//$where  = "fechaEvento = '".date('Y-m-d',mktime(0,0,0,$mon,$day,$year))."' and ";
-	        	//$where .= "estado != 'denegada' and ";
-	        	//$where .= "evento_id != '".$event->evento_id."' and ";
-				//$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
-				//$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
-				//$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
-				//$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
-				//$nSolapamientos = Recurso::find($id_recurso)->events()->whereRaw($where)->count();
-	        	$nSolapamientos = 0;
-				if ($nSolapamientos > 0){
-
-					$class_danger = 'text-danger';
-					//$alert = '<span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>';
-				}
-				else {
-
-					$class_danger = 'text-info';
-					$alert = '<span data-toggle="tooltip" title="Solicitud pendiente de validación" class="fa fa-question fa-fw text-info" aria-hidden="true"></span>';				
-				}
-			} 
-
-        	$title = htmlentities($alert . ' <span class = "title_popover '.$class_danger.' ">' . htmlentities($event->titulo) . '</span><span><a href="" class="closePopover"> X </a></span>');
-        	$time = mktime($hour,$min,0,$mon,$day,$year);
-        	
-        	
-        	
-        	$muestraItem = '';
-        	$numRecursos = 0;
-        	if ($event->recursoOwn->tipo != 'espacio') {
-        		$numRecursos = $event->total();
-        		
-
-				//Bug PODController, quitar el año q viene
-				$userPOD = User::where('username','=','pod')->first(); 
-				//$eventoTest = Evento::whereIn('recurso_id',$alist_id)->where('fechaEvento','=',$strDate)->orderBy('horaInicio','asc')->groupby('evento_id')->first();
-				$idPOD = $userPOD->id;
-				$iduser = 0;
-				$iduser = $event->user_id;
-				if ( $iduser == $idPOD ) {
-					$recursos = Recurso::where('grupo_id','=',$event->recursoOwn->grupo_id)->get();
-					$alist_id = array();
-					foreach($recursos as $recurso){
-						$alist_id[] = $recurso->id;
-					}
-
-					$numRecursos = Evento::whereIn('recurso_id',$alist_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->where('titulo','=',$event->titulo)->count();
-
-				}
-				//fin del bug
-
-        		if ($numRecursos > 0) $muestraItem =  ' ('.($numRecursos). ' ' . $event->recursoOwn->tipo.'/s)';
-        		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
-        	}
-			
-
-        	($view != 'week') ? $strhi = Date::parsedatetime($event->horaInicio,'H:i:s','G:i').'-'. Date::parsedatetime($event->horaFin,'H:i:s','G:i') : $strhi = '';
-
-        	//Si usuario autenticado puede editar el evento:
-        	$sgrEvento = new sgrEvento;
-
-        	$contenido = htmlentities((string) View::make('calendario.tooltip')->with('time',$time)->with('event',$event)->with('esEditable',$sgrEvento->esEditable(Auth::user()->id,$event))->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('esAnulable',$sgrEvento->puedeAnular(Auth::user()->id,$event))->with('esFinalizable',(Auth::user()->atiendeRecurso($event->recursoOwn->id) && $event->esFinalizable())));
-        	$textLink = '<strong>'. $strhi.'</strong> '.htmlentities($event->titulo);
-        	
-        	
-        	
-        	
-        	
-        	$html .= '<div class="divEvent" data-fecha="'.date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year)).'" data-hora="'.substr($event->horaInicio,0,2).'" >';
-        	
-        	$html .= '<a class = " '.$class_danger.' linkpopover linkEvento '.$event->evento_id.'  '.$event->id.'" id="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-id="'.$event->id.'"  href="" rel="popover" data-html="true" data-title="'.$title.'" data-content="'.$contenido.'" data-placement="auto right"> ' . $alert . ' ' . $textLink.'</a>';
-        	
-        	$html .='</div>';
-        }//fin del foreach ($events as $event)
-        
-        $html .= '</div>'; //Cierre div.divEvents
- 		 if (count($events) > $limit) $html .= '<a class="linkMasEvents" href=""> + '.(count($events)-$limit).'  más </a>';
-		$html .='</div>'; //Cierra div con id = idfecha
-
-		return $html;
-	}//getContentTD
+	
 
 	public static function getPrintBodytableMonth($data,$mon,$year,$id_recurso = ''){
 
@@ -426,7 +300,7 @@ class Calendar {
 	
 	private function getEvents($day,$mon,$year,$id_recurso){
 		$events = '';
-		$strDate = date('Y-m-d',mktime(0,0,0,$mon,$day,$year));
+		$strDate = date('Y-m-d',mktime(0,0,0,(int) $mon,(int) $day,(int) $year));
 		
 		//si "reservar todo"
 		$valueGrupo_id = Input::get('groupID');
@@ -552,7 +426,9 @@ class Calendar {
 						$itemsHours = explode(':',$startHour);
 						$hour = $itemsHours[0];		
 						$events = $self->getEventsViewWeek($currentDay,$currentMon,$currentYear,$id_recurso,$hour,30);
-						$html .= $self->getContentTD($currentDay,$currentMon,$currentYear,$id_recurso,$events,$hour,30,'week'); 
+						(count($events) > 4) ? $muchosEventos=true : $muchosEventos=false;
+						$html .= (string) View::make('calendario.td')->with('view','week')->with('isDayAviable',Auth::user()->isDayAviable($currentDay,$currentMon,$currentYear))->with('hour',$hour)->with('min',30)->with('mon',$currentMon)->with('day',$currentDay)->with('year',$currentYear)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events)->with('time',mktime(0,0,0,$currentMon,$currentDay,$currentYear));
+						
 					}
 					else { //$html .= $self->getCellDisable($currentDay,'week');
 							$html .= (string) View::make('calendario.tdFestivo')->with('view','week');
@@ -687,27 +563,5 @@ class Calendar {
 		return $hour;
 	} 
 
-	public static function testgetContentTD($day,$mon,$year,$id_recurso){
-		$self = new self();
-		$events = Evento::where('recurso_id','=',$id_recurso)->get();
-		return $self->getContentTD($day,$mon,$year,$id_recurso,$events,0,0,$view='month',$enabled='false');
-	}
-
 	
-
-	/*private function puedeFinalizar($event){
-		$puede = false;
-		$self = new self();
-		if (Auth::user()->puedeFinalizar($event->recursoOwn->id) && $event->esFinalizable()) $puede = true;
-		return $puede;
-	}*/
-
-	
-
-	
-
-	
-
-	
-
 }

@@ -74,7 +74,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				case '5': //Validadores
 				case '6': //Supervisores (EE MAV)
 					$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
+					$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
 					break;
 		}

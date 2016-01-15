@@ -49,7 +49,7 @@ class sgrCalendario {
 
 	public function ultimoDia(){
 
-		return $this->ultimodiasmes;
+		return (int) $this->ultimodiasmes;
 	}
 
 	/**

@@ -31,6 +31,18 @@ class sgrDia {
 
 
 	//public functions 
+	public function numeroEventos(){
+
+		//return $this->numeroEventos;
+		return 0;
+	}	
+
+	public function events(){
+		return array();
+		//return $this->events;
+	}
+
+
 	public function numerodia(){
 		return $this->numerodia;
 	}

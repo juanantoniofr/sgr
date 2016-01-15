@@ -3,6 +3,21 @@
 class sgrEvento {
 
 	/**
+	* Dado un evento, devuelve tooltip para calendario 
+	*/
+	public static function tooltip($event,$day,$mon,$year,$hour,$min){
+		$self = new self();
+		$day = (int) $day;
+		$mon = (int) $mon;
+		$year = (int) $year;
+		$time = mktime($hour,$min,0,$mon,$day,$year);
+  		return (string) View::make('calendario.tooltip')->with('time',$time)->with('event',$event)->with('esEditable',$self->esEditable(Auth::user()->id,$event))->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('esAnulable',$self->puedeAnular(Auth::user()->id,$event))->with('esFinalizable',(Auth::user()->atiendeRecurso($event->recursoOwn->id) && $event->esFinalizable()))->with('numRecursos',$event->numeroRecursos());
+ 	}
+
+ 	
+
+
+	/**
 	* Determina si un evento se puede anular -> (Criterios a determinar aún: fechaEvento está en la semana en curso, userid es propietario del evento, el evento no se ha iniciado y el evento es al menos para mañana)
 	*/
 	//
@@ -325,7 +340,7 @@ class sgrEvento {
 	}
 
 	//del
-	public function del(){
+	public function delete(){
 
 		$result = '';
 
