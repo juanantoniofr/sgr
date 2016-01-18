@@ -10,7 +10,7 @@ class Calendar {
 	public static function getBodyTableAgenda($day,$month,$year){
 		
 		$html = '';
-		$startDate = $year . '-' . $month .'-'. $day;
+		$startDate = date('Y-m-d',strtotime($year . '-' . $month .'-'. $day));
 		$haveEvents = false;
 		//si hay eventos
 		if (Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->count() > 0){
@@ -22,9 +22,8 @@ class Calendar {
 				$currentMaxDate = Date::prevDay($currentMaxDate);
 			}while ($numEvents>15);
 		
-			//$maxDate = Evento::where('user_id','=',Auth::user()->id)->where('fechaInicio','>',$startDate)->max('fechaInicio');
-
 			$currentDate=$startDate;
+			//$lastDate = $startDate;
 			while($currentDate <= $maxDate){
 				$events = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',$currentDate)->orderBy('titulo','ASC')->get();
 		
@@ -92,6 +91,8 @@ class Calendar {
 				$lastDate = $currentDate;
 				$currentDate=Date::nextDay($currentDate);
 			}//fin while $currentDate <= $maxDate
+			
+			$lastDate = $currentDate;
 			$html .= '<tr style="">';
 			$html .= '<td colspan="2">';
 			$html .= '<div class="alert alert-success" role="alert">';
@@ -104,14 +105,14 @@ class Calendar {
 		else{
 			$html = '<tr><td><div class="alert alert-danger pull-left col-sm-12" role="alert" id="alert_evento"><strong> No hay eventos</strong></div></td></tr>';
 		}		
-		//$events->setBaseUrl('/laravel/public/home/user/calendario?year='.$year);
 		return $html;
 	}
 
-	public static function getBodytableMonth($mon='',$year='',$id_recurso = ''){
+	/*public static function getBodytableMonth($mon='',$year='',$id_recurso = ''){
 
 		$self = new self();
-		$html = '';	
+		$html = '';
+
 		$sgrCalendario = new sgrCalendario($mon,$year);
 		$days = $sgrCalendario->dias();
 		//N -> Representación numérica ISO-8601 del día de la semana (añadido en PHP 5.1.0): 1 (para lunes) hasta 7 (para domingo)
@@ -122,7 +123,8 @@ class Calendar {
 		$mon = (int) $mon;
 		$year = (int) $year;
 		//$html = '';
-		$html = (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$mon)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('muchosEventos',false);
+
+		$html = (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$mon)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso);
 		return $html;
 
 
@@ -147,8 +149,8 @@ class Calendar {
 						else{
         					//No es un día de otro mes y no es festivo: entonces
         					$events = $self->getEvents($diaActual,$mon,$year,$id_recurso);
-							(count($events) > 4) ? $muchosEventos=true : $muchosEventos=false;
-							$html .= (string) View::make('calendario.td')->with('view','month')->with('isDayAviable',Auth::user()->isDayAviable($diaActual,$mon,$year))->with('hour',0)->with('min',0)->with('mon',$mon)->with('day',$diaActual)->with('year',$year)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events)->with('time',mktime(0,0,0,$mon,$diaActual,$year));
+							
+							$html .= (string) View::make('calendario.td')->with('view','month')->with('isDayAviable',Auth::user()->isDayAviable($diaActual,$mon,$year))->with('hour',0)->with('min',0)->with('mon',$mon)->with('day',$diaActual)->with('year',$year)->with('events',$events)->with('time',mktime(0,0,0,$mon,$diaActual,$year));
         				}
         				$diaActual++;		
 					}//fin else linea 131
@@ -161,7 +163,7 @@ class Calendar {
  		return $html;
 	}//getBodyTableMonth
 
-	
+	*/
 
 	public static function getPrintBodytableMonth($data,$mon,$year,$id_recurso = ''){
 
@@ -426,8 +428,8 @@ class Calendar {
 						$itemsHours = explode(':',$startHour);
 						$hour = $itemsHours[0];		
 						$events = $self->getEventsViewWeek($currentDay,$currentMon,$currentYear,$id_recurso,$hour,30);
-						(count($events) > 4) ? $muchosEventos=true : $muchosEventos=false;
-						$html .= (string) View::make('calendario.td')->with('view','week')->with('isDayAviable',Auth::user()->isDayAviable($currentDay,$currentMon,$currentYear))->with('hour',$hour)->with('min',30)->with('mon',$currentMon)->with('day',$currentDay)->with('year',$currentYear)->with('numeroEventos',count($events))->with('muchosEventos',$muchosEventos)->with('events',$events)->with('time',mktime(0,0,0,$currentMon,$currentDay,$currentYear));
+						
+						$html .= (string) View::make('calendario.td')->with('view','week')->with('isDayAviable',Auth::user()->isDayAviable($currentDay,$currentMon,$currentYear))->with('hour',$hour)->with('min',30)->with('mon',$currentMon)->with('day',$currentDay)->with('year',$currentYear)->with('events',$events)->with('time',mktime(0,0,0,$currentMon,$currentDay,$currentYear));
 						
 					}
 					else { //$html .= $self->getCellDisable($currentDay,'week');

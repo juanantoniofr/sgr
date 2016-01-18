@@ -9,18 +9,35 @@ class sgrCalendario {
 	private $diasMes;
 	
 	
-	
+	/*
 
+		$eventos = '';
+
+		if (!empty($id_recurso) && !empty($numMes) && !empty($numMes)) {
+			$recurso = Recurso::findOrFail($id_recurso);
+			$eventos = $recurso->events()->where('fechaEvento','<=','Y-m-'.date('t', mktime(0,0,0,(int) $numMes,1,(int) $year)))->where('fechaEvento','>=',date('Y-m-d',strtotime($year.'-'.$numMes.'-1')))->get();
+			$this->numMes = $numMes;
+			$this->year = $year;
+		} 		
+	*/
+	
+	/**
+	*	@param $numMes
+	*	@param $year
+	*/
 	function __construct($numMes = '',$year = ''){
 		
 		if (empty($numMes)) $numMes = date('m');//mes actual
 		if (empty($year)) $year = date('Y');//año actual
+		
 
 		$this->setNumeroMes($numMes);
 		$this->setYear($year);
 		$this->setUltimoDiaMes();//28|29|30|31
 		$this->setNombreMes($numMes);//establece el nombre del mes en español
 		$this->setDias();//construye un array con los días del mes
+
+
 		
 		return $this;
 	}
@@ -62,6 +79,63 @@ class sgrCalendario {
 		
 		if (array_key_exists($numDia, $this->diasMes))	return $this->diasMes[$numDia];
 		return false;
+	}
+
+
+	//private functions
+	private function setUltimoDiaMes(){
+		
+		return $this->ultimodiasmes = (int) date('t', mktime(0,0,0,$this->numeroMes,1,$this->year));
+	}
+	
+
+	private function setNumeroMes($numeroMes){
+		if (empty($numeroMes)) $numeroMes = date('m');
+		return $this->numeroMes = (int) $numeroMes;
+	}
+
+	private function setYear($year){
+		if (empty($year)) $year = date('Y');
+		return $this->year = (int) $year;
+	}
+
+	/**
+	 * Genera un array con indice los días del mes y valor objetos sgrDia
+ 	 * 
+ 	 * @return $diasmes array 
+	*/
+	private function setDias(){
+
+		// Falta por escribir la función validDate
+		// if (!validDate($month,$year)) return false;
+
+		$diasmes = array();
+		$timestamp = mktime(0,0,0,$this->numeroMes,1,$this->year);
+		$maxday = date("t",$timestamp); // número de días de $month
+		for($i=1;$i<=$maxday;$i++) {
+			$timestamp = mktime(0,0,0,$this->numeroMes,$i,$this->year);
+			$diasmes[$i] = new sgrDia($timestamp);
+		}
+
+		return $this->diasMes = $diasmes;
+		
+	}
+	
+	/**
+	 * Establece el nombre del mes en español
+ 	 * 
+ 	 * @param $month int Número del mes, 1=enero... 12=diciembre
+ 	 * @return $mes string Mes en español
+	*/
+	private function setNombreMes ($month = ''){
+
+		$mes = '';
+		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
+			  		$nombremes="Error setlocale";}
+		$m = (int) $month;	  		
+		$timestamp = strtotime('1970-'.$m.'-1');
+		$mes = ucfirst(strftime('%B',$timestamp));
+		return $this->nombreMes = $mes;
 	}
 
 
@@ -123,62 +197,6 @@ class sgrCalendario {
 
 		return $v;
 
-	}
-
-	//private functions
-	private function setUltimoDiaMes(){
-		
-		return $this->ultimodiasmes = (int) date('t', mktime(0,0,0,$this->numeroMes,1,$this->year));
-	}
-	
-
-	private function setNumeroMes($numeroMes){
-		if (empty($numeroMes)) $numeroMes = date('m');
-		return $this->numeroMes = (int) $numeroMes;
-	}
-
-	private function setYear($year){
-		if (empty($year)) $year = date('Y');
-		return $this->year = (int) $year;
-	}
-
-	/**
-	 * Genera un array con indice los días del mes y valor objetos sgrDia
- 	 * 
- 	 * @return $diasmes array 
-	*/
-	private function setDias(){
-
-		// Falta por escribir la función validDate
-		// if (!validDate($month,$year)) return false;
-
-		$diasmes = array();
-		$timestamp = mktime(0,0,0,$this->numeroMes,1,$this->year);
-		$maxday = date("t",$timestamp); // número de días de $month
-		for($i=1;$i<=$maxday;$i++) {
-			$timestamp = mktime(0,0,0,$this->numeroMes,$i,$this->year);
-			$diasmes[$i] = new sgrDia($timestamp);
-		}
-
-		return $this->diasMes = $diasmes;
-		
-	}
-	
-	/**
-	 * Establece el nombre del mes en español
- 	 * 
- 	 * @param $month int Número del mes, 1=enero... 12=diciembre
- 	 * @return $mes string Mes en español
-	*/
-	private function setNombreMes ($month = ''){
-
-		$mes = '';
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$nombremes="Error setlocale";}
-		$m = (int) $month;	  		
-		$timestamp = strtotime('1970-'.$m.'-1');
-		$mes = ucfirst(strftime('%B',$timestamp));
-		return $this->nombreMes = $mes;
 	}
 }
 

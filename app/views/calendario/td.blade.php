@@ -1,11 +1,12 @@
 <div class = "day {{ $view }} @if($isDayAviable) formlaunch @else disable @endif" id = {{date('jnYGi',mktime($hour,$min,0,$mon,$day,$year))}} data-fecha="{{date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year))}}" data-hora="{{date('G:i',mktime($hour,$min,0,$mon,$day,$year))}}">
 
     <div class="titleEvents"> @if($view == 'month') <small>{{ $day }}</small>@endif </div>
-    <div class="divEvents" data-numero-de-eventos="{{$numeroEventos}}">
-        @foreach($events as $event)
+    
+    <div class="divEvents" data-numero-de-eventos="{{count($currentday->events())}}">
+        @foreach($currentday->events($id_recurso,$id_grupo) as $event)
             <div class="divEvent" data-fecha="{{date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year))}}" data-hora="{{substr($event->horaInicio,0,2)}}">
             
-            @if($muchosEventos)<a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+            @if (count($currentday->events($id_recurso,$id_grupo)) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
            
                 <a class = " 
                         @if ($event->solape($mon,$day,$year))   text-danger
@@ -49,8 +50,8 @@
             @endif
             </div> <!-- ./divEvent -->  
         @endforeach
-        </div> <!-- ./divEvents -->
+    </div> <!-- ./divEvents -->
         
-        @if($muchosEventos) <a class="linkMasEvents" href=""> + {{ (count($events)-4) }}  más </a>@endif
+    @if (count($currentday->events($id_recurso,$id_grupo)) > 4) <a class="linkMasEvents" href=""> + {{ (count($currentday->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
           
 </div>

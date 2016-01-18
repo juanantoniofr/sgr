@@ -22,6 +22,7 @@ class Evento extends Eloquent{
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
 
+
  	/**
  	* Devevelve el número de recurso (equipos o espacios reservados por un evento)
  	*/
@@ -29,14 +30,14 @@ class Evento extends Eloquent{
  		$muestraItem = '';
         $numRecursos = 0;
         if ($this->recursoOwn->tipo != 'espacio') {
-        	$numRecursos = $event->total();
+        	$numRecursos = $this->total();
         		
 
 			//Bug PODController, quitar el año q viene
 			$userPOD = User::where('username','=','pod')->first(); 
 			$idPOD = $userPOD->id;
 			$iduser = 0;
-			$iduser = $event->user_id;
+			$iduser = $this->user_id;
 			if ( $iduser == $idPOD ) {
 				$recursos = Recurso::where('grupo_id','=',$this->recursoOwn->grupo_id)->get();
 				$alist_id = array();
@@ -93,7 +94,7 @@ class Evento extends Eloquent{
  	 * @return $total int número total de puestos o equipos asociados a una misma reserva 
  	*/
  	public function total(){
- 		$total = '';
+ 		$total = 0;
  		if ($this->recursoOwn->tipo != 'espacio') $total = Evento::where('evento_id','=',$this->evento_id)->where('horaInicio','=',$this->horaInicio)->where('fechaEvento','=',$this->fechaEvento)->count();
  		
 			//Bug PODController, quitar el año q viene

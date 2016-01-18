@@ -2,7 +2,7 @@
 	
 	Estado:<strong> {{ucfirst($event->estado)}}</strong>
 
-	 @if ($numRecursos > 0) ({{$numRecursos}} {{$event->recursoOwn->tipo}}/s)
+	 @if ($numRecursos > 1) ({{$numRecursos}} {{$event->recursoOwn->tipo}}/s)
      @else ({{$event->recursoOwn->nombre}})
      @endif
 

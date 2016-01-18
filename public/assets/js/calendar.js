@@ -124,7 +124,7 @@ $(function(e){
 			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
-			
+			//alert($('select#recurse option:selected').val());
 			$('input[name$=id_recurso]').val($('select#recurse option:selected').val());
 			printCalendar();
 		});
@@ -134,6 +134,7 @@ $(function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
 			//$('form#selectRecurse ').serialize());
+			//alert($('select#selectGroupRecurse option:selected').val());
 			$.ajax({
 				type:"GET",
 				url:"getRecursos",
@@ -562,17 +563,20 @@ $(function(e){
 		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
 		var $grupo_id = $('select#selectGroupRecurse option:selected').val();
 
-		$('#btnprint').removeClass('disabled');
+		
 		//$('#btnprint').attr('href','print?view='+$viewActive+'&day='+$aDate[0]+'&month='+$aDate[1]+'&year='+$aDate[2]+'&idrecurso='+$id_recurso+'&groupID='+$grupo_id);
 		
-		$('#btnNuevaReserva').removeClass('disabled');
+		
 		//console.log($('select#recurse option:selected').data('disabled'));
-		if 	($('select#recurse option:selected').data('disabled'))	$('#btnNuevaReserva').toggleClass('disabled');
+		//alert($id_recurso + '--' + $grupo_id);
 		
 
 		//console.log($id_recurso);
-		if ($id_recurso == 0) {$('#alert').fadeOut();$('#alert').fadeIn();}
+		if ($grupo_id == '0') {$('#alert').fadeOut();$('#alert').fadeIn();}
 		else {
+			$('#btnprint').removeClass('disabled');
+			$('#btnNuevaReserva').removeClass('disabled');
+			//if 	($('select#recurse option:selected').data('disabled'))	$('#btnNuevaReserva').toggleClass('disabled');
 			showGifEspera();
 			
 			$.ajax({
@@ -588,7 +592,7 @@ $(function(e){
 					
 					$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
 					$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
-					
+										
 					init();
 					if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
 					if ($viewActive == 'agenda') {
@@ -599,7 +603,7 @@ $(function(e){
 					},
 					error: function(xhr, ajaxOptions, thrownError){
 						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+						alert(' (codeError: ' + xhr.status +')' + xhr.responseText );
 					}
 				});
 				

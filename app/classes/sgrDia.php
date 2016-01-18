@@ -3,19 +3,16 @@
 class sgrDia {
 
 	private $timestamp; //timestamp de la fecha
-	private $eventos; 	//array de objetos de tipo Eventos
+	private $events; 	//array de objetos de tipo Eventos
 	private $esDomingo;
 	private $esSabado;
 	private $numdiames;
 	private $festivo;
 	private $fecha;
+	private $numMes;
+	private $year;
 	
-	/*function __construct($numerodia,$festivo){
-
-		$this->numerodia = (int) $numerodia;
-		$this->festivo = $festivo;
-		
-	}*/
+	
 	public function __construct($tsfecha){
 
 		$this->timestamp = $tsfecha;
@@ -26,20 +23,39 @@ class sgrDia {
 
 		$this->fecha = date('j-n-Y',$this->timestamp);
 
+		$this->numMes = date('n',$this->timestamp);//Sin ceros iniciales
+
+		$this->year = date('Y',$this->timestamp);//año actual
+		
 		return $this;
 	}
 
+	/**
+	*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
+	*	@param $id_recurso int
+	*	@param $id_gruppo int
+	*	@return array objetos Evento
+	*/
+	public function events($id_recurso='',$id_grupo=''){
 
-	//public functions 
-	public function numeroEventos(){
+		
+		$numMes = $this->numMes;
+		$year = $this->year;
+		
+		$fechaEvento = date('Y-m-d',mktime(0,0,0,(int) $numMes,(int) $this->numdiames,(int) $year));
 
-		//return $this->numeroEventos;
-		return 0;
-	}	
-
-	public function events(){
-		return array();
-		//return $this->events;
+		if ($id_recurso == 0){
+			//Eventos para todos los equipos//puestos para fechaEvento del id_grupo
+			$events = Evento::where('fechaEvento','=',$fechaEvento)->orderBy('horaInicio','asc')->groupby('titulo')->groupby('evento_id')->get();
+			return $events->filter(function($event) use ($id_grupo) {
+				return $event->recursoOwn->grupo_id == $id_grupo;
+			});
+		}		
+		else{
+			return Recurso::find($id_recurso)->events()->where('fechaEvento','=',$fechaEvento)->orderBy('horaInicio','asc')->get();
+		}	
+		
+		
 	}
 
 
