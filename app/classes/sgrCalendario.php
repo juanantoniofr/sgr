@@ -9,18 +9,6 @@ class sgrCalendario {
 	private $diasMes;
 	
 	
-	/*
-
-		$eventos = '';
-
-		if (!empty($id_recurso) && !empty($numMes) && !empty($numMes)) {
-			$recurso = Recurso::findOrFail($id_recurso);
-			$eventos = $recurso->events()->where('fechaEvento','<=','Y-m-'.date('t', mktime(0,0,0,(int) $numMes,1,(int) $year)))->where('fechaEvento','>=',date('Y-m-d',strtotime($year.'-'.$numMes.'-1')))->get();
-			$this->numMes = $numMes;
-			$this->year = $year;
-		} 		
-	*/
-	
 	/**
 	*	@param $numMes
 	*	@param $year

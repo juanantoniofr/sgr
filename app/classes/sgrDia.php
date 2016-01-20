@@ -11,9 +11,12 @@ class sgrDia {
 	private $fecha;
 	private $numMes;
 	private $year;
+
 	
 	
-	public function __construct($tsfecha){
+	public function __construct($tsfecha = ''){
+
+		if(empty($tsfecha)) $tsfecha = strtotime('1970-1-1');
 
 		$this->timestamp = $tsfecha;
 			
@@ -58,9 +61,20 @@ class sgrDia {
 		
 	}
 
+	public function fecha(){
+		return $this->fecha;
+	}
+
+	public function mes(){
+		return $this->numMes;
+	}
+
+	public function year(){
+		return $this->year;
+	}
 
 	public function numerodia(){
-		return $this->numerodia;
+		return $this->numdiames;
 	}
 
 	public function festivo(){

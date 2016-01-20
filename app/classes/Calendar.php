@@ -386,16 +386,19 @@ class Calendar {
 		return $showInfo;
 	}
 
-	public static function getBodytableWeek($day,$month,$year,$id_recurso){
+	public static function getBodytableWeek($day,$month,$year,$id_recurso,$id_grupo='0'){
 
 		$html = '';
 		$self = new self();
 
-		//timeStamp lunes semana de $day - $month -$year seleccionado por el usuario
-		$timefirstMonday = sgrDate::timestamplunesanterior($day,$month,$year);
-		//número de día del mes del lunes de la semana seleccionada
-		$firstMonday = date('j',$timefirstMonday);
-		$sgrCalendario = new sgrCalendario($month,$year);
+		$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
+		
+
+		$sgrWeek = new sgrWeek($day,$month,$year);
+
+		return (string) View::make('calendario.bodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+		//{{ (string) View::make('calendario.testtd')->with('view','week')->with('isDayAviable',Auth::user()->isDayAviable($sgrWeek->dia($i)->numerodia(),$sgrWeek->dia($i)->mes(),$sgrWeek->dia($i)->year()))->with('hour',$horas[$j])->with('min',30)->with('mon',$sgrWeek->dia($i)->mes())->with('day',$sgrWeek->dia($i)->numerodia())->with('year',$sgrWeek->dia($i)->year())->with('time',$sgrWeek->dia($i)->timestamp())->with('currentday',$sgrWeek->dia($i))->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo) }}
+		
 		for($j=0;$j<count($self->aHour)-1;$j++) {
 
 			$hour = // $itemsHours[0];

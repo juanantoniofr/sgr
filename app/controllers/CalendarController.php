@@ -188,6 +188,7 @@ class CalendarController extends BaseController {
 				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$numMonth)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
 				break;
 			case 'week':
+
 					return Calendar::getBodytableWeek($day,$numMonth,$year,$id_recurso);
 				break;
 			case 'day':
@@ -200,6 +201,29 @@ class CalendarController extends BaseController {
 				$table['tBody'] = 'Error al generar vista...';
 				break;	
 		}
+	}
+
+	
+	//Ajax functions
+	public function getTablebyajax(){
+		
+		$table = array( 'tHead' => '',
+						'tBody' => '');
+		
+		$viewActive = Input::get('viewActive','month'); //vista por defecto
+		$day = Input::get('day',date('d'));
+		$numMonth = Input::get('month',date('n'));
+		$year = Input::get('year',date('Y'));
+		$id_recurso = Input::get('id_recurso','');
+		$id_grupo = Input::get('groupID','');
+
+       	$sgrCalendario = new sgrCalendario($numMonth,$year);
+
+       	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
+		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
+		$table['tCaption'] = CalendarController::caption($sgrCalendario->nombreMes(),$sgrCalendario->getYear());
+				
+	    return $table;
 	}
 
 	public static function head($viewActive,$day,$numMonth,$year){
@@ -223,27 +247,6 @@ class CalendarController extends BaseController {
 
 	public static function caption($nombreMes,$year){
 		return (string) View::make('calendario.caption')->with('nombreMes',$nombreMes)->with('year',$year);
-	}
-	//Ajax functions
-	public function getTablebyajax(){
-		
-		$table = array( 'tHead' => '',
-						'tBody' => '');
-		
-		$viewActive = Input::get('viewActive','month'); //vista por defecto
-		$day = Input::get('day',date('d'));
-		$numMonth = Input::get('month',date('n'));
-		$year = Input::get('year',date('Y'));
-		$id_recurso = Input::get('id_recurso','');
-		$id_grupo = Input::get('groupID','');
-
-       	$sgrCalendario = new sgrCalendario($numMonth,$year);
-
-       	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
-		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		$table['tCaption'] = CalendarController::caption($sgrCalendario->nombreMes(),$sgrCalendario->getYear());
-				
-	    return $table;
 	}
 
 }//fin del controlador
