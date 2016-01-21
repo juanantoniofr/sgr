@@ -7,8 +7,13 @@ class Calendar {
 	
 	//private $aAbrNameDaysWeek = array('1'=>'Lun','2'=>'Mar','3'=>'Mie','4'=>'Jue','5'=>'Vie','6'=>'Sab','7'=>'Dom');
 
-	public static function getBodyTableAgenda($day,$month,$year){
+/*	public static function getBodyTableAgenda($day,$month,$year){
 		
+		$maxEventsByPage = 10;
+		$startDate = date('Y-m-d',strtotime($year . '-' . $month .'-'. $day));
+		$events = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->orderby('fechaEvento','Asc')->orderby('horaInicio','Asc')->orderby('titulo','Asc')->paginate($maxEventsByPage);
+		
+		return (string) View::make('calendario.bodyAgenda')->with('events',$events);
 		$html = '';
 		$startDate = date('Y-m-d',strtotime($year . '-' . $month .'-'. $day));
 		$haveEvents = false;
@@ -107,7 +112,7 @@ class Calendar {
 		}		
 		return $html;
 	}
-
+*/
 	/*public static function getBodytableMonth($mon='',$year='',$id_recurso = ''){
 
 		$self = new self();
@@ -386,7 +391,7 @@ class Calendar {
 		return $showInfo;
 	}
 
-	public static function getBodytableWeek($day,$month,$year,$id_recurso,$id_grupo='0'){
+	/*public static function getBodytableWeek($day,$month,$year,$id_recurso,$id_grupo='0'){
 
 		$html = '';
 		$self = new self();
@@ -447,7 +452,7 @@ class Calendar {
 		}
 		return $html;
 	}//getBodyTableWeek
-
+	*/
 	public static function getPrintBodytableWeek($data,$day,$month,$year,$id_recurso){
 
 		$html = '';

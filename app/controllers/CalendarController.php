@@ -138,7 +138,7 @@ class CalendarController extends BaseController {
 		return $respuesta;
 	}	
 
-	//Se carga la vista por defecto: Mensual
+	//Carga la vista por defecto: Mensual
 	public function showCalendarViewMonth(){
 		
 		$viewActive = Input::get('view','month'); //vista por defecto
@@ -169,41 +169,8 @@ class CalendarController extends BaseController {
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
 	}
-
-	public static function body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo){
-		
-		$sgrCalendario = new sgrCalendario($numMonth,$year);
-		$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-		$days = $sgrCalendario->dias();
-		$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());//Representación numérica ISO-8601 del día de la semana 1 lunes,.7 domingo
-		$diaActual = 1;
-		$j=1;
-		switch ($viewActive) {
-			case 'year':
-				return '<p>Aún en desarrollo....</p>';
-				break;
-			case 'month':
-				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$numMonth)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
-				break;
-			case 'week':
-
-					return Calendar::getBodytableWeek($day,$numMonth,$year,$id_recurso);
-				break;
-			case 'day':
-				return '<p>Aún en desarrollo.....</p>';	
-				break;
-			case 'agenda':
-				return Calendar::getBodytableAgenda($day,$numMonth,$year);
-				break;
-			default:
-				$table['tBody'] = 'Error al generar vista...';
-				break;	
-		}
-	}
-
-	
 	//Ajax functions
 	public function getTablebyajax(){
 		
@@ -221,9 +188,47 @@ class CalendarController extends BaseController {
 
        	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
 		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		$table['tCaption'] = CalendarController::caption($sgrCalendario->nombreMes(),$sgrCalendario->getYear());
+		$table['tCaption'] = CalendarController::caption($day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
 				
 	    return $table;
+	}
+
+
+	public static function body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo){
+		
+		$sgrCalendario = new sgrCalendario($numMonth,$year);
+		$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
+		$days = $sgrCalendario->dias();
+		$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());//Representación numérica ISO-8601 del día de la semana 1 lunes,.7 domingo
+		$diaActual = 1;
+		$j=1;
+		switch ($viewActive) {
+			case 'year':
+				return '<p>Aún en desarrollo....</p>';
+				break;
+			case 'month':
+				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$numMonth)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+				break;
+			case 'week':
+				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
+				$sgrWeek = new sgrWeek($day,$numMonth,$year);
+				return (string) View::make('calendario.bodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);	
+					//return Calendar::getBodytableWeek($day,$numMonth,$year,$id_recurso);
+				break;
+			case 'day':
+				return '<p>Aún en desarrollo.....</p>';	
+				break;
+			case 'agenda':
+				$maxEventsByPage = 10;
+				$startDate = date('Y-m-d',strtotime($year . '-' . $numMonth .'-'. $day));
+				$events = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->orderby('fechaEvento','Asc')->orderby('horaInicio','Asc')->orderby('titulo','Asc')->paginate($maxEventsByPage);
+		
+				return (string) View::make('calendario.bodyAgenda')->with('events',$events);
+				break;
+			default:
+				$table['tBody'] = 'Error al generar vista...';
+				break;	
+		}
 	}
 
 	public static function head($viewActive,$day,$numMonth,$year){
@@ -245,8 +250,8 @@ class CalendarController extends BaseController {
 		}
 	}
 
-	public static function caption($nombreMes,$year){
-		return (string) View::make('calendario.caption')->with('nombreMes',$nombreMes)->with('year',$year);
+	public static function caption($day,$nombreMes,$year){
+		return (string) View::make('calendario.caption')->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
 	}
 
 }//fin del controlador

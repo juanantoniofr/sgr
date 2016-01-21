@@ -1,1 +1,1 @@
-<span id="alternate">{{$nombreMes or ''}} / {{$year or ''}}</span>
+<span id="alternate">{{$day or ''}} / {{$nombreMes or ''}} / {{$year or ''}}</span>

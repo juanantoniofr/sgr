@@ -22,7 +22,16 @@ class Evento extends Eloquent{
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
 
+ 	public function esEditable(){
+ 		$editable = false;
+ 		$day = date('d',strtotime($this->fechaEvento));
+ 		$mon = date('m',strtotime($this->fechaEvento));
+ 		$year = date('Y',strtotime($this->fechaEvento));
+ 		
+ 		if ($this->userOwn->isDayAviable($day,$mon,$year)) $editable = true;
 
+ 		return $editable;
+ 	}
  	/**
  	* Devevelve el número de recurso (equipos o espacios reservados por un evento)
  	*/

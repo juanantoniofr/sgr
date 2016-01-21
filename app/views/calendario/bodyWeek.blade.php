@@ -7,9 +7,7 @@
       				{{(string) View::make('calendario.tdFestivo')->with('idfecha',date('jnY',$sgrWeek->dia($i)->timestamp()))->with('fecha',$sgrWeek->dia($i)->fecha())->with('view','week')->with('festivo','festivo')}}
       			@else
       				
-                              {{ (string) View::make('calendario.testtd')->with('day',$sgrWeek->dia($i)->numerodia())->with('mon',$sgrWeek->dia($i)->mes())->with('year',$sgrWeek->dia($i)->year())->with('hour',$horas[$j])->with('min','30')->with('view','week')->with('isDayAviable',true) }}
-
-                              
+                              {{ (string) View::make('calendario.td')->with('day',(int) $sgrWeek->dia($i)->numerodia())->with('mon',(int) $sgrWeek->dia($i)->mes())->with('year',(int) $sgrWeek->dia($i)->year())->with('hour',(int) $horas[$j])->with('min',30)->with('view','week')->with('currentday',$sgrWeek->dia($i))->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('isDayAviable',Auth::user()->isDayAviable($sgrWeek->dia($i)->numerodia(),$sgrWeek->dia($i)->mes(),$sgrWeek->dia($i)->year())) }}
       			@endif
       		</td>		
 	    @endfor
