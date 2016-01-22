@@ -2,31 +2,72 @@
 
 class CalendarController extends BaseController {
 	
-
+	//Generación de pdf's para imprimir
 	public function imprime(){
 		
-		$currentDay = Date::currentDay();
-		$currentMonth = Date::currentMonth();
-		$currentYear = Date::currentYear();
-		
+		//get Input or default
 		$viewActive = Input::get('view','month');
-		$day = Input::get('day',$currentDay);
-		$month = Input::get('month',$currentMonth);
-		$year = Input::get('year',$currentYear);
+		$day = Input::get('day',date('d'));
+		$month = Input::get('month',date('m'));
+		$year = Input::get('year',date('Y'));
 		$id_recurso = Input::get('idRecurso','');
-		$grupo_id = Input::get('groupID','');
-
+		$id_grupo = Input::get('groupID','');
 		$titulo = Input::get('titulo',false);
 		$nombre = Input::get('nombre',false);
 		$colectivo = Input::get('colectivo',false);
-		$total = Input::get('total',false);
-		$data = array('titulo' => $titulo,'nombre' => $nombre,'colectivo' => $colectivo,'total' => $total);
+		$total = Input::get('total',false);//Total de puestos o equipos de una reserva
+		$datatoprint = array('titulo' => $titulo,'nombre' => $nombre,'colectivo' => $colectivo,'total' => $total);//Información a imprimir seleccionada por el usuario
 		
+		//Output
+		$table = array( 'tCaption'	=> '',
+						'tHead' 	=> '',
+						'tBody'		=> '');
+
 		$sgrCalendario = new sgrCalendario($month,$year);
 
-		$table = array( 'tHead' => '',
-						'tBody' => '');
+
+		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
+		$table['tHead'] = CalendarController::head($viewActive,$day,$month,$year);
+
+		switch ($viewActive) {
+			case 'month':
+				$diaActual = 1;
+				$j=1;
+				$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
+				$days = $sgrCalendario->dias();
+				$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
+				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$month)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
+				break;
+			case 'week':
+				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
+				$sgrWeek = new sgrWeek($day,$month,$year);
+
+				$table['tBody'] = View::make('calendario.printBodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);	
+					
+				break;
+			default:
+				# code...
+				break;
+		}
 		
+		//$table['tBody'] = CalendarController::body($viewActive,$day,$month,$year,$id_recurso,$id_grupo);
+		
+
+		//
+		
+		if (0 != $id_recurso) {
+			$nombre = Recurso::find($id_recurso)->nombre;
+		}	
+		else {
+			$recurso = Recurso::where('grupo_id','=',$id_grupo)->first();
+			$nombre = $recurso->grupo; 
+		}	   		
+		$html = View::make('pdf.calendario')->with(compact('table','nombre'));
+		//return $html;
+		$nombreFichero = $day .'-'. $month.'-' . $year .'_'.$nombre;
+		$result = myPDF::getPDF($html,$nombreFichero);
+		return Response::make($result)->header('Content-Type', 'application/pdf');
+	
 		switch ($viewActive) {
 			case 'year':
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
@@ -34,7 +75,7 @@ class CalendarController extends BaseController {
 			case 'month':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
 				$table['tHead'] = (string) View::make('calendario.printHeadMonth');//Calendar::getPrintHead('month',$day,$month,$year);
-				$table['tBody'] = Calendar::getPrintBodytableMonth($data,$month,$year,$id_recurso);	
+				$table['tBody'] = Calendar::getPrintBodytableMonth($datatoprint,$month,$year,$id_recurso);	
 				break;
 			case 'week':
 				$table['tCaption'] = (string) View::make('calendario.caption')->with('nombreMes',$sgrCalendario->nombreMes())->with('year',$sgrCalendario->getYear());
@@ -48,7 +89,7 @@ class CalendarController extends BaseController {
 				}
 				$table['tHead'] = (string) View::make('calendario.headWeek')->with('text',$text)->with('hora','Hora');
 
-				$table['tBody']= Calendar::getPrintBodytableWeek($data,$day,$month,$year,$id_recurso);
+				$table['tBody']= Calendar::getPrintBodytableWeek($datatoprint,$day,$month,$year,$id_recurso);
 				break;
 			case 'day':
 				$table['tBody'] = '<p>Aún en desarrollo.....</p>';	
@@ -62,21 +103,6 @@ class CalendarController extends BaseController {
 				$table['tBody'] = 'Error al generar vista...';
 				break;
 		}
-
-		if (0 != $id_recurso){
-			$recurso = Recurso::find($id_recurso);	
-			$nombre = $recurso->nombre;	
-		} 
-		else {
-			$recurso = Recurso::where('grupo_id','=',$grupo_id)->first();
-			$nombre = 'Todos los puestos o equipos de ' . $recurso->grupo; 
-		}	   		
-		$html = View::make('pdf.calendario')->with(compact('table','nombre'));
-
-		$nombreFichero = $day .'-'. $month.'-' . $year .'_'.$recurso->nombre;
-		$result = myPDF::getPDF($html,$nombreFichero);
-		//return $html;
-   		return Response::make($result)->header('Content-Type', 'application/pdf');
 	}
 
 	//Datos de un evento para un validador
@@ -169,7 +195,7 @@ class CalendarController extends BaseController {
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
 	}
 	//Ajax functions
 	public function getTablebyajax(){
@@ -188,11 +214,10 @@ class CalendarController extends BaseController {
 
        	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
 		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		$table['tCaption'] = CalendarController::caption($day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
+		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
 				
 	    return $table;
 	}
-
 
 	public static function body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo){
 		
@@ -245,13 +270,14 @@ class CalendarController extends BaseController {
 					$time = strtotime('+'.$i.' day',$timefirstMonday);	
 					$text[$i] = sgrDate::abrDiaSemana($time) . ', '.strftime('%d/%b',$time);
 				}
-				return (string) View::make('calendario.headWeek')->with('text',$text);
+				return (string) View::make('calendario.headWeek')->with('view',$viewActive)->with('text',$text);
 				break;
 		}
 	}
 
-	public static function caption($day,$nombreMes,$year){
-		return (string) View::make('calendario.caption')->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
+	public static function caption($viewActive,$day,$nombreMes,$year){
+
+		return (string) View::make('calendario.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
 	}
 
 }//fin del controlador

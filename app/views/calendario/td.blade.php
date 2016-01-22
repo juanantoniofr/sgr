@@ -46,7 +46,7 @@
                         {{ $event->titulo }}
                         <!-- ./Title -->
                 </a>
-                </span>
+               
             @endif
             </div> <!-- ./divEvent -->  
         @endforeach

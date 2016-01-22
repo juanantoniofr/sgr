@@ -1,9 +1,9 @@
 <style>
-table tr td {border:1px solid #aaa;vertical-align: top;}
-p {font-size:0.8em;margin-top:0px;padding: 0px;};
-span {font-size:0.8em;}
+table tr td {border:1px solid #aaa;border-collapse: collapse;text-align: left;text-indent: none}
+p {font-size:0.8em;margin-top:0px;padding: 0px;}
+span.evento {font-size:0.7em;text-align: left;}
 small {margin:0px;padding: 0px;}
-table th {border:1px solid green;}
+table th {border:1px solid green;border-collapse: collapse;}
 
 
 </style>

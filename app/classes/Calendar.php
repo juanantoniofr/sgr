@@ -233,12 +233,7 @@ class Calendar {
 		$self = new self();
 		$aColorLink = array();
 
-		
-        //if ($view == 'month' && $day <= sgrCalendario::dias($mon,$year)) $html .= '<small>'. $day .'</small>' ;
         if ($view == 'month') $html .= '<small>'. $day .'</small>' ;
-
-        
-        
        foreach($events as $event){
 
         	if ($event->estado == 'denegada'){
@@ -453,6 +448,7 @@ class Calendar {
 		return $html;
 	}//getBodyTableWeek
 	*/
+	
 	public static function getPrintBodytableWeek($data,$day,$month,$year,$id_recurso){
 
 		$html = '';

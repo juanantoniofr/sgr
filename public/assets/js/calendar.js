@@ -133,8 +133,7 @@ $(function(e){
 		$('#selectGroupRecurse').on('change',function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
-			//$('form#selectRecurse ').serialize());
-			//alert($('select#selectGroupRecurse option:selected').val());
+			
 			$.ajax({
 				type:"GET",
 				url:"getRecursos",
@@ -385,17 +384,6 @@ $(function(e){
 		//When view = agenda
 		var $viewActive = $('#btnView .active').data('calendarView');
 		if ($viewActive == 'agenda'){
-			$('.agendaLinkTitle').each(function(){
-	  				$this = $(this);
-	  				$this.next('div.agendaInfoEvent').hide();
-					$this.click(function(e){
-						e.preventDefault();
-						$this = $(this);
-						$this.next('div.agendaInfoEvent').slideToggle('slow');					
-					});
-	  		});
-			
-			setActionAgendaVerMas();
 			$('a.agendaEdit').each(function(){setLinkEditEvent($(this).data('idEvento'));});
 		}
 		else {
@@ -554,7 +542,7 @@ $(function(e){
 
 	
 	function printCalendar(){
-		//showGifEspera();
+		
 		updatePrintButton();
 		var $val = $('#datepicker').val();
 		var $aDate = parseDate($val,'-','es-ES');
@@ -563,20 +551,10 @@ $(function(e){
 		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
 		var $grupo_id = $('select#selectGroupRecurse option:selected').val();
 
-		
-		//$('#btnprint').attr('href','print?view='+$viewActive+'&day='+$aDate[0]+'&month='+$aDate[1]+'&year='+$aDate[2]+'&idrecurso='+$id_recurso+'&groupID='+$grupo_id);
-		
-		
-		//console.log($('select#recurse option:selected').data('disabled'));
-		//alert($id_recurso + '--' + $grupo_id);
-		
-
-		//console.log($id_recurso);
-		if ($grupo_id == '0') {$('#alert').fadeOut();$('#alert').fadeIn();}
+		if ($grupo_id == '0' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
 		else {
 			$('#btnprint').removeClass('disabled');
 			$('#btnNuevaReserva').removeClass('disabled');
-			//if 	($('select#recurse option:selected').data('disabled'))	$('#btnNuevaReserva').toggleClass('disabled');
 			showGifEspera();
 			
 			$.ajax({
@@ -657,9 +635,6 @@ $(function(e){
       			});
 	}
 	
-
-	
-
 	/*Action: 2. delete event
 		********************************************************************************
 		********************************************************************************
@@ -696,8 +671,6 @@ $(function(e){
 				}
       		});
 	}
-	
-
 	
 	/*Action: 3. Edit event
 		********************************************************************************
@@ -741,81 +714,7 @@ $(function(e){
 						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
 				}
 	      	});
-		
 	}
-
-	/*
-		Functions: relative to actions & programer events
-		//********************************************************************************
-		//********************************************************************************
-	*/
-	/*
-	function hasnewdata($respuesta){
-		
-		$newdata = false;
-
-		//titulo
-		
-		if ($('form#addEvent input#newReservaTitle').val() != $respuesta.titulo) {
-			$newdata = true;
-		}
-		//Actividad
-		if ($('select[name|="actividad"]').val() != $respuesta.actividad) {
-			$newdata = true;
-		}
-		//hora inicio
-		if (compareTime($('select[name|="hInicio"]').val(),$respuesta.horaInicio) != 0) {
-			$newdata = true;
-		}
-		//hora fin
-		if (compareTime($('select[name|="hFin"]').val(),$respuesta.horaFin) != 0) {
-			$newdata = true;
-		}
-		//repetir
-		$value = 'SR';
-		if ($respuesta.repeticion == '1') $value = 'CS';
-		if ($('select[name|="repetir"]').val() != $value) {
-			$newdata = true;
-		}
-		// fecha inicio
-		if ($value == 'CS'){
-			if ($('#datepickerFevento').val() != dateToformatES($respuesta.fechaInicio)) {
-				$newdata = true;
-			}
-			//fechaEvento
-			if ($('#datepickerFinicio').val() != dateToformatES($respuesta.fechaEvento)) {
-				$newdata = true;
-			}
-		}
-		else {
-			if ($('#datepickerFevento').val() != dateToformatES($respuesta.fechaEvento)) {
-				$newdata = true;
-			}
-			//fechaEvento
-			if ($('#datepickerFinicio').val() != dateToformatES($respuesta.fechaInicio)) {
-				$newdata = true;
-			}	
-		}
-		//fechafin
-		if ($('#datepickerFfin').val() != dateToformatES($respuesta.fechaFin)) {
-			$newdata = true;
-		}
-		//días
-		$aDias = eval($respuesta.diasRepeticion);
-		$("input:checkbox").each(function(index,value){
-			if ( $(this).prop('checked') == true ){
-				if ( $.inArray($(this).val(),$aDias) == -1)	{
-					$newdata = true;
-				}
-			}
-		
-		});
-
-		
-
-		return $newdata;
-		
-	}*/
 
 	function initModalEdit($idEvento,$idSerie){
 		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
@@ -907,26 +806,8 @@ $(function(e){
 			$('#EditOption1').data('idSerie',$idSerie);
 			editEvents('1',$idEvento,$idSerie);
 		});
-		
 	}
 	
-	
-
-	//link agendaVerMas
-	function setActionAgendaVerMas(){
-		$('#agendaVerMas').click(function(e){
-			e.preventDefault();
-			$this = $(this);
-			var $fecha = $this.data('date');
-			var aDate = parseDate($fecha);
-			$day = aDate[2];
-			$month = aDate[1];
-			$year = aDate[0];
-			$('#datepicker').val($day+'-'+$month+'-'+$year);
-			printCalendar();
-		});
-	}
-
 	//popover 
 	function setPopOver($item){
 		$item.popover(); 
@@ -1009,12 +890,13 @@ $(function(e){
 		viewActive = $('#btnView .active').data('calendarView');
 	
 		$selector = 'a#edit';
-		if (viewActive == 'agenda') $selector = 'a.edit_agenda';
-
+		if (viewActive == 'agenda') $selector = 'a#edit_agenda';
+		//alert('Selector = ' + $selector+'_'+$id);
 		//Programa el envento onClick en el enlace en la ventana popover para eliminar evento.
-		$($selector+'_'+$id).click(function(e){
+		$($selector + '_' + $id).click(function(e){
 			e.preventDefault();
-
+			e.stopPropagation();
+			alert('lanza evento');
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
@@ -1065,7 +947,6 @@ $(function(e){
 			 	$(this).prop('checked',true);}
 		});
 		//$('#datepickerFfin').val(nextDay(dateToformatES($fecha)));
-
 	}
 
 	function setResumen(){
@@ -1143,7 +1024,6 @@ $(function(e){
 				});
 			}
 			);		
-			
 	}
 
 	function newLinkSetOnHover($idSerie){
@@ -1261,7 +1141,6 @@ $(function(e){
 		return $nextHoraInicio;
 	}
 
-
 	function getIntervalos($hi,$hf){
 		$numIntervalos = 1;
 		if ($('#btnView .active').data('calendarView') == 'week'){
@@ -1345,7 +1224,6 @@ $(function(e){
 		//$day.setTime($day.getTime() + (24 * 60 * 60 * 1000));
 
 		return $day.getDate()+'-'+($day.getMonth()+1)+'-'+$day.getFullYear();
-
 	}
 
 	function firstDayAviable(){

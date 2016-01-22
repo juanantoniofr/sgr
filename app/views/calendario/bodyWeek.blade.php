@@ -1,6 +1,6 @@
 @for ( $j=0; $j < count($horas)-1 ; $j++ )
 	<tr>
-      	<td style="width:10px;text-align:center;font-weight: bold;" class="week">{{$horas[$j]}}-{{$horas[$j+1]}}</td>
+      	<td style="width:10px;text-align:center;font-weight: bold;" class="week"><small>{{$horas[$j]}}-{{$horas[$j+1]}}</small></td>
       	@for ( $i=0 ; $i<7 ; $i++ )
       		<td class="celda">
       			@if ($sgrWeek->dia($i)->festivo()) 
@@ -11,6 +11,6 @@
       			@endif
       		</td>		
 	    @endfor
-      	</td>
+      	
 	</tr>
 @endfor

@@ -1,1 +1,1 @@
-<span id="alternate">{{$day or ''}} / {{$nombreMes or ''}} / {{$year or ''}}</span>
+<span id="alternate">@if($view == 'week') {{$day or ''}} / @endif {{$nombreMes or ''}} / {{$year or ''}}</span>

@@ -297,7 +297,7 @@ class Date{
 		$str .= $diasSemana[$dias[$cont]];
 		return $str;
 	}
-
+/*
 	//devuelve el día del mes (dos dígitos) de la fecha actual (hoy)
 	public static function currentDay(){
 		return date('d');
@@ -310,5 +310,6 @@ class Date{
 	public static function currentYear(){
 		return date('Y');
 	}
+*/
 }
 ?>

@@ -29,12 +29,9 @@
 			</a>
 		
 			@if($event->esEditable())	
-				<a href="" class="agendaEdit edit_agenda_'{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}">
-					<i class="fa fa-pencil fa-fw"></i>
-				</a>
-								
-				<a href="#" class="delete_agenda" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" >
-					<i class="fa fa-trash-o fa-fw"></i>
+				<a href="" class="agendaEdit" id = "edit_agenda_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}"><span class="fa fa-pencil fa-fw"></span></a>
+
+				<a href="#" class="delete_agenda" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" ><span class="fa fa-trash-o fa-fw"></span>
 				</a>
 							
 			@endif
