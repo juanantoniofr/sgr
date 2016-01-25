@@ -169,9 +169,9 @@ class PodController extends BaseController {
 			//fecha Evento
 			$startDate = Date::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA']);
 			$currentfecha = Date::currentFecha($startDate,$j);
-			
+			$sgrEvento = new sgrEvento;
 			foreach ($recursos as $recurso) {
-				if ( 0 < Calendar::getNumSolapamientos($recurso->id,$currentfecha,$data['INI'],$data['FIN']) ){
+				if ( 0 < $sgrEvento->solapa($recurso->id,$currentfecha,$data['INI'],$data['FIN']) ){
 					//hay solape: fin -> return true
 					return true;
 					}	

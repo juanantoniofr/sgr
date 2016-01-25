@@ -68,7 +68,7 @@ class CalendarController extends BaseController {
 		$result = myPDF::getPDF($html,$nombreFichero);
 		return Response::make($result)->header('Content-Type', 'application/pdf');
 	
-		switch ($viewActive) {
+		/*switch ($viewActive) {
 			case 'year':
 				$table['tBody'] = '<p>Aún en desarrollo....</p>';
 				break;
@@ -102,7 +102,7 @@ class CalendarController extends BaseController {
 			default:
 				$table['tBody'] = 'Error al generar vista...';
 				break;
-		}
+		}*/
 	}
 
 	//Datos de un evento para un validador
@@ -125,7 +125,8 @@ class CalendarController extends BaseController {
 			$respuesta['estado'] = 'Solicitud denegada';
 		}
 		else{
-			if (Calendar::hasSolapamientos($evento[0]->evento_id,$evento[0]->recurso_id)){
+			
+			if ($evento[0]->solape(strtotime($evento[0]->fechaEvento))){
 				$respuesta['solapamientos'] = true;
 				$respuesta['estado'] = 'Pendiente de validar con solapamientos';
 			}

@@ -72,7 +72,7 @@ class Recurso extends Eloquent {
             //Si no hay definida fecha limite o es null (modo no automático para siempre)
             else  $validacion = true;
         }
-        
+       
         return $validacion;
 
     }

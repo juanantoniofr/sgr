@@ -3,7 +3,7 @@
 @foreach($currentday->events($id_recurso,$id_grupo) as $event)
 
     <span class= "evento" style = "
-                @if ($event->solape($mon,$day,$year))   color:#C12E2A
+                @if ($event->solape(mktime(0,0,0,(int) $mon,(int) $day,(int) $year)))   color:#C12E2A
                 @else
                     
                     @if($event->estado == 'aprobada')   color:#419641 @endif

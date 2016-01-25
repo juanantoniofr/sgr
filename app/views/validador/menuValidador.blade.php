@@ -6,10 +6,7 @@
             <div class="form-group ">
                 <a href="{{route('calendarios.html')}}" class="btn btn-danger" title="Añadir nueva reserva"><i class="fa fa-calendar fa-fw"></i> Nueva reserva</a>
             </div>
-           <!-- <div class="form-group">
-                <a href="{{route('validadorHome.html',array('verpendientes' => true))}}" class="btn btn-primary" title="Listar solicitudes"><i class="fa fa-list fa-fw"></i> Listar</a>
-            </div>                      
-               --> 
+           
         </form>
 
         <form class="navbar-form navbar-right" id ="filter">    
@@ -31,10 +28,10 @@
                     <div class="form-group ">
                        <select class="form-control " name = "id_recurso" id="selectRecurso">
                             <option value="0" @if($id_recurso == 0) selected="selected" @endif >Todos los espacios</option>
-                            @foreach($eventsByrecurso as $event)
-                                <option value="{{$event->recurso_id}}" 
-                                    @if ($id_recurso == $event->recurso_id) selected="selected" @endif>
-                                    {{$event->recursoOwn->nombre}}
+                            @foreach($recursos as $recurso)
+                                <option value="{{$recurso->id}}" 
+                                    @if ($id_recurso == $recurso->id) selected="selected" @endif>
+                                    {{$recurso->nombre}}
                                 </option>
                             @endforeach
                         </select>

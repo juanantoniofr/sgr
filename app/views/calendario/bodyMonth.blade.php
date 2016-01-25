@@ -3,7 +3,7 @@
 	<tr class="fila">
 	@for($i=1;$i<=7;$i++)
 		<!-- Una celda por cada día de la semama -->
-		<td class="celda">
+		<td class="celda" width="3px !important" >
 		
 			@if ( ((int) $diaSemanaPimerDiaMes > $i && $j == 1) || ((int) $diaActual > (int) $sgrCalendario->ultimoDia()) )
 				{{ (string) View::make('calendario.tdFestivo') }}

@@ -123,10 +123,9 @@ class Date{
 		$self = new self();
 					
 		$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($fInicio,'d-m-Y'));
-		$endTime = $self->gettimestamp($fFin,'Y-m-d');
+		$endTime = $self->gettimestamp($fFin,'d-m-Y');
 		$currentTime = $startTime;
-		//$nextTime = strtotime('Next ' . $aDaysWeek[$dWeek],$currentTime);
-		//if ($startTime == $self->getTimeStamp($fInicio,'-')) $numRepeticiones++;
+		
 		if ($startTime <= $endTime){
 			do {
 				$numRepeticiones++;
@@ -134,8 +133,7 @@ class Date{
 				$currentTime = $nextTime;
 			} while($nextTime <= $endTime);	
 		}
-		//if ($endTime == $self->getTimeStamp($fFin,'-')) $numRepeticiones++;
-		//echo $numRepeticiones;
+		
 		return $numRepeticiones;
 	}
 
@@ -160,7 +158,7 @@ class Date{
 		$self = new self();
 		if ($numRepeticion == 0) return $fInicio;
 		$currentTime = strtotime('+ '.$numRepeticion.' Week',$self->gettimestamp($fInicio,'d-m-Y'));
-		$fecha = date('j-n-Y',$currentTime);
+		$fecha = date('d-m-Y',$currentTime);
 		return $fecha;
 	
 	}

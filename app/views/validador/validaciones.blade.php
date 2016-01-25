@@ -38,8 +38,8 @@
 				</div>
 			@endif    	   	          
 
-			@if (!$events->count()) 
-	            <div class="alert alert-warning" role="alert">No hay solicitudes....</div>
+			@if (count($events)  == 0) 
+	            <div class="alert alert-warning text-center" role="alert">No hay solicitudes....</div>
 			@else 
 				<div class="table-responsive"> 
 		  			<table class="table table-hover table-striped">
@@ -59,7 +59,10 @@
 				                        	'sortby' => 'titulo',
 				                            'order' => 'desc',
 				                            'id_recurso' => $idrecurso,
-				                            'id_user'	=>	$iduser
+				                            'id_user'	=>	$iduser,
+				                            'verpendientes' => $verpendientes,
+				                            'verdenegadas' => $verdenegadas,
+				                            'veraprobadas' => $veraprobadas,
 				                            )
 				                        )
 				                   }}
@@ -71,7 +74,10 @@
 				                                'sortby' => 'titulo',
 				                                'order' => 'asc',
 				                                'id_recurso' => $idrecurso,
-				                                'id_user'	=>	$iduser
+				                                'id_user'	=>	$iduser,
+				                                'verpendientes' => $verpendientes,
+				                            	'verdenegadas' => $verdenegadas,
+				                            	'veraprobadas' => $veraprobadas,
 				                            )
 				                        )
 				                    }}
@@ -87,7 +93,10 @@
 				                        	'sortby' => 'created_at',
 				                            'order' => 'desc',
 				                            'id_recurso' => $idrecurso,
-				                            'id_user'	=>	$iduser
+				                            'id_user'	=>	$iduser,
+				                            'verpendientes' => $verpendientes,
+				                            'verdenegadas' => $verdenegadas,
+				                            'veraprobadas' => $veraprobadas,
 				                            )
 				                        )
 				                   }}
@@ -99,7 +108,10 @@
 				                                'sortby' => 'created_at',
 				                                'order' => 'asc',
 				                                'id_recurso' => $idrecurso,
-				                            	'id_user'	=>	$iduser
+				                            	'id_user'	=>	$iduser,
+				                            	'verpendientes' => $verpendientes,
+				                            	'verdenegadas' => $verdenegadas,
+				                            	'veraprobadas' => $veraprobadas,
 				                            )
 				                        )
 				                    }}
@@ -108,7 +120,6 @@
 			  				</th>
 		  				</thead>
 		    			<tbody>
-
 		    				@foreach($events as $event)
 		    					@if ($event->estado == 'aprobada')
 		    						<tr  class=" text-success event"  data-idEvent = "{{$event->id}}">
@@ -137,10 +148,10 @@
 			                        	</td>
 
 
-			    				@elseif (Calendar::hasSolapamientos($event->evento_id,$event->recurso_id))
+			    				@elseif ($event->solape(strtotime($event->fechaEvento)))
 				    					<tr class=" text-warning event"  data-idEvent = "{{$event->id}}">
 				    						<td>
-				                        		<span  class="fa fa-warning fa-fw" aria-hidden="true" data-toggle="tooltip" title="Solicitud con solapamiento">Con Solapamiento</span>
+				                        		<span  class="fa fa-warning fa-fw" aria-hidden="true" data-toggle="tooltip" title="Solicitud con solapamiento">Solapamiento!!</span>
 				                        	</td>
 				    						<td><i class="fa fa-calendar fa-fw "></i></td>
 				    						<td>
@@ -173,7 +184,8 @@
 				                        <td><i class="fa fa-clock-o fa-fw "></i><span title="Click para aprobar o denegar... " class="pull-center  small"><em> {{date('d \d\e M \d\e Y \a \l\a\s H:i',strtotime($event->created_at))}}</em></span></td>
 				                    </tr>
 				                
-			                    @endforeach
+			                @endforeach
+			            	
 		    			</tbody>
 					</table>
 				</div><!-- /.table-responsive -->

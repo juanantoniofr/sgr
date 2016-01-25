@@ -61,17 +61,17 @@ class Evento extends Eloquent{
         return $numRecursos;
  	}
  	/**
- 	* Determina si un evento tiene solape 
+ 	* Determina si un evento en BD tiene solape 
  	* @param $mon mes dos dígitos
  	* @param $day día dos dígitos
  	* @param $year año cuatro dígitos
  	* @return $solapado boolean
  	*/
- 	public function solape($mon,$day,$year){
+ 	public function solape($timestamp){
  		$solapado = false;
 		$hi = date('H:i:s',strtotime($this->horaInicio));
 		$hf = date('H:i:s',strtotime('+1 hour',strtotime($this->horaInicio)));
-	    $where  = "fechaEvento = '".date('Y-m-d',mktime(0,0,0,$mon,$day,$year))."' and ";
+	    $where  = "fechaEvento = '".date('Y-m-d',$timestamp)."' and ";
 	    $where .= "estado != 'denegada' and ";
 	    $where .= "evento_id != '".$this->evento_id."' and ";
 		$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
@@ -126,8 +126,9 @@ class Evento extends Eloquent{
  		return $total;
  	}
 	
-	
-	
+
+ 	
+
 
  	private $rules = array (
 			'titulo' 			=>	'required',
@@ -204,7 +205,7 @@ class Evento extends Eloquent{
     	if (isset($data['dias']) && in_array('0', $data['dias']) )
     		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>domingo</strong><br />";
     	
-    	if (!empty($data['fFin'])){
+    	if ( !empty($data['fFin']) ){
     		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
     	}
 
@@ -278,7 +279,7 @@ class Evento extends Eloquent{
        	if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
 			
 			$v->sometimes('titulo','req3',function($data) {
-				
+				$sgrEvento = new sgrEvento;
 				if ($data['id_recurso'] == 0){
 					$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
 					foreach($recursos as $recurso){
@@ -298,7 +299,7 @@ class Evento extends Eloquent{
 								for($j=0;$j<$nRepeticiones;$j++){
 									$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
 									$currentfecha = Date::currentFecha($startDate,$j);
-									$numEvents = Calendar::getNumSolapamientos($id_recurso,$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+									$numEvents = $sgrEvento->solapa($data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 									//si ocupado
 									if($numEvents > 0){
 										return true;
@@ -324,7 +325,7 @@ class Evento extends Eloquent{
 							for($j=0;$j<$nRepeticiones;$j++){
 								$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
 								$currentfecha = Date::currentFecha($startDate,$j);
-								$numEvents = Calendar::getNumSolapamientos($data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+								$numEvents = $sgrEvento->solapa($data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 								//si ocupado
 								if($numEvents > 0){
 									return true;
@@ -370,7 +371,7 @@ class Evento extends Eloquent{
         	
 	        
 		        $intFinicio = Date::gettimestamp($data['fInicio'],'d-m-Y');
-		        $intNow = Date::gettimestamp(date('d-m-Y'),'d-m-Y');
+		        $intNow = strtotime('now');//Date::gettimestamp(date('d-m-Y'),'d-m-Y');
 	        	$intDiaAnterior = strtotime('-1 day',$intFinicio);
 			    //fecha posterior al día actual
 			    $v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){
@@ -392,11 +393,16 @@ class Evento extends Eloquent{
 			    });
         }
         
-        // requisito: reservas debe finalizar dentro del curso académico actual
-        if (!empty($data['fFin'])){
+        // requisito: reservas debe finalizar dentro del curso académico actual (Restringido a todos los usuarios menos a los validadores)
+        if (!empty($data['fFin'])  && !empty($data['repetir']) && !Auth::user()->isValidador()){
+
 			$v->sometimes('fFin','datefincurso',function($data){
+		    	
 		    	$fechaFinCurso = Config::get('options.fin_cursoAcademico');
-		    	if (strtotime(Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
+		    	$fechaMaximaEvento = $data['fEvento'];
+		    	if ($data['repetir'] == 'CS') $fechaMaximaEvento = $data['fFin']; //Reptición cada semana
+		    		
+		    	if (strtotime(Date::parsedatetime($fechaMaximaEvento,'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
 			    });
         }
 

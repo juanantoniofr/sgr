@@ -460,27 +460,70 @@ class sgrEvento {
 		return $evento_id;
 	}
 
+	/**
+ 	* Determina si un nuevo evento en $idRecurso en $currentfecha, con hora inicio $hi, hora de finalización $hf, solapa con eventos con $condicionEstado existentes en BD
+ 	*
+ 	* @param $idRecurso int
+ 	* @param $currentfecha (d-m-Y)
+ 	* @param $hi
+ 	* @param $hf
+ 	* @param $condicionEstado
+ 	* @return $numSolapamientos int
+ 	*
+ 	*/
+	public function solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado = ''){
+		
+		$numSolapamientos = 0;
+		
+		$hi = date('H:i:s',strtotime($hi));
+		$hf = date('H:i:s',strtotime($hf));
+
+		//si estamos editando un evento => Existe Input::get('idEvento'), hay que excluir para poder modificar por ejemplo en nombre del evento
+		$idEvento = Input::get('idEvento');
+		$option = Input::get('option');
+		$action = Input::get('action');
+		$excludeEvento = '';
+		
+		//Excluye eventos de la misma serie en cualquier espacio para poder cambiar el nombre a reservas tanto de un solo equipo//puesto o espacio como a reservas de todos los equipos/puestos
+		$idSerie = Input::get('idSerie');
+		$excludeEvento = '';
+		if (!empty($idSerie) && $action == 'edit') $excludeEvento = " and evento_id != '".$idSerie."'";
+
+
+		$where  =	"fechaEvento = '".Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d')."' and ";
+		if (!empty($condicionEstado))	$where .=	"estado = '".$condicionEstado."' and ";	
+		$where .= 	" (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
+		$where .= 	" or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
+		$where .=	" or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
+		$where .=	" or horaFin < '".$hf."' and horaFin > '".$hi."')";
+		$where .= 	$excludeEvento;
+		$numSolapamientos = Recurso::find($idRecurso)->events()->whereRaw($where)->count();
+		
+		
+		return $numSolapamientos;
+	}
+	
+
+
 	private function setEstado($idRecurso,$currentfecha,$hi,$hf){
 		$estado = 'denegada';
 
+		$self = new self();
 		
 		//si modo automatico validacion = false	
 		if( !Recurso::find($idRecurso)->validacion() ){
 			//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
 			$condicionEstado = 'aprobada';
 			//$currentFecha tiene formato d-m-Y
-			$numEvents = Calendar::getNumSolapamientos($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
-	
+			$numEvents =  $self->solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
 			//si ocupado
 			if($numEvents > 0){
 				//si ocupado
 				$estado = 'denegada';
-				//$msg = 'su reserva no se puede realizar, existen solapamientos con otras reservas ya aprobadas (ver detalles)';
 			}
 			//si libre
 			else{
 				$estado = 'aprobada';
-				//$msg = 'Su reserva se realizado con éxito. (imprimir justificacante)'
 			}
 
 		}
@@ -488,11 +531,10 @@ class sgrEvento {
 		else{
 			//ocupado??; estado = aprobado | pendiente | solapada (cualquiera de los posibles)
 			$condicionEstado = '';
-			$numEvents = Calendar::getNumSolapamientos($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
+			$numEvents = $self->solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
 			if($numEvents > 0){
 				//si ocupado
 				$estado = 'pendiente';
-				//$msg = 'su reserva está pendiente de validación. Existen solapamientos con otras peticiones (ver detalles)';
 			}
 			else{
 				//si libre

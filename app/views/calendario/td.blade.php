@@ -9,7 +9,7 @@
             @if (count($currentday->events($id_recurso,$id_grupo)) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
            
                 <a class = " 
-                        @if ($event->solape($mon,$day,$year))   text-danger
+                        @if ($event->solape(mktime(0,0,0,(int) $mon,(int) $day,(int) $year)) && $event->estado != 'aprobada')   text-danger
                         @elseif($event->estado == 'aprobada')   text-success
                         @elseif ($event->estado == 'pendiente') text-info
                         @elseif ($event->estado == 'denegada')  text-warning
@@ -27,7 +27,7 @@
                             {{ htmlentities('<a href="" class="closePopover"> X </a>') }}
                             " 
                         data-content="{{htmlentities(sgrEvento::tooltip($event,$day,$mon,$year,$hour,$min))}}">
-                        @if ($event->solape($mon,$day,$year))
+                        @if ($event->solape(mktime(0,0,0,(int) $mon,(int) $day,(int) $year)) && $event->estado != 'aprobada')
                             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
                         @else
                         <!-- Icono -->
@@ -39,6 +39,7 @@
                                 @endif" 
                                 aria-hidden="true"></span>
                         <!-- ./Icono -->
+                         @endif
                          <!-- Title -->
                          @if($view != 'week') 
                             {{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{Date::parsedatetime($event->horaFin,'H:i:s','G:i')}}
@@ -47,7 +48,7 @@
                         <!-- ./Title -->
                 </a>
                
-            @endif
+            
             </div> <!-- ./divEvent -->  
         @endforeach
     </div> <!-- ./divEvents -->

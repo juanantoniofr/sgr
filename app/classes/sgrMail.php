@@ -113,7 +113,7 @@ class sgrMail {
 		}
 
 		//Notifica técnicos
-		if ($this->notificaTecnicos($evento->fechaInicio)) //notificamos	
+		//if ($this->notificaTecnicos($evento->fechaInicio)) //notificamos	
 		
 	
 	}//fin notificaValidacion
