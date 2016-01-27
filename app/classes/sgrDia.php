@@ -6,11 +6,12 @@ class sgrDia {
 	private $events; 	//array de objetos de tipo Eventos
 	private $esDomingo;
 	private $esSabado;
-	private $numdiames;
+	
 	private $festivo;
 	private $fecha;
 	private $numMes;
 	private $year;
+	private $numdiames;
 
 	
 	
@@ -32,6 +33,8 @@ class sgrDia {
 		
 		return $this;
 	}
+
+	
 
 	/**
 	*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
@@ -57,8 +60,18 @@ class sgrDia {
 		else{
 			return Recurso::find($id_recurso)->events()->where('fechaEvento','=',$fechaEvento)->orderBy('horaInicio','asc')->get();
 		}	
-		
-		
+	}
+
+	/**
+	* Boolean si $day es de $month
+	* @param $month int
+	* @return boolean true si $this es un día de month
+	*/
+
+	public function isDayOfMonth($month){
+		$isDay = false;
+		if ((int) $month == (int) $this->numMes) $isDay = true;
+		return $isDay;
 	}
 
 	public function fecha(){
@@ -80,11 +93,15 @@ class sgrDia {
 	public function festivo(){
 		return $this->festivo;
 	}
-
-	public function timestamp(){
-
-		return $this->timestamp;
+	/**
+	*	@param $hora int hora del día
+	*	@param $minuto int minuto del día
+	* 	@return $timestamp int
+	*/
+	public function timestamp($hora = 0,$minuto = 0){
+		return $this->timestamp + 60*60*$hora + 60*$minuto;		
 	}
+
 	//private
 	/**
 	 * Determina si el día es festivo (domingo || sábabo)

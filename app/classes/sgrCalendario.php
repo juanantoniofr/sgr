@@ -2,11 +2,11 @@
 
 class sgrCalendario {
 	
-	private $numeroMes;
-	private $nombreMes;
-	private $year;
-	private $ultimodiasmes;
-	private $diasMes;
+	private $numeroMes; //int numero del mes entre 1 y 12
+	private $nombreMes; //string nombre del mes en español
+	private $year;	//int año cuatro dígitos
+	private $ultimodiasmes; //int timestamp
+	private $sgrWeeks; //array de objetos sgrWeek
 	
 	
 	/**
@@ -19,22 +19,37 @@ class sgrCalendario {
 		if (empty($year)) $year = date('Y');//año actual
 		
 
-		$this->setNumeroMes($numMes);
-		$this->setYear($year);
+		//$this->setNumeroMes($numMes);
+		$this->numeroMes = (int) $numMes;
+		//$this->setYear($year);
+		$this->year = (int) $year;
 		$this->setUltimoDiaMes();//28|29|30|31
 		$this->setNombreMes($numMes);//establece el nombre del mes en español
-		$this->setDias();//construye un array con los días del mes
-
+		//$this->setDias();//construye un array con los días del mes
+		$this->setSemanas();
 
 		
 		return $this;
 	}
 
 	//public functions
-	
-	public function dias(){
+	public function sgrWeeks(){
+		return $this->sgrWeeks;
+	}
+
+	/**
+	*	@param $timestamp int timestamp fecha
+	*	@return $sgrWeek array object srgDia || false si timestamp no es de $this
+	*/
+	public function sgrWeek($timestamp = 0){
+
+		foreach ($this->sgrWeeks as $sgrWeek) {
+			foreach ($sgrWeek->sgrDays() as $sgrDia) {
+				if ($timestamp == $sgrDia->timestamp()) return $sgrWeek;
+			}
+		}
 		
-		return $this->diasMes;
+		return false;//no existe la semana que contenga $timestamp
 	}
 
 	public function numeroMes(){
@@ -71,21 +86,40 @@ class sgrCalendario {
 
 
 	//private functions
+	/**
+	*	 Genera un array de objetos sgrWeek (semanas del mes)
+	*/
+	private function setSemanas(){
+		
+		$semanas = array();
+		$day = 1;
+		$i=0;
+		$timestamp = mktime(0,0,0,(int) $this->numeroMes,1,(int) $this->year);
+		$maxday = date("t",$timestamp);
+		while ($day <= $maxday){
+			$semanas[$i] =  new sgrWeek((int) $day,(int) $this->numeroMes,(int) $this->year);
+			$day = $day + 7;
+		 	$i = $i + 1;
+		} 
+		
+		return $this->sgrWeeks = $semanas;
+	}
+
 	private function setUltimoDiaMes(){
 		
 		return $this->ultimodiasmes = (int) date('t', mktime(0,0,0,$this->numeroMes,1,$this->year));
 	}
 	
 
-	private function setNumeroMes($numeroMes){
+	/*private function setNumeroMes($numeroMes){
 		if (empty($numeroMes)) $numeroMes = date('m');
 		return $this->numeroMes = (int) $numeroMes;
-	}
+	}*/
 
-	private function setYear($year){
+	/*private function setYear($year){
 		if (empty($year)) $year = date('Y');
 		return $this->year = (int) $year;
-	}
+	}*/
 
 	/**
 	 * Genera un array con indice los días del mes y valor objetos sgrDia

@@ -14,7 +14,7 @@ class sgrDate{
 		
 		$timestamp = '';
 		
-		$time = mktime(0,0,0,$month,$day,$year);
+		$time = mktime(0,0,0,(int) $month,(int) $day,(int) $year);
 		if (1 == date('N',$time)) $timestamp = $time;
 		else {
 			do {
