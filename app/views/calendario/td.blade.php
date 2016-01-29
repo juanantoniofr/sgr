@@ -8,15 +8,13 @@
     
     <div class="divEvents" data-numero-de-eventos="{{count($sgrDia->events($id_recurso,$id_grupo))}}">
         
-        @if (count($sgrDia->events($id_recurso,$id_grupo)) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
-
-        @foreach($sgrDia->events($id_recurso,$id_grupo) as $event)
+        @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+    
+        @foreach($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
 
             
             <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
-            
-                
-                
+               
                 <a class = " 
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada') text-danger
                         @elseif($event->estado == 'aprobada')   text-success
@@ -64,5 +62,5 @@
     </div> <!-- ./divEvents -->
     
 
-    @if (count($sgrDia->events($id_recurso,$id_grupo)) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
+    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
 </div>

@@ -177,6 +177,7 @@ class Evento extends Eloquent{
     		//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
     		//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
 			//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
+    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico 
     
     public function validate($data)
     	{
@@ -299,7 +300,7 @@ class Evento extends Eloquent{
 								for($j=0;$j<$nRepeticiones;$j++){
 									$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
 									$currentfecha = Date::currentFecha($startDate,$j);
-									$numEvents = $sgrEvento->solapa($data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+									$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 									//si ocupado
 									if($numEvents > 0){
 										return true;
@@ -325,7 +326,7 @@ class Evento extends Eloquent{
 							for($j=0;$j<$nRepeticiones;$j++){
 								$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
 								$currentfecha = Date::currentFecha($startDate,$j);
-								$numEvents = $sgrEvento->solapa($data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+								$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 								//si ocupado
 								if($numEvents > 0){
 									return true;

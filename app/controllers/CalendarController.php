@@ -2,6 +2,42 @@
 
 class CalendarController extends BaseController {
 	
+	//Carga la vista por defecto: Mensual
+	public function showCalendarViewMonth(){
+		
+		$viewActive = Input::get('view','month'); //vista por defecto
+		$uvus = Input::get('uvus','');
+		$msg = '';
+		$nh = Auth::user()->numHorasReservadas();//Número de horas reservadas
+
+			
+		$day = Input::get('day',date('d'));
+		$numMonth = Input::get('numMonth',date('m'));
+		$year = Input::get('year',date('Y'));
+		$id_recurso = Input::get('id_recurso','');
+		$id_grupo = Input::get('groupID','');
+		$tsPrimerLunes = sgrCalendario::fristMonday();//timestamp primer lunes reservable...
+		$datefirstmonday = getdate($tsPrimerLunes);
+		$sgrCalendario = new sgrCalendario((int) $numMonth,(int) $year);
+			
+		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
+		if (Auth::user()->isUser() && $nh >=12 ){
+			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
+		}	
+		
+		$tHead = CalendarController::head($viewActive,$day,$numMonth,$year);
+		
+		$tBody = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
+		//return $tBody;
+		
+		$gruposderecursos = Auth::user()->gruposRecursos();		
+		$recursos = array();//No hay recurso seleccionado la primera vez
+		$dropdown = Auth::user()->dropdownMenu();
+		//se devuelve la vista calendario.
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		
+	}
+
 	//Generación de pdf's para imprimir
 	public function imprime(){
 		
@@ -126,39 +162,7 @@ class CalendarController extends BaseController {
 		return $respuesta;
 	}	
 
-	//Carga la vista por defecto: Mensual
-	public function showCalendarViewMonth(){
-		
-		$viewActive = Input::get('view','month'); //vista por defecto
-		$uvus = Input::get('uvus','');
-		$msg = '';
-		$nh = Auth::user()->numHorasReservadas();//Número de horas reservadas
-
-			
-		$day = Input::get('day',date('d'));
-		$numMonth = Input::get('numMonth',date('n'));
-		$year = Input::get('year',date('Y'));
-		$id_recurso = Input::get('id_recurso','');
-		$id_grupo = Input::get('groupID','');
-		$tsPrimerLunes = sgrCalendario::fristMonday();//timestamp primer lunes reservable...
-		$datefirstmonday = getdate($tsPrimerLunes);
-		$sgrCalendario = new sgrCalendario(1,2016);
-			
-		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
-		if (Auth::user()->isUser() && $nh >=12 ){
-			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
-		}	
-		
-		$tHead = CalendarController::head($viewActive,$day,$numMonth,$year);
-		$tBody = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		
-		
-		$gruposderecursos = Auth::user()->gruposRecursos();		
-		$recursos = array();//No hay recurso seleccionado la primera vez
-		$dropdown = Auth::user()->dropdownMenu();
-		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
-	}
+	
 	//Ajax functions
 	public function getTablebyajax(){
 		
@@ -197,10 +201,9 @@ class CalendarController extends BaseController {
 				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
 				break;
 			case 'week':
-				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
-					//$sgrWeek = new sgrWeek($day,$numMonth,$year);
 					$sgrWeek = $sgrCalendario->sgrWeek(strtotime($year.'-'.$numMonth.'-'.$day));
-				return (string) View::make('calendario.bodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);	
+					$horarioApertura = Config::get('options.horarioApertura');	
+					return (string) View::make('calendario.bodyWeek')->with('horarioApertura',$horarioApertura)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);	
 				break;
 			case 'day':
 				return '<p>Aún en desarrollo.....</p>';	

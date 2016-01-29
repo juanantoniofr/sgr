@@ -2,8 +2,6 @@
 
 class sgrEvento {
 
-	
-
 	/**
 	* Dado un evento, devuelve tooltip para calendario 
 	*/
@@ -12,6 +10,8 @@ class sgrEvento {
 		$day = (int) $day;
 		$mon = (int) $mon;
 		$year = (int) $year;
+		$hour = (int) $hour;
+		$min = (int) $min;
 		$time = mktime($hour,$min,0,$mon,$day,$year);
   		return (string) View::make('calendario.tooltip')->with('time',$time)->with('event',$event)->with('esEditable',$self->esEditable(Auth::user()->id,$event))->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('esAnulable',$self->puedeAnular(Auth::user()->id,$event))->with('esFinalizable',(Auth::user()->atiendeRecurso($event->recursoOwn->id) && $event->esFinalizable()))->with('numRecursos',$event->numeroRecursos());
  	}
@@ -132,7 +132,7 @@ class sgrEvento {
 				//obtener estado (pendiente|aprobada)
 				$hInicio = date('H:i:s',strtotime($data['hInicio']));
 				$hFin = date('H:i:s',strtotime($data['hFin']));
-				$evento->estado = $this->setEstado($id_recurso,$currentfecha,$hInicio,$hFin);
+				$evento->estado = $this->setEstado($data['grupo_id'],$id_recurso,$currentfecha,$hInicio,$hFin);
 			
 				$repeticion = 1;
 				$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
@@ -178,7 +178,7 @@ class sgrEvento {
 			//obtener estado (pendiente|aprobada)
 			$hInicio = date('H:i:s',strtotime($data['hInicio']));
 			$hFin = date('H:i:s',strtotime($data['hFin']));
-			$evento->estado = $this->setEstado($data['id_recurso'],$currentfecha,$hInicio,$hFin);
+			$evento->estado = $this->setEstado($data['grupo_id'],$data['id_recurso'],$currentfecha,$hInicio,$hFin);
 			
 
 			
@@ -463,6 +463,7 @@ class sgrEvento {
 	/**
  	* Determina si un nuevo evento en $idRecurso en $currentfecha, con hora inicio $hi, hora de finalización $hf, solapa con eventos con $condicionEstado existentes en BD
  	*
+ 	* @param $idGrupo int
  	* @param $idRecurso int
  	* @param $currentfecha (d-m-Y)
  	* @param $hi
@@ -471,7 +472,7 @@ class sgrEvento {
  	* @return $numSolapamientos int
  	*
  	*/
-	public function solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado = ''){
+	public function solapa($idGrupo,$idRecurso,$currentfecha,$hi,$hf,$condicionEstado = ''){
 		
 		$numSolapamientos = 0;
 		
@@ -497,7 +498,16 @@ class sgrEvento {
 		$where .=	" or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
 		$where .=	" or horaFin < '".$hf."' and horaFin > '".$hi."')";
 		$where .= 	$excludeEvento;
-		$numSolapamientos = Recurso::find($idRecurso)->events()->whereRaw($where)->count();
+		
+		if ($idRecurso != 0) $numSolapamientos = Recurso::find($idRecurso)->events()->whereRaw($where)->count();
+		else {
+			//Si idRecurso == 0 entonces tenemos un espacio con puestos o un grupo de equipos, por ejemplo cámaras
+			$recursos = Recurso::where('grupo_id','=',$idGrupo)->get();
+			
+			foreach ($recursos as $recurso) {
+				$numSolapamientos = $numSolapamientos + $recurso->events()->whereRaw($where)->count();	
+			 } 
+		}
 		
 		
 		return $numSolapamientos;
@@ -505,7 +515,7 @@ class sgrEvento {
 	
 
 
-	private function setEstado($idRecurso,$currentfecha,$hi,$hf){
+	private function setEstado($idGrupo,$idRecurso,$currentfecha,$hi,$hf){
 		$estado = 'denegada';
 
 		$self = new self();
@@ -515,7 +525,7 @@ class sgrEvento {
 			//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
 			$condicionEstado = 'aprobada';
 			//$currentFecha tiene formato d-m-Y
-			$numEvents =  $self->solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
+			$numEvents =  $self->solapa($idGrupo,$idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
 			//si ocupado
 			if($numEvents > 0){
 				//si ocupado
@@ -531,7 +541,7 @@ class sgrEvento {
 		else{
 			//ocupado??; estado = aprobado | pendiente | solapada (cualquiera de los posibles)
 			$condicionEstado = '';
-			$numEvents = $self->solapa($idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
+			$numEvents = $self->solapa($idGrupo,$idRecurso,$currentfecha,$hi,$hf,$condicionEstado);
 			if($numEvents > 0){
 				//si ocupado
 				$estado = 'pendiente';

@@ -12,14 +12,20 @@ class sgrDia {
 	private $numMes;
 	private $year;
 	private $numdiames;
+	private $horario = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30'); //array -> intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
 
 	
-	
-	public function __construct($tsfecha = ''){
+
+	/**
+	*	@param $tsfecha int timestamp 
+	*	@param $horasdisponibles array intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
+	*/
+	public function __construct($tsfecha = '',$horario = ''){
 
 		if(empty($tsfecha)) $tsfecha = strtotime('1970-1-1');
-
 		$this->timestamp = $tsfecha;
+
+		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			
 		$this->festivo = $this->setFestivo($tsfecha);
 			
@@ -42,23 +48,28 @@ class sgrDia {
 	*	@param $id_gruppo int
 	*	@return array objetos Evento
 	*/
-	public function events($id_recurso='',$id_grupo=''){
+	public function events($id_recurso='',$id_grupo='',$view='',$hora = ''){
 
 		
 		$numMes = $this->numMes;
 		$year = $this->year;
 		
 		$fechaEvento = date('Y-m-d',mktime(0,0,0,(int) $numMes,(int) $this->numdiames,(int) $year));
+		$whereRaw = '1=1';
+		if(!empty($hora) && $view == 'week') {
+			
+			$whereRaw = "horaInicio <= '".$hora."' and horaFin > '".$hora."'";
+		}
 
 		if ($id_recurso == 0){
 			//Eventos para todos los equipos//puestos para fechaEvento del id_grupo
-			$events = Evento::where('fechaEvento','=',$fechaEvento)->orderBy('horaInicio','asc')->groupby('titulo')->groupby('evento_id')->get();
+			$events = Evento::where('fechaEvento','=',$fechaEvento)->whereRaw($whereRaw)->orderBy('horaInicio','asc')->groupby('titulo')->groupby('evento_id')->get();
 			return $events->filter(function($event) use ($id_grupo) {
 				return $event->recursoOwn->grupo_id == $id_grupo;
 			});
 		}		
 		else{
-			return Recurso::find($id_recurso)->events()->where('fechaEvento','=',$fechaEvento)->orderBy('horaInicio','asc')->get();
+			return Recurso::find($id_recurso)->events()->where('fechaEvento','=',$fechaEvento)->whereRaw($whereRaw)->orderBy('horaInicio','asc')->get();
 		}	
 	}
 
@@ -99,7 +110,7 @@ class sgrDia {
 	* 	@return $timestamp int
 	*/
 	public function timestamp($hora = 0,$minuto = 0){
-		return $this->timestamp + 60*60*$hora + 60*$minuto;		
+		return $this->timestamp + (60 * 60 * (int) $hora) + (60 * (int) $minuto);		
 	}
 
 	//private

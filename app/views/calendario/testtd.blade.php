@@ -1,15 +1,22 @@
-<div class = "day {{ $view }} @if($isDayAviable) formlaunch @else disable @endif" id = {{date('jnYGi',mktime($hour,$min,0,$mon,$day,$year))}} data-fecha="{{date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year))}}" data-hora="{{date('G:i',mktime($hour,$min,0,$mon,$day,$year))}}">
+<div 
+    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->numerodia(),$sgrDia->mes(),$sgrDia->year()) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
+    id = "{{date('jnYGi',$sgrDia->timestamp($hora,$minuto))}}" 
+    data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" 
+    data-hora="{{date('G:i',$sgrDia->timestamp($hora,$minuto))}}">
 
-    <div class="titleEvents"> @if($view == 'month') <small>{{ $day }}</small>@endif </div>
+    <div class="titleEvents"> @if($view == 'month') <small>{{ $sgrDia->numerodia() }}</small>@endif </div>
     
-    <div class="divEvents" data-numero-de-eventos="{{count($currentday->events())}}">
-        @foreach($currentday->events($id_recurso,$id_grupo) as $event)
-            <div class="divEvent" data-fecha="{{date('j-n-Y',mktime($hour,$min,0,$mon,$day,$year))}}" data-hora="{{substr($event->horaInicio,0,2)}}">
+    <div class="divEvents" data-numero-de-eventos="{{count($sgrDia->events($id_recurso,$id_grupo))}}">
+        
+        @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+    
+        @foreach($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
+
             
-            @if (count($currentday->events($id_recurso,$id_grupo)) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
-           
+            <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
+               
                 <a class = " 
-                        @if ($event->solape($mon,$day,$year))   text-danger
+                        @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada') text-danger
                         @elseif($event->estado == 'aprobada')   text-success
                         @elseif ($event->estado == 'pendiente') text-info
                         @elseif ($event->estado == 'denegada')  text-warning
@@ -26,8 +33,9 @@
                             {{ $event->titulo }}
                             {{ htmlentities('<a href="" class="closePopover"> X </a>') }}
                             " 
-                        data-content="{{htmlentities(sgrEvento::tooltip($event,$day,$mon,$year,$hour,$min))}}">
-                        @if ($event->solape($mon,$day,$year))
+                        data-content="{{htmlentities( (string) View::make('calendario.testtooltip')->with('time',$sgrDia->timestamp($hora,$minuto))->with('event',$event) )}}"    
+                        >
+                        @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
                             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
                         @else
                         <!-- Icono -->
@@ -39,6 +47,7 @@
                                 @endif" 
                                 aria-hidden="true"></span>
                         <!-- ./Icono -->
+                         @endif
                          <!-- Title -->
                          @if($view != 'week') 
                             {{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{Date::parsedatetime($event->horaFin,'H:i:s','G:i')}}
@@ -46,12 +55,13 @@
                         {{ $event->titulo }}
                         <!-- ./Title -->
                 </a>
-                </span>
-            @endif
+               
+            
             </div> <!-- ./divEvent -->  
         @endforeach
+    
     </div> <!-- ./divEvents -->
-        
-    @if (count($currentday->events($id_recurso,$id_grupo)) > 4) <a class="linkMasEvents" href=""> + {{ (count($currentday->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
-          
+    
+
+    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
 </div>

@@ -1,1 +1,0 @@
-<div  id="{{ $idfecha or ''}}" class = "day {{ $view or ''}} @if($sgrDia->festivo()) festivo @endif  disable "   data-fecha="{{ $fecha or ''}}"><small> {{ $day  or '' }}</small></div>
