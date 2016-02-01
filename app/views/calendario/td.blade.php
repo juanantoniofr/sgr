@@ -12,12 +12,13 @@
     
         @foreach($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
 
-            
+           
             <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
                
                 <a class = " 
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada') text-danger
-                        @elseif($event->estado == 'aprobada')   text-success
+                        @elseif($event->estado == 'aprobada' && !$event->finalizada)   text-success
+                        @elseif($event->finalizada)   text-info
                         @elseif ($event->estado == 'pendiente') text-info
                         @elseif ($event->estado == 'denegada')  text-warning
                         @endif
@@ -33,7 +34,7 @@
                             {{ $event->titulo }}
                             {{ htmlentities('<a href="" class="closePopover"> X </a>') }}
                             " 
-                        data-content="{{htmlentities( (string) View::make('calendario.testtooltip')->with('time',$sgrDia->timestamp($hora,$minuto))->with('event',$event) )}}"    
+                        data-content="{{htmlentities( (string) View::make('calendario.tooltip')->with('time',$sgrDia->timestamp($hora,$minuto))->with('event',$event) )}}"    
                         >
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
                             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
@@ -41,7 +42,8 @@
                         <!-- Icono -->
                         <span   data-toggle="tooltip" title="Solicitud {{$event->estado}}" 
                                 class=" fa fa-fw
-                                    @if($event->estado == 'aprobada') fa-check text-success
+                                    @if($event->estado == 'aprobada'  && !$event->finalizada) fa-check text-success
+                                    @elseif($event->finalizada) fa-clock-o text-info
                                     @elseif ($event->estado == 'pendiente') fa-question text-info
                                     @elseif ($event->estado == 'denegada') fa-ban text-warning
                                 @endif" 
@@ -55,9 +57,8 @@
                         {{ $event->titulo }}
                         <!-- ./Title -->
                 </a>
-               
-            
             </div> <!-- ./divEvent -->  
+        
         @endforeach
     
     </div> <!-- ./divEvents -->

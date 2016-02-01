@@ -147,12 +147,13 @@
 <!-- ./modal print -->
 
 
- {{$modalfinalizareserva or ''}}
-  {{$modaldescripcion or ''}}
- 
-  {{$modalliberareserva or ''}}
+ {{ $modalfinalizareserva  or '' }}
+ {{ $modalanulareserva     or '' }}
+ {{ $modaldescripcion      or '' }}
 
- @stop
+@stop
+
+
 @section('js')
   {{HTML::script('assets/js/calendar.js')}}
   {{HTML::script('assets/js/imprimir.js')}}

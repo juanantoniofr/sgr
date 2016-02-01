@@ -151,6 +151,7 @@ Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','be
 
 Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
 Route::post('finalizaevento',array('uses' => 'EventoController@finaliza','before' => array('auth','ajax_check')));
+Route::post('anulaevento',array('uses' => 'EventoController@anula','before' => array('auth','ajax_check')));
 Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atiende','before' => array('auth','capacidad:3-4,msg')));
 Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
 
@@ -187,18 +188,12 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	$event = Evento::find('9');
+	
+	$hora = '8:30';
+	$date = DateTime::createFromFormat('H:i',$hora);
+	echo $date->format('h');
 
-	$horaInicio = $event->horaInicio;
-	$horaFin = $event->horaFin;
-
-	if ((strtotime($horaInicio) + (20*60)) < strtotime('H:i') && strtotime($horaFin) > strtotime('H:i') ) echo 'ok';
-
-	echo '<br />' .'1ASDASD: '. (strtotime($horaInicio) + (20*60)) . '--1--';
-	echo '<br />' .'2: '. strtotime(date('H:i')) . '--2--';
-	echo '<br />' .'3: '. strtotime($horaFin) . '--3--';
-	echo '<br />' .'4: '. strtotime('H:i'). '--4--';
-
+	
  }));
 
 

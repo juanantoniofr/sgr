@@ -1,10 +1,14 @@
 <?php
 
+//use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class Evento extends Eloquent{
-
- 	protected $table = 'eventos';
-
+	
+	//use SoftDeletingTrait;
+	protected $table = 'eventos';
+	//protected $dates = ['deleted_at'];
  	protected $fillable = array('titulo', 'recurso_id','fechaEvento','fechaInicio','repeticion', 'dia','diasRepeticion','fechaFin','user_id','created_at','user_id');
+ 	protected $softDelete = true;
 
 	public function userOwn(){
 		return $this->belongsTo('User','user_id','id');
@@ -152,10 +156,6 @@ class Evento extends Eloquent{
 			//fin del bug
  		return $total;
  	}
-	
-
- 	
-
 
  	private $rules = array (
 			'titulo' 			=>	'required',

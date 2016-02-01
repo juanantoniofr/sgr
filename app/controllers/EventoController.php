@@ -35,6 +35,14 @@ class EventoController extends BaseController {
 		return $result;
 	}
 
+	public function anula(){
+		$sgrEvento = new sgrEvento;
+
+		$result = $sgrEvento->anula();
+
+		return $result;
+	}
+
 	public function atiende(){
 		$sgrEvento = new sgrEvento;
 

@@ -845,6 +845,7 @@ $(function(e){
 
 		});
 	}
+	
 	//Programa evento onCLick en el link finalizar de la ventana popover
 	function activarLinkFinalizaReserva($id){
 		
@@ -884,6 +885,46 @@ $(function(e){
 		$("#modalFinalizareserva").modal('hide');
 	});
 
+//Programa evento onCLick en el link finalizar de la ventana popover
+	function activarLinkAnulaReserva($id){
+		
+		$('#anula_'+$id).click(function(e){
+			e.preventDefault();
+			$('span#tituloanula').html($(this).data('titulo'));
+			$('span#usuarioanula').html($(this).data('usuario'));
+			$('#buttonModalAnula').data('idevento',$id);
+			$('#anula_'+$id).parents('.divEvent').find('a.linkpopover').popover('hide');
+			$("#modalAnulareserva").modal('show');
+		});
+	}
+
+	$('#buttonModalAnula').on('click',function(e){
+		e.preventDefault();
+		
+		$('#message').fadeOut("slow");
+		$.ajax({
+    	   	type: "POST",
+			url: "anulaevento",
+			data: {'idevento' : $(this).data('idevento'), 'observaciones' : $('#anulaObservaciones').val() },
+        	success: function(respuesta){
+        		//alert(respuesta);
+        		if (respuesta['error'] == false){
+ 		       		$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+					printCalendar();
+				}
+ 		       	else {
+ 		       		$('#alert_msg').fadeOut('slow').html(respuesta['msgError']).fadeIn("slow");
+ 		       		}
+ 		        },
+				error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+					}
+      			});
+		$("#modalAnulareserva").modal('hide');
+	});
+
+
 	//Programa evento onCLick en el link editar de la ventana popover
 	function setLinkEditEvent($id){
 		var viewActive = '';
@@ -896,7 +937,7 @@ $(function(e){
 		$($selector + '_' + $id).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			alert('lanza evento');
+			//alert('lanza evento');
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
@@ -1227,6 +1268,7 @@ $(function(e){
 	}
 
 	function firstDayAviable(){
+		
 		if ($('.formlaunch').first().data('fecha') != undefined)
 			return $('.formlaunch').first().data('fecha'); 
 		else return $('#btnNuevaReserva').data('fristday');

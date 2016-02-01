@@ -293,10 +293,6 @@ class sgrEvento {
 	private function delEvents(){
 		$result = '';
 		$eventToDel = Evento::find(Input::get('idEvento'))->first();
-		//$actions = Config::get('options.required_mail');
-		//cMail::sendMail($actions['del'],$eventToDel->recursoOwn->id,$eventToDel->evento_id);
-		
-
 		$event = Evento::find(Input::get('idEvento'));
 		if (Input::get('id_recurso') == 0){
 			Evento::where('evento_id','=',Input::get('idSerie'))->delete();
@@ -345,6 +341,32 @@ class sgrEvento {
 		return $result;
 	}
 	
+	//Anular evento
+	public function anula(){
+		
+		$result = array('error' => false,
+						'msgError' => '',
+						'msgSuccess' => '');
+
+		$idEvento = Input::get('idevento','');
+		if (empty($idEvento)) {
+			$result['error'] = true;
+			$result['msgError'] = 'Identificador de evento vacio...';
+			return $result;	
+		}
+
+		//$finalizarEvento = new FinalizarEvento;
+		
+
+		$evento = Evento::findOrFail($idEvento);
+		//$evento->estado = 'anulado';
+		$evento->delete();
+		
+		$result['msgSuccess'] = 'Evento finalizado con éxito...';
+
+		return $result;
+	}
+
 	//Atender evento
 	public function atiende(){
 		
