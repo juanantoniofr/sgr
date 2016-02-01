@@ -21,17 +21,44 @@ class Evento extends Eloquent{
  	public function atencion(){
  		return $this->belongsTo('AtencionEvento','id','evento_id');
  	}
-
- 	public function esEditable(){
- 		$editable = false;
- 		$day = date('d',strtotime($this->fechaEvento));
- 		$mon = date('m',strtotime($this->fechaEvento));
- 		$year = date('Y',strtotime($this->fechaEvento));
+ 	/**
+ 	* Determina si el evento es editable (Auth::user es propietario || Auth::user reservo en favor de otro && la fecha del evento es un día disponible para el Auth::user)
+ 	* @param $idUser int identificador de usuario para comprobar si tiene permiso para editar el evento
+ 	* @return boolean
+ 	*/
+ 	public function esEditable($idUser){
  		
- 		if ($this->userOwn->isDayAviable($day,$mon,$year)) $editable = true;
+ 		//$idUser no existe	
+ 		if (User::where('id','=',$idUser)->count() == 0) return false;
+ 		//$idUser no es propietario y no ha reservado para otro
+ 		if ($this->userOwn->id != $idUser && $this->reservadoPor->id != $idUser) return false;
+ 		//la fecha del evento permite editar (depende del rol de usuario)
+ 		$timestamp = strtotime($this->fechaEvento);
+ 		if ($this->userOwn->isDayAviable($timestamp)) return true;
 
- 		return $editable;
+ 		return false;
  	}
+
+ 	/**
+	* Los eventos se podrán anular hasta 24 horas antes de su inicio.
+	* @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
+	* @return boolean
+	*/
+
+	public function esAnulable($idUser){
+		
+		//$idUser no existe	
+ 		if (User::where('id','=',$idUser)->count() == 0) return false;
+		//$idUser no es propietario y no ha reservado para otro
+ 		if ($this->userOwn->id != $idUser && $this->reservadoPor->id != $idUser) return false;
+ 		//la fecha del evento permite anular (igual para todos los usuarios)
+		$hoy = strtotime('today');
+		$timestamp = strtotime($this->fechaEvento);
+		if ($timestamp > $hoy) return true;
+		
+		return false;
+	}
+
  	/**
  	* Devevelve el número de recurso (equipos o espacios reservados por un evento)
  	*/

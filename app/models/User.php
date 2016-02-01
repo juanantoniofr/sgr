@@ -49,24 +49,29 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 		return $userPuedeFinalizar;
 	}
+	
 	/**
-	*	determina si un día es un dia disponible para que el usuario añada reservas: se habilita la celda en el calendario para que pueda añadir reservas
+	*
+	* 	Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
+	* 	@param $timestamp int fecha a valorar
+	* 	@return $isAviable boolean 
+	*
 	*/
-
-	public function isDayAviable($day,$mon,$year){
+	public function isDayAviable($timestamp){
+		
 		$isAviable = false;
-		//$self = new self();
+		$intCurrentDate = $timestamp; //mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
 		$capacidad = $this->capacidad;
 		switch ($capacidad) {
 				case '1': //alumnos
 					$intfristMondayAviable = sgrCalendario::fristMonday();
 					$intlastFridayAviable = sgrCalendario::lastFriday();
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year);
+					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
 					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
 					break;	
 				case '2': //pdi & pas administración
 					$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
-					$intCurrentDate = mktime(0,0,0,$mon,$day,$year); // fecha del evento a valorar
+					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
 					break;
 				case '3': //Técnicos MAV
@@ -74,7 +79,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				case '5': //Validadores
 				case '6': //Supervisores (EE MAV)
 					$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
-					$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
 					break;
 		}
@@ -188,8 +193,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	/*
   		* Overrides the method to ignore the remember token.
   	*/
- 	public function setAttribute($key, $value)
- 	{
+ 	public function setAttribute($key, $value){
+	   
 	   $isRememberTokenAttribute = $key == $this->getRememberTokenName();
 	   if (!$isRememberTokenAttribute)
 	   {

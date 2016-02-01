@@ -1,5 +1,5 @@
 <div 
-    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->numerodia(),$sgrDia->mes(),$sgrDia->year()) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
+    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->timestamp()) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
     id = "{{date('jnYGi',$sgrDia->timestamp($hora,$minuto))}}" 
     data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" 
     data-hora="{{date('G:i',$sgrDia->timestamp($hora,$minuto))}}">
@@ -33,7 +33,8 @@
                             {{ $event->titulo }}
                             {{ htmlentities('<a href="" class="closePopover"> X </a>') }}
                             " 
-                        data-content="{{htmlentities(sgrEvento::tooltip($event,$sgrDia->numerodia(),$sgrDia->mes(),$sgrDia->year(),$hora,$minuto))}}">
+                        data-content="{{htmlentities( (string) View::make('calendario.testtooltip')->with('time',$sgrDia->timestamp($hora,$minuto))->with('event',$event) )}}"    
+                        >
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
                             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
                         @else

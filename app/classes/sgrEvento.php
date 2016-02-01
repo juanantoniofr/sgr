@@ -2,63 +2,6 @@
 
 class sgrEvento {
 
-	/**
-	* Dado un evento, devuelve tooltip para calendario 
-	*/
-	public static function tooltip($event,$day,$mon,$year,$hour,$min){
-		$self = new self();
-		$day = (int) $day;
-		$mon = (int) $mon;
-		$year = (int) $year;
-		$hour = (int) $hour;
-		$min = (int) $min;
-		$time = mktime($hour,$min,0,$mon,$day,$year);
-  		return (string) View::make('calendario.tooltip')->with('time',$time)->with('event',$event)->with('esEditable',$self->esEditable(Auth::user()->id,$event))->with('isDayAviable',Auth::user()->isDayAviable($day,$mon,$year))->with('esAnulable',$self->puedeAnular(Auth::user()->id,$event))->with('esFinalizable',(Auth::user()->atiendeRecurso($event->recursoOwn->id) && $event->esFinalizable()))->with('numRecursos',$event->numeroRecursos());
- 	}
-
- 	/**
-	* Determina si un evento se puede anular -> (Criterios a determinar aún: fechaEvento está en la semana en curso, userid es propietario del evento, el evento no se ha iniciado y el evento es al menos para mañana)
-	*/
-	//
-	public function puedeAnular($userid,$event){
-		$puede = false;
-
-		$lunes = strtotime('last monday');
-		$viernes = strtotime('next friday');
-		$hoy = strtotime('today');
-		$fechaEvento = strtotime($event->fechaEvento);
-		$horaActual = strtotime(date('H:i'));
-		$horaInicio = strtotime($event->horaInicio);
-		$horaFin = strtotime($event->horaFin);
-
-		if ( $event->userOwn->id == $userid && $lunes <= $fechaEvento  && $fechaEvento <= $viernes  && $fechaEvento >= $hoy && $horaActual < $horaInicio) $puede = true;
-		
-		return $puede;
-	}
-
-	/**
-	*
-	*/
-	public function esEditable($iduser,$evento){
-		
-		$esEditable = false;
-		//User es propietario de la reserva
-		if($iduser == $evento->user_id) $esEditable = true;
-		//fin
-
-		//User es administrador y reserva es de POD
-		$userPOD = User::where('username','=','pod')->first();
-		$idUserPOD = 0;
-		if (!empty($userPOD)) $idUserPOD=$userPOD->id;
-		if(User::find($iduser)->capacidad == 4 && $evento->reservadoPor_id == $idUserPOD) $esEditable = true;
-		//fin
-		
-		//User es técnico (capacidad 3) y realizó la reserva para otro usuario
-		if(User::find($iduser)->capacidad == 3 &&  $iduser == $evento->reservadoPor_id) $esEditable = true;
-		
-		return $esEditable;
-	}
-
 	//Save
 	public function save(){
 
@@ -401,6 +344,7 @@ class sgrEvento {
 
 		return $result;
 	}
+	
 	//Atender evento
 	public function atiende(){
 		
