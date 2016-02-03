@@ -191,6 +191,7 @@ class Evento extends Eloquent{
 			'titulo.required' 		=>	' El campo <strong>título</strong> es obligatorio.',
 			'titulo.req3' 			=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
 			'reservarParaUvus.existeuvus' => '',
+			'titulo.deshabilitado'	=> 'Espacio deshabilitado temporalmente..',
 			);	
 	
     private $errors = array();
@@ -204,7 +205,8 @@ class Evento extends Eloquent{
     		//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
     		//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
 			//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
-    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico 
+    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico
+    		//deshabilitado: no permite añadir reservas en espacios deshabilitados 
     
     public function validate($data)
     	{
@@ -302,7 +304,15 @@ class Evento extends Eloquent{
 			    	}
 			    });
 		}
-		
+		//deshabilitado
+		if (isset($data['id_recurso']) && $data['id_recurso'] != 0){
+
+			$v->sometimes('titulo','deshabilitado',function($data){
+				if ( 1 == Recurso::findOrFail($data['id_recurso'])->disabled ) return true;
+			});
+
+		}
+
 		//req3: espacio ocupado (no solapamientos)
        	if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
 			

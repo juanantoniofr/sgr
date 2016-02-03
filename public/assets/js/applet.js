@@ -1,45 +1,43 @@
 $(function(e){
 
-	$('.updateList').on('click',function(e){
+	/*$('.updateList').on('click',function(e){
 		$('#resultsearch').fadeOut('slow').fadeIn('slow');
 		if (getUvus() != $('#uvus').html()) $('#uvus').fadeOut().html(getUvus()).fadeIn('slow');
 		$('#uvusBtn').html(getUvus());
 		e.preventDefault();
 		getReservas();
-		//$('#update').close('show');
-	});
-	
-	
-	$('#dni').on('change',function(){
 		
-		resetmsg();
-		if ($('#dni').html() != ""){
-			getReservas();
-		}
-		
-		if (getUvus() != $('#uvus').html()) $('#uvus').html(getUvus()).fadeIn('slow');
-		$('#uvusBtn').html(getUvus());
-	});
-
-	function resetmsg(){
-		$('#errorgetEvents').fadeOut('slow');
-		$('#error').fadeOut('slow');
-		$('#success').fadeOut('slow');
-		$('#nohayreservas').fadeOut('slow');
-		$('#divSearch').fadeOut('slow');
-		$('#resultsearch').html('');
+	});*/
+	
+	function getNombre(){
+		var $json = lector.getJsonObject().toString();
+		var $obj = $.parseJSON($json);
+		return $obj.nombreApellidos;
 	}
 
-	function getReservas(){
+	function getUvus(){
+		return $('#dni').html();
+	}
+
+	$('#dni').on('change',function(){
 		
+		console.log('change #dni.., uvus = ' + $('#dni').html());
+
+		if ($('#dni').html() != '') {
+			getReservas();
+			$('#modalAtenderReserva').modal('show');
+		}			
+		else $('#modalAtenderReserva').modal('hide');
+	});
+
+	function getReservas(){
+		console.log(getNombre());
 		$.ajax({
 				type: "GET",
-				url: "getUserEvents",
+				url: "tecnico/getUserEvents",
 				data: {username:getUvus()},
 
 				success: function(respuesta){
-					//console.log(respuesta);
-					
 					
 					if (respuesta === '-1'){
 						
@@ -53,25 +51,42 @@ $(function(e){
 						//$('#btnNuevaReserva').addClass('disabled');	
 					}
 					else {
-						$('#btnNuevaReserva').removeClass('disabled');	
+						//$('#btnNuevaReserva').removeClass('disabled');	
 						$('#resultsearch').html(respuesta).fadeIn('slow');//.fadeIn('slow');
-						$('#divSearch').fadeIn('slow');
-						$('.reserva').on('click',function(e){
+						
+						$('textarea[name|="observaciones"]').val($('#evento').data('observaciones'));
+						console.log($('#evento').data('observaciones'));
+						//$('#divSearch').fadeIn('slow');
+						/*$('.reserva').on('click',function(e){
 													e.preventDefault();
 													if ($(this).hasClass('disabled')) {
 														$('#update').modal('show');
 													}
 													else launchDataModal($(this).data('idevento'),$(this).data('observaciones'));													
-												});
+												});*/
 					}
-					 
 		    },
 				error: function(xhr, ajaxOptions, thrownError){
 						//hideGifEspera();
 						alert(xhr.responseText + ' (codeError: ' + xhr.status  +')');
-				}
-	  });
+			}
+	  	});
 	}
+
+	//obj tipo: Object { numeroSerie: "00221684", uvus: "joacalrod", nombreApellidos: "JOAQUIN CALONGE RODRIGUEZ", tipoUsuario: "ESTUDIANTE", dni: "77848620" }
+	
+
+/*
+	function resetmsg(){
+		$('#errorgetEvents').fadeOut('slow');
+		$('#error').fadeOut('slow');
+		$('#success').fadeOut('slow');
+		$('#nohayreservas').fadeOut('slow');
+		$('#divSearch').fadeOut('slow');
+		$('#resultsearch').html('');
+	}
+
+	
 
 	function launchDataModal($idEvento,$observaciones){
 		$('#success').fadeOut('slow');
@@ -299,12 +314,8 @@ $(function(e){
 		return $('#dni').html();
 	}
 
-	function getNombre(){
-		var $json = lector.getJsonObject().toString();
-		var $obj = $.parseJSON($json);
-		return $obj.nombreApellidos;
-	}
 	
+	*/
 
 	function showGifEspera(){
 		$('#espera').css('display','inline').css('z-index','100');

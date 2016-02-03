@@ -80,11 +80,12 @@ class EventoController extends BaseController {
 						
 		$user = User::where('username','=',$username)->first();
 		$today = date('Y-m-d');
-		$hora = date('H:i');
+		$hora = date('H:i:s');
 		if (empty($user)) return '1';//No hay usuario
 		
-		$events = Evento::where('user_id','=',$user->id)->where('fechaEvento','=',$today)->where('horaInicio','>',$hora)->groupby('evento_id')->orderby('fechaEvento','asc')->orderby('recurso_id','asc')->get();
-		return View::make('tecnico.resultSearch',compact('events','username'));
+		$event = Evento::where('user_id','=',$user->id)->where('fechaEvento','=',$today)->where('horaFin','>',$hora)->groupby('evento_id')->orderby('recurso_id','asc')->orderby('fechaEvento','asc')->orderby('horaInicio','asc')->first();
+		$username = $user->id;
+		return View::make('tecnico.resultSearch',compact('event','username'));
 	}
 	
 }

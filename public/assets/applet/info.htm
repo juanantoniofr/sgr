@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+</head>
+<body>
+
+<applet id="lector"  
+	code="fcom.maviuno.LectorCarnetUniversitario/InfoUI.class" 
+	codebase="https://150.214.225.41/applet/" 
+	archive="LectorCarnetUniversitario.jar, json-simple-1.1.1.jar" 
+	width=448 
+	height=308>
+</applet>
+<!--<applet codebase="classes" code="fcom/maviuno/LectorCarnetUniversitario/InfoUI_3.class" width=448 height=308></applet>-->
+
+<p id="campo"> Aquí te muestro el JSON completo cuando pulses el botón </p>
+<script>
+  function getJSON() {
+    //document.getElementById("campo").innerHTML = lector.getJsonObject().get("numeroSerie");
+    var json = lector.getJsonObject().toString();
+	document.getElementById("campo").innerHTML = json;
+  }
+</script>
+
+<button onclick="getJSON()">JSON Completo</button>
+
+<!--
+<button onclick="getXMLRecibido()">XML</button>
+<p id="campo1"> Aquí te muestro el XML recibido: </p>
+<script>
+ //  function getXMLRecibido() {
+ //    var numSerie = lector.getJsonObject().get("numeroSerie");
+ //    var xmlResp = $.get("https://sevius.us.es/gicus/serial/xml.php?serie=" + numSerie.trim());
+	// document.getElementById("campo1").innerHTML = xmlResp;
+ //  }
+</script>
+-->
+</body>
+</html>

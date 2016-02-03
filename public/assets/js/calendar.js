@@ -13,8 +13,12 @@ $(function(e){
 	*/
 
 
+	
 	//When load page....
 	function onLoad(){
+
+		
+	
 
 		// 1. --> Programmer events 
 		
@@ -77,6 +81,11 @@ $(function(e){
 				$('#modalAdd').modal('show');
 			}
 		});
+
+		//1.5.1 When clik button "leer carnet"
+		/*$('#appletLaunch').click(function(e){
+			$('#modalApplet').modal('show');
+		});*/
 
 		//1.6 click infoButton
 		$('#infoButton').on('click',function(e){
@@ -463,28 +472,36 @@ $(function(e){
 
 	//Programer event for Click In calendar Cell
 	function programerEventClickToCalendarCell(){	
+		
 		$('.formlaunch').click(function(e){
-			if (!$('select#recurse option:selected').val()) {
-				//alert('Espacio o medio a reservar no seleccionado');
-				$('#alert').fadeOut('slow');
-				$('#alert').fadeIn('slow');
-			}
-			else if ($('#alert_msg').data('nh') >= 12){
-					$('#alert_msg').fadeOut('slow');
-					$('#alert_msg').fadeIn('slow');		
+			
+			if($('select#recurse option:selected').data('disabled')){
+				$('#modalMsg').modal('show');
+			}	
+			else{
+				if (!$('select#recurse option:selected').val()) {
+					//alert('Espacio o medio a reservar no seleccionado');
+					$('#alert').fadeOut('slow');
+					$('#alert').fadeIn('slow');
 				}
-			else {
-				$elem = $(this).find($('.divEvents'));
-				$hidden = $elem.css('overflow');
-				if($hidden == 'visible') {
-					$elem.css({'width':$ancho,'height':'68px','background-color':'white','overflow':'hidden','border':'0px','position':'inherit','z-index':'0'});
-					$(this).find($('.cerrar')).hide();
-				}
+				else if ($('#alert_msg').data('nh') >= 12){
+						$('#alert_msg').fadeOut('slow');
+						$('#alert_msg').fadeIn('slow');		
+					}
+				else {
+					$elem = $(this).find($('.divEvents'));
+					$hidden = $elem.css('overflow');
+					if($hidden == 'visible') {
+						$elem.css({'width':$ancho,'height':'68px','background-color':'white','overflow':'hidden','border':'0px','position':'inherit','z-index':'0'});
+						$(this).find($('.cerrar')).hide();
+					}
 
-				setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
-				$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
-				$('#modalAdd').modal('show');
+					setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
+					$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
+					$('#modalAdd').modal('show');
+				}
 			}
+
 		});
 	}
 
@@ -563,8 +580,7 @@ $(function(e){
 				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso,groupID: $grupo_id},
 				success: function(respuesta){
 					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
-					if ($('select#recurse option:selected').data('disabled')) $('#warning').html('Espacio Deshabilitado temporalmente..... <br />No es posible añadir nuevas reservas.').fadeIn('slow');
-					else $('#warning').fadeOut('fast');
+					
 
 					$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
 					
@@ -572,12 +588,26 @@ $(function(e){
 					$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
 										
 					init();
-					if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
+					//if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
+					programerEventClickToCalendarCell();
 					if ($viewActive == 'agenda') {
 						setLinkDeleteEvent();
 						}
 					
 					hideGifEspera();
+
+					if ($('select#recurse option:selected').data('disabled')) {
+						
+						$('#btnNuevaReserva').addClass('disabled');
+						//muestra modal disabled recurso
+						$('#modalMsgTitle').html(respuesta['disabled']['title']);
+						$('#textMsg').addClass('alert');
+						$('#textMsg').addClass('alert-warning');
+						$('#textMsg').html(respuesta['disabled']['msg']);
+						$('#modalMsg').modal('show');
+			
+					}
+					
 					},
 					error: function(xhr, ajaxOptions, thrownError){
 						hideGifEspera();

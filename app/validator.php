@@ -44,4 +44,9 @@ Validator::extend('existeuvus',function($attributes,$value,$parameters){
 	return false;
 });
 
+//recurso deshabilitado
+Validator::extend('deshabilitado',function($attributes,$value,$parameters){
+	return false;
+});
+
 ?>

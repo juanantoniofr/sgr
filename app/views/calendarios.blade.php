@@ -18,14 +18,17 @@
         Calendario: <span id ="recurseName"></span> 
 
       </h2>
+
       <hr />
 
       <div class="form-inline pull-left" role="form">
         <div class="form-group">
-          <button class="btn btn-danger" data-toggle="modal" data-target=".myModal-sm" id="btnNuevaReserva" data-fristday="{{date('d-m-Y',$tsPrimerLunes)}}"><i class="fa fa-calendar fa-fw" ></i>
+          <button class="btn btn-danger disabled"  data-toggle="modal" data-target=".myModal-sm" id="btnNuevaReserva" data-fristday="{{date('d-m-Y',$tsPrimerLunes)}}"><i class="fa fa-calendar fa-fw" ></i>
            Nueva reserva
           </button>
-          <a class="btn btn-warning" id="infoButton" alt="Muestra descripción del recurso..." style="display:none" > <i class="fa fa-eye fa-fw" ></i>Descripción</a>
+         <!--<a class="btn btn-warning" id="appletLaunch" alt="Lanzar applet lector de tarjetas" style="" > <i class="fa fa-credit-card fa-fw" ></i>Leer carnet</a>-->
+          <a class="btn btn-info" id="infoButton" alt="Muestra descripción del recurso..." style="display:none" > <i class="fa fa-eye fa-fw" ></i>Descripción</a>
+           
         </div>
       </div>  
 
@@ -150,11 +153,23 @@
  {{ $modalfinalizareserva  or '' }}
  {{ $modalanulareserva     or '' }}
  {{ $modaldescripcion      or '' }}
-
+ {{ $modalMsg              or '' }}
+ {{ $modalAtenderReserva   or '' }}
+ 
 @stop
 
 
 @section('js')
+  {{HTML::script('assets/js/applet.js')}}
+  
+  <script type="text/javascript">
+        function writeToContainer(valor){
+                $('#dni').html(valor).change();
+            }    
+  </script> 
+  
+
   {{HTML::script('assets/js/calendar.js')}}
   {{HTML::script('assets/js/imprimir.js')}}
+  
 @stop

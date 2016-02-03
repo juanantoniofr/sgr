@@ -68,49 +68,51 @@ class sgrEvento {
 		if ($data['id_recurso'] == 0){
 			$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
 			foreach($recursos as $recurso){
-				$id_recurso = $recurso->id;
-				$sucess = true;
-				$evento = new Evento();
-			
-				//obtener estado (pendiente|aprobada)
-				$hInicio = date('H:i:s',strtotime($data['hInicio']));
-				$hFin = date('H:i:s',strtotime($data['hFin']));
-				$evento->estado = $this->setEstado($data['grupo_id'],$id_recurso,$currentfecha,$hInicio,$hFin);
-			
-				$repeticion = 1;
-				$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
-				$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
-				$evento->diasRepeticion = json_encode($data['dias']);
-			
-				if ($data['repetir'] == 'SR') {
-					$repeticion = 0;
-					$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-					$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-					$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
-				}
-			
-				$evento->evento_id = $evento_id;
-				$evento->titulo = $data['titulo'];
-				$evento->actividad = $data['actividad'];
-				$evento->recurso_id = $id_recurso;
-				$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-				$evento->repeticion = $repeticion;
-				$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
-				$evento->horaInicio = $data['hInicio'];
-				$evento->horaFin = $data['hFin'];
-				$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
+				if ($recurso->disabled != 1){
+					$id_recurso = $recurso->id;
+					$sucess = true;
+					$evento = new Evento();
 				
-				//Propietaria de la reserva
-				$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
+					//obtener estado (pendiente|aprobada)
+					$hInicio = date('H:i:s',strtotime($data['hInicio']));
+					$hFin = date('H:i:s',strtotime($data['hFin']));
+					$evento->estado = $this->setEstado($data['grupo_id'],$id_recurso,$currentfecha,$hInicio,$hFin);
 				
-				//U otro usuario
-				$uvus = Input::get('reservarParaUvus','');
-				if (!empty($uvus)) {
-					$user = User::where('username','=',$uvus)->first();
-					if ($user->count() > 0) $evento->user_id = $user->id;
-				}
+					$repeticion = 1;
+					$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
+					$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
+					$evento->diasRepeticion = json_encode($data['dias']);
 				
+					if ($data['repetir'] == 'SR') {
+						$repeticion = 0;
+						$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+						$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+						$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
+					}
+				
+					$evento->evento_id = $evento_id;
+					$evento->titulo = $data['titulo'];
+					$evento->actividad = $data['actividad'];
+					$evento->recurso_id = $id_recurso;
+					$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+					$evento->repeticion = $repeticion;
+					$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
+					$evento->horaInicio = $data['hInicio'];
+					$evento->horaFin = $data['hFin'];
+					$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
+					
+					//Propietaria de la reserva
+					$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
+					
+					//U otro usuario
+					$uvus = Input::get('reservarParaUvus','');
+					if (!empty($uvus)) {
+						$user = User::where('username','=',$uvus)->first();
+						if ($user->count() > 0) $evento->user_id = $user->id;
+					}
+					
 				if ($evento->save()) $result = $evento->id;
+				}
 			}
 		}
 		//reserva de un solo puesto o equipo

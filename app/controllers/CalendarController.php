@@ -34,7 +34,7 @@ class CalendarController extends BaseController {
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('modalfinalizareserva','modalanulareserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('modalfinalizareserva','modalanulareserva')->nest('modalMsg','modalMsg')->nest('modalAtenderReserva','modalAtenderReserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
 		
 	}
 
@@ -167,7 +167,10 @@ class CalendarController extends BaseController {
 	public function getTablebyajax(){
 		
 		$table = array( 'tHead' => '',
-						'tBody' => '');
+						'tBody' => '',
+						'disabled' => array('title' => '',
+											'msg'	=> ''),
+						);
 		
 		$viewActive = Input::get('viewActive','month'); //vista por defecto
 		$day = Input::get('day',date('d'));
@@ -181,7 +184,15 @@ class CalendarController extends BaseController {
        	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
 		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
 		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
-				
+		
+		if ($id_recurso != 0){
+			$recurso = Recurso::findOrFail($id_recurso);
+			if (1 == $recurso->disabled){
+				$table['disabled']['title'] = $recurso->nombre . ' deshabilitado temporalmente';
+				$table['disabled']['msg'] = '<p class="text-center"><b>Vicedecanato de Desarrollo de Proyectos e Infraestructuras</b></p><p>Nos hemos visto en la necesidad de acometer reformas integrales importantes (cableado de sonido y video, equipos, sistema eléctrico, mesas de mezcla, cambio de matriz) en el Salón de Actos, después de doce años de actividad ininterrumpida y de los cambios tecnológicos que se han ido produciendo. El sistema de distribución de señales ha dejado de funcionar y el paso del sistema analógico obsoleto al digital requiere una inversión importante, además de un cierre de este espacio que va a durar previsiblemente sobre dos meses.</p>';
+			}
+		} 
+
 	    return $table;
 	}
 
