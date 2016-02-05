@@ -370,26 +370,19 @@ class sgrEvento {
 	}
 
 	//Atender evento
-	public function atiende(){
-		
-		$idEvento = Input::get('eventoid','');
-		if (empty($idEvento)) return 'error';
-
-		$evento = Evento::findOrFail($idEvento);
-		$atencionEvento = new AtencionEvento;
-		if (isset($evento->atencion->id)) $atencionEvento = AtencionEvento::find($evento->atencion->id);
-		
-		
-		
-		$atencionEvento->evento_idSerie = $evento->evento_id;
-		$atencionEvento->evento_id = $evento->id;
-		$atencionEvento->user_id = $evento->userOwn->id;
-		$atencionEvento->tecnico_id = Auth::user()->id;
+	public function atender($data){
+		//data
+		$idevento = $data['idevento'];
+		$observaciones = $data['observaciones'];
+		$idtecnico = $data['idtecnico'];
+		//atencionEvento
+		$atencionEvento = AtencionEvento::firstOrNew(array('tecnico_id' => $idtecnico));
+		$atencionEvento->evento_id = $idevento;
 		$atencionEvento->momento = date('Y-m-d H:i:s',time());//momento actual
-		$atencionEvento->observaciones = Input::get('observaciones','');
-		
-		
+		$atencionEvento->observaciones = $observaciones;
 		$atencionEvento->save();
+		//evento
+		$evento = Evento::findOrFail($data['idEvento']);
 		$evento->atendida = true;
 		$evento->save();		
 		return 'success';

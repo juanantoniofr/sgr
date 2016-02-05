@@ -25,6 +25,7 @@ $(function(e){
 
 		if ($('#dni').html() != '') {
 			getReservas();
+
 			$('#modalAtenderReserva').modal('show');
 		}			
 		else $('#modalAtenderReserva').modal('hide');
@@ -53,8 +54,13 @@ $(function(e){
 					else {
 						//$('#btnNuevaReserva').removeClass('disabled');	
 						$('#resultsearch').html(respuesta).fadeIn('slow');//.fadeIn('slow');
+													
+						$('#nombreUsuario').html($('#evento').data('nombre') + ' (' + $('#evento').data('uvus') + ')');
 						
+						//form
 						$('textarea[name|="observaciones"]').val($('#evento').data('observaciones'));
+						$('form#atenderEvento input#idevento').val($('#evento').data('idevento'));
+
 						console.log($('#evento').data('observaciones'));
 						//$('#divSearch').fadeIn('slow');
 						/*$('.reserva').on('click',function(e){
@@ -72,6 +78,32 @@ $(function(e){
 			}
 	  	});
 	}
+
+	$('#atender').on('click',function(e){
+		e.preventDefault();
+		$('#msgModalAtender').fadeOut('slow');
+		showGifEspera();
+		$.ajax({
+			type:"POST",
+			url:"tecnico/saveAtencion",
+			data: $('form#atenderEvento').serialize(),
+			success: function($respuesta){
+				hideGifEspera();
+				if ($respuesta == "success") {
+					$('#infoEvento').removeClass('text-info').addClass('text-success');
+					$('#infoEvento i').removeClass('fa-calendar-o').addClass('fa-calendar-check-o');
+					$('#msgModalAtender').fadeIn('slow');
+					//$('#infoEvento').fadeIn('slow');
+				}
+				
+				
+			},
+			error: function(xhr, ajaxOptions, thrownError){
+					hideGifEspera();
+					alert(xhr.responseText + ' (codeError: ' + xhr.status  +')');
+				}
+		});
+	});
 
 	//obj tipo: Object { numeroSerie: "00221684", uvus: "joacalrod", nombreApellidos: "JOAQUIN CALONGE RODRIGUEZ", tipoUsuario: "ESTUDIANTE", dni: "77848620" }
 	
@@ -318,10 +350,10 @@ $(function(e){
 	*/
 
 	function showGifEspera(){
-		$('#espera').css('display','inline').css('z-index','100');
+		$('#espera').css('display','inline').css('z-index','10000');
 	}
 
 	function hideGifEspera(){
-		$('#espera').css('display','none').css('z-index','-100');
+		$('#espera').css('display','none').css('z-index','-10000');
 	}
 });

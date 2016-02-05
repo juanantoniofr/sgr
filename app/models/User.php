@@ -19,7 +19,12 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	public function atiende(){
         return $this->belongsToMany('Recurso','recurso_tecnico');
     	}
-    
+
+    //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
+	public function atenciones(){
+        return $this->hasMany('atencionEventos','tecnico_id');
+    	}
+
     //devuelve los recurso que valida (aprueba//deniega reservas)
 	public function valida()
     {

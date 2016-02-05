@@ -36,6 +36,7 @@ class EventoController extends BaseController {
 	}
 
 	public function anula(){
+		
 		$sgrEvento = new sgrEvento;
 
 		$result = $sgrEvento->anula();
@@ -43,12 +44,16 @@ class EventoController extends BaseController {
 		return $result;
 	}
 
-	public function atiende(){
+	public function atender(){
+		$result = 'fail';
+
 		$sgrEvento = new sgrEvento;
 
-		$result = $sgrEvento->atiende();
-
+		if ($sgrEvento->atender(Input::all()))  $result = 'success';
+		
 		return $result;
+
+		//return "success";
 	}
 
 	/**
