@@ -5,6 +5,7 @@
     <div class="modal-dialog modal-md">
      
       <div class="modal-content">
+       
         <form id="atenderEvento"> 
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -15,9 +16,7 @@
         <div class="modal-body">
         
           <div id ="reserva">
-          
-          
-            <label class="control-label" >Próxima reserva de <b><span class="text-info" id="nombreUsuario"></span></b>:</label>
+            <label class="control-label" >Próxima/s reserva/s de <b><span class="text-info" id="nombreUsuario"></span></b>:</label>
             <div class="alert alert-success text-center" id="msgModalAtender" style="display:none">Datos salvados con éxito...</div>
             <p class="" id="resultsearch" ></p>
             <!-- atendido por -->
@@ -32,7 +31,6 @@
                   <textarea class="form-control" rows="5" name="observaciones" placeholder="por ejemplo: entrega de material, alumno responsable, descripción de la actividad....."></textarea>
               </div>
             
-            <input type="hidden" name="idevento" id="idevento"  value=""   />
             <input type="hidden" name="idtecnico" id="idtecnico"  value="{{Auth::user()->id}}"   />
           
           </div><!-- /#reserva -->

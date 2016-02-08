@@ -41,9 +41,9 @@
                         <select class="form-control" id="selectUser" name="id_user">
                             <option value="0" @if($id_user == 0) selected="selected" @endif>Todos los usuarios</option>
                             @foreach($eventsByUser as $event)
-                                <option value="{{$event->userOwn->id}}" 
-                                    @if($id_user == $event->userOwn->id)selected="selected" @endif>
-                                    {{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}
+                                <option value="{{$event->user->id}}" 
+                                    @if($id_user == $event->user->id)selected="selected" @endif>
+                                    {{$event->user->apellidos}}, {{$event->user->nombre}}
                                 </option>
                             @endforeach
                         </select>

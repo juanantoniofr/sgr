@@ -136,8 +136,8 @@ class CalendarController extends BaseController {
 		
 		$respuesta['titulo'] = $evento[0]->titulo;
 		$respuesta['actividad'] = $evento[0]->actividad;
-		$respuesta['usuario'] = $evento[0]->userOwn->nombre .', ' . $evento[0]->userOwn->apellidos;
-		$respuesta['espacio'] = $evento[0]->recursoOwn->nombre;
+		$respuesta['usuario'] = $evento[0]->user->nombre .', ' . $evento[0]->user->apellidos;
+		$respuesta['espacio'] = $evento[0]->recurso->nombre;
 		setlocale(LC_ALL,'es_ES@euro','es_ES.UTF-8','esp');
 		$respuesta['fInicio'] = ucfirst(strftime('%A, %d de %B de %Y',strtotime($evento[0]->fechaInicio)));
 		$respuesta['fFin'] = ucfirst(strftime('%A, %d de %B de %Y',strtotime($evento[0]->fechaFin)));

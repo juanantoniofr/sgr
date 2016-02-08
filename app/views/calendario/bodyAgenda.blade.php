@@ -22,7 +22,7 @@
 		
 					
 		<td  height="45px">
-				{{$event->recursoOwn->nombre}} <small> {{$event->recursoOwn->grupo}}</small>
+				{{$event->recurso->nombre}} <small> {{$event->recurso->grupo}}</small>
 		</td>
 		<td  style="text-align:left">
 			<a class = "comprobante" href="{{URL::route('justificante',array('idEventos' => $event->evento_id))}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" title="Comprobante" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>

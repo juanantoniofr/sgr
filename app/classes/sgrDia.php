@@ -65,7 +65,7 @@ class sgrDia {
 			//Eventos para todos los equipos//puestos para fechaEvento del id_grupo
 			$events = Evento::where('fechaEvento','=',$fechaEvento)->whereRaw($whereRaw)->orderBy('horaInicio','asc')->groupby('titulo')->groupby('evento_id')->get();
 			return $events->filter(function($event) use ($id_grupo) {
-				return $event->recursoOwn->grupo_id == $id_grupo;
+				return $event->recurso->grupo_id == $id_grupo;
 			});
 		}		
 		else{

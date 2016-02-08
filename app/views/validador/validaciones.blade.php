@@ -131,7 +131,7 @@
 			    							 <span class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
 			    						</td>
 			    						<td>
-			                        		<span>{{$event->recursoOwn->nombre}}</span>
+			                        		<span>{{$event->recurso->nombre}}</span>
 			                        	</td>
 			                    @elseif($event->estado == 'denegada')
 			                   		<tr class=" text-danger event"  data-idEvent = "{{$event->id}}">
@@ -144,7 +144,7 @@
 			    						</td>
 			    						
 			                        	<td>
-			                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+			                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 			                        	</td>
 
 
@@ -159,7 +159,7 @@
 				    						</td>
 				    						
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 				                        	</td>
 				    			@else
 				    				    <tr class="event  text-info"  data-idEvent = "{{$event->id}}">
@@ -172,12 +172,12 @@
 				                        	</td>
 				                        	
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 				                        	</td>
 			                    @endif
 			                    
 			    				        
-				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}</span></td>
+				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->user->apellidos}}, {{$event->user->nombre}}</span></td>
 
 				                        <td><i class="fa fa-angle-double-right fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->titulo}}</span></td>
 				                        

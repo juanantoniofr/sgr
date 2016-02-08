@@ -2,6 +2,31 @@
 
 class sgrEvento {
 
+
+	/**
+	* Atender evento
+	* @param $data array datos de formulario
+	* @return boolean 
+	*/
+	public function atenderEvento($data){
+		//$data
+		$idevento = $data['idevento'];
+		$observaciones = $data['observaciones'];
+		$idtecnico = $data['idtecnico'];
+		
+		//save atención 
+		$atencionEvento = AtencionEvento::firstOrNew(array('evento_id' => $idevento));
+		$atencionEvento->tecnico_id = $idtecnico;
+		$atencionEvento->momento = date('Y-m-d H:i:s',time());//momento actual
+		$atencionEvento->observaciones = $observaciones;
+		$atencionEvento->save();
+		//evento
+		//$evento = Evento::findOrFail($data['idEvento']);
+		//$evento->atendida = true;
+		//$evento->save();		
+		return true;
+	}
+
 	//Save
 	public function save(){
 
@@ -32,7 +57,7 @@ class sgrEvento {
 			}
 
 			//notificar a validadores si espacio requiere validación
-			if ( $event->recursoOwn->validacion() ){
+			if ( $event->recurso->validacion() ){
 				$sgrMail = new sgrMail();
 				$sgrMail->notificaNuevoEvento($event);
 			}
@@ -215,7 +240,7 @@ class sgrEvento {
 					$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
 				
 				//notificar a validadores si espacio requiere validación
-				if ( $event->recursoOwn->validacion() ){
+				if ( $event->recurso->validacion() ){
 					$sgrMail = new sgrMail();
 					$sgrMail->notificaEdicionEvento($newEvent);
 				}
@@ -327,7 +352,7 @@ class sgrEvento {
 		$evento = Evento::findOrFail($idEvento);
 		$finalizarEvento->evento_idSerie = $evento->evento_id;
 		$finalizarEvento->evento_id = $evento->id;
-		$finalizarEvento->user_id = $evento->userOwn->id;
+		$finalizarEvento->user_id = $evento->user->id;
 		$finalizarEvento->tecnico_id = Auth::user()->id;
 		$finalizarEvento->momento = date('Y-m-d H:i:s',time());//momento actual
 		$finalizarEvento->observaciones = Input::get('observaciones','');
@@ -369,24 +394,7 @@ class sgrEvento {
 		return $result;
 	}
 
-	//Atender evento
-	public function atender($data){
-		//data
-		$idevento = $data['idevento'];
-		$observaciones = $data['observaciones'];
-		$idtecnico = $data['idtecnico'];
-		//atencionEvento
-		$atencionEvento = AtencionEvento::firstOrNew(array('tecnico_id' => $idtecnico));
-		$atencionEvento->evento_id = $idevento;
-		$atencionEvento->momento = date('Y-m-d H:i:s',time());//momento actual
-		$atencionEvento->observaciones = $observaciones;
-		$atencionEvento->save();
-		//evento
-		$evento = Evento::findOrFail($data['idEvento']);
-		$evento->atendida = true;
-		$evento->save();		
-		return 'success';
-	}
+	
 
 	//private functions
 	

@@ -1,15 +1,19 @@
-@if (count($event) > 0)
-    <p href="#" id="evento" data-observaciones="{{$event->atencion->observaciones or ''}}" data-idevento="{{$event->id}}" data-fechaevento="{{$event->fechaEvento}}" data-uvus="{{$event->userOwn->username}}" data-nombre="{{$event->userOwn->nombre}} {{$event->userOwn->apellidos}}" data-recurso="{{$event->recursoOwn->nombre}} ({{$event->recursoOwn->grupo}})">
-            <span id = "infoEvento" class="@if($event->atendida) text-success @else text-info @endif">
-            <i class="fa @if($event->atendida) fa-calendar-check-o @else fa-calendar-o @endif fa-fw"></i>
-            {{$event->recursoOwn->nombre}} ({{$event->recursoOwn->grupo}}): {{date('d-m-Y',strtotime($event->fechaEvento))}}, {{date('G:i',strtotime($event->horaInicio))}}-{{date('G:i',strtotime($event->horaFin))}}</span>
+@if ($eventos->count() > 0)
+	@foreach($eventos as $event)
 
-            @if (!empty($event->atencion->observaciones) ) <span class="text-danger text-center"> ({{$event->atencion->observaciones}} )</span>@endif
-        </p>
-    
+	<div class="radio">
+		<label href="#" id="evento_{{$event->id}}"  data-idevento="{{$event->id}}" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}">
+            <input type="radio" name="idevento" value="{{$event->id}}" data-observaciones="{{$event->atencion->observaciones or ''}}">
+            <span id = "infoEvento_{{$event->id}}" class="@if($event->atendido()) text-success @else text-info @endif">
+            <i class="fa @if($event->atendido()) fa-calendar-check-o @else fa-calendar-o @endif fa-fw"></i>
+            {{$event->recurso->nombre}} ({{$event->recurso->grupo}}): {{date('d-m-Y',strtotime($event->fechaEvento))}}, {{date('G:i',strtotime($event->horaInicio))}}-{{date('G:i',strtotime($event->horaFin))}}</span>
 
+            
+        </label>
+    	</div>    
+    @endforeach
 @else
     <div class="alert alert-danger text-center" id="nohayreservas" rol="alert">
-        <span>No hay reservas para el usuario con uvus: {{$username or ''}} </span>
+        <span id="evento" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}">No hay reservas para el usuario con uvus: {{$username or ''}} </span>
     </div>  
 @endif 

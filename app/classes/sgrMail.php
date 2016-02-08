@@ -32,8 +32,8 @@ class sgrMail {
 			
 			$data = array('evento' => serialize($evento));
 
-			if (!empty($evento->userOwn->email)){
-				$mailUser = $evento->userOwn->email;
+			if (!empty($evento->user->email)){
+				$mailUser = $evento->user->email;
 				Mail::queue(array('html'=>'emails.deshabilitaRecurso'),$data,function($m) use ($mailUser,$s){
 				$m->to($mailUser)->subject($s);});
 			}//fin if		
@@ -56,8 +56,8 @@ class sgrMail {
 			
 			$data = array('evento' => serialize($evento));
 
-			if (!empty($evento->userOwn->email)){
-				$mailUser = $evento->userOwn->email;
+			if (!empty($evento->user->email)){
+				$mailUser = $evento->user->email;
 				Mail::queue(array('html'=>'emails.habilitaRecurso'),$data,function($m) use ($mailUser,$s){
 				$m->to($mailUser)->subject($s);});
 			}//fin if		
@@ -93,7 +93,7 @@ class sgrMail {
 		$evento = Evento::where('evento_id','=',$evento_id)->first();//datos de la solicitud de uso
 		
 		$data = array('evento' => serialize($evento),'validador' => Auth::user()->nombre .' '. Auth::user()->apellidos);
-		$s = date('d-m-Y H:i') .': '. $evento->recursoOwn->nombre . ': '. $this->subject[$acccion];
+		$s = date('d-m-Y H:i') .': '. $evento->recurso->nombre . ': '. $this->subject[$acccion];
 		
 		$validadores = User::where('capacidad','=',5)->get(); //Todos los Validadores incluido Auth::user() (validador autenticado)
 		//Notifica validadores
@@ -105,7 +105,7 @@ class sgrMail {
 		}
 		
 		//Notifica solicitante
-		$mailSolicitante = $evento->userOwn->email;
+		$mailSolicitante = $evento->user->email;
 		if ( !empty($mailSolicitante) ){
 			Mail::queue(array('html'=>'emails.validacion'),$data,function($m) use ($mailSolicitante,$s){
 				$m->to($mailSolicitante)->subject($s);
@@ -137,7 +137,7 @@ class sgrMail {
 	public function notificaNuevoEvento($evento){
 
 		$data = array('evento' => serialize($evento),'solicitante' => Auth::user()->nombre .' '. Auth::user()->apellidos );
-		$s = 	date('d-m-Y H:i') .': '. $this->subject['addEvento'] . ' en ' . $evento->recursoOwn->nombre;
+		$s = 	date('d-m-Y H:i') .': '. $this->subject['addEvento'] . ' en ' . $evento->recurso->nombre;
 		$validadores = User::where('capacidad','=',5)->get(); //todos  los validadores
 		//Notifica validadores
 		foreach ($validadores as $validador) {
@@ -153,7 +153,7 @@ class sgrMail {
 	public function notificaEdicionEvento($evento){
 
 		$data = array('evento' => serialize($evento),'solicitante' => Auth::user()->nombre .' '. Auth::user()->apellidos );
-		$s = 	date('d-m-Y H:i') .': '. $this->subject['editEvento'] . ' en ' . $evento->recursoOwn->nombre;
+		$s = 	date('d-m-Y H:i') .': '. $this->subject['editEvento'] . ' en ' . $evento->recurso->nombre;
 		$validadores = User::where('capacidad','=',5)->get(); //todos  los validadores
 		//Notifica validadores
 		foreach ($validadores as $validador) {

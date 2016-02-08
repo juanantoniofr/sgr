@@ -49,7 +49,7 @@ class EventoController extends BaseController {
 
 		$sgrEvento = new sgrEvento;
 
-		if ($sgrEvento->atender(Input::all()))  $result = 'success';
+		if ($sgrEvento->atenderEvento(Input::all()))  $result = 'success';
 		
 		return $result;
 
@@ -68,29 +68,44 @@ class EventoController extends BaseController {
 						'nombreRecursoReservado' => '',);
 		$event = Evento::findOrFail(Input::get('id'));
 		$result['event'] = $event->toArray();
-		$result['usernameReservadoPor'] = $event->userOwn->username;
+		$result['usernameReservadoPor'] = $event->user->username;
 		$result['usernameReservadoPara'] = $event->reservadoPor->username;
-		$result['nombreRecursoReservado'] = $event->recursoOwn->nombre;
+		$result['nombreRecursoReservado'] = $event->recurso->nombre;
 		return $result;		
 	}
 
-	//Buscar eventos de un usuario dado su username (uvus)
+	/**
+	* Devuelve evento de usuario dado su username (uvus) para su atención: debe cumplirse:
+	*	1. El eventos está programado en un recurso "atendido" por Auth::user
+	*	2. fechaEvento = today && horaFin < now
+	*	
+	* @param Input array
+	* @return object Evento
+	* 
+	*/
 	public function getUserEvents(){
 
-		
 		$username = Input::get('username','');
+		$usuarioAtendido = User::where('username','=',$username)->first();
+		if (empty($usuarioAtendido)) return '-1';//No hay usuario
 
-		if(empty($username)) return '-1'; //parámetro de entrada vacio
-		
-						
-		$user = User::where('username','=',$username)->first();
 		$today = date('Y-m-d');
-		$hora = date('H:i:s');
-		if (empty($user)) return '1';//No hay usuario
+		$now = date('H:i:s');
+
+		$eventosCandidatos = Evento::where('user_id','=',$usuarioAtendido->id)->where('fechaEvento','=',$today)->where('horaFin','>',$now)->get();
+		$recursosAtendidos = Auth::user()->atiende;
+		//recolectar identificadores
+		$idsRecursos = array();
+		foreach ($recursosAtendidos as $recurso) {
+			$idsRecursos[] = $recurso->id;
+		}
+		//filtrar eventos candidartos
+		$eventos = $eventosCandidatos->filter(function($evento) use ($idsRecursos){
+			return in_array($evento->recurso_id, $idsRecursos);//si el evento se realiza en un recurso atendido por Auth::user()
+		});
+
 		
-		$event = Evento::where('user_id','=',$user->id)->where('fechaEvento','=',$today)->where('horaFin','>',$hora)->groupby('evento_id')->orderby('recurso_id','asc')->orderby('fechaEvento','asc')->orderby('horaInicio','asc')->first();
-		$username = $user->id;
-		return View::make('tecnico.resultSearch',compact('event','username'));
+		return View::make('tecnico.resultSearch',compact('eventos','username','usuarioAtendido'));
 	}
 	
 }

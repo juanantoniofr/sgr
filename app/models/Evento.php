@@ -10,21 +10,27 @@ class Evento extends Eloquent{
  	protected $fillable = array('horaInicio','titulo', 'recurso_id','fechaEvento','fechaInicio','repeticion', 'dia','diasRepeticion','fechaFin','user_id','created_at','user_id');
  	protected $softDelete = true;
 
-	public function userOwn(){
+ 	//Devuelve el objeto User propietario del evento
+	public function user(){
 		return $this->belongsTo('User','user_id','id');
  	}	
 
  	public function reservadoPor(){
 		return $this->belongsTo('User','reservadoPor_id','id');
  	}	
-
- 	public function recursoOwn(){
+ 	//Devuelve el objeto Recurso donde se realiza el evento
+ 	public function recurso(){
  		return $this->belongsTo('Recurso','recurso_id','id');
  	} 
 
+ 	//Un evento es atendido una o cero veces
  	public function atencion(){
- 		return $this->belongsTo('AtencionEvento','id','evento_id');
+ 		return $this->hasOne('AtencionEvento','evento_id','id');
  	}
+ 	//devuelve true si hay una atención y false en caso contrario
+	public function atendido(){
+		return $this->atencion()->count() > 0;
+	} 	
  	/**
  	* Determina si el evento es editable (Auth::user es propietario || Auth::user reservo en favor de otro && la fecha del evento es un día disponible para el Auth::user)
  	* @param $idUser int identificador de usuario para comprobar si tiene permiso para editar el evento
@@ -35,10 +41,10 @@ class Evento extends Eloquent{
  		//$idUser no existe	
  		if (User::where('id','=',$idUser)->count() == 0) return false;
  		//$idUser no es propietario y no ha reservado para otro
- 		if ($this->userOwn->id != $idUser && $this->reservadoPor->id != $idUser) return false;
+ 		if ($this->user->id != $idUser && $this->reservadoPor->id != $idUser) return false;
  		//la fecha del evento permite editar (depende del rol de usuario)
  		$timestamp = strtotime($this->fechaEvento);
- 		if ($this->userOwn->isDayAviable($timestamp)) return true;
+ 		if ($this->user->isDayAviable($timestamp)) return true;
 
  		return false;
  	}
@@ -54,7 +60,7 @@ class Evento extends Eloquent{
 		//$idUser no existe	
  		if (User::where('id','=',$idUser)->count() == 0) return false;
 		//$idUser no es propietario y no ha reservado para otro
- 		if ($this->userOwn->id != $idUser && $this->reservadoPor->id != $idUser) return false;
+ 		if ($this->user->id != $idUser && $this->reservadoPor->id != $idUser) return false;
  		//la fecha del evento permite anular (igual para todos los usuarios)
 		$hoy = strtotime('today');
 		$timestamp = strtotime($this->fechaEvento);
@@ -69,7 +75,7 @@ class Evento extends Eloquent{
  	public function numeroRecursos(){
  		$muestraItem = '';
         $numRecursos = 0;
-        if ($this->recursoOwn->tipo != 'espacio') {
+        if ($this->recurso->tipo != 'espacio') {
         	$numRecursos = $this->total();
         		
 
@@ -79,7 +85,7 @@ class Evento extends Eloquent{
 			$iduser = 0;
 			$iduser = $this->user_id;
 			if ( $iduser == $idPOD ) {
-				$recursos = Recurso::where('grupo_id','=',$this->recursoOwn->grupo_id)->get();
+				$recursos = Recurso::where('grupo_id','=',$this->recurso->grupo_id)->get();
 				$alist_id = array();
 				foreach($recursos as $recurso){
 					$alist_id[] = $recurso->id;
@@ -110,7 +116,7 @@ class Evento extends Eloquent{
 		$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
 		$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
 		//$nSolapamientos = Recurso::find($this->recurso_id)->events()->whereRaw($where)->count();
-		$nSolapamientos = $this->recursoOwn->events()->whereRaw($where)->count();
+		$nSolapamientos = $this->recurso->events()->whereRaw($where)->count();
  		if ($nSolapamientos > 0) $solapado = true;
  		return $solapado;
  	}
@@ -135,7 +141,7 @@ class Evento extends Eloquent{
  	*/
  	public function total(){
  		$total = 0;
- 		if ($this->recursoOwn->tipo != 'espacio') $total = Evento::where('evento_id','=',$this->evento_id)->where('horaInicio','=',$this->horaInicio)->where('fechaEvento','=',$this->fechaEvento)->count();
+ 		if ($this->recurso->tipo != 'espacio') $total = Evento::where('evento_id','=',$this->evento_id)->where('horaInicio','=',$this->horaInicio)->where('fechaEvento','=',$this->fechaEvento)->count();
  		
 			//Bug PODController, quitar el año q viene
 			$userPOD = User::where('username','=','pod')->first(); 
@@ -144,7 +150,7 @@ class Evento extends Eloquent{
 			$iduser = 0;
 			$iduser = $this->user_id;
 			if ( $iduser == $idPOD ) {
-				$recursos = Recurso::where('grupo_id','=',$this->recursoOwn->grupo_id)->get();
+				$recursos = Recurso::where('grupo_id','=',$this->recurso->grupo_id)->get();
 				$alist_id = array();
 				foreach($recursos as $recurso){
 					$alist_id[] = $recurso->id;

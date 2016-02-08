@@ -2,8 +2,8 @@
 	
 	Estado:<strong> {{ucfirst($event->estado)}}</strong>
 
-	 @if ($event->numeroRecursos() > 1) ({{$event->numeroRecursos()}} {{$event->recursoOwn->tipo}}/s)
-     @else ({{$event->recursoOwn->nombre}})
+	 @if ($event->numeroRecursos() > 1) ({{$event->numeroRecursos()}} {{$event->recurso->tipo}}/s)
+     @else ({{$event->recurso->nombre}})
      @endif
 
 </p>
@@ -12,7 +12,7 @@
 
 <p style="width=100%;text-align:center">{{Config::get('options.tiporeserva')[$event->repeticion]}}</p>
 
-<p style="width=100%;text-align:center">{{$event->userOwn->nombre }} {{$event->userOwn->apellidos}}</p>
+<p style="width=100%;text-align:center">{{$event->user->nombre }} {{$event->user->apellidos}}</p>
 
 <hr />
 
@@ -27,8 +27,8 @@
 	|
 @endif
 @if($event->esAnulable(Auth::user()->id))
-	<a  href="#"  class="libera" id="libera_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->userOwn->nombre}}" data-periodica="{{$event->repeticion}}" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
+	<a  href="#"  class="libera" id="libera_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->user->nombre}}" data-periodica="{{$event->repeticion}}" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
 @endif
-@if($event->esFinalizable() && Auth::user()->atiendeRecurso($event->recursoOwn->id) )
-	<a  href="#" class="finaliza" id="finaliza_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->userOwn->nombre}}" data-periodica="{{$event->repeticion}}" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>
+@if($event->esFinalizable() && Auth::user()->atiendeRecurso($event->recurso->id) )
+	<a  href="#" class="finaliza" id="finaliza_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->user->nombre}}" data-periodica="{{$event->repeticion}}" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>
 @endif

@@ -160,7 +160,7 @@
 
 
 @section('js')
-  {{HTML::script('assets/js/applet.js')}}
+  
   
   <script type="text/javascript">
         function writeToContainer(valor){
@@ -168,7 +168,7 @@
             }    
   </script> 
   
-
+  {{HTML::script('assets/js/applet.js')}}
   {{HTML::script('assets/js/calendar.js')}}
   {{HTML::script('assets/js/imprimir.js')}}
   

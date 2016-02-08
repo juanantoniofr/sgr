@@ -45,7 +45,7 @@ table {
 </style>
 <h3>Notificación automática Sistema de reservas fcom</h3>
 
-<h3>{{$solicitante}} ha añadido una nueva solicitud de reserva en {{htmlentities($e->recursoOwn->nombre)}}</h3>
+<h3>{{$solicitante}} ha añadido una nueva solicitud de reserva en {{htmlentities($e->recurso->nombre)}}</h3>
 
 <div style = "border:1px solid #666;padding:10px;line-height:1.6em"> 
 <h4><strong>Datos del evento:</strong></h4>
@@ -53,8 +53,8 @@ table {
 	<ul style ="list-style:none;padding:5px">
 		<li class = 'subtitle'><strong>Código:</strong> <span>{{$e->evento_id}}</span></li>
 		<li id = 'title'><strong>Título:</strong> <span>{{htmlentities($e->titulo)}}</span></li>
-		<li class = 'subtitle'><strong>Solicitada por:</strong> <span>{{$e->userOwn->nombre}} {{$e->userOwn->apellidos}} </span></li>
-		<li id = 'title'><strong>Espacio:</strong> <span>{{htmlentities($e->recursoOwn->nombre)}}</span></li>
+		<li class = 'subtitle'><strong>Solicitada por:</strong> <span>{{$e->user->nombre}} {{$e->user->apellidos}} </span></li>
+		<li id = 'title'><strong>Espacio:</strong> <span>{{htmlentities($e->recurso->nombre)}}</span></li>
 		<li class = 'first'><strong>Estado de la reserva:</strong> {{$e->estado}}</li>		
 		<li class = 'subtitle'><strong>Fecha de solicitud:</strong> <span>{{$e->created_at}}</span></li>
 	</ul>

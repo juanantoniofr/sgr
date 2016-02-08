@@ -177,19 +177,12 @@
                         <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
                     </div>             
             </div>
-            <!--
-            <div class="form-group" id="atendidoPor" >
-                    <label for="atendidoPor"  class="control-label col-md-2" >Atendido por</label>   
-                    <div class = "col-md-10">  
-                        <input type="text" name = "atendidoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  id = "atendidoPor"  />
-                    </div>             
-            </div>
-           -->
+           
             <!-- observaciones -->  
             <div class="form-group">
               <label for="observaciones"  class="control-label col-md-2" >Observaciones</label> 
               <div class="col-md-10">
-                <textarea class="form-control" rows="5" name="observaciones" placeholder="por ejemplo: entrega de material, alumno responsable, descripción de la actividad....."></textarea>
+                <textarea class="form-control" rows="5" name="observaciones_add" placeholder="por ejemplo: entrega de material, alumno responsable, descripción de la actividad....."></textarea>
               </div>
             </div>
           @endif
@@ -197,8 +190,7 @@
           
             <div class="alert alert-info text-center" role="alert" id="resumen"><p></p></div>
             <!-- fin elementos de edición -->
-            <!-- <input type="hidden" name="eventoid" value="" /> -->
-            <!-- <input type="hidden" name="atendidoPor" value="{{Auth::user()->id}}" /> -->
+           
             <input type="hidden" name="id_recurso" id="idRecurso" value="" />
             <input type="hidden" name="action"  id="actionType" value="" />
             <input type="hidden" name="eventoid"  value=""   />
