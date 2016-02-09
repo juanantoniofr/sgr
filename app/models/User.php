@@ -265,9 +265,9 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 			case '4': //root
 				return 'admin.dropdown';
 			case '3': //pas - técnico 
-				return 'tecnico.dropdown';
+				return 'emptydropdown';
 			case '6': //pas - supervisor
-				return 'tecnico.dropdown';
+				return 'supervisor.dropdown';
 			case '2': //pdi
 				return 'emptydropdown';
 			case '1': //alumno

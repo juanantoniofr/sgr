@@ -2,6 +2,46 @@
 
 class sgrEvento {
 
+	/**
+	* //finalizar evento: cambia la hora fin del evento
+	* @param $idevento int 
+	* @return $result array
+	*/
+	
+	public function finalizarEvento($idEvento = ''){
+		
+		$result = array('error' => false,
+						'msgError' => '',
+						'msgSuccess' => '');
+
+		//$idEvento = Input::get('idevento','');
+		if (empty($idEvento)) {
+			$result['error'] = true;
+			$result['msgError'] = 'Identificador de evento vacio...';
+			return $result;	
+		}
+
+		$finalizarEvento = new FinalizarEvento;
+		
+
+		$evento = Evento::findOrFail($idEvento);
+		//$finalizarEvento->evento_idSerie = $evento->evento_id;
+		$finalizarEvento->evento_id = $evento->id;
+		//$finalizarEvento->user_id = $evento->user->id;
+		$finalizarEvento->tecnico_id = Auth::user()->id;
+		$finalizarEvento->momento = date('Y-m-d H:i:s',time());//momento actual
+		$finalizarEvento->observaciones = Input::get('observaciones','');
+		
+		
+		$finalizarEvento->save();
+		//$evento->finalizada = true;
+		$evento->horaFin = date('H:i',mktime(date('H'),30));
+		$evento->save();
+
+		$result['msgSuccess'] = 'Evento finalizado con éxito...';
+
+		return $result;
+	}
 
 	/**
 	* Atender evento
@@ -332,41 +372,7 @@ class sgrEvento {
 		return $result;
 	}
 
-	//finalizar evento
-	public function finaliza(){
-		
-		$result = array('error' => false,
-						'msgError' => '',
-						'msgSuccess' => '');
-
-		$idEvento = Input::get('idevento','');
-		if (empty($idEvento)) {
-			$result['error'] = true;
-			$result['msgError'] = 'Identificador de evento vacio...';
-			return $result;	
-		}
-
-		$finalizarEvento = new FinalizarEvento;
-		
-
-		$evento = Evento::findOrFail($idEvento);
-		$finalizarEvento->evento_idSerie = $evento->evento_id;
-		$finalizarEvento->evento_id = $evento->id;
-		$finalizarEvento->user_id = $evento->user->id;
-		$finalizarEvento->tecnico_id = Auth::user()->id;
-		$finalizarEvento->momento = date('Y-m-d H:i:s',time());//momento actual
-		$finalizarEvento->observaciones = Input::get('observaciones','');
-		
-		
-		$finalizarEvento->save();
-		$evento->finalizada = true;
-		$evento->horaFin = date('H:i',mktime(date('H'),30));
-		$evento->save();
-
-		$result['msgSuccess'] = 'Evento finalizado con éxito...';
-
-		return $result;
-	}
+	
 	
 	//Anular evento
 	public function anula(){

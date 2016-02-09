@@ -16,7 +16,7 @@
         <div class="modal-body">
         
           <div id ="reserva">
-            <label class="control-label" >Próxima/s reserva/s de <b><span class="text-info" id="nombreUsuario"></span></b>:</label>
+            <label class="control-label" >Próxima/s reserva/s de <b><span class="text-info" id="nombreUsuario"></span></b></label>
             <div class="alert alert-success text-center" id="msgModalAtender" style="display:none">Datos salvados con éxito...</div>
             <p class="" id="resultsearch" ></p>
             <!-- atendido por -->

@@ -16,7 +16,7 @@ class sgrMail {
 							);
 
 	
-	public function notificaDeshabilitaRecurso($id){
+	public function notificaDeshabilitaRecurso($id,$motivo = ''){
 
 		if (empty($id)) return true;
 
@@ -30,7 +30,7 @@ class sgrMail {
 
 		foreach ($eventosToMail as $evento) {
 			
-			$data = array('evento' => serialize($evento));
+			$data = array('evento' => serialize($evento),'motivo' => $motivo);
 
 			if (!empty($evento->user->email)){
 				$mailUser = $evento->user->email;

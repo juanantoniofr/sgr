@@ -28,7 +28,7 @@
 			<a class = "comprobante" href="{{URL::route('justificante',array('idEventos' => $event->evento_id))}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" title="Comprobante" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>
 			</a>
 		
-			@if($event->esEditable())	
+			@if($event->esEditable(Auth::user()->id))	
 				<a href="" class="agendaEdit" id = "edit_agenda_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}"><span class="fa fa-pencil fa-fw"></span></a>
 
 				<a href="#" class="delete_agenda" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" ><span class="fa fa-trash-o fa-fw"></span>

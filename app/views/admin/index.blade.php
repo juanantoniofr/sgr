@@ -19,52 +19,36 @@
 
     <div class="row">
         
-        
-              
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h2><i class="fa fa-comment fa-fw"></i> Peticiones de alta </h2>   
-                </div><!-- /.panel-heading -->
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2><i class="fa fa-comment fa-fw"></i> Peticiones de alta </h2>   
+            </div><!-- /.panel-heading -->
                 
-                <div class="alert alert-success alert-dismissible" role="alert" id="msgsuccess" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <p id ="textmsgsuccess"></p>
-                </div>   
+            <div class="alert alert-success alert-dismissible" role="alert" id="msgsuccess" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <p id ="textmsgsuccess"></p>
+            </div>   
                 
-                <div class="alert alert-danger alert-dismissible" role="alert" id="msgerror" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <p id ="textmsgerror"></p>
-                </div> 
+            <div class="alert alert-danger alert-dismissible" role="alert" id="msgerror" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <p id ="textmsgerror"></p>
+            </div> 
                 
-                <div class="panel-body" id='listTask'>
-                            @if($notificaciones->count()>0)
-                                @foreach($notificaciones as $notificacion)
-                                    <div class="list-group" data-uvus = "{{$notificacion->source}}" data-sourceId = "{{$notificacion->id}}">
-                                        <a href="#"   class="list-group-item" title="Activar" data-toggle="modal" data-target="#modalUser">
-                                            {{$notificacion->msg }}
-                                           <!-- <span class="pull-right text-muted small"><em>hace 4 minutos</em>
-                                            </span>-->
-                                        </a>
-                                        
-                                    </div>
-                                    <!-- /.list-group -->
-                                @endforeach
-                               <!-- <a href="#" class="btn btn-default btn-block">Ver todas las peticiones</a> -->
-                            
-                            @else
-                                <div class="alert alert-warning" role="alert">No hay peticiones pendientes</a>
-                            @endif
-                            </div>
-                            <!-- /.panel-body -->
-                        </div>
-                        <!-- /.panel -->
-        
-        
+            <div class="panel-body" id='listTask'>
+                @if($notificaciones->count()>0)
+                    @foreach($notificaciones as $notificacion)
+                        <div class="list-group" data-uvus = "{{$notificacion->source}}" data-sourceId = "{{$notificacion->id}}">
+                            <a href="#"   class="list-group-item" title="Activar" data-toggle="modal" data-target="#modalUser">
+                                {{$notificacion->msg }}
+                            </a>
+                        </div><!-- /.list-group -->
+                    @endforeach
+                @else
+                        <div class="alert alert-warning" role="alert">No hay peticiones pendientes</a>
+                @endif
+            </div><!-- /.panel-body -->
+        </div><!-- /.panel -->
     </div>
 
-
-
     <div id = "espera" style="display:none"></div>
-
-
 </div>
 
 

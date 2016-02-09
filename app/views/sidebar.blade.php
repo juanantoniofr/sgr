@@ -27,18 +27,19 @@
   <div id="datepicker" value="{{date('d-m-Y',$tsPrimerLunes)}}" style="width:190px" ></div>
   
 
-  uvus: <span id = "dni" ></span>
+  <span id = "dni" style="display:none"></span>
   
- 
-  <div style="width:216px">               
-    <div id='divApplet'>
-      <applet id="lector"  
-              code="fcom.maviuno.LectorCarnetUniversitario/InfoUI.class" 
-              codebase="https://juanantonio.us.es/sgr1/public/assets/applet"
-              archive="LectorCarnetUniversitario.jar, json-simple-1.1.1.jar" 
-              width=100%
-              height=100% >
-      </applet><!-- ./applet -->
+  @if (Auth::user()->isTecnico())
+    <div style="width:216px;margin-top:10px">               
+      <div id='divApplet'>
+        <applet id="lector"  
+                code="fcom.maviuno.LectorCarnetUniversitario/InfoUI.class" 
+                codebase="https://juanantonio.us.es/sgr1/public/assets/applet"
+                archive="LectorCarnetUniversitario.jar, json-simple-1.1.1.jar" 
+                width=100%
+                height=100% >
+        </applet><!-- ./applet -->
+      </div>
     </div>
-  </div>
+  @endif
 </div>

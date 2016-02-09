@@ -2,6 +2,80 @@
 
 class recursosController extends BaseController{
 
+   public function deshabilitar(){
+ 
+    
+
+    $id = Input::get('idDisableRecurso','');
+    $motivo = Input::get('motivo','');
+
+    
+    if (empty($id)){
+      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
+      return Redirect::to($url);
+    }
+
+    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => true,'motivoDisabled'=>$motivo));
+    
+    //Enviar mail a usuarios con reserva futuras
+    $sgrMail = new sgrMail();
+    $sgrMail->notificaDeshabilitaRecurso($id,$motivo);         
+    
+    $respuesta = 'Recurso <b>deshabilitado</b> con éxito....';
+    return $respuesta;
+    
+    
+  }
+  
+  public function habilitar(){
+ 
+    $id = Input::get('id','');
+
+    
+    if (empty($id)){
+      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
+      return Redirect::to($url);
+    }
+
+    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => false));
+    
+    //Enviar mail a usuarios con reserva futuras
+    $sgrMail = new sgrMail();
+    $sgrMail->notificaHabilitaRecurso($id); 
+
+    Session::flash('message', 'Recurso <b>habilitado</b> con éxito....');
+    return Redirect::back();
+    
+  } 
+  /**
+  * 
+  */
+  public function listar(){
+    
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+    $offset = Input::get('offset','10');
+    $search = Input::get('search','');
+    $idgruposelected = Input::get('grupoid','');
+    
+    $recursosListados = 'Todos los recursos';
+    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
+
+    //Output
+    if (Auth::user()->isAdmin()){
+      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
+    }
+    else {
+      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
+    }
+    
+
+    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('modalAddSupervisor','admin.supervisorModalAdd')->nest('modalConfirmaBajaSupervisor','admin.supervisorModalBaja')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
+  } 
+
   //Devuelve el campo descripción dado un id_recurso
   public function getDescripcion(){
 
@@ -71,48 +145,6 @@ class recursosController extends BaseController{
     
   }
 
-  public function deshabilitar(){
- 
-    $id = Input::get('id','');
-
-    
-    if (empty($id)){
-      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
-      return Redirect::to($url);
-    }
-
-    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => true));
-    
-    //Enviar mail a usuarios con reserva futuras
-    $sgrMail = new sgrMail();
-    $sgrMail->notificaDeshabilitaRecurso($id);         
-
-    Session::flash('message', 'Recurso <b>deshabilitado</b> con éxito....');
-    return Redirect::back();
-    
-  }
-  
-  public function habilitar(){
- 
-    $id = Input::get('id','');
-
-    
-    if (empty($id)){
-      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
-      return Redirect::to($url);
-    }
-
-    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => false));
-    
-    //Enviar mail a usuarios con reserva futuras
-    $sgrMail = new sgrMail();
-    $sgrMail->notificaHabilitaRecurso($id); 
-
-    Session::flash('message', 'Recurso <b>habilitado</b> con éxito....');
-    return Redirect::back();
-    
-  }
-  
   //devuelve los supervisores de un recurso
   public function supervisores(){
 
@@ -337,32 +369,7 @@ class recursosController extends BaseController{
     return $respuesta;
   }
 
-  public function listar(){
-    
-    //Input      
-    $sortby = Input::get('sortby','nombre');
-    $order = Input::get('order','asc');
-    $offset = Input::get('offset','10');
-    $search = Input::get('search','');
-    $idgruposelected = Input::get('grupoid','');
-    
-    $recursosListados = 'Todos los recursos';
-    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
-
-    //Output
-    if (Auth::user()->isAdmin()){
-      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
-    }
-    else {
-      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
-    }
-    
-
-    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('modalAddSupervisor','admin.supervisorModalAdd')->nest('modalConfirmaBajaSupervisor','admin.supervisorModalBaja');
-  } 
-
+  
 
   public function formEdit(){
 

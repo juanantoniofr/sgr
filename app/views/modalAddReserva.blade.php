@@ -162,7 +162,7 @@
            
           </div>  
 
-          @if(Auth::user()->capacidad == 3 || Auth::user()->capacidad == 4 || Auth::user()->capacidad == 6)
+          @if(Auth::user()->capacidad == 3 || Auth::user()->capacidad == 4)
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva diaria</h4>
               <div class="form-group" id="reservadoPor">
                     <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
@@ -186,6 +186,7 @@
               </div>
             </div>
           @endif
+         
           <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Resumen</h4>
           
             <div class="alert alert-info text-center" role="alert" id="resumen"><p></p></div>

@@ -1,5 +1,38 @@
 $(function(e){
 
+
+    $(".deshabilitarRecurso").on('click',function(e){
+        e.preventDefault();
+        $('#nombrerecursoDeshabilitar').html($(this).data('nombrerecurso'));
+        //$('a#btnDeshabilitar').data('idrecurso',$(this).data('idrecurso'));
+        $('input[name|="idDisableRecurso"]').val($(this).data('idrecurso'));
+        //$('a#btnDeshabilitar').attr('href', 'deshabilitarRecurso.html' + '?'+'id='+$(this).data('idrecurso'));
+        $('#modaldisabledRecurso').modal('show');
+    });
+
+   $('#btnDeshabilitar').on('click',function(e){
+    alert('asdfas');
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:'deshabilitarRecurso.html',
+            data:$('form#deshabilitarecurso').serialize(),
+            success:function($respuesta){
+                $('#modaldisabledRecurso').modal('hide');
+                alert($respuesta);
+                hideGifEspera();
+                location.reload();
+                },
+            error:function(xhr, ajaxOptions, thrownError){
+                        hideGifEspera();
+                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+        });
+    
+   });   
+
+
     //Muestra modal confirmación baja supervisor
     $('.bajasupervisor').on('click',function(e){
         e.preventDefault();
@@ -40,7 +73,7 @@ $(function(e){
     $('#modalConfirmaBajaSupervisor').on('hidden.bs.modal', function (e) {location.reload();});
     
     //Muestra ventana modal addsupervisor
-    $("#addsupervisor").on('click',function(e){
+    $(".addsupervisor").on('click',function(e){
         e.preventDefault();
 
         $('#ModalUsuerAviso').fadeOut();
@@ -243,14 +276,7 @@ $(function(e){
         $('#modalborrarRecurso').modal('show');
     });
 
-    $(".deshabilitarRecurso").on('click',function(e){
-        e.preventDefault();
-        $('#nombrerecursoDeshabilitar').html($(this).data('nombrerecurso'));
-        $('a#btnDeshabilitar').data('idrecurso',$(this).data('idrecurso'));
-        $('a#btnDeshabilitar').attr('href', 'deshabilitarRecurso.html' + '?'+'id='+$(this).data('idrecurso'));
-        $('#modaldisabledRecurso').modal('show');
-    });  
-
+    
     $(".habilitarRecurso").on('click',function(e){
         e.preventDefault();
         $('#nombrerecursoHabilitar').html($(this).data('nombrerecurso'));
@@ -281,5 +307,13 @@ $(function(e){
         e.preventDefault();
         $('#nuevoGrupo_edit').toggle('slow');
     });
+
+    function showGifEspera(){
+        $('#espera').css('display','inline').css('z-index','10000');
+    }
+
+    function hideGifEspera(){
+        $('#espera').css('display','none').css('z-index','-10000');
+    }
 
 });

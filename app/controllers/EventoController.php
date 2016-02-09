@@ -27,10 +27,10 @@ class EventoController extends BaseController {
 		return $result;
 	}
 
-	public function finaliza(){
+	public function finalizar(){
 		$sgrEvento = new sgrEvento;
 
-		$result = $sgrEvento->finaliza();
+		$result = $sgrEvento->finalizarEvento(Input::get('idevento'));
 
 		return $result;
 	}

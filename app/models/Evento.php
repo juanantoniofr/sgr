@@ -23,13 +23,22 @@ class Evento extends Eloquent{
  		return $this->belongsTo('Recurso','recurso_id','id');
  	} 
 
- 	//Un evento es atendido una o cero veces
+ 	//relación: Un evento es atendido una o cero veces
  	public function atencion(){
  		return $this->hasOne('AtencionEvento','evento_id','id');
  	}
  	//devuelve true si hay una atención y false en caso contrario
 	public function atendido(){
 		return $this->atencion()->count() > 0;
+	} 
+ 	//Relación: Un evento es finalizado una o cero veces
+ 	public function finalizacion(){
+ 		return $this->hasOne('FinalizarEvento','evento_id','id');
+ 	}
+ 	
+	//devuelve true si hay la reserva fue finalizada y false en caso contrario
+	public function finalizada(){
+		return $this->finalizacion()->count() > 0;
 	} 	
  	/**
  	* Determina si el evento es editable (Auth::user es propietario || Auth::user reservo en favor de otro && la fecha del evento es un día disponible para el Auth::user)
@@ -38,13 +47,17 @@ class Evento extends Eloquent{
  	*/
  	public function esEditable($idUser){
  		
- 		//$idUser no existe	
- 		if (User::where('id','=',$idUser)->count() == 0) return false;
- 		//$idUser no es propietario y no ha reservado para otro
- 		if ($this->user->id != $idUser && $this->reservadoPor->id != $idUser) return false;
- 		//la fecha del evento permite editar (depende del rol de usuario)
- 		$timestamp = strtotime($this->fechaEvento);
- 		if ($this->user->isDayAviable($timestamp)) return true;
+ 		
+ 		$user = User::findOrFail($idUser); //@param identificador de usuario autenticado
+ 		if ($user->count() == 0) return false;//no hay usuario
+ 		
+ 		if ($this->user->id != $idUser && $this->reservadoPor->id != $idUser) 
+ 			return false;//Usuario autenticado no es propietario del evento, ni reservó para otro
+ 		
+
+ 		$timestamp = strtotime($this->fechaEvento);//la fecha del evento permite editar?? (depende del rol de usuario)
+ 		if ($this->user->isDayAviable($timestamp) || $user->isDayAviable($timestamp)) return true;
+ 		//el día está disponible para editar eventos para el usuario propiestario del evento ($this->user) o para el ususario autenticado ($user) es 
 
  		return false;
  	}
@@ -128,7 +141,7 @@ class Evento extends Eloquent{
 	public function esFinalizable(){
 		$eventoEsFinalizable = false;
 		
-		if ( strtotime($this->fechaEvento) == strtotime(date('Y-m-d')) && (strtotime($this->horaInicio) + Config::get('options.tiempocortesia')) < strtotime(date('H:i')) && strtotime($this->horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
+		if ( strtotime($this->fechaEvento) == strtotime(date('Y-m-d')) && strtotime($this->horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
 		
 		return $eventoEsFinalizable;
 	}

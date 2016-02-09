@@ -119,19 +119,10 @@ Route::post('admin/salvarDesecripcion.html',array('as' => 'updateDescripcionGrup
 
 
 Route::get('admin/eliminarecurso.html',array('uses'=>'RecursosController@eliminar','before' => array('auth','capacidad:4-6,msg')));
-Route::get('admin/deshabilitarRecurso.html',array('uses'=>'RecursosController@deshabilitar','before' => array('auth','capacidad:4-6,msg')));
+Route::post('admin/deshabilitarRecurso.html',array('uses'=>'RecursosController@deshabilitar','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/habilitarRecurso.html',array('uses'=>'RecursosController@habilitar','before' => array('auth','capacidad:4-6,msg')));
 
 Route::get('admin/getrecurso',array('uses'=>'RecursosController@getrecurso','before' => array('auth','capacidad:4-6,msg')));
-
-
-//Técnico MAV atención de reservas (capacidad = 3)
-Route::get('tecnico/home.html',array('as' => 'tecnicoHome.html','uses' => 'UsersController@hometecnico','before' => array('auth','capacidad:3-4,msg')));
-Route::get('tecnico/espacios.html',array('as' => 'recursosAtendidos','uses' => 'recursosController@recursosAtendidos','before' => array('auth','capacidad:3-4,msg')));
-Route::get('tecnico/informes.html',array('as' => 'informes','uses' => 'InformesController@index','before' => array('auth','capacidad:3-4,msg')));
-
-//Route::get('tecnico/getDataEvent',array(	'uses' => 'CalendarController@getDataEvent','before' => array('auth','capacidad:3-4,msg')));
-
 
 //Calendarios
 Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth','inicioCurso')));
@@ -150,10 +141,13 @@ Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' =>
 Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
 
 Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
-Route::post('finalizaevento',array('uses' => 'EventoController@finaliza','before' => array('auth','ajax_check')));
+Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
 Route::post('anulaevento',array('uses' => 'EventoController@anula','before' => array('auth','ajax_check')));
-Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atiende','before' => array('auth','capacidad:3-4,msg')));
+
+//Atención de eventos
 Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
+Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
+
 
 
 
@@ -188,11 +182,12 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	
-	$hora = '8:30';
-	$date = DateTime::createFromFormat('H:i',$hora);
-	echo $date->format('h');
-
+	$data = array('motivo'=> 'este el es motivo ....');
+	$mailUser = 'juanantonio.fr@gmail.com';
+	$s = 'prueba local';
+	Mail::queue(array('html'=>'emails.test'),$data,function($m) use ($mailUser,$s){
+				$m->to($mailUser)->subject($s);});
+	echo 'enviado';
 	
  }));
 

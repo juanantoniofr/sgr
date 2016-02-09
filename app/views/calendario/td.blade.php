@@ -17,8 +17,8 @@
                
                 <a class = " 
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada') text-danger
-                        @elseif($event->estado == 'aprobada' && !$event->finalizada)   text-success
-                        @elseif($event->finalizada)   text-info
+                        @elseif($event->estado == 'aprobada' && !$event->finalizada())   text-success
+                        @elseif($event->finalizada())   text-info
                         @elseif ($event->estado == 'pendiente') text-info
                         @elseif ($event->estado == 'denegada')  text-warning
                         @endif
@@ -42,8 +42,8 @@
                         <!-- Icono -->
                         <span   data-toggle="tooltip" title="Solicitud {{$event->estado}}" 
                                 class=" fa fa-fw
-                                    @if($event->estado == 'aprobada'  && !$event->finalizada) fa-check text-success
-                                    @elseif($event->finalizada) fa-clock-o text-info
+                                    @if($event->estado == 'aprobada'  && !$event->finalizada()) fa-check text-success
+                                    @elseif($event->finalizada()) fa-clock-o text-info
                                     @elseif ($event->estado == 'pendiente') fa-question text-info
                                     @elseif ($event->estado == 'denegada') fa-ban text-warning
                                 @endif" 

@@ -47,7 +47,10 @@ table {
 
 <h4>Se ha deshabilitado para su uso el recurso {{$e->recurso->nombre}} </h4>
 
-<p> La reserva que acontinuación se detalla <b>puede ser que no se pueda realizar</b>. Puede contactar con la Unidad correspondiente (Administrador de Centro, Servicio MAV, o Unidad TIC) para más información.</p>
+<p> La reserva que acontinuación se detalla <b>puede ser que no se pueda realizar</b>.</p> 
+<p>
+{{$motivo or ''}}
+</p>
 
 <div style = "border:1px solid #666;padding:10px;line-height:1.6em"> 
 <h4><strong>Datos del evento:</strong></h4>

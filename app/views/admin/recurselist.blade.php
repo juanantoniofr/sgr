@@ -17,7 +17,7 @@
 
 
 <div class="row">
-    
+    <div id = "espera" style="display:none"></div>
     <div class="panel panel-info">
             
         <div class="panel-heading">
@@ -105,31 +105,7 @@
                         @endif
                         <i class="fa fa-sort fa-fw text-info"></i>
                     </th>
-                     <!-- Order column by tipo
-                    <th style="width:8%">
-                        @if ($sortby == 'tipo' && $order == 'asc') {{
-                            link_to_action(
-                                'recursosController@listar',
-                                'Tipo',
-                                array(
-                                    'sortby' => 'tipo',
-                                    'order' => 'desc'
-                                    )
-                                )
-                            }}
-                        @else {{
-                            link_to_action(
-                                'recursosController@listar',
-                                'Tipo',
-                                    array(
-                                        'sortby' => 'tipo',
-                                        'order' => 'asc',
-                                    )
-                                )
-                            }}
-                        @endif
-                        <i class="fa fa-sort fa-fw text-info"></i>
-                    </th> --> 
+                    
                     <th style="width:20%">Disponibilidad</th>
                     <th>Validación</th>
                     <th style="width:20%">Usuarios</th>
@@ -177,7 +153,7 @@
                             </td>
                             <td>{{$recurso->tipoGestionReservas()}}</td>
                              @if (Auth::user()->capacidad == 4)
-                            <td><a id="addsupervisor" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="establecer usuarios con roles uspervisor, tecnico y validador" class="pull-right"><i class="fa fa-user-plus fa-fw"></i></a><hr />
+                            <td><a class="addsupervisor" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="establecer usuarios con roles uspervisor, tecnico y validador" class="pull-right"><i class="fa fa-user-plus fa-fw"></i></a><hr />
                                 <span><b>Supervisores:</b></span><br />
                                 @foreach($recurso->supervisores as $supervisor)
                                     <a href="" title='eliminar supervisor' class="bajasupervisor" data-username="{{$supervisor->username}}" data-iduser="{{$supervisor->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
@@ -238,36 +214,7 @@
 </div><!-- ./#modalborrarRecurso -->
 
 
-<!-- modal deshabilitar recurso -->
-<div class="modal fade" id="modaldisabledRecurso" tabindex="-2" role="dialog" aria-labelledby="disabledRecurso" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-      
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Deshabilitar recurso</h4>
-            </div>
-
-            <div class="modal-body">
-        
-                <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>deshabilitar</b> el recurso: "<b><span id="nombrerecursoDeshabilitar"></span>"</b> ?</div>
-                <div class="alert alert-warning"> Al deshabilitar el recurso:
-                    <ul>
-                        <li> No se podrán añadir nuevas reservas o solicitudes de uso. </li>
-                        <lI> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso. </lI>
-                    </ul>
-                </div>
-       
-            </div><!-- ./.modal-body -->
-
-            <div class="modal-footer">
-                <a class="btn btn-primary" href="" role="button" id="btnDeshabilitar"><i class="fa fa-toggle-off fa-fw"></i> Deshabilitar</a>
-
-                
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            </div>
-        </div><!-- ./.modal-content -->
-    </div><!-- ./.modal-dialog -->
-</div><!-- ./#modaldisabledRecurso -->                     
+                    
 
 <!-- modal habilitar recurso -->
 <div class="modal fade" id="modalenabledRecurso" tabindex="-3" role="dialog" aria-labelledby="enabledRecurso" aria-hidden="true">
@@ -300,7 +247,8 @@
     </div><!-- ./.modal-dialog -->
 </div><!-- ./#modaldisabledRecurso -->   
 
-<!-- modal nuevo recurso -->
+
+{{ $modaldeshabilitarecurso     or '' }}
 {{ $modalAdd                    or '' }}
 {{ $modalEdit                   or '' }}
 {{ $modalEditGrupo              or '' }}
@@ -313,6 +261,7 @@
 
 @section('js')
     {{HTML::script('assets/ckeditor/ckeditor.js')}}
+    <script type="text/javascript">CKEDITOR.replace( 'motivo' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'descripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'editdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'updatedescripciongrupo' );</script>

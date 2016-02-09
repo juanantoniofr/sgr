@@ -34,7 +34,7 @@ class CalendarController extends BaseController {
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
 		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('modalfinalizareserva','modalanulareserva')->nest('modalMsg','modalMsg')->nest('modalAtenderReserva','modalAtenderReserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('modalanulareserva','modalanulareserva')->nest('modalMsg','modalMsg')->nest('modalAtenderReserva','modalAtenderReserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
 		
 	}
 
@@ -180,11 +180,10 @@ class CalendarController extends BaseController {
 		$id_grupo = Input::get('groupID','');
 
        	$sgrCalendario = new sgrCalendario($numMonth,$year);
-
        	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
 		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
 		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
-		
+       	
 		if ($id_recurso != 0){
 			$recurso = Recurso::findOrFail($id_recurso);
 			if (1 == $recurso->disabled){
@@ -200,8 +199,6 @@ class CalendarController extends BaseController {
 		
 		$sgrCalendario = new sgrCalendario($numMonth,$year);
 		$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-		//$days = $sgrCalendario->dias();
-		//$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());//Representación numérica ISO-8601 del día de la semana 1 lunes,.7 domingo
 		$diaActual = 1;
 		$j=1;
 		switch ($viewActive) {

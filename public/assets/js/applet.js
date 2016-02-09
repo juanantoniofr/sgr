@@ -45,17 +45,16 @@ $(function(e){
 					}
 					else {
 						$('#resultsearch').html(respuesta).fadeIn('slow');
+						$('#nombreUsuario').html($('#usuarioAtendido').data('nombre') + ' (' + $('#usuarioAtendido').data('uvus') + ')');
 						$('#msgModalAtender').fadeOut();
+						
 						$eventSelectId = $('input[name|="idevento"]:first').val();
-						$('#nombreUsuario').html($('#evento_'+$eventSelectId).data('nombre') + ' (' + $('#evento_'+$eventSelectId).data('uvus') + ')');
-						
-						
 						$('input[name|="idevento"]').change(function(){
-							
 							$('textarea[name|="observaciones"]').val($(this).data('observaciones'));	
 						});
+
 						$('input[name|="idevento"]:first').prop( "checked", true ).change();
-						}
+					}
 		    },
 				error: function(xhr, ajaxOptions, thrownError){
 						alert(xhr.responseText + ' (codeError: ' + xhr.status  +')');

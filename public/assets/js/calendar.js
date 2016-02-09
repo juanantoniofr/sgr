@@ -363,7 +363,6 @@ $(function(e){
 		$( "#newReservaRepetir" ).on('change',function(){
 			if ($('#newReservaRepetir').val() == 'CS') {
 				$('#inputRepeticion').slideDown('slow');
-				//$('#datepickerFinicio').addClass('readonly');
 				$('#datepickerFinicio').prop('disabled', true);
 			}
 			else {
