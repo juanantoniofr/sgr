@@ -1,18 +1,24 @@
 $(function(e){
 
 
-    $(".deshabilitarRecurso").on('click',function(e){
+    $(".enabled").on('click',function(e){
         e.preventDefault();
-        $('#nombrerecursoDeshabilitar').html($(this).data('nombrerecurso'));
-        //$('a#btnDeshabilitar').data('idrecurso',$(this).data('idrecurso'));
+        console.log($(this).data('switch'));
+        //Init modal
+        $('#nombrerecurso_switchenabled').html($(this).data('nombrerecurso'));
         $('input[name|="idDisableRecurso"]').val($(this).data('idrecurso'));
-        //$('a#btnDeshabilitar').attr('href', 'deshabilitarRecurso.html' + '?'+'id='+$(this).data('idrecurso'));
-        $('#modaldisabledRecurso').modal('show');
+        //select habilitar//deshabilitar recurso
+        if ($(this).data('switch') == 'On'){
+            $('#modalenabledRecurso').modal('show');
+        }
+        else { 
+            if ($(this).data('switch') == 'Off') $('#modaldisabledRecurso').modal('show');
+        }
     });
 
-   $('#btnDeshabilitar').on('click',function(e){
-    alert('asdfas');
+    $('#btnDeshabilitar').on('click',function(e){
         e.preventDefault();
+        updateChkeditorInstances();
         showGifEspera();
         $.ajax({
             type:"POST",
@@ -20,18 +26,53 @@ $(function(e){
             data:$('form#deshabilitarecurso').serialize(),
             success:function($respuesta){
                 $('#modaldisabledRecurso').modal('hide');
-                alert($respuesta);
                 hideGifEspera();
-                location.reload();
+                //location.reload();
+                $idrecurso = $('#modaldisable_idrecurso').val();
+
+                $('#link_'+ $idrecurso +' i').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+                $('#link_'+ $idrecurso).data('switch','On');
+                $('#tr_'+ $idrecurso +' td').each(function(){
+                    $(this).fadeOut('slow').fadeIn('4000');
+                });
+                
+                $('#success_recurselist_msg p').html($respuesta);
+                $('#success_recurselist_msg').fadeIn('4000');
                 },
             error:function(xhr, ajaxOptions, thrownError){
                         hideGifEspera();
                         alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
                     }
         });
-    
-   });   
-
+    });   
+   
+    $('#btnHabilitar').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:'habilitarRecurso.html',
+            data:$('form#deshabilitarecurso').serialize(),
+            success:function($respuesta){
+                $('#modalenabledRecurso').modal('hide');
+                hideGifEspera();
+                
+                $idrecurso = $('#modaldisable_idrecurso').val();
+                $('#link_'+ $idrecurso +' i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+                $('#link_'+ $idrecurso).data('switch','Off');
+                $('#tr_'+ $idrecurso +' td').each(function(){
+                    $(this).fadeOut('slow').fadeIn('4000');
+                });
+                
+                $('#success_recurselist_msg p').html($respuesta);
+                $('#success_recurselist_msg').fadeIn('4000');
+                },
+            error:function(xhr, ajaxOptions, thrownError){
+                        hideGifEspera();
+                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+        });
+    });
 
     //Muestra modal confirmación baja supervisor
     $('.bajasupervisor').on('click',function(e){
@@ -41,7 +82,7 @@ $(function(e){
         $('#nombreRecurso').html($(this).data('nombrerecurso'));
         $('#btnquitaSupervisor').data('idrecurso',$(this).data('idrecurso'));
         $('#btnquitaSupervisor').data('iduser',$(this).data('iduser'));
-        $('#avisoQuitarSupervisor').fadeOut();
+        $('#avisoQuitarSupervisor').fadeOut('4000');
 
         $('#modalConfirmaBajaSupervisor').modal('show');
     });
@@ -57,9 +98,9 @@ $(function(e){
             data: {idrecurso:$(this).data('idrecurso'),iduser:$(this).data('iduser')},
             success: function($respuesta){
                console.log($respuesta);
-               if ($respuesta['error'] === true) $('#avisoQuitarSupervisor').fadeOut('slow').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('slow');
+               if ($respuesta['error'] === true) $('#avisoQuitarSupervisor').fadeOut('4000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('4000');
                else {
-                    $('#avisoQuitarSupervisor').fadeOut('slow').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('slow');
+                    $('#avisoQuitarSupervisor').fadeOut('4000').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('4000');
                     }
             },
             error: function(xhr, ajaxOptions, thrownError){
@@ -88,7 +129,7 @@ $(function(e){
     $('#btnSalvarSupervisor').on('click',function(e){
         e.preventDefault();
         
-        if ($('#username').val() == '') $('#ModalUsuerAviso').removeClass('alert-success').addClass('alert-danger').html('Uvus no puede quedar vacio...').fadeOut('slow').fadeIn('slow');
+        if ($('#username').val() == '') $('#ModalUsuerAviso').removeClass('alert-success').addClass('alert-danger').html('Uvus no puede quedar vacio...').fadeOut('4000').fadeIn('4000');
         else{
             
         $.ajax({
@@ -97,9 +138,9 @@ $(function(e){
             data: {username:$('#username').val(),idRecurso:$('#ModalUsuerIdRecurso').val(),rol:$('#selectrol').val()},
             success: function($respuesta){
                console.log($respuesta);
-               if ($respuesta['error'] === true) $('#ModalUsuerAviso').fadeOut('slow').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('slow');
+               if ($respuesta['error'] === true) $('#ModalUsuerAviso').fadeOut('4000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('4000');
                else {
-                    $('#ModalUsuerAviso').fadeOut('slow').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('slow');
+                    $('#ModalUsuerAviso').fadeOut('slow').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('4000');
                     }
             },
             error: function(xhr, ajaxOptions, thrownError){
@@ -122,10 +163,7 @@ $(function(e){
             url:  "getrecurso",
             data: {id:$(this).data('idrecurso')},
             success: function($respuesta){
-                
                 $atributos = $respuesta['atributos'];
-                //console.log($('#modalEditRecurso input#editdescripcion'));
-                //$('#modalEditRecurso input#editdescripcion').val();
                 CKEDITOR.instances['editdescripcion'].setData($atributos['descripcion']);
                 CKEDITOR.instances['editdescripcion'].updateElement();
                 //console.log($atributos['descripcion']);
@@ -133,7 +171,6 @@ $(function(e){
                                             $('#modalEditRecurso input#'+key).val(value);
                                             $('#modalEditRecurso #select_'+key).val(value);
                                         });
-                //updateChkeditorInstances();
                 $('#modalEditRecurso #select_modo').val($.parseJSON($atributos['acl']).m);
                 $('#modalEditRecurso .check_colectivos').val($respuesta['visibilidad']);
                 $('#modalEditRecurso .text-danger').slideDown();
@@ -148,11 +185,8 @@ $(function(e){
     });
     
     //Muestra ventana modal para editar grupo
-    
     $(".linkEditgrupo").on('click',function(e){
         e.preventDefault();
-        //Cargar valores del recurso a editar en #modalEditRecurso
-        //console.log($(this).data('idrecurso'));
         $idRecurso = $(this).data('idrecurso');
         $descripciongrupo = $(this).data('descripciongrupo');
         $nombregrupo = $(this).data('nombregrupo');
@@ -173,8 +207,7 @@ $(function(e){
             url:  "salvarDesecripcion.html",
             data: $('form#formeditargrupo').serialize(),
             success: function($respuesta){
-               //console.log($respuesta);
-               if($respuesta.hasError == true){  
+                if($respuesta.hasError == true){  
                     $.each($respuesta.errores,function(key,value){
                         $('b#text_error_'+key).html(value);
                         $('div#error_'+key).removeClass('hidden');
@@ -253,8 +286,8 @@ $(function(e){
                    $.each($respuesta['errors'],function(key,value){
                         $('#modalAddRecurso #fg'+key).addClass('has-error');
                         $('#modalAddRecurso #'+key+'_error > span#text_error').html(value);
-                        $('#modalAddRecurso #'+key+'_error').fadeIn("slow");
-                        $('#modalAddRecurso #'+key+'_error').fadeIn("slow");
+                        $('#modalAddRecurso #'+key+'_error').fadeIn("4000");
+                        $('#modalAddRecurso #'+key+'_error').fadeIn("4000");
 
                         $('#aviso').slideDown("slow");
                         
@@ -277,14 +310,6 @@ $(function(e){
     });
 
     
-    $(".habilitarRecurso").on('click',function(e){
-        e.preventDefault();
-        $('#nombrerecursoHabilitar').html($(this).data('nombrerecurso'));
-        $('a#btnHabilitar').data('idrecurso',$(this).data('idrecurso'));
-        $('a#btnHabilitar').attr('href', 'habilitarRecurso.html' + '?'+'id='+$(this).data('idrecurso'));
-        $('#modalenabledRecurso').modal('show');
-    });  
-
     $("#caducidad").datepicker({
             showOtherMonths: true,
             selectOtherMonths: true,

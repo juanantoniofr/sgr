@@ -1,15 +1,78 @@
 <?php
 
 class UsersController extends BaseController {
+  
+
+  /**
+  * //Request by Ajax
+  * 
+  */
+  public function edit(){
+
+    $result = array ('exito' => false, 'errors' => array(), 'data' => array());
+    
+    
+    
+    $rules = array(
+        'id'        => 'required',
+        'nombre'    => 'required',
+        'apellidos' => 'required',
+        'estado'    => 'required',
+        'colectivo' => 'required',
+        'caducidad' => 'required|date|date_format:d-m-Y',
+        'capacidad' => 'required|in:1,2,3,4,5',
+        'email'     => 'required|email',
+        );
+
+    $messages = array(
+            'required'   => 'El campo <strong>:attribute</strong> es obligatorio.',
+            'date_es'    => 'El campo <strong>:attribute</strong> debe ser una fecha válida.',
+            'in'         => 'El campo <strong>:attribute</strong> es erroneo.',
+            'email'      => 'El campo <strong>:attribute</strong> debe ser una dirección de email válida',
+           );
+  
  
-  //escritorio admin
-  public function home(){
-    $veractivados = Input::get('veractivados',0);
-    $verdesactivados = Input::get('verdesactivados',0);
+    $validator = Validator::make(Input::all(), $rules, $messages);
     
-    
-    $notificaciones = Notificacion::where('estado','=','abierta')->orderby('id','desc')->get();
-    return View::make('admin.index')->with(compact('notificaciones'))->nest('dropdown','admin.dropdown');
+
+    $fecha = Input::get('caducidad'); 
+    if (!empty($fecha)){
+      $data = Input::all();
+      $validator->sometimes('caducidad','date_es',function($data){
+        $date_es = date_parse_from_format("j-m-Y", $data['caducidad']);
+        if ($date_es['warning_count'] > 0 || $date_es['error_count'] > 0) return true;        
+      });
+    }
+   
+   
+    if ($validator->fails())
+    {
+        $result['errors'] = $validator->errors()->toArray(); 
+        //return $result;
+    }
+    else{  
+      // salvamos los datos.....
+      $user = User::findOrFail(Input::get('id'));
+      
+      // La fecha se debe guardar en formato USA Y-m-d  
+      $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
+      $user->caducidad = $fecha->format('Y-m-d');
+      $user->capacidad = Input::get('capacidad');
+      $user->colectivo = Input::get('colectivo');
+      $user->estado = Input::get('estado','0');
+      $user->email = Input::get('email');
+      $user->nombre = Input::get('nombre');
+      $user->apellidos = Input::get('apellidos');
+
+      $user->save();
+
+      //cierra notificación de alta en caso de que exista....
+      $this->cierraNotificacion($user->username);
+      $result['exito'] = true;
+      
+    }
+    $result['data'] = Input::all();
+    return $result;
   }
 
   public function listUsers(){
@@ -31,15 +94,35 @@ class UsersController extends BaseController {
       
       $offset = Input::get('offset','15');
       
-      //if ($perfil == 0) $perfil = '';
-
       $usuarios = User::where('username','like',"%$search%")->whereIn('estado',$estados)->where('colectivo','like',"%".$colectivo)->where('capacidad','like',"%".$perfil)->orderby($sortby,$order)->paginate($offset);
       
 
       $colectivos = Config::get('options.colectivos');
       $perfiles = Config::get('options.perfiles');
 
-      return View::make('admin.userList')->with(compact('usuarios','sortby','order','veractivados','verdesactivados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuUsuarios','admin.menuUsuarios',compact('veractivados','verdesactivados','colectivo','colectivos','perfil','perfiles'))->nest('modalAddUser','admin.userModalAdd');
+      return View::make('admin.userList')->with(compact('usuarios','sortby','order','veractivados','verdesactivados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuUsuarios','admin.menuUsuarios',compact('veractivados','verdesactivados','colectivo','colectivos','perfil','perfiles'))->nest('modalAddUser','admin.userModalAdd')->nest('modalEditUser','admin.userModalEdit');
+  }
+  
+  /**
+  * @param $id int
+  * @return $user Object User
+  */
+  
+  public function user(){
+
+    $id = Input::get('id','');
+    $user = User::findOrFail($id);
+
+    return $user;
+  }
+  
+  //Home rol admin
+  public function home(){
+    $veractivados = Input::get('veractivados',0);
+    $verdesactivados = Input::get('verdesactivados',0);
+    
+    $notificaciones = Notificacion::where('estado','=','abierta')->orderby('id','desc')->get();
+    return View::make('admin.index')->with(compact('notificaciones'))->nest('dropdown','admin.dropdown');
   }
 
   public function delete(){
@@ -246,100 +329,8 @@ class UsersController extends BaseController {
     }
 
   }
- 
-
- /**
-   * Update the specified resource in storage.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-
-
-public function formEditUser(){
-
-    $id = Input::get('id','');
-    $veractivados = Input::get('veractivados',1);
-    $verdesactivados = Input::get('verdesactivados',0);
-    $vercaducados = Input::get('vercaducados',0);
-
-    if (empty($id)) $user = new User();
-    else $user = User::find($id);
-    
-    return View::make('admin.userEdit')->with(compact('user'))->nest('dropdown',Auth::user()->dropdownMenu());//->nest('menuUsuarios','admin.menuUsuarios',compact('veractivados','verdesactivados','vercaducados'));
-} 
   
-public function updateUser(){
-
-    
-    $rules = array(
-        'nombre'                => 'required',
-        'apellidos'             => 'required',
-        'estado'                => 'required',
-        'colectivo'             => 'required',
-        'caducidad'             => 'required',//|date|date_format:Y-m-d',
-        'capacidad'             => 'required|in:1,2,3,4,5',
-        'email'                 => 'required|email',
-        //'password'              => 'sometimes|confirmed|min:4|alpha_num',
-        
-      );
-
-    $messages = array(
-            'required'   => 'El campo <strong>:attribute</strong> es obligatorio.',
-            'date_es'    => 'El campo <strong>:attribute</strong> debe ser una fecha válida.',
-            'in'         => 'El campo <strong>:attribute</strong> es erroneo.',
-            'email'      => 'El campo <strong>:attribute</strong> debe ser una dirección de email válida',
-           );
   
- 
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    //validación fecha formato d-m-Y
-    $fecha = Input::get('caducidad'); 
-    if (!empty($fecha)){
-      $data = Input::all();
-      $validator->sometimes('caducidad','date_es',function($data){
-        $date_es = date_parse_from_format("j-m-Y", $data['caducidad']);
-        if ($date_es['warning_count'] > 0 || $date_es['error_count'] > 0) return true;        
-      });
-    }
-   
-    if ($validator->fails())
-    {
-        return Redirect::back()->withErrors($validator->errors());
-    }
-    else{  
-        $id = Input::get('id','');
-        if (empty($id)){
-          Session::flash('message', 'id vacio');
-          return Redirect::back();
-
-        }
-        // salvamos los datos.....
-        $user = User::find($id);
-        
-        // La fecha se debe guardar en formato USA Y-m-d  
-        $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
-        $user->caducidad = $fecha->format('Y-m-d');
-        $user->capacidad = Input::get('capacidad');
-        $user->colectivo = Input::get('colectivo');
-        $user->estado = Input::get('estado','0');
-        $user->email = Input::get('email');
-        $user->nombre = Input::get('nombre');
-        $user->apellidos = Input::get('apellidos');
-
-        $user->save();
-
-        //cierra notificación de alta en caso de que exista....
-        $this->cierraNotificacion($user->username);
-        $message = 'Usuario <strong>'. $user->username .' </strong>actualizado con éxito';
-        Session::flash('message', 'Usuario <strong>'. $user->username .' </strong>actualizado con éxito');
-        $url = URL::route('useredit.html',['id' => $id]); 
-        return Redirect::to($url);
-        //$message = 'Usuario <strong>'. $user->username .' </strong>actualizado con éxito';
-        //return View::make('admin.userEdit')->with(compact('user','message'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuAdminUsuarios','admin.menuAdminUsuarios');
-    }
-  
-}
  
 
   /**
@@ -348,7 +339,7 @@ public function updateUser(){
    * @return Response
    */
   public function store()
-  {
+   {
     //
   }
  
@@ -363,16 +354,7 @@ public function updateUser(){
     //
   }
  
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function edit($id)
-  {
-    //
-  }
+  
  
  
   /**

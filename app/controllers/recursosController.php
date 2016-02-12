@@ -4,47 +4,39 @@ class recursosController extends BaseController{
 
    public function deshabilitar(){
  
-    
-
     $id = Input::get('idDisableRecurso','');
     $motivo = Input::get('motivo','');
 
     
-    if (empty($id)){
-      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
-      return Redirect::to($url);
-    }
-
-    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => true,'motivoDisabled'=>$motivo));
+    if (empty($id)) return 'Identificador vacio: No se ha realizado ninguna acción....';
+    
+    $result = Recurso::where('id','=',$id)->update(array('disabled' => true,'motivoDisabled' => $motivo));
     
     //Enviar mail a usuarios con reserva futuras
     $sgrMail = new sgrMail();
     $sgrMail->notificaDeshabilitaRecurso($id,$motivo);         
     
-    $respuesta = 'Recurso <b>deshabilitado</b> con éxito....';
+    $recurso = Recurso::findOrFail($id);
+    $respuesta = 'Recurso <i>'.$recurso->nombre.' ('.$recurso->grupo.')</i> <b>deshabilitado</b> con éxito....';
     return $respuesta;
-    
-    
   }
   
   public function habilitar(){
  
-    $id = Input::get('id','');
+    $id = Input::get('idDisableRecurso','');
 
     
-    if (empty($id)){
-      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
-      return Redirect::to($url);
-    }
+    if (empty($id)) return 'Identificador vacio: No se ha realizado ninguna acción....';
 
-    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => false));
+    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => false,'motivoDisabled' => ''));
     
     //Enviar mail a usuarios con reserva futuras
     $sgrMail = new sgrMail();
     $sgrMail->notificaHabilitaRecurso($id); 
 
-    Session::flash('message', 'Recurso <b>habilitado</b> con éxito....');
-    return Redirect::back();
+    $recurso = Recurso::findOrFail($id);
+    $respuesta = 'Recurso <i>'.$recurso->nombre.' ('.$recurso->grupo.')</i> <b>habilitado</b> con éxito....';
+    return $respuesta;
     
   } 
   /**

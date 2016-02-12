@@ -8,6 +8,7 @@
 
 @section('content')
 <div class="container">
+<div id = "espera" style="display:none"></div>
 <div class="row">
     {{$menuUsuarios or ''}}
 </div>
@@ -23,8 +24,9 @@
                         
                 
             <table class="table table-hover table-striped">
+                
                 <thead>
-                    <th style="width: 1%;"></th>  
+                    <th style="width: 1%;">#</th>  
                     <th  style="width: 15%;">
                         @if ($sortby == 'username' && $order == 'asc') {{
                                 link_to_action(
@@ -151,9 +153,9 @@
                         </th>
                         <th style="width: 20%;">Observaciones</th>
                         <th >Última modificación</th>
-                        
-                    </thead>
-                    <tbody>
+                </thead>
+                
+                <tbody>
                          @foreach($usuarios as $user)
                                 <tr>
                                     <td>
@@ -167,7 +169,7 @@
                                     </td>
                                     <td>
                                         <a href="" class="eliminarUsuario" data-infousuario="{{$user->nombre}} {{$user->apellidos}} - {{$user->username}} -" data-id="{{$user->id}}"><i class="fa fa-trash fa-fw" title='borrar'></i></a>
-                                        <a href="{{route('useredit.html',array('id' => $user->id))}}"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
+                                        <a href="" data-id="{{$user->id}}" class="editUser"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
                                         {{$user->username}}
 
                                     </td>
@@ -186,17 +188,14 @@
                                     
                                 </tr>
                                  @endforeach
-                    </tbody>
-                    </table>
+                </tbody>
+            </table>
 
-                    {{$usuarios->appends(Input::except('page','result'))->links();}}
+            {{$usuarios->appends(Input::except('page','result'))->links();}}
                 
-            </div><!-- /.panel-body -->
-
-        </div><!-- /.panel-default -->
-    
+        </div><!-- /.panel-body -->
+    </div><!-- /.panel-default -->
 </div><!-- /.row -->    
-
 </div><!-- /.container -->
 
 
@@ -227,6 +226,9 @@
 </div><!-- ./#modalborrarRecurso -->
 
 {{$modalAddUser or ''}}
+{{$modalEditUser or ''}}
+
+
 
 @stop
 @section('js')

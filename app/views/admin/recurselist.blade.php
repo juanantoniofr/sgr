@@ -45,12 +45,10 @@
 
             </div>
 
-            @if (Session::has('message'))
-                <div class="alert alert-success alert-dismissable">
-                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                  {{ Session::get('message') }}
-                </div>
-            @endif
+            
+            <div class="alert alert-success alert-dismissable text-center" id = "success_recurselist_msg" style="display:none"><p></p> 
+            </div>
+            
             
             <table class="table table-hover table-striped">
                 <thead>
@@ -112,8 +110,8 @@
                 </thead>
                 <tbody>
                     @foreach($recursos as $recurso)
-                        <tr >
-                            <td>
+                        <tr id="tr_{{$recurso->id}}">
+                            <td >
                                 @if($recurso->disabled)  
                                     <i class="fa fa-ban fa-fw text-danger" title="Deshabilitado"></i>
                                 @else
@@ -122,20 +120,18 @@
                                 {{$recurso->id_lugar}}
                             </td>
                             <td>
-                                
-                             
                                 <!-- editar -->
                                 <a href="{{route('editarecurso.html',array('id' => $recurso->id))}}" title="Editar recurso" class="linkEditrecurso" data-idrecurso="{{$recurso->id}}"><i class="fa fa-pencil fa-fw"></i></a>
                                 
                                 <!-- eliminar -->
                                 <a href="" class = "eliminarRecurso" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Eliminar recurso"><i class="fa fa-trash-o fa-fw"></i></a>
                                 
-                                @if(!$recurso->disabled)
+                                @if($recurso->disabled == false)
                                     <!-- deshabilitar -->
-                                    <a href="" class = "deshabilitarRecurso" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Deshabilitar recurso"><i class="fa fa-toggle-off fa-fw "></i></a>
+                                    <a id="link_{{$recurso->id}}" href="" class = "enabled" data-idrecurso="{{$recurso->id}}" data-switch="Off" data-nombrerecurso="{{$recurso->nombre}}" title = "Deshabilitar recurso"><i class="fa fa-toggle-off fa-fw "></i></a>
                                 @else    
                                     <!-- habilitar -->
-                                    <a href="" class = "habilitarRecurso" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Habilitar recurso"><i class="fa fa-toggle-on fa-fw"></i></a>
+                                    <a id="link_{{$recurso->id}}" href="" class = "enabled" data-idrecurso="{{$recurso->id}}" data-switch="On" data-nombrerecurso="{{$recurso->nombre}}" title = "Habilitar recurso"><i class="fa fa-toggle-on fa-fw"></i></a>
                                 @endif
                                 {{$recurso->nombre}}
                             </td>
@@ -220,14 +216,14 @@
 <div class="modal fade" id="modalenabledRecurso" tabindex="-3" role="dialog" aria-labelledby="enabledRecurso" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-      
+            <form id="habilitarecurso">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Habilitar recurso</h4>
             </div>
 
             <div class="modal-body">
         
-                <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>Habilitar</b> el recurso: "<b><span id="nombrerecursoHabilitar"></span>"</b> ?</div>
+                <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>Habilitar</b> el recurso: "<b><span id="nombrerecurso_switchenabled"></span>"</b> ?</div>
                 <div class="alert alert-warning"> Al deshabilitar el recurso:
                     <ul>
                         <li> Se podrán añadir nuevas reservas o solicitudes de uso. </li>
@@ -240,9 +236,10 @@
             <div class="modal-footer">
                 <a class="btn btn-primary" href="" role="button" id="btnHabilitar"><i class="fa fa-toggle-on fa-fw"></i> Habilitar</a>
 
-                
+                <input id="modaldisable_idrecurso" type="hidden" name="idDisableRecurso" value=""   />
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
             </div>
+            </form>
         </div><!-- ./.modal-content -->
     </div><!-- ./.modal-dialog -->
 </div><!-- ./#modaldisabledRecurso -->   
