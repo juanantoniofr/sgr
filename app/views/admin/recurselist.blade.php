@@ -25,28 +25,27 @@
         </div>
 
         <div class="panel-body">
-                        
+                                    
             <div class="row">
     
-            <form class="navbar-form navbar-right">    
-                <div class="form-group ">
-                    <select class="form-control" id="selectRecurso" name="grupoid" >
-                        <option value ="">Seleccione grupo.....</option>
-                        @foreach ($grupos as $grupo)
-                            <option value="{{$grupo->grupo_id}}" placeholder="Seleccione recurso...">{{$grupo->grupo}}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="btn btn-primary form-control" role="submit"><i class="fa fa-filter fa-fw"></i> Filtrar</button> 
-                </div>
-            </form>
-            <form class="navbar-form navbar-right" >    
-                           
-            </form>
+                <form class="navbar-form navbar-right">    
+                    <div class="form-group ">
+                        <select class="form-control" id="selectRecurso" name="grupoid" >
+                            <option value ="">Seleccione grupo.....</option>
+                            @foreach ($grupos as $grupo)
+                                <option value="{{$grupo->grupo_id}}" placeholder="Seleccione recurso...">{{$grupo->grupo}}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn btn-primary form-control" role="submit"><i class="fa fa-filter fa-fw"></i> Filtrar</button> 
+                    </div>
+                </form>
+                <form class="navbar-form navbar-right" >    
+                </form>
 
             </div>
 
             
-            <div class="alert alert-success alert-dismissable text-center" id = "success_recurselist_msg" style="display:none"><p></p> 
+            <div class="alert alert-success text-center" id = "success_recurselist_msg" style="display:none" role="alert"> 
             </div>
             
             
@@ -149,22 +148,31 @@
                             </td>
                             <td>{{$recurso->tipoGestionReservas()}}</td>
                              @if (Auth::user()->capacidad == 4)
-                            <td><a class="addsupervisor" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="establecer usuarios con roles uspervisor, tecnico y validador" class="pull-right"><i class="fa fa-user-plus fa-fw"></i></a><hr />
+                            <td>
+                                <div style="border-bottom:1px solid #ccc" >    
+                                <a class="addUserWithRol" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo}}" title="Añade usuarios con las relaciones de supervisor, tecnico y/o validador" ><i class="fa fa-user-plus fa-fw"></i></a>
+                                |
+                                <a class="removeUserWithRol" href="" data-idrecurso="{{$recurso->id}}"  title="Elimina usuarios con  relación de supervisor, tecnico y/o validador" ><i class="fa fa-user-times fa-fw"></i></a>
+                                </div>
+                                
                                 <span><b>Supervisores:</b></span><br />
-                                @foreach($recurso->supervisores as $supervisor)
-                                    <a href="" title='eliminar supervisor' class="bajasupervisor" data-username="{{$supervisor->username}}" data-iduser="{{$supervisor->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
-                                   {{$supervisor->nombre}} {{$supervisor->apellidos}}.<br /> 
-                                @endforeach
+                                <div id="supervisores_{{$recurso->id}}">
+                                    @foreach($recurso->supervisores as $supervisor)
+                                        {{$supervisor->nombre}} {{$supervisor->apellidos}}.<br /> 
+                                    @endforeach
+                                </div>
                                 <span><b>Validadores:</b></span><br />
-                                @foreach($recurso->validadores as $validador)
-                                    <a href="" title='eliminar validador' class="bajasupervisor" data-username="{{$validador->username}}" data-iduser="{{$validador->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
-                                   {{$validador->nombre}} {{$validador->apellidos}}.<br /> 
-                                @endforeach
+                                <div id="validadores_{{$recurso->id}}">
+                                    @foreach($recurso->validadores as $validador)
+                                        {{$validador->nombre}} {{$validador->apellidos}}.<br /> 
+                                    @endforeach
+                                </div>
                                 <span><b>Técnicos:</b></span><br />
-                                @foreach($recurso->tecnicos as $tecnico)
-                                    <a href="" title='eliminar tecnico' class="bajasupervisor" data-username="{{$tecnico->username}}" data-iduser="{{$tecnico->id}}" data-idrecurso="{{$recurso->id}}" ><i class="fa fa-user-times fa-fw "></i></i></a>
-                                   {{$tecnico->nombre}} {{$tecnico->apellidos}}.<br /> 
-                                @endforeach
+                                <div id="tecnicos_{{$recurso->id}}">
+                                    @foreach($recurso->tecnicos as $tecnico)
+                                        {{$tecnico->nombre}} {{$tecnico->apellidos}}.<br /> 
+                                    @endforeach
+                                </div>
                             </td>
                             @endif
                         </tr>
@@ -244,13 +252,13 @@
     </div><!-- ./.modal-dialog -->
 </div><!-- ./#modaldisabledRecurso -->   
 
+{{ $recurseModalRemoveUserWithRol   or '' }}
 
-{{ $modaldeshabilitarecurso     or '' }}
-{{ $modalAdd                    or '' }}
-{{ $modalEdit                   or '' }}
-{{ $modalEditGrupo              or '' }}
-{{ $modalAddSupervisor          or '' }}
-{{ $modalConfirmaBajaSupervisor or '' }}
+{{ $modaldeshabilitarecurso         or '' }}
+{{ $modalAdd                        or '' }}
+{{ $modalEdit                       or '' }}
+{{ $modalEditGrupo                  or '' }}
+{{ $recurseModalAddUserWithRol      or '' }}
 
 
 <!-- ./ nuevo recurso -->

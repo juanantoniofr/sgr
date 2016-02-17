@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="container">
-<div id = "espera" style="display:none"></div>
+
 <div class="row">
     {{$menuUsuarios or ''}}
 </div>
@@ -17,16 +17,20 @@
 <div class="row">
     
     <div class="panel panel-info">
-            
+        <div id = "espera" style="display:none"></div>            
+        
         <div class="panel-heading"><h2><i class="fa fa-list fa-fw"></i> Listado</h2></div>
 
         <div class="panel-body">
                         
+            <div id = "msg" class = "alert text-center" role="alert" style="display:none">
                 
+            </div>    
+            
             <table class="table table-hover table-striped">
                 
                 <thead>
-                    <th style="width: 1%;">#</th>  
+                    <th>#</th>  
                     <th  style="width: 15%;">
                         @if ($sortby == 'username' && $order == 'asc') {{
                                 link_to_action(
@@ -156,38 +160,31 @@
                 </thead>
                 
                 <tbody>
-                         @foreach($usuarios as $user)
-                                <tr>
-                                    <td>
-                                      
-                                        @if($user->estado && !$user->caducado()) <i class="fa fa-check fa-fw text-success"  title='Cuenta Activa'></i> @endif
-                                        @if ($user->caducado()) <i class="fa fa-clock-o fa-fw text-danger" title='Cuenta Caducada'></i> @endif
-                                        @if(!$user->estado) <i class="fa fa-minus-circle fa-fw text-danger " title='Cuenta Desactivada'></i> @endif
-                                              
-                                     
-                                            
-                                    </td>
-                                    <td>
-                                        <a href="" class="eliminarUsuario" data-infousuario="{{$user->nombre}} {{$user->apellidos}} - {{$user->username}} -" data-id="{{$user->id}}"><i class="fa fa-trash fa-fw" title='borrar'></i></a>
-                                        <a href="" data-id="{{$user->id}}" class="editUser"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
-                                        {{$user->username}}
-
-                                    </td>
-                                    <td>
-                                        {{$user->colectivo}}
-                                    </td>
-                                    <td>
-                                        {{$user->getRol()}}
-                                        
-                                    </td>
-                                    <td>
-                                        {{$user->apellidos .', '.$user->nombre}}
-                                    </td>
-                                    <td> {{$user->observaciones}}</td>
-                                    <td><small>{{date('d M Y, H:m',strtotime($user->updated_at))}}</small></td>
-                                    
-                                </tr>
-                                 @endforeach
+                    @foreach($usuarios as $user)
+                        <tr id = "{{$user->id}}">
+                            <td id ="{{$user->id}}_estado">
+                                <i id ="{{$user->id}}_activa" class="fa fa-check fa-fw text-success"  title='Cuenta Activa' @if($user->estado == 0 || $user->caducado())style="display:none" @endif></i>
+                                <i id ="{{$user->id}}_caducada" class="fa fa-clock-o fa-fw text-danger" title='Cuenta Caducada' @if (!$user->caducado()) style="display:none" @endif></i> 
+                                <i id ="{{$user->id}}_desactiva" class="fa fa-minus-circle fa-fw text-danger " title='Cuenta Desactivada' @if($user->estado == '1') style="display:none" @endif></i>
+                            </td>
+                            <td>
+                                <a href="" class="eliminarUsuario" data-infousuario="{{$user->nombre}} {{$user->apellidos}} - {{$user->username}} -" data-id="{{$user->id}}"><i class="fa fa-trash fa-fw" title='borrar'></i></a>
+                                <a href="" data-id="{{$user->id}}" class="editUser"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
+                                   <span id ="username">{{$user->username}}</span>
+                            </td>
+                            <td id ="{{$user->id}}_colectivo"> 
+                                {{$user->colectivo}}
+                            </td>
+                            <td id ="{{$user->id}}_rol">
+                                {{$user->getRol()}}
+                            </td>
+                            <td id ="{{$user->id}}_apellidosnombre">
+                                {{$user->apellidos}},{{$user->nombre}}
+                            </td>
+                            <td id ="{{$user->id}}_observaciones"> {{$user->observaciones}}</td>
+                            <td ><small id ="{{$user->id}}_updated_at">{{$user->updated_at}}</small></td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
 

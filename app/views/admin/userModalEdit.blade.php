@@ -59,6 +59,12 @@
             <span id="editmodal_email_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
             {{Form::text('email',Input::old('email'),array('class' => 'form-control'))}}
           </div>
+
+          <div class="form-group" id="editmodal_observaciones">
+              <label for="observaciones">Observaciones</label> 
+              <textarea class="form-control" name="observaciones" rows="5"  value=""></textarea>
+              
+            </div>
         </div><!-- ./modal-body -->
 
         <input type="hidden" name="id" value="" />

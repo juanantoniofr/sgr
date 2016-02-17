@@ -2,7 +2,7 @@
 
 class recursosController extends BaseController{
 
-   public function deshabilitar(){
+  public function deshabilitar(){
  
     $id = Input::get('idDisableRecurso','');
     $motivo = Input::get('motivo','');
@@ -65,7 +65,7 @@ class recursosController extends BaseController{
     }
     
 
-    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('modalAddSupervisor','admin.supervisorModalAdd')->nest('modalConfirmaBajaSupervisor','admin.supervisorModalBaja')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
+    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
   } 
 
   //Devuelve el campo descripción dado un id_recurso
@@ -137,18 +137,42 @@ class recursosController extends BaseController{
     
   }
 
-  //devuelve los supervisores de un recurso
-  public function supervisores(){
+  /**
+  * Devuelve los usuarios con relación de supervisor // tecnico // validador
+  * @param Input::get('idrecurso') int identificador de recurso
+  */
+  public function usersWithRelation(){
 
-    $sortby = Input::get('sortby','username');
-    $order = Input::get('order','asc');
-    $offset = Input::get('offset','10');
-    $search = Input::get('search','');
-    $idRecurso = Input::get('idRecurso','');
+    //$sortby = Input::get('sortby','username');
+    //$order = Input::get('order','asc');
+    //$offset = Input::get('offset','10');
+    //$search = Input::get('search','');
+    
+    //Input 
+    $idrecurso = Input::get('idrecurso','');
 
-    $recurso = Recurso::find($idRecurso);
-    $supervisores = $recurso->supervisores()->orderby($sortby,$order)->paginate($offset);
-    return View::make('admin.supervisores')->with(compact('recurso','supervisores','sortby','order','offset','search'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menu','admin.menuSupervisores',['idRecurso' => $recurso->id, 'recurso' => $recurso->nombre])->nest('modalAddSupervisor','admin.supervisorModalAdd',['recurso' => $recurso])->nest('modalConfirmaBajaSupervisor','admin.supervisorModalBaja');
+    //Output
+    $result = array('error'         => false,
+                    'supervisores'  => array(),
+                    'validadores'   => array(),
+                    'tecnicos'      => array(),
+                    'msg'           => '');
+    //check $idrecurso
+    if (empty($idrecurso)){
+      $result['error'] = true;
+      $result['mgs']  = Config::get('msg.idnotfound');
+      return $result;
+    }
+    else{
+      $recurso = Recurso::findOrFail($idrecurso);
+      if ($recurso->supervisores->count() > 0) $result['supervisores'] = $recurso->supervisores->toArray();
+      if ($recurso->validadores->count() > 0) $result['validadores'] = $recurso->validadores->toArray();
+      if ($recurso->tecnicos->count() > 0) $result['tecnicos'] = $recurso->tecnicos->toArray();  
+    }
+      
+    return $result;  
+    
+   // return View::make('admin.supervisores')->with(compact('recurso','supervisores','sortby','order','offset','search'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menu','admin.menuSupervisores',['idRecurso' => $recurso->id, 'recurso' => $recurso->nombre])->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol',['recurso' => $recurso])->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol');
   }
 
   //añade relación usuario recurso
@@ -159,8 +183,11 @@ class recursosController extends BaseController{
     $username  = Input::get('username','');
     $rol       = Input::get('rol','');      
     //output
-    $respuesta = array( 'error' => false,
-                        'msg' => '',
+    $respuesta = array( 'error'     => false,
+                        'msg'       => '',
+                        'user'      => array(),
+                        'recurso'   => array(),
+                        'relacion'  => '',
                         );
 
     if (empty($rol)){
@@ -196,50 +223,57 @@ class recursosController extends BaseController{
     
 
     $recurso = Recurso::find($idRecurso);
+    $user = User::where('username','=',$username)->first();
+    $respuesta['user']= $user->toArray();
+    $respuesta['recurso'] = $recurso->toArray();
+    $idUser = $user->id;
     switch ($rol) {
       //tecnicos
       case '1':
         $tecnicos = Recurso::find($idRecurso)->tecnicos;
-        $idUser = User::where('username','=',$username)->first()->id;
         if ($tecnicos->contains($idUser)){
           $respuesta['error'] = true;
           $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recurso.';
+          
           return $respuesta;
         }
         $recurso->tecnicos()->attach($idUser);
         $respuesta['error'] = false;
         $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>técnico</b></i> con éxito.';
+        $respuesta['relacion'] = 'tecnico';
         break;
       //Supervisor
       case '2':
         $supervisores = Recurso::find($idRecurso)->supervisores;
-        $idUser = User::where('username','=',$username)->first()->id;
         if ($supervisores->contains($idUser)){
           $respuesta['error'] = true;
           $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
+         
           return $respuesta;
         }
         $recurso->supervisores()->attach($idUser);
         $respuesta['error'] = false;
         $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>supervisor</b></i> con éxito.';
+         $respuesta['relacion'] = 'supervisor';
         break;
       //Validador
       case '3':
         $validadores = Recurso::find($idRecurso)->validadores;
-        $idUser = User::where('username','=',$username)->first()->id;
         if ($validadores->contains($idUser)){
           $respuesta['error'] = true;
           $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
+          
           return $respuesta;
         }
         $recurso->validadores()->attach($idUser);
         $respuesta['error'] = false;
         $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
+        $respuesta['relacion'] = 'validador';
         break;
       
       default:
         $respuesta['error'] = false;
-        $respuesta['msg'] = 'Identificador de rol del esperado: ' . $rol;
+        $respuesta['msg'] = 'Identificador de rol no esperado: ' . $rol;
         break;
     }
 
@@ -248,52 +282,46 @@ class recursosController extends BaseController{
     return $respuesta;
   }
   //elimina la relación 
-  public function removeUserWithRol(){
+  public function removeUsersWithRol(){
     
     //input
-    $idRecurso  = Input::get('idrecurso','');
-    $idUser     = Input::get('iduser','');
+    $idRecurso                = Input::get('idrecurso','');
+    $detachSupervisores       = Input::get('supervisores','');
+    $detachValidadores        = Input::get('validadores','');
+    $detachTecnicos           = Input::get('tecnicos','');
     
     //output
     $respuesta = array( 'error' => false,
                         'msg' => '',
+                        'supervisores' => '',
+                        'validadores' => '',
+                        'tecnicos' => '',
                         );
 
     if (empty($idRecurso)){
       $respuesta['error'] = true;
-      $respuesta['msg'] = 'Identificador de recurso vacio.';
+      $respuesta['msg'] = Config::get('msg.idnotfound');
       return $respuesta;
     }
 
-    if (empty($idUser)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Identificador de usuario vacio.';
-      return $respuesta;
-    }
-
-    if (User::where('id','=',$idUser)->count() == 0) {
-       $respuesta['error'] = true;
-       $respuesta['msg'] = 'No existe usuario con identificador <i>'.$idUser.'</i>.';
-       return $respuesta;
-    }
-
-    if (Recurso::where('id','=',$idRecurso)->count() == 0) {
-       $respuesta['error'] = true;
-       $respuesta['msg'] = 'No existe recurso con identificador <i>'.$idRecurso.'</i>.';
-       return $respuesta;
-    }
-
-    $supervisores = Recurso::find($idRecurso)->supervisores;
-    if (!$supervisores->contains($idUser)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Usuario con identificador <i>'.$idUser.'</i> no es supervisor de este recurso.';
-      return $respuesta;
-    }
-
-    $recurso = Recurso::find($idRecurso);
-    $recurso->supervisores()->detach($idUser);
-    $respuesta['error'] = false;
-    $respuesta['msg'] = 'Operación realizada con éxito.';
+    $recurso = Recurso::findOrFail($idRecurso);
+    if (!empty($detachSupervisores))
+      foreach ($detachSupervisores as $idSupervisor) {
+        $recurso->supervisores()->detach($idSupervisor);
+        $respuesta['supervisores'] = $recurso->supervisores->toArray();
+      }
+    if (!empty($detachValidadores))  
+      foreach ($detachValidadores as $idValidador) {
+        $recurso->validadores()->detach($idValidador);
+        $respuesta['validadores'] = $recurso->validadores->toArray();
+      }
+    if (!empty($detachTecnicos))
+      foreach ($detachTecnicos as $idTecnico) {
+        $recurso->tecnicos()->detach($idTecnico);
+        $respuesta['tecnicos'] = $recurso->tecnicos->toArray();
+      }
+    
+    $respuesta['msg'] = Config::get('msg.success');
 
     return $respuesta;
   }

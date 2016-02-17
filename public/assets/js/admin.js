@@ -1,6 +1,150 @@
 $(function(e){
 
+    //Muestra modal confirmación baja supervisor // validador y/o técnico
+    $('.removeUserWithRol').on('click',function(e){
+        e.preventDefault();
 
+        $('form#removeUserWithRol input[name="idrecurso"]').val($(this).data('idrecurso'));
+        //obtiene supervisores//validadores//técnico del un recurso
+        $.ajax({
+            type:"GET",
+            url:"usersWithRelation.html",
+            data:{idrecurso : $(this).data('idrecurso')},
+            success: function($respuesta){
+                //console.log($respuesta);
+                //Añade input formualrio en ventana modal
+                $('form#removeUserWithRol div#supervisores').html('');
+                $('form#removeUserWithRol div#validadores').html('');
+                $('form#removeUserWithRol div#tecnicos').html('');
+                $.each($respuesta['supervisores'],function(index,value){
+                    //console.log(value);
+                    $('form#removeUserWithRol div#supervisores').append('<label><input type="checkbox" value = "'+value.id+'" name="supervisores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
+                });
+                
+                $.each($respuesta['validadores'],function(index,value){
+                    //console.log(value);
+                    $('form#removeUserWithRol div#validadores').append('<label><input type="checkbox" value = "'+value.id+'" name="validadores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
+                });
+
+                $.each($respuesta['tecnicos'],function(index,value){
+                    //console.log(value);
+                    $('form#removeUserWithRol div#tecnicos').append('<label><input type="checkbox" value = "'+value.id+'" name="tecnicos[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
+                });
+
+                $('#modalRemoveUserWithRol').modal('show');
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+        });
+    });
+
+    //Ajax: baja supervisor, validor y/o técnico
+    $('#btnremoveUserWithRol').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "removeUsersWithRol",
+            data: $('form#removeUserWithRol').serialize(),
+            success: function($respuesta){
+               console.log($respuesta);
+               hideGifEspera();
+               if ($respuesta['error'] === true) {
+                    $('#msg_modalRemoveUserWithRol').fadeOut('8000').html($respuesta['msg']).fadeIn('16000');
+                    
+                }
+               else {
+                    $('#modalRemoveUserWithRol').modal('hide');
+                    $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');
+
+                    //actualiza td
+                    $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
+                    $('#supervisores_'+$idrecurso).html('');
+                    $('#validadores_'+$idrecurso).html('');
+                    $('#tecnicos_'+$idrecurso).html('');
+                    $.each($respuesta['supervisores'],function(index,value){
+                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
+                        console.log(value);
+                        $('#supervisores_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                    });
+                    $.each($respuesta['validadores'],function(index,value){
+                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
+                        console.log(value);
+                        $('#validadores_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                    });
+                    $.each($respuesta['tecnicos'],function(index,value){
+                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
+                        console.log(value);
+                        $('#stecnicos_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                    });
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+
+            });
+    });
+
+    //show modal add user with relation supervisor // técnico // validador
+    $(".addUserWithRol").on('click',function(e){
+        e.preventDefault();
+
+        $('#ModalUsuerAviso').fadeOut();
+        $('#ModalUsuerNombreRecurso').html($(this).data('nombrerecurso'));
+        $('#ModalUserNombreGrupo').html($(this).data('nombregrupo'));
+        $('#ModalUsuerIdRecurso').val($(this).data('idrecurso'));
+        
+        $('#modalAddUserWithRol').modal('show');
+    });
+
+    //Save user with relation supervisor // técnico // validador
+    $('#btnAddUserWithRol').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+          
+        $.ajax({
+            type: "POST",
+            url:  "addUserWithRol",
+            data: $('form#addUserWithRol').serialize(),
+            success: function($respuesta){
+               //console.log($respuesta);
+               if ($respuesta['error'] === true) {
+                    $('#msg_modalAddUserWithRol').fadeOut('8000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('16000');
+                    hideGifEspera();
+                }
+               else {
+                    $idrecurso = $('form#addUserWithRol input[name="idRecurso"]').val();
+                    console.log($idrecurso);
+                    if($respuesta['relacion'] == 'supervisor'){
+                        $('#supervisores_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
+                    }
+                    if($respuesta['relacion'] == 'validador'){
+                        
+                        $('#validadores_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
+                    }
+                    if($respuesta['relacion'] == 'tecnico'){
+                        $('#tecnicos_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
+                    }
+                    
+                    
+                    
+                    $('#modalAddUserWithRol').modal('hide');//oculta modal
+                    hideGifEspera();//oculta gif
+                    $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');//muestra mensage
+                    $('tr#tr_'+$respuesta["recurso"].id+' td').fadeOut('8000').fadeIn('8000');//toggle tr
+                    }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+
+            });
+    });
+    
     $(".enabled").on('click',function(e){
         e.preventDefault();
         console.log($(this).data('switch'));
@@ -27,17 +171,16 @@ $(function(e){
             success:function($respuesta){
                 $('#modaldisabledRecurso').modal('hide');
                 hideGifEspera();
-                //location.reload();
                 $idrecurso = $('#modaldisable_idrecurso').val();
 
                 $('#link_'+ $idrecurso +' i').removeClass('fa-toggle-off').addClass('fa-toggle-on');
                 $('#link_'+ $idrecurso).data('switch','On');
                 $('#tr_'+ $idrecurso +' td').each(function(){
-                    $(this).fadeOut('slow').fadeIn('4000');
+                    $(this).fadeOut('8000').fadeIn('16000');
                 });
                 
-                $('#success_recurselist_msg p').html($respuesta);
-                $('#success_recurselist_msg').fadeIn('4000');
+                $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');
+                
                 },
             error:function(xhr, ajaxOptions, thrownError){
                         hideGifEspera();
@@ -74,86 +217,6 @@ $(function(e){
         });
     });
 
-    //Muestra modal confirmación baja supervisor
-    $('.bajasupervisor').on('click',function(e){
-        e.preventDefault();
-
-        $('#usernameSupervisor').html($(this).data('username'));
-        $('#nombreRecurso').html($(this).data('nombrerecurso'));
-        $('#btnquitaSupervisor').data('idrecurso',$(this).data('idrecurso'));
-        $('#btnquitaSupervisor').data('iduser',$(this).data('iduser'));
-        $('#avisoQuitarSupervisor').fadeOut('4000');
-
-        $('#modalConfirmaBajaSupervisor').modal('show');
-    });
-
-    //da de baja un supervisor
-
-    $('#btnquitaSupervisor').on('click',function(e){
-        e.preventDefault();
-        
-        $.ajax({
-            type: "POST",
-            url:  "quitasupervisor",
-            data: {idrecurso:$(this).data('idrecurso'),iduser:$(this).data('iduser')},
-            success: function($respuesta){
-               console.log($respuesta);
-               if ($respuesta['error'] === true) $('#avisoQuitarSupervisor').fadeOut('4000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('4000');
-               else {
-                    $('#avisoQuitarSupervisor').fadeOut('4000').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('4000');
-                    }
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-
-            });
-
-    });
-    //cuando se cierra ventana modal quitarsupervisor
-    $('#modalConfirmaBajaSupervisor').on('hidden.bs.modal', function (e) {location.reload();});
-    
-    //Muestra ventana modal addsupervisor
-    $(".addsupervisor").on('click',function(e){
-        e.preventDefault();
-
-        $('#ModalUsuerAviso').fadeOut();
-        $('#ModalUsuerNombreRecurso').html($(this).data('nombrerecurso'));
-        $('#ModalUserNombreGrupo').html($(this).data('nombregrupo'));
-        $('#ModalUsuerIdRecurso').val($(this).data('idrecurso'));
-        
-        
-        $('#modalAddSupervisor').modal('show');
-    });
-    //Salva nuevo supervisor
-    $('#btnSalvarSupervisor').on('click',function(e){
-        e.preventDefault();
-        
-        if ($('#username').val() == '') $('#ModalUsuerAviso').removeClass('alert-success').addClass('alert-danger').html('Uvus no puede quedar vacio...').fadeOut('4000').fadeIn('4000');
-        else{
-            
-        $.ajax({
-            type: "POST",
-            url:  "addsupervisor",
-            data: {username:$('#username').val(),idRecurso:$('#ModalUsuerIdRecurso').val(),rol:$('#selectrol').val()},
-            success: function($respuesta){
-               console.log($respuesta);
-               if ($respuesta['error'] === true) $('#ModalUsuerAviso').fadeOut('4000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('4000');
-               else {
-                    $('#ModalUsuerAviso').fadeOut('slow').html($respuesta['msg']).removeClass('alert-danger').addClass('alert-success').fadeIn('4000');
-                    }
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-
-            });
-        }
-    });
-    
-    //cuando se cierra ventana modal addsupervisor
-    $('#modalAddSupervisor').on('hidden.bs.modal', function (e) {location.reload();});
-    
    //Muestra ventana modal editRecurso
     $(".linkEditrecurso").on('click',function(e){
         e.preventDefault();

@@ -9,7 +9,7 @@ class UsersController extends BaseController {
   */
   public function edit(){
 
-    $result = array ('exito' => false, 'errors' => array(), 'data' => array());
+    $result = array ('exito' => false, 'errors' => array(), 'user' => array(),'msg' => '','rol' => '','caducada' => '');
     
     
     
@@ -63,6 +63,7 @@ class UsersController extends BaseController {
       $user->email = Input::get('email');
       $user->nombre = Input::get('nombre');
       $user->apellidos = Input::get('apellidos');
+      $user->observaciones = Input::get('observaciones');
 
       $user->save();
 
@@ -71,7 +72,10 @@ class UsersController extends BaseController {
       $result['exito'] = true;
       
     }
-    $result['data'] = Input::all();
+    $result['user'] = $user->toArray();
+    $result['msg'] = Config::get('msg.success');
+    $result['capacidad'] = $user->getRol();
+    $result['caducada'] = $user->caducado();
     return $result;
   }
 

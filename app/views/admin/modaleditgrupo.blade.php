@@ -43,7 +43,7 @@
             <button type="submit" class="btn btn-primary" id ="saveChangeDescriptionGroup"><i class="fa fa-save fa-fw"></i> Salvar cambios</button>
           </div>
         </div><!-- ./modal-footer -->
-       </form> 
+      
        
       </div><!-- ./modal-content -->
     </div><!-- ./modal-dialog -->

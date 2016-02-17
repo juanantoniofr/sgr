@@ -18,6 +18,7 @@ $(function(e){
           $('form#formEditUser input[name="apellidos"]').val($user.apellidos);
           $('form#formEditUser input[name="email"]').val($user.email);
           $('form#formEditUser input[name="id"]').val($user.id);
+          $('form#formEditUser textarea[name="observaciones"]').val($user.observaciones);
           $('#modalEditUser').modal('show');
         },
       error: function(xhr, ajaxOptions, thrownError){
@@ -30,15 +31,39 @@ $(function(e){
   $('#modaleditUser').on('click',function(e){
 
     e.preventDefault();
+    showGifEspera();
     $.ajax({
       type: "GET",
       url: "editarUsuario.html",
       data: $('form#formEditUser').serialize(),
       success: function($respuesta){
-        console.log($respuesta);
+        //console.log($respuesta);
         if ($respuesta['exito'] == true){
             $('#modalEditUser').modal('hide');
-            console.log($respuesta);
+            hideGifEspera();
+            $('#msg').removeClass('alert-warning alert-danger alert-info').addClass('alert-success').html($respuesta['msg']).fadeOut('4000').fadeIn('4000');
+            
+            $('td#'+$respuesta["user"].id+'_colectivo').html($respuesta['user'].colectivo);
+            $('td#'+$respuesta["user"].id+'_rol').html($respuesta['capacidad']);
+            $('td#'+$respuesta["user"].id+'_apellidosnombre').html($respuesta['user'].apellidos + ', ' + $respuesta['user'].nombre);
+            $('td#'+$respuesta["user"].id+'_observaciones').html($respuesta['user'].observaciones);
+            $('small#'+$respuesta["user"].id+'_updated_at').html($respuesta['user'].updated_at);
+
+            //estado
+            $('td#'+$respuesta["user"].id+'_estado i').fadeOut();
+            if($respuesta['user'].estado == '1' && !$respuesta['caducada']) {
+              $('i#'+$respuesta["user"].id+'_activa').fadeIn();
+            }
+            if($respuesta['user'].estado == '0') {
+              $('i#'+$respuesta["user"].id+'_desactiva').fadeIn();
+            }
+            if($respuesta['caducada']) {
+              $('i#'+$respuesta["user"].id+'_caducada').fadeIn();
+            }
+
+            $('tr#'+$respuesta["user"].id+' td').fadeOut('8000').fadeIn('16000');
+            //console.log($('tr#'+$respuesta["user"].id+'  > td#colectivo'));
+            //console.log($('tr#'+$respuesta["user"].id+' td'));
           }
         //Hay errores de validación del formulario
         else {
@@ -150,11 +175,11 @@ $(function(e){
 
 
   function showGifEspera(){
-    $('#espera').css('z-index','10000');
+    $('#espera').css('display','inline').css('z-index','1000');
   }
 
   function hideGifEspera(){
-    $('#espera').css('z-index','-10000');
+    $('#espera').css('display','inline').css('z-index','-1000');
   }
 
 });
