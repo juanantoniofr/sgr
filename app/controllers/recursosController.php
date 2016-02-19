@@ -143,11 +143,6 @@ class recursosController extends BaseController{
   */
   public function usersWithRelation(){
 
-    //$sortby = Input::get('sortby','username');
-    //$order = Input::get('order','asc');
-    //$offset = Input::get('offset','10');
-    //$search = Input::get('search','');
-    
     //Input 
     $idrecurso = Input::get('idrecurso','');
 
@@ -308,21 +303,23 @@ class recursosController extends BaseController{
     if (!empty($detachSupervisores))
       foreach ($detachSupervisores as $idSupervisor) {
         $recurso->supervisores()->detach($idSupervisor);
-        $respuesta['supervisores'] = $recurso->supervisores->toArray();
+        
       }
     if (!empty($detachValidadores))  
       foreach ($detachValidadores as $idValidador) {
         $recurso->validadores()->detach($idValidador);
-        $respuesta['validadores'] = $recurso->validadores->toArray();
+        
       }
     if (!empty($detachTecnicos))
       foreach ($detachTecnicos as $idTecnico) {
         $recurso->tecnicos()->detach($idTecnico);
-        $respuesta['tecnicos'] = $recurso->tecnicos->toArray();
+        
       }
     
     $respuesta['msg'] = Config::get('msg.success');
-
+    $respuesta['supervisores'] = $recurso->supervisores->toArray();
+    $respuesta['validadores'] = $recurso->validadores->toArray();
+    $respuesta['tecnicos'] = $recurso->tecnicos->toArray();
     return $respuesta;
   }
 

@@ -63,7 +63,7 @@ class Evento extends Eloquent{
  	}
 
  	/**
-	* Los eventos se podrán anular hasta 24 horas antes de su inicio.
+	* Los eventos se podrán anular hasta el día anterior a su fecha de realización.
 	* @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
 	* @return boolean
 	*/

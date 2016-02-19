@@ -14,7 +14,7 @@
           <select class="form-control" id="recurse" name="recurseName" > 
             <option value="0" disabled selected> --- </option>
               @foreach ($recursos as $recurso)
-                <option value="{{$recurso->id}}" >{{$recurso->nombre}}</option>
+                <option value="{{$recurso->id}}" data-atendido = "@if ($recurso->esAtendidoPor(Auth::user()->id)) 1 @else 0 @endif">{{$recurso->nombre}}</option>
               @endforeach         
           </select>
         </div>

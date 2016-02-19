@@ -158,19 +158,19 @@
                                 <span><b>Supervisores:</b></span><br />
                                 <div id="supervisores_{{$recurso->id}}">
                                     @foreach($recurso->supervisores as $supervisor)
-                                        {{$supervisor->nombre}} {{$supervisor->apellidos}}.<br /> 
+                                        {{$supervisor->nombre}} {{$supervisor->apellidos}} ({{$supervisor->username}}).<br /> 
                                     @endforeach
                                 </div>
                                 <span><b>Validadores:</b></span><br />
                                 <div id="validadores_{{$recurso->id}}">
                                     @foreach($recurso->validadores as $validador)
-                                        {{$validador->nombre}} {{$validador->apellidos}}.<br /> 
+                                        {{$validador->nombre}} {{$validador->apellidos}} ({{$validador->username}}).<br /> 
                                     @endforeach
                                 </div>
                                 <span><b>Técnicos:</b></span><br />
                                 <div id="tecnicos_{{$recurso->id}}">
                                     @foreach($recurso->tecnicos as $tecnico)
-                                        {{$tecnico->nombre}} {{$tecnico->apellidos}}.<br /> 
+                                        {{$tecnico->nombre}} {{$tecnico->apellidos}} ({{$tecnico->username}}).<br /> 
                                     @endforeach
                                 </div>
                             </td>

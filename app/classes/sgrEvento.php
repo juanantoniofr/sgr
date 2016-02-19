@@ -374,8 +374,9 @@ class sgrEvento {
 
 	
 	
-	//Anular evento
-	public function anula(){
+	//Anular evento: realiza un soft_delete
+
+	public function anularEvento(){
 		
 		$result = array('error' => false,
 						'msgError' => '',
@@ -384,7 +385,7 @@ class sgrEvento {
 		$idEvento = Input::get('idevento','');
 		if (empty($idEvento)) {
 			$result['error'] = true;
-			$result['msgError'] = 'Identificador de evento vacio...';
+			$result['msgError'] = Config::get('msg.idempty');
 			return $result;	
 		}
 
@@ -393,9 +394,9 @@ class sgrEvento {
 
 		$evento = Evento::findOrFail($idEvento);
 		//$evento->estado = 'anulado';
-		$evento->delete();
+		$evento->delete();//Softdelete
 		
-		$result['msgSuccess'] = 'Evento finalizado con éxito...';
+		$result['msgSuccess'] = Config::get('msg.actionSuccess');
 
 		return $result;
 	}

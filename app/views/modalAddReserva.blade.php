@@ -159,23 +159,23 @@
               </div>        
               
             </div>
-           
-          </div>  
+          </div>  <!-- ./ preiodica -->
 
-          @if(Auth::user()->capacidad == 3 || Auth::user()->capacidad == 4)
+          
+          <div style="display:none" id = "reservarPara">
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva diaria</h4>
-              <div class="form-group" id="reservadoPor">
-                    <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
-                    <div class = "col-md-10">  
-                        <input type="text" name = "reservadoPor" id = "reservadoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  />
-                    </div>             
+            <div class="form-group" id="reservadoPor">
+              <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
+              <div class = "col-md-10">  
+                <input type="text" name = "reservadoPor" id = "reservadoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  />
+              </div>             
             </div>
 
             <div class="form-group" id="reservarParaUvus" >
-                    <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
-                    <div class = "col-md-10">  
-                        <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
-                    </div>             
+              <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
+              <div class = "col-md-10">  
+                <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
+              </div>             
             </div>
            
             <!-- observaciones -->  
@@ -185,7 +185,7 @@
                 <textarea class="form-control" rows="5" name="observaciones_add" placeholder="por ejemplo: entrega de material, alumno responsable, descripción de la actividad....."></textarea>
               </div>
             </div>
-          @endif
+          </div>
          
           <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Resumen</h4>
           

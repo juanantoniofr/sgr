@@ -28,6 +28,20 @@ class Recurso extends Eloquent {
     }
 
     /**
+    *   Devuelve true si el identificador de usuario es uno de los técnicos que atienden el recurso
+    *   @param $id 
+    *   @return boolean
+    */
+
+    public function isAtendidoPor($id = ''){
+        $result = false;
+        
+        if ($this->tecnicos->contains($id)) $result = true;
+
+        return $result;
+    }
+
+    /**
      * @param void
      * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
     */

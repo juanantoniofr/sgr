@@ -7,21 +7,14 @@ $(function(e){
 
 	onLoad();
 	
-
 	/*functions 
 		*****************************************************************************
 	*/
 
-
-	
 	//When load page....
 	function onLoad(){
 
-		
-	
-
 		// 1. --> Programmer events 
-		
 
 		// 1.1 When change recurse selected 
 		whenChangeRecurseSelected();
@@ -154,7 +147,7 @@ $(function(e){
     					var $itemsdisabled = 0;
     					var $recursos = respuesta['recursos'];
     					var $html = '';
-    					
+    					console.log($recursos);
     					$.each($recursos,function(key,$recurso){
       						$html = $html + '<option ' + $selected + ' value="' + $recurso.id + '" data-disabled="' + $recurso.disabled + '">' + $recurso.nombre;
       						if ($recurso.disabled) {
@@ -539,6 +532,9 @@ $(function(e){
 		setCheckBoxActive($fecha);
 		//Texto resumen
 		setResumen();
+
+		//
+
 	}
 
 	function resetMsgErrors(){
@@ -871,11 +867,12 @@ $(function(e){
 			setLinkEditEvent($elem.data('id'));
 			setLinkDeleteEvent();
 			activarLinkFinalizaReserva($elem.data('id'));
+			activarLinkAnulaReserva($elem.data('id'));
 
 		});
 	}
 	
-	//Programa evento onCLick en el link finalizar de la ventana popover
+	//Programa evento onCLick en el link finalizar de la ventana popover 
 	function activarLinkFinalizaReserva($id){
 		
 		$('#finaliza_'+$id).click(function(e){
@@ -914,7 +911,7 @@ $(function(e){
 		$("#modalFinalizareserva").modal('hide');
 	});
 
-//Programa evento onCLick en el link finalizar de la ventana popover
+	//Programa evento onCLick en el link anular de la ventana popover
 	function activarLinkAnulaReserva($id){
 		
 		$('#anula_'+$id).click(function(e){
@@ -926,7 +923,7 @@ $(function(e){
 			$("#modalAnulareserva").modal('show');
 		});
 	}
-
+	//ajax: anular reserva
 	$('#buttonModalAnula').on('click',function(e){
 		e.preventDefault();
 		

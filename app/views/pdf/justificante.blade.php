@@ -45,9 +45,9 @@ table {
 <h2>Comprobante de Reserva</h2>
 <div>
 
-	<p id = "title">Título: <span>{{htmlentities($events->titulo)}}</span></p>
-	<p class = "subtitle">Código: <span>{{$events->evento_id}}</span></p>
-	<p class = "subtitle">Registrada por: <span>{{$events->user->nombre .' '. $events->user->apellidos}}</span></p>
+	<p id = "title">Título: <span>{{htmlentities($event->titulo)}}</span></p>
+	<p class = "subtitle">Código: <span>{{$event->evento_id}}</span></p>
+	<p class = "subtitle">Registrada por: <span>{{$event->user->nombre .' '. $event->user->apellidos}}</span></p>
 	<p class = "subtitle">Fecha de registro: <span>{{utf8_decode($created_at)}}</span></p>
 
 
@@ -68,9 +68,9 @@ table {
 	</tr>
 	<tr>
 		<td class = "first"><p class="label">Estado de la reserva</p></td>
-		<td class = "first {{$events->estado}}"><p>{{$events->estado}}</p></td>		
+		<td class = "first {{$event->estado}}"><p>{{$event->estado}}</p></td>		
 	</tr>
-@if($events->repeticion == 0)
+@if($event->repeticion == 0)
 	<tr>
 		<td class = "first"><p class="label">Tipo de Evento:</p></td>
 		<td><p>Puntual</p></td>
@@ -78,17 +78,17 @@ table {
 	
 	<tr>
 		<td class = "first"><p class="label">Fecha del evento:</p></td>
-		<td><p>{{$strDayWeek;}}, {{date('d-m-Y',strtotime($events->fechaEvento))}}</p></td>
+		<td><p>{{$strDayWeek;}}, {{date('d-m-Y',strtotime($event->fechaEvento))}}</p></td>
 	</tr>
 
 	<tr>
 		<td class = "first"><p class="label">Horario:</p></td>
-		<td><p>{{'Desde las ' .date('G:i',strtotime($events->horaInicio)). ' hasta las '. date('G:i',strtotime($events->horaFin))}}</p></td>
+		<td><p>{{'Desde las ' .date('G:i',strtotime($event->horaInicio)). ' hasta las '. date('G:i',strtotime($event->horaFin))}}</p></td>
 	</tr>
 
 	<tr>
 		<td class = "first"><p class="label">Actividad:</p></td>
-		<td><p>{{$events->actividad}}</p></td>	
+		<td><p>{{$event->actividad}}</p></td>	
 	</tr>					
 @else
 	<tr>
@@ -98,22 +98,42 @@ table {
 
 	<tr>
 		<td><p class="label">Fecha de inicio:</p></td>
-		<td><p>{{$strDayWeekInicio;}}, {{date('d-m-Y',strtotime($events->fechaInicio))}}</p></td>
+		<td><p>{{$strDayWeekInicio;}}, {{date('d-m-Y',strtotime($event->fechaInicio))}}</p></td>
 	</tr>	
 
 	<tr>
 		<td><p class="label">Fecha de finalización:</p></td>
-		<td><p>{{$strDayWeekFin;}}, {{date('d-m-Y',strtotime($events->fechaFin))}}</p></td>
+		<td><p>{{$strDayWeekFin;}}, {{date('d-m-Y',strtotime($event->fechaFin))}}</p></td>
 	</tr>
 
 	<tr>
 		<td><p class="label">Horario:</p></td>
-		<td><p>{{'Desde las ' .date('G:i',strtotime($events->horaInicio)). ' hasta las '. date('G:i',strtotime($events->horaFin)) }}</p></td>
+		<td><p>{{'Desde las ' .date('G:i',strtotime($event->horaInicio)). ' hasta las '. date('G:i',strtotime($event->horaFin)) }}</p></td>
 	</tr>
 
 	<tr>
-		<td><p class="label">Todos los:</p></td>
-		<td><p>{{Date::DaysWeekToStr(json_decode($events->diasRepeticion))}}</p></td>		
+		<td><p class="label">Días de la semana:</p></td>
+		<td><p>{{Date::DaysWeekToStr(json_decode($event->diasRepeticion))}}</p></td>		
+	</tr>
+	<tr>
+		<td>
+			<p class="label">Serie completa:</p>
+		</td>
+		<td>
+	
+		@foreach($recursos as $recurso)
+	
+			<ul><b>{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo}} )</small></b>
+			
+			@foreach($recurso->recurso->events as $event)
+				<li>{{Date::getStrDayWeek($event->fechaEvento);}}, {{date('d-m-Y',strtotime($event->fechaEvento))}}</li>
+			@endforeach
+			
+			</ul>
+	
+		@endforeach
+	
+		</td>	
 	</tr>
 @endif
 	

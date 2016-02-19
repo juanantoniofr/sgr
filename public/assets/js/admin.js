@@ -17,17 +17,17 @@ $(function(e){
                 $('form#removeUserWithRol div#validadores').html('');
                 $('form#removeUserWithRol div#tecnicos').html('');
                 $.each($respuesta['supervisores'],function(index,value){
-                    //console.log(value);
+                    
                     $('form#removeUserWithRol div#supervisores').append('<label><input type="checkbox" value = "'+value.id+'" name="supervisores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
                 });
                 
                 $.each($respuesta['validadores'],function(index,value){
-                    //console.log(value);
+                    
                     $('form#removeUserWithRol div#validadores').append('<label><input type="checkbox" value = "'+value.id+'" name="validadores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
                 });
 
                 $.each($respuesta['tecnicos'],function(index,value){
-                    //console.log(value);
+                    //console.log('tecnicos '+value.pivot.recurso_id);
                     $('form#removeUserWithRol div#tecnicos').append('<label><input type="checkbox" value = "'+value.id+'" name="tecnicos[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
                 });
 
@@ -64,20 +64,15 @@ $(function(e){
                     $('#supervisores_'+$idrecurso).html('');
                     $('#validadores_'+$idrecurso).html('');
                     $('#tecnicos_'+$idrecurso).html('');
+                    console.log($respuesta['supervisores']);
                     $.each($respuesta['supervisores'],function(index,value){
-                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
-                        console.log(value);
-                        $('#supervisores_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                        $('#supervisores_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
                     });
                     $.each($respuesta['validadores'],function(index,value){
-                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
-                        console.log(value);
-                        $('#validadores_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                        $('#validadores_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
                     });
                     $.each($respuesta['tecnicos'],function(index,value){
-                        $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
-                        console.log(value);
-                        $('#stecnicos_'+$idrecurso).append(value.nombre + ' ' + value.apellidos +'<br />');
+                        $('#tecnicos_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
                     });
                 }
             },
@@ -118,7 +113,7 @@ $(function(e){
                 }
                else {
                     $idrecurso = $('form#addUserWithRol input[name="idRecurso"]').val();
-                    console.log($idrecurso);
+                    //console.log($idrecurso);
                     if($respuesta['relacion'] == 'supervisor'){
                         $('#supervisores_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
                     }
