@@ -1,5 +1,4 @@
-@if($view == 'month') <small>{{ $day }}</small>@endif
-
+@if($view == 'month') <span style="float:right;font-size:0.5em;color:#aaa">{{ $day }}</span><br />@endif
 @foreach($currentday->events($id_recurso,$id_grupo) as $event)
 
     <span class= "evento" style = "
@@ -11,7 +10,7 @@
                     @if ($event->estado == 'denegada')  color:#EB9316 @endif
                  @endif
                ">@if($view != 'week') 
-           {{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{Date::parsedatetime($event->horaFin,'H:i:s','G:i')}}, @endif
+           {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}, @endif
         @if ($datatoprint['titulo'] == 'true') {{$event->titulo}}, @endif
         @if ($datatoprint['nombre'] == 'true') {{$event->user->nombre}} {{$event->user->apellidos}}, @endif
         @if ($datatoprint['colectivo'] == 'true') {{$event->user->colectivo}}, @endif

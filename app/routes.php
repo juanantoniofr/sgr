@@ -33,21 +33,23 @@ Route::post('contactar.html',array('as'=>'enviaformulariocontacto','uses'=>'Home
 
 Route::get('justificante', array('as' => 'justificante', function(){
 	
-	if (Evento::where('evento_id','=',Input::get('idEventos'))->count() == 0) return View::make('pdf.msg'); 
+	if (Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->count() == 0) return View::make('pdf.msg'); 
 
-	$events = Evento::where('evento_id','=',Input::get('idEventos'))->first();
+	$event = Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->first();
+	$events = Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->get();
 		
 
 	$recursos = Evento::where('evento_id','=',Input::get('idEventos'))->groupby('recurso_id')->get();
 	
 	setlocale(LC_TIME,'es_ES@euro','es_ES.UTF-8','esp');
 	
-   	$strDayWeek = Date::getStrDayWeek($events->fechaEvento);
-	$strDayWeekInicio = Date::getStrDayWeek($events->fechaInicio);
-	$strDayWeekFin = Date::getStrDayWeek($events->fechaFin);
-	$created_at = utf8_encode(ucfirst(strftime('%A %d de %B  a las %H:%M:%S',strtotime($events->created_at))));
+   	$strDayWeek = sgrDate::getStrDayWeek($event->fechaEvento);
+	$strDayWeekInicio = sgrDate::getStrDayWeek($event->fechaInicio);
+	$strDayWeekFin = sgrDate::getStrDayWeek($event->fechaFin);
+	$created_at = utf8_encode(ucfirst(strftime('%A %d de %B  a las %H:%M:%S',strtotime($event->created_at))));
    
-    $html = View::make('pdf.justificante')->with(compact('events','strDayWeek','strDayWeekInicio','strDayWeekFin','recursos','created_at'));
+    $html = View::make('pdf.justificante')->with(compact('event','events','strDayWeek','strDayWeekInicio','strDayWeekFin','recursos','created_at'));
+   	
    	$result = myPDF::getPDF($html,'comprobante');
 
    	return Response::make($result)->header('Content-Type', 'application/pdf');
@@ -67,21 +69,23 @@ Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'Valida
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
 
 //Gestión supervisores: rol -> admin (4)
-Route::get('admin/supervisores.html',array('as' => 'supervisores','uses' => 'recursosController@supervisores','before' => array('auth','capacidad:4,msg')));	
-Route::post('admin/addsupervisor',array('uses' => 'recursosController@addUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
-Route::post('admin/quitasupervisor',array('uses' => 'recursosController@removeUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::get('admin/usersWithRelation.html',array('uses' => 'recursosController@usersWithRelation','before' => array('auth','auth_ajax','capacidad:4,msg')));	
+Route::post('admin/addUserWithRol',array('uses' => 'recursosController@addUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::post('admin/removeUsersWithRol',array('uses' => 'recursosController@removeUsersWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
 
 //routes gestión de usuarios
 Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listUsers','before' => array('auth','capacidad:4,msg')));
+Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::get('admin/editarUsuario.html',array('as' => 'updateUser.html','uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
 Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg')));
 //Route::post('admin/user/new',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','capacidad:4,msg')));
 Route::post('admin/salvarNuevoUsuario',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','ajax_check','capacidad:4,msg')));
 
 
-Route::get('admin/useredit.html',array('as' => 'useredit.html','uses' => 'UsersController@formEditUser','before' => array('auth','capacidad:4,msg')));
-Route::post('admin/useredit.html',array('as' => 'updateUser.html','uses' => 'UsersController@updateUser','before' => array('auth','capacidad:4,msg')));
+
+
 
 Route::get('admin/eliminaUser.html',array('as' => 'eliminaUser.html','uses' => 'UsersController@delete','before' => array('auth','capacidad:4,msg')));
 Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
@@ -120,7 +124,7 @@ Route::post('admin/salvarDesecripcion.html',array('as' => 'updateDescripcionGrup
 
 Route::get('admin/eliminarecurso.html',array('uses'=>'RecursosController@eliminar','before' => array('auth','capacidad:4-6,msg')));
 Route::post('admin/deshabilitarRecurso.html',array('uses'=>'RecursosController@deshabilitar','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::get('admin/habilitarRecurso.html',array('uses'=>'RecursosController@habilitar','before' => array('auth','capacidad:4-6,msg')));
+Route::post('admin/habilitarRecurso.html',array('uses'=>'RecursosController@habilitar','before' => array('auth','capacidad:4-6,msg')));
 
 Route::get('admin/getrecurso',array('uses'=>'RecursosController@getrecurso','before' => array('auth','capacidad:4-6,msg')));
 
@@ -142,7 +146,7 @@ Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','be
 
 Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
 Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
-Route::post('anulaevento',array('uses' => 'EventoController@anula','before' => array('auth','ajax_check')));
+Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
 
 //Atención de eventos
 Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
@@ -182,12 +186,14 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	$data = array('motivo'=> 'este el es motivo ....');
-	$mailUser = 'juanantonio.fr@gmail.com';
-	$s = 'prueba local';
-	Mail::queue(array('html'=>'emails.test'),$data,function($m) use ($mailUser,$s){
-				$m->to($mailUser)->subject($s);});
-	echo 'enviado';
+	$espacio = Recurso::findOrFail('18')->espacio;
+	
+		echo "nombre espacio " . $espacio->nombre . "<br />";
+	
+
+	echo "<pre>";
+	//var_dump($recurso->puestos);
+	echo "</pre>";
 	
  }));
 

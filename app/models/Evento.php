@@ -56,7 +56,7 @@ class Evento extends Eloquent{
  		
 
  		$timestamp = strtotime($this->fechaEvento);//la fecha del evento permite editar?? (depende del rol de usuario)
- 		if ($this->user->isDayAviable($timestamp) || $user->isDayAviable($timestamp)) return true;
+ 		if ($this->user->isDayAviable($timestamp,$this->recurso_id) || $user->isDayAviable($timestamp,$this->recurso_id)) return true;
  		//el día está disponible para editar eventos para el usuario propiestario del evento ($this->user) o para el ususario autenticado ($user) es 
 
  		return false;
@@ -304,7 +304,7 @@ class Evento extends Eloquent{
 	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
 				if (Auth::user()->isUser()) {
-					if ( sgrCalendario::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y')  || sgrCalendario::lastFriday()  < Date::gettimestamp($data['fInicio'],'d-m-Y')) return true;
+					if ( sgrCalendario::fristMonday() > sgrDate::gettimestamp($data['fInicio'],'d-m-Y')  || sgrCalendario::lastFriday()  < sgrDate::gettimestamp($data['fInicio'],'d-m-Y')) return true;
 				}
 			});
 		}
@@ -316,7 +316,7 @@ class Evento extends Eloquent{
 			$v->sometimes('hFin','req2',function($data){
 				if (Auth::user()->isUser()){
 					$nh = Auth::user()->numHorasReservadas();//Número de horas ya reservadas
-					$nh2 = Date::diffHours($data['hInicio'],$data['hFin']);//números de horas que se quiere reservar
+					$nh2 = sgrDate::diffHours($data['hInicio'],$data['hFin']);//números de horas que se quiere reservar
 					$maximo = Config::get('options.max_horas');
 					$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
 			    		if ($credito < $nh2) return true;
@@ -351,11 +351,11 @@ class Evento extends Eloquent{
 							
 							foreach ($dias as $dWeek) {
 								if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-								else $nRepeticiones = Date::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+								else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
 								for($j=0;$j<$nRepeticiones;$j++){
-									$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-									$currentfecha = Date::currentFecha($startDate,$j);
+									$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
+									$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 									$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 									//si ocupado
 									if($numEvents > 0){
@@ -377,11 +377,11 @@ class Evento extends Eloquent{
 						
 						foreach ($dias as $dWeek) {
 							if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-							else $nRepeticiones = Date::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+							else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
 							for($j=0;$j<$nRepeticiones;$j++){
-								$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-								$currentfecha = Date::currentFecha($startDate,$j);
+								$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
+								$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 								$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
 								//si ocupado
 								if($numEvents > 0){
@@ -409,7 +409,7 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req5',function($data){
 				if (Auth::user()->isAvanceUser()) {
-					if ( sgrCalendario::fristMonday() > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
+					if ( sgrCalendario::fristMonday() > sgrDate::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
 				}
 			}); 
 		}	
@@ -419,7 +419,7 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req6',function($data){
 				if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()) {
-					if ( strtotime('today') > Date::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
+					if ( strtotime('today') > sgrDate::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
 				}
 			}); 
 		}	
@@ -427,8 +427,8 @@ class Evento extends Eloquent{
  		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false ){
         	
 	        
-		        $intFinicio = Date::gettimestamp($data['fInicio'],'d-m-Y');
-		        $intNow = strtotime('now');//Date::gettimestamp(date('d-m-Y'),'d-m-Y');
+		        $intFinicio = sgrDate::gettimestamp($data['fInicio'],'d-m-Y');
+		        $intNow = strtotime('now');
 	        	$intDiaAnterior = strtotime('-1 day',$intFinicio);
 			    //fecha posterior al día actual
 			    $v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){
@@ -459,7 +459,7 @@ class Evento extends Eloquent{
 		    	$fechaMaximaEvento = $data['fEvento'];
 		    	if ($data['repetir'] == 'CS') $fechaMaximaEvento = $data['fFin']; //Reptición cada semana
 		    		
-		    	if (strtotime(Date::parsedatetime($fechaMaximaEvento,'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
+		    	if (strtotime(sgrDate::parsedatetime($fechaMaximaEvento,'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
 			    });
         }
 

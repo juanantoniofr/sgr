@@ -1,5 +1,5 @@
 <div 
-    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->timestamp()) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
+    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->timestamp(),$id_recurso) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
     id = "{{date('jnYGi',$sgrDia->timestamp($hora,$minuto))}}" 
     data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" 
     data-hora="{{date('G:i',$sgrDia->timestamp($hora,$minuto))}}">
@@ -8,9 +8,9 @@
     
     <div class="divEvents" data-numero-de-eventos="{{count($sgrDia->events($id_recurso,$id_grupo))}}">
         
-        @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+        @if (count($sgrDia->events($id_recurso,$id_grupo,$view,sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
     
-        @foreach($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
+        @foreach($sgrDia->events($id_recurso,$id_grupo,$view,sgrDate::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
 
            
             <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
@@ -28,7 +28,7 @@
                         
                         data-title="
                             @if($view != 'week') 
-                                {{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{Date::parsedatetime($event->horaFin,'H:i:s','G:i')}}
+                                {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
                             @endif
                             
                             {{ $event->titulo }}
@@ -52,7 +52,7 @@
                          @endif
                          <!-- Title -->
                          @if($view != 'week') 
-                            {{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{Date::parsedatetime($event->horaFin,'H:i:s','G:i')}}
+                            {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
                         @endif
                         {{ $event->titulo }}
                         <!-- ./Title -->
@@ -64,5 +64,5 @@
     </div> <!-- ./divEvents -->
     
 
-    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,Date::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
+    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
 </div>

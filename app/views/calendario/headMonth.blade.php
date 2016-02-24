@@ -1,9 +1,9 @@
 <tr>
-	<th>Lunes</th>
-	<th>Martes</th>
-	<th>Miércoles</th>
-	<th>Jueves</th>
-	<th>Viernes</th>
-	<th class="hidden-print">Sabado</th>
-	<th class="hidden-print">Domingo</th>
+	<th  width="18%">Lunes</th>
+	<th  width="18%">Martes</th>
+	<th  width="18%">Miércoles</th>
+	<th  width="18%">Jueves</th>
+	<th  width="18%">Viernes</th> 
+	<th  width="5%">S</th> 
+	<th  width="5%">D</th> 
 </tr>

@@ -47,7 +47,8 @@ table {
 
 	<p id = "title">Título: <span>{{htmlentities($event->titulo)}}</span></p>
 	<p class = "subtitle">Código: <span>{{$event->evento_id}}</span></p>
-	<p class = "subtitle">Registrada por: <span>{{$event->user->nombre .' '. $event->user->apellidos}}</span></p>
+	<p class = "subtitle">Reservado para: <span>{{$event->user->nombre .' '. $event->user->apellidos}} ({{$event->user->username}})</span></p>
+	<p class = "subtitle">Reservado por: <span>{{$event->reservadoPor->nombre .' '. $event->reservadoPor->apellidos}} ({{$event->reservadoPor->username}})</span></p>
 	<p class = "subtitle">Fecha de registro: <span>{{utf8_decode($created_at)}}</span></p>
 
 
@@ -78,7 +79,7 @@ table {
 	
 	<tr>
 		<td class = "first"><p class="label">Fecha del evento:</p></td>
-		<td><p>{{$strDayWeek;}}, {{date('d-m-Y',strtotime($event->fechaEvento))}}</p></td>
+		<td><p>{{$strDayWeek;}}, {{date('d-m-Y',strtotime($event->fechaEvento))}}</p> @if ($event->deleted_at != NULL) <span style="color:red;">(Anulada o Eliminada)</span>@endif</td>
 	</tr>
 
 	<tr>
@@ -113,7 +114,7 @@ table {
 
 	<tr>
 		<td><p class="label">Días de la semana:</p></td>
-		<td><p>{{Date::DaysWeekToStr(json_decode($event->diasRepeticion))}}</p></td>		
+		<td><p>{{sgrDate::DaysWeekToStr(json_decode($event->diasRepeticion))}}</p></td>		
 	</tr>
 	<tr>
 		<td>
@@ -126,7 +127,7 @@ table {
 			<ul><b>{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo}} )</small></b>
 			
 			@foreach($recurso->recurso->events as $event)
-				<li>{{Date::getStrDayWeek($event->fechaEvento);}}, {{date('d-m-Y',strtotime($event->fechaEvento))}}</li>
+				<li>{{sgrDate::getStrDayWeek($event->fechaEvento);}}, {{date('d-m-Y',strtotime($event->fechaEvento))}} @if ($event->deleted_at != NULL) <span style="color:red;">(Anulada o Eliminada)</span>@endif</li>
 			@endforeach
 			
 			</ul>

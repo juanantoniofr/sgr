@@ -57,8 +57,8 @@ class EventoController extends BaseController {
 	}
 
 	/**
-	 * //Devulve los datos de un evennto dado el id del evento
-	 * @param $id identificador de evento
+	 * //Devulve los datos de un evennto dado su identificador ($id) 
+	 * @param $id int (identificador de evento)
 	 * @return $result array 
 	*/
 	public function getbyId(){
@@ -68,8 +68,8 @@ class EventoController extends BaseController {
 						'nombreRecursoReservado' => '',);
 		$event = Evento::findOrFail(Input::get('id'));
 		$result['event'] = $event->toArray();
-		$result['usernameReservadoPor'] = $event->user->username;
-		$result['usernameReservadoPara'] = $event->reservadoPor->username;
+		$result['usernameReservadoPara'] = $event->user->username;
+		$result['usernameReservadoPor'] = $event->reservadoPor->username;
 		$result['nombreRecursoReservado'] = $event->recurso->nombre;
 		return $result;		
 	}

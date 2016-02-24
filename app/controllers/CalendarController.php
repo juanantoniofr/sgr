@@ -72,12 +72,13 @@ class CalendarController extends BaseController {
 
 		switch ($viewActive) {
 			case 'month':
-				$diaActual = 1;
-				$j=1;
-				$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-				$days = $sgrCalendario->dias();
-				$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
-				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$month)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
+				//$diaActual = 1;
+				//$j=1;
+				//$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
+				//$days = $sgrCalendario->dias();
+				//$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
+				//$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$month)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);
+				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
 				break;
 			case 'week':
 				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
@@ -102,6 +103,7 @@ class CalendarController extends BaseController {
 		$html = View::make('pdf.calendario')->with(compact('table','nombre'));
 		//return $html;
 		$nombreFichero = $day .'-'. $month.'-' . $year .'_'.$nombre;
+		//return $html;
 		$result = myPDF::getPDF($html,$nombreFichero);
 		return Response::make($result)->header('Content-Type', 'application/pdf');
 	
@@ -242,13 +244,8 @@ class CalendarController extends BaseController {
 				break;
 			
 			case 'week':
-				$timefirstMonday = sgrDate::timestamplunesanterior($day,$numMonth,$year);
-				$numOfMonday = date('j',$timefirstMonday); //Número del mes 1-31
-				for($i=0;$i<7;$i++){
-					$time = strtotime('+'.$i.' day',$timefirstMonday);	
-					$text[$i] = sgrDate::abrDiaSemana($time) . ', '.strftime('%d/%b',$time);
-				}
-				return (string) View::make('calendario.headWeek')->with('view',$viewActive)->with('text',$text);
+				$sgrWeek = new sgrWeek($day,$numMonth,$year);
+				return (string) View::make('calendario.headWeek')->with('sgrWeek',$sgrWeek);
 				break;
 		}
 	}

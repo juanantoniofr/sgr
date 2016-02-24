@@ -73,7 +73,7 @@ table {
 		<li class="label"><strong>Fecha de inicio:</strong> {{date('d-m-Y',strtotime($e->fechaInicio))}}</li>
 		<li class="label"><strong>Fecha de finalización:</strong> {{date('d-m-Y',strtotime($e->fechaFin))}}</li>
 		<li class="label"><strong>Horario:</strong> {{'Desde las ' .date('G:i',strtotime($e->horaInicio)). ' hasta las '. date('G:i',strtotime($e->horaFin)) }}</li>
-		<li class="label"><strong>Todos los:</strong> {{Date::DaysWeekToStr(json_decode($e->diasRepeticion))}}</li>		
+		<li class="label"><strong>Todos los:</strong> {{sgrDate::DaysWeekToStr(json_decode($e->diasRepeticion))}}</li>		
 	@endif
 	</ul>	
 

@@ -18,10 +18,7 @@ class sgrWeek {
 		if (empty($year)) $year = date('Y');//año actual
 
 		//timeStamp del lunes 
-		$timestamplunes = sgrDate::timestamplunesanterior((int) $day,(int) $month,(int) $year);
-		
-		//$this->year = $year;
-
+		$timestamplunes = $this->timestamplunesanterior((int) $day,(int) $month,(int) $year);
 		for($i=0;$i<7;$i++) $this->dias[$i] = new sgrDia(strtotime('+ '.$i.' days',$timestamplunes));
 	}
 
@@ -45,6 +42,30 @@ class sgrWeek {
 		return $this->dias;
 	}
 
+
+	/**
+	 * Devuelve timestamp del lunes inmediatamente anterior a fecha=$day-$month-$year
+ 	 * 
+ 	 * @param $day string
+ 	 * @param $month string
+ 	 * @param $year string
+ 	 * @return $timestamp int timestamp lunes inmediatamente anterior a $day-$month-$year
+	*/
+	private function timestamplunesanterior($day,$month,$year){
+		
+		$timestamp = '';
+		
+		$time = mktime(0,0,0,(int) $month,(int) $day,(int) $year);
+		if (1 == date('N',$time)) $timestamp = $time;
+		else {
+			do {
+				$time = strtotime('-1 day', $time);
+			} while(date('N',$time)!=1);
+			$timestamp = $time;
+		} 
+		return $timestamp;
+	}
+	
 
 }
 

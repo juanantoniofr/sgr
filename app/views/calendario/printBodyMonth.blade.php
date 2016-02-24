@@ -1,28 +1,13 @@
-@while ( mktime(0,0,0,(int) $mon,(int) $sgrCalendario->ultimoDia(),(int) $year) >= mktime(0,0,0,(int) $mon,(int) $diaActual,(int) $year) )
-	<!-- una fila por cada semana del mes -->
+@foreach($sgrCalendario->sgrWeeks() as $sgrWeek)
 	<tr class="fila">
-	@for($i=1;$i<=7;$i++)
-		<!-- Una celda por cada día de la semama -->
-		<td class="celda">
-		
-			@if ( ((int) $diaSemanaPimerDiaMes > $i && $j == 1) || ((int) $diaActual > (int) $sgrCalendario->ultimoDia()) )
-				{{ (string) View::make('calendario.tdFestivo') }}
-				<!-- días de la primera semana y de la última que no son del mes -->
-			@else
-				
-				@if($days[$diaActual]->festivo())
-					<!-- festivo mes en curso -->
-					{{ (string) View::make('calendario.tdFestivo')->with('idfecha',date('jnY',mktime(0,0,0,(int) $mon,(int) $diaActual,(int) $year)))->with('fecha',date('j-n-Y',mktime(0,0,0,(int) $mon,(int) $diaActual,(int) $year)))->with('view','month')->with('day',(int) $diaActual)->with('festivo','festivo') }}
-				@else
-					<!-- disponible mes en curso -->
-					{{ (string) View::make('calendario.printTd')->with('view','month')->with('mon',$mon)->with('day',$diaActual)->with('year',$year)->with('currentday',$sgrCalendario->dia($diaActual))->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint) }}
-        				
-				@endif
-				<?php $diaActual++; ?>
+	@foreach($sgrWeek->sgrDays() as $sgrDia)
+		<td class="celda" @if ($sgrDia->festivo()) width="5%" @else width="18%" @endif>
+			@if ($sgrDia->festivo()) 
+      				{{(string) View::make('calendario.tdFestivo')->with('idfecha',date('jnY',$sgrDia->timestamp()))->with('fecha',$sgrDia->fecha())->with('view','month')->with('festivo','festivo')}}
+      		@else
+      				{{ (string) View::make('calendario.printTd')->with('day',(int) $sgrDia->numerodia())->with('mon',(int) $sgrDia->mes())->with('year',(int) $sgrDia->year())->with('view','month')->with('currentday',$sgrDia)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('isDayAviable',Auth::user()->isDayAviable($sgrDia->timestamp(),$id_recurso))->with('datatoprint',$datatoprint) }}
 			@endif
-			
-		</td>
-	@endfor			
+		</td>	
+	@endforeach
 	</tr>
-	<?php $j++; ?>
-@endwhile
+@endforeach

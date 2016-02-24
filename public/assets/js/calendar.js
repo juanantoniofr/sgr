@@ -143,27 +143,7 @@ $(function(e){
 				success: function(respuesta){
 					$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
 					$('#selectRecurseInGroup').fadeIn('fast',function(){
-						var $selected = 'selected';
-    					var $itemsdisabled = 0;
-    					var $recursos = respuesta['recursos'];
-    					var $html = '';
-    					console.log($recursos);
-    					$.each($recursos,function(key,$recurso){
-      						$html = $html + '<option ' + $selected + ' value="' + $recurso.id + '" data-disabled="' + $recurso.disabled + '">' + $recurso.nombre;
-      						if ($recurso.disabled) {
-        						$itemsdisabled++;
-        						$html = $html + ' (Deshabilitado)';
-      						} 
-      						$html = $html + '</option>';
-      						$selected = '';
-      					} );
-    					if (respuesta['optionTodos']){
-      						$disabled = 0;
-      						if ($itemsdisabled == $recursos.length ) $disabled = 1;
-      						$html = $html + '<option ' + $selected + ' value="0" data-disabled="' + $disabled + '">Todos los ' + respuesta['tipoRecurso'] + 's</option>';
-    					}
-    					//return $html;
-						$('#recurse').append($html);
+						$('#recurse').html(respuesta);
 						$("select#recurse option:first").prop("selected", "selected");
 						$('select#recurse').change();
 					});
@@ -502,7 +482,15 @@ $(function(e){
 		$('#actionType').val('');
 		var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
 		$('#myModalLabel').html($str);
-			
+		
+		
+		if ($('select#recurse option:selected').data('atendido')) $('#reservarPara').fadeIn();	
+		else {
+			$('#reservarPara').fadeOut();
+			$('form#addEvent input[name=reservarParaUvus]').val('');	
+		}
+		
+
 		resetMsgErrors();
 		$('#errorsModalAdd').slideUp();//Cierra el div con los errores
 		$('#editOptions').hide();

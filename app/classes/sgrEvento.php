@@ -116,10 +116,10 @@ class sgrEvento {
 	
 		foreach ($dias as $dWeek) {
 			if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-			else $nRepeticiones = Date::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+			else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = Date::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-				$currentfecha = Date::currentFecha($startDate,$j);
+				$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 				$respuesta[] =$this->saveEvent($data,$currentfecha,$evento_id);
 			}
 		}
@@ -144,24 +144,24 @@ class sgrEvento {
 					$evento->estado = $this->setEstado($data['grupo_id'],$id_recurso,$currentfecha,$hInicio,$hFin);
 				
 					$repeticion = 1;
-					$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
-					$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
+					$evento->fechaFin = sgrDate::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
+					$evento->fechaInicio = sgrDate::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 					$evento->diasRepeticion = json_encode($data['dias']);
 				
 					if ($data['repetir'] == 'SR') {
 						$repeticion = 0;
-						$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-						$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-						$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
+						$evento->fechaFin = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+						$evento->fechaInicio = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+						$evento->diasRepeticion = json_encode(array(date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'))));
 					}
 				
 					$evento->evento_id = $evento_id;
 					$evento->titulo = $data['titulo'];
 					$evento->actividad = $data['actividad'];
 					$evento->recurso_id = $id_recurso;
-					$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+					$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 					$evento->repeticion = $repeticion;
-					$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
+					$evento->dia = date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'));
 					$evento->horaInicio = $data['hInicio'];
 					$evento->horaFin = $data['hFin'];
 					$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
@@ -193,24 +193,24 @@ class sgrEvento {
 
 			
 			$repeticion = 1;
-			$evento->fechaFin = Date::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
-			$evento->fechaInicio = Date::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
+			$evento->fechaFin = sgrDate::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
+			$evento->fechaInicio = sgrDate::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 			$evento->diasRepeticion = json_encode($data['dias']);
 			
 			if ($data['repetir'] == 'SR') {
 				$repeticion = 0;
-				$evento->fechaFin = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-				$evento->fechaInicio = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-				$evento->diasRepeticion = json_encode(array(date('N',Date::gettimestamp($currentfecha,'d-m-Y'))));
+				$evento->fechaFin = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+				$evento->fechaInicio = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+				$evento->diasRepeticion = json_encode(array(date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'))));
 			}
 			
 			$evento->evento_id = $evento_id;
 			$evento->titulo = $data['titulo'];
 			$evento->actividad = $data['actividad'];
 			$evento->recurso_id = $data['id_recurso'];
-			$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+			$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 			$evento->repeticion = $repeticion;
-			$evento->dia = date('N',Date::gettimestamp($currentfecha,'d-m-Y'));
+			$evento->dia = date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'));
 			$evento->horaInicio = $data['hInicio'];
 			$evento->horaFin = $data['hFin'];
 			$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
@@ -265,10 +265,10 @@ class sgrEvento {
 				//Borrar todos los eventos a modificar
 				$event = Evento::find(Input::get('idEvento'));
 				if (Input::get('id_recurso') == 0){
-					Evento::where('evento_id','=',Input::get('idSerie'))->delete();
+					Evento::where('evento_id','=',Input::get('idSerie'))->forceDelete();
 				}
 				else {
-					Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->delete();
+					Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->forceDelete();
 				}
 				//Añadir los nuevos
 				$result['idEvents'] = $this->editEvents($fechaInicio,$fechaFin,$idSerie);
@@ -299,18 +299,18 @@ class sgrEvento {
 		$repetir = Input::get('repetir');	
 		$dias = Input::get('dias'); //1->lunes...., 5->viernes
 		if ($repetir == 'SR') { //SR == sin repetición (no periódico)
-			$dias = array(Date::getDayWeek($fechaInicio));
+			$dias = array(date('N',sgrDate::gettimestamp($fechaInicio,'d-m-Y')));
 			$fechaFin = $fechaInicio;
 		}
 							
 		foreach ($dias as $dWeek) {
 							
 			if (Input::get('repetir') == 'SR') $nRepeticiones = 1;
-			else { $nRepeticiones = Date::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
+			else { $nRepeticiones = sgrDate::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
 							
 			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = Date::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);
-				$currentfecha = Date::currentFecha($startDate,$j);
+				$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 				$result = $this->saveEvent(Input::all(),$currentfecha,$idSerie);
 			}
 						
@@ -330,13 +330,13 @@ class sgrEvento {
 		
 		//número de horas del evento a modificar (hay que restarlas de $nh)
 		$event = Evento::find(Input::get('idEvento'));
-		$nhcurrentEvent = Date::diffHours($event->horaInicio,$event->horaFin);
+		$nhcurrentEvent = sgrDate::diffHours($event->horaInicio,$event->horaFin);
 		
 		//Actualiza el valor de horas ya reservadas quitando las del evento que se modifica
 		$nh = $nh - $nhcurrentEvent;
 
 		//Estas son las horas que se quieren reservar 
-		$nhnewEvent = Date::diffHours(Input::get('hInicio'),Input::get('hFin'));
+		$nhnewEvent = sgrDate::diffHours(Input::get('hInicio'),Input::get('hFin'));
 		
 		//máximo de horas a la semana	
 		$maximo = Config::get('options.max_horas');
@@ -405,23 +405,6 @@ class sgrEvento {
 
 	//private functions
 	
-	/**
-	 * calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
- 	 * 
- 	 * @param void
- 	 * @return $numerohorasreservadas int número de horas de una reserva: diferencia entre horaInicio y horaFin
-	*/
-	private function diffHours($h1,$h2){ 
-	    //In: $h1,$h2 -> horas en formato H:m:s
-	    $tsh1 = strtotime($h1); //número de segundos desde 1 enero de 1970
-	    $tsh2 = strtotime($h2); //número de segundos desde 1 enero de 1970
-
-	    $diff = ($tsh2 - $tsh1) / (60 * 60) ; //diferencia en horas
-		
-		return $diff;
-	}  
-
-
 	private function uniqueId(){
 		
 		$idSerie = $this->getIdUnique();
@@ -467,7 +450,7 @@ class sgrEvento {
 		if (!empty($idSerie) && $action == 'edit') $excludeEvento = " and evento_id != '".$idSerie."'";
 
 
-		$where  =	"fechaEvento = '".Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d')."' and ";
+		$where  =	"fechaEvento = '".sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d')."' and ";
 		if (!empty($condicionEstado))	$where .=	"estado = '".$condicionEstado."' and ";	
 		$where .= 	" (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
 		$where .= 	" or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";

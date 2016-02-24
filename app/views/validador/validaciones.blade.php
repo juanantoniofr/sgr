@@ -128,7 +128,7 @@
 			                        	</td>
 			    						<td><i class="fa fa-calendar fa-fw "></i></td>
 			    						<td>
-			    							 <span class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+			    							 <span class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
 			    						</td>
 			    						<td>
 			                        		<span>{{$event->recurso->nombre}}</span>
@@ -140,7 +140,7 @@
 			                        	</td>
 			    						<td><i class="fa fa-calendar fa-fw "></i></td>
 			    						<td>
-			    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+			    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
 			    						</td>
 			    						
 			                        	<td>
@@ -155,7 +155,7 @@
 				                        	</td>
 				    						<td><i class="fa fa-calendar fa-fw "></i></td>
 				    						<td>
-				    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+				    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
 				    						</td>
 				    						
 				                        	<td>
@@ -168,7 +168,7 @@
 				                        	</td>
 				    				    	<td><i class="fa fa-calendar fa-fw "></i></td>
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... " class="small"><strong>Inicio:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong>Fin: </strong>{{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario: </strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+				                        		<span title="Click para aprobar o denegar... " class="small"><strong>Inicio:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong>Fin: </strong>{{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario: </strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
 				                        	</td>
 				                        	
 				                        	<td>

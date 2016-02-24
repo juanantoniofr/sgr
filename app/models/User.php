@@ -45,15 +45,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	* 	@return boolean
 	*/
 	public function atiendeRecurso($idrecurso){
-		$userPuedeFinalizar = false;
+		$atiendeRecurso = false;
 		
 		//Auth::user tiene que atender las reservas en el recurso donde se realiza el evento
 		$recursos = $this->atiende;
 		if ($recursos->contains($idrecurso)) {
-			$userPuedeFinalizar = true;
+			$atiendeRecurso = true;
 		}
 
-		return $userPuedeFinalizar;
+		return $atiendeRecurso;
 	}
 	
 	/**
@@ -63,7 +63,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	* 	@return $isAviable boolean 
 	*
 	*/
-	public function isDayAviable($timestamp){
+	public function isDayAviable($timestamp,$idrecurso){
 		
 		$isAviable = false;
 		$intCurrentDate = $timestamp; //mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
@@ -81,6 +81,19 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
 					break;
 				case '3': //Técnicos MAV
+					//No atiende el recurso => igual que case 2	
+					if (!$this->atiendeRecurso($idrecurso)){
+						$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+						//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+						if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+					}
+					//sí atiende el recurso => igual que case 4, 5 y 6
+					else {
+						$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+						//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+						if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+					}
+					break;
 				case '4': //administradores SGR
 				case '5': //Validadores
 				case '6': //Supervisores (EE MAV)
@@ -113,7 +126,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		$events = $this->userEvents()->where('fechaEvento','>=',$fm)->where('fechaEvento','<=',$lf)->get();
 
 		foreach ($events as $key => $event) {
-			$nh = $nh + Date::diffHours($event->horaInicio,$event->horaFin);
+			$nh = $nh + sgrDate::diffHours($event->horaInicio,$event->horaFin);
 		}
 		
 		return $nh;

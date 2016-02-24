@@ -22,6 +22,15 @@ class Recurso extends Eloquent {
         return $this->belongsToMany('User','recurso_validador');
     }
     
+    
+    //devuelve los puestos de un recurso (espacio) (Relación Reflexiva)
+    public function puestos(){
+        return $this->hasMany('Recurso','espacio_id','id');
+    }
+
+    public function espacio(){
+     return $this->hasOne('Recurso','id','espacio_id');   
+    }
 
     public function events(){
         return $this->hasMany('Evento','recurso_id','id');
@@ -33,7 +42,7 @@ class Recurso extends Eloquent {
     *   @return boolean
     */
 
-    public function isAtendidoPor($id = ''){
+    public function esAtendidoPor($id = ''){
         $result = false;
         
         if ($this->tecnicos->contains($id)) $result = true;
@@ -55,6 +64,7 @@ class Recurso extends Eloquent {
         
         return $visible;
     }
+
 
     /**
      * Implementa requisito: la gestión de las solicitudes de reservas pueden ser con validación o sin validación.

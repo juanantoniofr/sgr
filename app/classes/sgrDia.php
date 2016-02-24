@@ -40,7 +40,20 @@ class sgrDia {
 		return $this;
 	}
 
-	
+	/**
+	* Devuelve una abreviatura de tres letras del día de la semana en español
+	* @param $month número del mes
+	* @return $abreviatura 
+	*/
+	public function abrDiaSemana(){
+
+		$abreviatura = '';
+		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
+			  		$abreviatura="Error setlocale";}
+		
+		$abreviatura = ucfirst(strftime('%a',$this->timestamp));
+		return $abreviatura;
+	}
 
 	/**
 	*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo

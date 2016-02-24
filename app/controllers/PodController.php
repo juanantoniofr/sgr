@@ -76,10 +76,10 @@ class PodController extends BaseController {
 	private function save($data,$numFila,$recurso,$evento_id){
 		
 		$result = true;
-		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
-		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
+		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
+		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
 		
-		$nRepeticiones = Date::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
+		$nRepeticiones = sgrDate::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
 
 		
 		
@@ -95,13 +95,13 @@ class PodController extends BaseController {
 				
 				$evento->evento_id = $evento_id;
 				//fechas de inicio y fin
-				$evento->fechaFin = Date::parsedatetime(Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'d-m-Y','Y-m-d');//¿por que, no es $fechaDesde ya calculado??
-				$evento->fechaInicio = Date::parsedatetime(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'d-m-Y','Y-m-d');
+				$evento->fechaFin = sgrDate::parsedatetime(sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'d-m-Y','Y-m-d');//¿por que, no es $fechaDesde ya calculado??
+				$evento->fechaInicio = sgrDate::parsedatetime(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'d-m-Y','Y-m-d');
 				
 				//fecha Evento
-				$startDate = Date::timeStamp_fristDayNextToDate(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA']);
-				$currentfecha = Date::currentFecha($startDate,$j);
-				$evento->fechaEvento = Date::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+				$startDate = sgrDate::timeStamp_fristDayNextToDate(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA']);
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
+				$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 
 				//horario
 				$evento->horaInicio = $data['INI'];
@@ -159,16 +159,16 @@ class PodController extends BaseController {
 	private function existeSolapamientodb($data,$numFila,$recursos){
 		
 	
-		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
-		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
+		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
+		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
 		
-		$nRepeticiones = Date::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
+		$nRepeticiones = sgrDate::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
 
 		for($j=0;$j < $nRepeticiones; $j++ ){ //foreach 
 			
 			//fecha Evento
-			$startDate = Date::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA']);
-			$currentfecha = Date::currentFecha($startDate,$j);
+			$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA']);
+			$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 			$sgrEvento = new sgrEvento;
 			foreach ($recursos as $recurso) {
 				if ( 0 < $sgrEvento->solapa($recurso->id,$currentfecha,$data['INI'],$data['FIN']) ){
@@ -188,8 +188,8 @@ class PodController extends BaseController {
 		$csv = new csv();
 		//estado del evento?? (solapamientos)
 		$idLugar = $data['ID_LUGAR'];
-		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);//d-m-Y
-		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);//d-m-Y
+		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);//d-m-Y
+		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);//d-m-Y
 		$horaInicio = $data['INI'];
 		$horaFin = $data['FIN'];
 		$diaSemana = $data['COD_DIA_SEMANA'];
@@ -204,12 +204,12 @@ class PodController extends BaseController {
 			$datosfila = $csv->filterFila($fila);
 			if ($datosfila['ID_LUGAR'] == $idLugar && $datosfila['COD_DIA_SEMANA'] == $diaSemana && $contadorfila != $numFila){
 				//posible solapamiento
-				$filafechaDesde = Date::dateCSVtoSpanish($datosfila['F_DESDE_HORARIO1']);//d-m-Y
-				$filafechaHasta = Date::dateCSVtoSpanish($datosfila['F_HASTA_HORARIO1']);//d-m-Y
+				$filafechaDesde = sgrDate::dateCSVtoSpanish($datosfila['F_DESDE_HORARIO1']);//d-m-Y
+				$filafechaHasta = sgrDate::dateCSVtoSpanish($datosfila['F_HASTA_HORARIO1']);//d-m-Y
 				$filahoraInicio = $datosfila['INI'];
 				$filahoraFin = $datosfila['FIN'];
-				if (strtotime(Date::parsedatetime($fechaDesde,'d-m-Y','Y-m-d')) <= strtotime(Date::parsedatetime($filafechaHasta,'d-m-Y','Y-m-d')) &&
-					strtotime(Date::parsedatetime($fechaHasta,'d-m-Y','Y-m-d')) >= strtotime(Date::parsedatetime($filafechaDesde,'d-m-Y','Y-m-d')) ){
+				if (strtotime(sgrDate::parsedatetime($fechaDesde,'d-m-Y','Y-m-d')) <= strtotime(sgrDate::parsedatetime($filafechaHasta,'d-m-Y','Y-m-d')) &&
+					strtotime(sgrDate::parsedatetime($fechaHasta,'d-m-Y','Y-m-d')) >= strtotime(sgrDate::parsedatetime($filafechaDesde,'d-m-Y','Y-m-d')) ){
 						//posible solapamiento
 						if(strtotime($horaInicio) < strtotime($filahoraFin) && strtotime($horaFin) > strtotime($filahoraInicio)){
 							//hay solapamiento

@@ -2,6 +2,39 @@
 
 class recursosController extends BaseController{
 
+  
+  //Devuelve los recursos de una misma agrupación/grupo en forma de html options
+
+  public function getRecursos(){
+    
+    //Default output 
+    $addOptionAll = false;
+    $tipoRecurso = '';
+    $disabledAll = 0;
+
+    $grupo = Input::get('groupID','');
+    
+    if(empty($grupo)) $recursos = array();
+    else {
+      $recursos = Recurso::where('grupo_id','=',$grupo)->get();  
+      //se filtran para obtener sólo aquellos con visibles o atendidos para el usuario logeado
+      $recursos = $recursos->filter(function($recurso){
+          return $recurso->visible() || $recurso->esAtendidoPor(Auth::user()->id); });
+      //Añadir opción reservar "todos los puestos o equipos"
+      if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio') $addOptionAll = true;
+      //tipo de recurso
+      $tipoRecurso = $recursos[0]->tipo;
+      //número de puestos//equipos disabled
+      $numerodeitemsdisabled = Recurso::where('grupo_id','=',$grupo)->where('disabled','=','1')->count();
+      if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
+
+    }
+
+    return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
+  }
+
+
+
   public function deshabilitar(){
  
     $id = Input::get('idDisableRecurso','');
@@ -97,27 +130,7 @@ class recursosController extends BaseController{
     return $respuesta;
   }
 
-  //Devuelve los recursos de una misma agrupación/grupo
-  public function getRecursos(){
-    
-    $respuesta = array( 'recursos' => '',
-                        'optionTodos' => false,
-                        'tipoRecurso' => '');
-
-    $grupo = Input::get('groupID','');
-    $recursos = Recurso::where('grupo_id','=',$grupo)->get();
-    //se filtran para obtener sólo aquellos con acceso para el usuario logeado
-    $recursos = $recursos->filter(function($recurso){
-        return $recurso->visible();
-    });
-    
-    $respuesta['recursos'] = $recursos->toArray();
-    if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio') $respuesta['optionTodos'] = true;
-    $respuesta['tipoRecurso'] = $recursos[0]->tipo;
-    
-
-    return $respuesta;
-  }
+ 
 
   public function eliminar(){
  

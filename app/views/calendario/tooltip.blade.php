@@ -8,7 +8,7 @@
 
 </p>
 
-<p style="width=100%;text-align:center">{{ucfirst(strftime('%a, %d de %B, ',$time))}}{{ Date::parsedatetime($event->horaInicio,'H:i:s','G:i')}} - {{Date::parsedatetime($event->horaFin,'H:i:s','G:i') }}</p><p style="width=100%;text-align:center">{{$event->actividad}}</p>
+<p style="width=100%;text-align:center">{{ucfirst(strftime('%a, %d de %B, ',$time))}}{{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}} - {{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i') }}</p><p style="width=100%;text-align:center">{{$event->actividad}}</p>
 
 <p style="width=100%;text-align:center">{{Config::get('options.tiporeserva')[$event->repeticion]}}</p>
 

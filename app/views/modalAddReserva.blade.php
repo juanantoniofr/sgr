@@ -174,7 +174,7 @@
             <div class="form-group" id="reservarParaUvus" >
               <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
               <div class = "col-md-10">  
-                <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS de usuario" id = "reservadoPara"  />
+                <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS o inserte tarjeta" id = "reservadoPara"  />
               </div>             
             </div>
            
