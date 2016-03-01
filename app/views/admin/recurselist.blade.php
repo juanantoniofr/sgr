@@ -12,37 +12,62 @@
 @section('content')
 <div class="container">
 <div class="row">
-    {{$menuRecursos or ''}}
+    <h2 class=""><i class="fa fa-institution fa-fw"></i> Gestión de espacios y equipos</h2>
+    <div class="col-md-12">
+        <ul class="nav nav-pills">
+            <li class="active"><a  href="{{route('recursos')}}"> <i class="fa fa-list fa-fw"></i> Recursos</a></li>
+            <li><a href="{{route('grupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
+        </ul>
+    </div>
 </div>
 
 
-<div class="row">
+<div class="row" style="margin-top:5px" >
     <div id = "espera" style="display:none"></div>
     <div class="panel panel-info">
             
         <div class="panel-heading">
-            <h2><i class="fa fa-list fa-fw"></i> {{$recursosListados or ''}}</h2>
+            <h3><i class="fa fa-list fa-fw"></i> {{$recursosListados or ''}}</h3>
         </div>
 
         <div class="panel-body">
                                     
-            <div class="row">
-    
-                <form class="navbar-form navbar-right">    
+            
+                <form class="navbar-form navbar-left">
                     <div class="form-group ">
-                        <select class="form-control" id="selectRecurso" name="grupoid" >
-                            <option value ="">Seleccione grupo.....</option>
-                            @foreach ($grupos as $grupo)
-                                <option value="{{$grupo->grupo_id}}" placeholder="Seleccione recurso...">{{$grupo->grupo}}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-primary form-control" role="submit"><i class="fa fa-filter fa-fw"></i> Filtrar</button> 
+                        <a href="{{route('addRecurso')}}" class="btn btn-danger" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-plus fa-fw"></i> Nuevo Recurso</a>
                     </div>
                 </form>
-                <form class="navbar-form navbar-right" >    
-                </form>
+                
+                <form class="navbar-form navbar-right" role="search">
+                    <div class="form-group">
+                        
+                            <div class="input-group ">
+                                <span class="alert-info input-group-addon"><i class="fa fa-search fa-fw"></i></span>
+                                <input type="text" class="form-control" id="search" placeholder="Buscar recurso...." name="search" >
+                                <!--<button type="submit" class="btn btn-primary form-control"><i class="fa fa-search fa-fw"></i> Buscar</button> -->
+                            </div>                            
+                        
+                    </div>
+                </form> 
 
-            </div>
+                <form class="navbar-form navbar-right">    
+                   <div class="form-group">
+                         <div class="input-group">
+                            <span class="alert-info input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
+                            <select class="form-control" id="selectRecurso" name="grupoid" role="submit">
+                                <option value ="" role="submit">Filtrar.....</option>
+                                @foreach ($grupos as $grupo)
+                                    <option value="{{$grupo->grupo_id}}" placeholder="Seleccione recurso...">{{$grupo->grupo}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                   </div>
+                   
+                        <!--<button type="submit" class="btn btn-primary form-control" role="submit"><i class="fa fa-filter fa-fw"></i> Filtrar</button>--> 
+                </form>
+             
+        
 
             
             <div class="alert alert-success text-center" id = "success_recurselist_msg" style="display:none" role="alert"> 

@@ -3,6 +3,76 @@
 class recursosController extends BaseController{
 
   
+
+
+/**
+  * 
+  */
+  public function listargrupos(){
+    
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+    $offset = Input::get('offset','1');
+    $page = Input::get('page','0');
+    $search = Input::get('search','');
+    $idgruposelected = Input::get('grupoid','');
+    
+    
+    //if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
+
+    //$grupos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->orderby($sortby,$order)->paginate($offset); 
+
+    //Output
+    //if (Auth::user()->isAdmin()){
+    //  $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
+    //  $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
+    //}
+    //else {
+    //  $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
+    //  $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
+    //}
+    //Grupos que contienen algún recurso supervisado por Auth::user.
+    $grupos = GrupoRecurso::all()->filter(function($grupo){
+      
+      $recursos = $grupo->recursos->each(function($recurso){
+        return $recurso->supervisores->contains(Auth::user()->id);  
+      }); 
+      if ($recursos->count() > 0) return true;
+      
+     });
+
+
+    return View::make('admin.grupolist')->with(compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add');
+  } /**
+  * 
+  */
+  public function listar(){
+    
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+    $offset = Input::get('offset','10');
+    $search = Input::get('search','');
+    $idgruposelected = Input::get('grupoid','');
+    
+    $recursosListados = 'Todos los recursos';
+    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
+
+    //Output
+    if (Auth::user()->isAdmin()){
+      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
+    }
+    else {
+      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
+    }
+    
+
+    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
+  } 
+
   //Devuelve los recursos de una misma agrupación/grupo en forma de html options
 
   public function getRecursos(){
@@ -72,34 +142,7 @@ class recursosController extends BaseController{
     return $respuesta;
     
   } 
-  /**
-  * 
-  */
-  public function listar(){
-    
-    //Input      
-    $sortby = Input::get('sortby','nombre');
-    $order = Input::get('order','asc');
-    $offset = Input::get('offset','10');
-    $search = Input::get('search','');
-    $idgruposelected = Input::get('grupoid','');
-    
-    $recursosListados = 'Todos los recursos';
-    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
-
-    //Output
-    if (Auth::user()->isAdmin()){
-      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
-    }
-    else {
-      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
-    }
-    
-
-    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
-  } 
+  
 
   //Devuelve el campo descripción dado un id_recurso
   public function getDescripcion(){

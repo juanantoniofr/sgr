@@ -15,6 +15,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
         return $this->belongsToMany('Recurso','recurso_supervisor');
     	}
 
+    public function supervisaGrupos()
+    {
+        return $this->hasManyThrough('Recurso', 'GrupoRecurso');
+    }	
     //devuelve los recurso que atiende (gestiona reservas)
 	public function atiende(){
         return $this->belongsToMany('Recurso','recurso_tecnico');

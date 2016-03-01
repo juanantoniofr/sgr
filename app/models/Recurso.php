@@ -28,8 +28,19 @@ class Recurso extends Eloquent {
         return $this->hasMany('Recurso','espacio_id','id');
     }
 
+    //identifica el espacio al que pertenece un puesto
     public function espacio(){
      return $this->hasOne('Recurso','id','espacio_id');   
+    }
+
+    //identifica el tipo de equipo al que pertenece un equipo
+    public function tipoequipo(){
+     return $this->hasOne('Recurso','id','tipoequipo_id');   
+    }
+
+    //identifica el grupo al que pertence un recurso
+    public function grupo(){
+     return $this->hasOne('GrupoRecurso','grupo_id','id');   
     }
 
     public function events(){

@@ -114,6 +114,10 @@ Route::get('admin/salvarNuevoRecurso',array('as' => 'postAddRecurso','uses' => '
 
 
 Route::get('admin/listarecursos.html',array('as' => 'recursos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
+Route::get('admin/listargrupos.html',array('as' => 'grupos','uses' => 'recursosController@listargrupos','before' => array('auth','capacidad:4-6,msg')));
+
+Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//añade nuevo recurso
+
 
 Route::get('admin/editarecurso.html',array('as' => 'editarecurso.html','uses' => 'recursosController@formEdit','before' => array('auth','capacidad:4-6,msg')));
 Route::post('admin/updateRecurso.html',array('uses' => 'recursosController@editRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
@@ -186,14 +190,32 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	$espacio = Recurso::findOrFail('18')->espacio;
-	
-		echo "nombre espacio " . $espacio->nombre . "<br />";
 	
 
+	$grupos = GrupoRecurso::all()->filter(function($grupo){
+		
+		
+		$recursos = $grupo->recursos->each(function($recurso){
+				return $recurso->supervisores->contains(Auth::user()->id); 	
+		});	
+		
+		if ($recursos->count() > 0) return true;
+			
+	});
+
+	//$grupos = array_slice($grupos->toArray(), 1 * 1, 1);
+	foreach ($grupos as $grupo) {
+		echo "nombre grupo = " . $grupo->nombre . "<br />";
+	}
+		
+	$paginator = Paginator::make($grupos->toArray(), $grupos->count(), 1);
+
 	echo "<pre>";
-	//var_dump($recurso->puestos);
+	var_dump($grupos);
 	echo "</pre>";
+	
+	
+
 	
  }));
 

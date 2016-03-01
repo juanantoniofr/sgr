@@ -6,9 +6,6 @@ class Notificacion extends Eloquent {
 
     public $timestamps = false;
 
- 	
-
-	
 
 }
 

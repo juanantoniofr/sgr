@@ -1,5 +1,32 @@
 $(function(e){
 
+    //Muestra ventana modal para crear nuevo grupo de recursos
+    $('#btnNuevoGrupo').on('click',function(e){
+        e.preventDefault();
+        $('#m_addgrupo').modal('show');
+    });
+
+    //Ajax save nuevo grupo
+    $('#fm_addgrupo_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:"addgrupo",
+            data: $('#fm_addgrupo').serialize(),
+            success: function($respuesta){
+                console.log($respuesta);
+                hideGifEspera();
+            }
+            ,
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+        });//<--./ajax-->
+    });
+    
+
     //Muestra modal confirmación baja supervisor // validador y/o técnico
     $('.removeUserWithRol').on('click',function(e){
         e.preventDefault();
