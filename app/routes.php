@@ -114,9 +114,21 @@ Route::get('admin/salvarNuevoRecurso',array('as' => 'postAddRecurso','uses' => '
 
 
 Route::get('admin/listarecursos.html',array('as' => 'recursos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
-Route::get('admin/listargrupos.html',array('as' => 'grupos','uses' => 'recursosController@listargrupos','before' => array('auth','capacidad:4-6,msg')));
 
+
+
+
+
+//Gestión de recursos
+Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//añade nuevo recurso
+Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
+
+
+
+
+
+
 
 
 Route::get('admin/editarecurso.html',array('as' => 'editarecurso.html','uses' => 'recursosController@formEdit','before' => array('auth','capacidad:4-6,msg')));
