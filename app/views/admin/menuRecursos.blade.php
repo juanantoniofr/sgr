@@ -4,7 +4,7 @@
     <div class="col-md-12">
         <ul class="nav nav-pills">
             <li class="active"><a  href="{{route('recursos')}}"> <i class="fa fa-list fa-fw"></i> Recursos</a></li>
-            <li><a href="{{route('grupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
+            <li><a href="{{route('getListadoGrupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
         </ul>
     </div>
 

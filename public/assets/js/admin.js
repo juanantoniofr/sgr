@@ -3,20 +3,36 @@ $(function(e){
     //Muestra ventana modal para crear nuevo grupo de recursos
     $('#btnNuevoGrupo').on('click',function(e){
         e.preventDefault();
+        hideMsg();
         $('#m_addgrupo').modal('show');
     });
 
     //Ajax save nuevo grupo
     $('#fm_addgrupo_save').on('click',function(e){
         e.preventDefault();
+        updateChkeditorInstances();
         showGifEspera();
         $.ajax({
             type:"POST",
             url:"addgrupo",
             data: $('#fm_addgrupo').serialize(),
             success: function($respuesta){
-                console.log($respuesta);
-                hideGifEspera();
+                if($respuesta.error === true){
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.msgError').html('').fadeOut();
+                        $('#fm_addgrupo_input'+index).addClass('has-error');
+                        $('#fm_addgrupo_textError').append(value + '<br />');
+                    });
+                    $('#fm_addgrupo_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addgrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
             }
             ,
             error:function(xhr, ajaxOptions, thrownError){
@@ -26,6 +42,34 @@ $(function(e){
         });//<--./ajax-->
     });
     
+
+    function getListado(){
+        console.log('traer el nuevo listado de grupos por ajax...');
+        $.ajax({
+            type:"GET",
+            url:"getTableGrupos",
+            data:{'orderby':'','order':''},
+            success:function($html){
+                $('#tableRecursos').fadeOut('8000').html($html).fadeIn('8000');
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+
+        });//<!--./ajax-->
+    }
+
+    function showMsg($msg){
+        console.log('muestro msg: ' + $msg);
+        $('#success_recurselist_msg').removeClass().addClass('alert text-center alert-success').fadeOut('4000').html($msg).fadeIn('8000');
+    }
+
+    function hideMsg(){
+        $('#success_recurselist_msg').fadeOut('4000').html('');
+        $('.msgError').html('').css('display','none');
+        $('.form-group').removeClass('has-error');
+    }
 
     //Muestra modal confirmación baja supervisor // validador y/o técnico
     $('.removeUserWithRol').on('click',function(e){

@@ -13,7 +13,7 @@
    
     <li><a  href="{{route('users',array('veractivados' => 1))}}"><i class="fa fa-user fa-fw"></i> Usuarios<span class="fa arrow"></span></a></li>
     
-    <li><a  href="{{route('recursos')}}"><i class="fa fa-institution fa-fw"></i> Espacios y equipos<span class="fa arrow"></span></a></li>
+    <li><a  href="{{route('getListadoGrupos')}}"><i class="fa fa-institution fa-fw"></i> Espacios y equipos<span class="fa arrow"></span></a></li>
           
     <li><a href="config.html"><i class="fa fa-wrench fa-fw"></i> Configuración</a></li>
     

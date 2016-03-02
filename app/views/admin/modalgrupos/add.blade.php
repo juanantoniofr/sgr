@@ -11,13 +11,11 @@
       </div><!-- ./modal-header -->
       
       <div class="modal-body">
+        <div class="msgError alert alert-danger text-center" role="alert" id="fm_addgrupo_textError"></div>
         <!-- nombre del grupo -->
-        <div class="form-group">  
-          {{Form::label('nombre', 'Grupo')}}
-          <div id="e_fm_addgrupo_inputnombre" class="text-danger hidden" >
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i> <b id="fm_addgrupo_texterror_inputgrupo"></b>
-          </div>
-              {{Form::text('grupo','',array('class' => 'form-control', 'id' => 'nombre'))}}
+        <div class="form-group" id="fm_addgrupo_inputnombre">  
+          {{Form::label('nombre', 'Nombre',array('class' => 'control-label'))}}
+          {{Form::text('nombre','',array('class' => 'form-control', 'id' => 'nombre'))}}
         </div>
 
         <!-- Descripción del grupo --> 

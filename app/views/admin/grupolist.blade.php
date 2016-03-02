@@ -13,12 +13,14 @@
 <div class="container">
 <div class="row">
     <h2 class=""><i class="fa fa-institution fa-fw"></i> Gestión de espacios y equipos</h2>
+    <!--
     <div class="col-md-12">
         <ul class="nav nav-pills">
             <li ><a  href="{{route('recursos')}}"> <i class="fa fa-list fa-fw"></i> Recursos</a></li>
-            <li class="active"><a href="{{route('grupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
+            <li class="active"><a href="{{route('getListadoGrupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
         </ul>
     </div>
+    -->
 </div>
 
 
@@ -27,90 +29,29 @@
     <div class="panel panel-info">
             
         <div class="panel-heading">
-            <h3><i class="fa fa-list fa-fw"></i> Listado de grupos</h3>
+            <h3><i class="fa fa-list fa-fw"></i> Listado de recursos</h3>
         </div>
 
         <div class="panel-body">
                                     
           
-            <form class="navbar-form navbar-left">
+            <form class="navbar-form">
                 <div class="form-group ">
-                    <a href="#" class="btn btn-danger" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-plus fa-fw"></i> Nuevo Grupo</a>
+                    <a  href="{{route('addRecurso')}}" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-plus fa-fw"></i> Añadir Recurso</a>
+                </div>
+                <div class="form-group ">
+                    <a href="#" class="btn btn-primary" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Añadir Grupo</a>
                 </div>
             </form>
-                
-            <form class="navbar-form navbar-right" role="search">
-                <div class="form-group">
-                    <div class="input-group ">
-                        <span class="alert-info input-group-addon"><i class="fa fa-search fa-fw"></i></span>
-                        <input type="text" class="form-control" id="search" placeholder="Buscar grupo...." name="search" >
-                        <!--<button type="submit" class="btn btn-primary form-control"><i class="fa fa-search fa-fw"></i> Buscar</button> -->
-                    </div>                            
-                </div>
-            </form> 
-
             
-            <div class="alert alert-success text-center" id = "success_recurselist_msg" style="display:none" role="alert"> 
+            
+            <div class="" id = "success_recurselist_msg" style="display:none" role="alert"> 
             </div>
             
-            <table class="table table-hover table-striped">
-                <thead>
-                    <th style="width:2%" >Id.</th>
-                    <!-- Order column by nombre de grupo--> 
-                    <th style="width:30%" >
-                        @if ($sortby == 'nombre' && $order == 'asc') {{
-                            link_to_action(
-                                'recursosController@listargrupos',
-                                'Nombre',
-                                array(
-                                    'sortby' => 'nombre',
-                                    'order' => 'desc',
-                                )
-                            )
-                        }}
-                        @else {{
-                            link_to_action(
-                               'recursosController@listargrupos',
-                                'Nombre',
-                                array(
-                                    'sortby' => 'nombre',
-                                    'order' => 'asc',
-                                    )
-                                )
-                            }}
-                        @endif
-                        <i class="fa fa-sort fa-fw text-info"></i>
-                    </th>
-                    <th style="width:68%">Recursos
-                    </th>
-                </thead>
-                <tbody>
-                    @foreach($grupos as $grupo)
-                        <tr id="tr_{{$grupo->id}}">
-                            <td ><ul class="list-unstyled"><li>{{$grupo->id}}</li></ul></td>
-                            <td>
-                                <ul class="list-unstyled"><li>
-                                <!-- editar -->
-                                <a href="" title="Editar recurso" class="linkEditGrupo" data-idgrupo="{{$grupo->id}}"><i class="fa fa-pencil fa-fw"></i></a>
-                                
-                                <!-- eliminar -->
-                                <a href="" class = "eliminarRecurso" data-idgrupo="{{$grupo->id}}" data-nombregrupo="{{$grupo->nombre}}" title = "Eliminar recurso"><i class="fa fa-trash-o fa-fw"></i></a>
-                                
-                                {{$grupo->nombre}}
-                                </li></ul>
-                            </td>
-                            <td>
-                                <ul class="list-unstyled">
-                                @foreach($grupo->recursos as $recurso)
-                                    <li>{{$recurso->nombre}}</li>
-                                @endforeach
-                                </ul>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
 
+            <div id="tableRecursos">
+                {{$tableRecursos or ''}}
+            </div>
             
                 
             </div><!-- /.panel-body -->
@@ -156,11 +97,7 @@
 
 @section('js')
     {{HTML::script('assets/ckeditor/ckeditor.js')}}
-    <script type="text/javascript">CKEDITOR.replace( 'motivo' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'descripcion' );</script>
-    <script type="text/javascript">CKEDITOR.replace( 'editdescripcion' );</script>
-    <script type="text/javascript">CKEDITOR.replace( 'updatedescripciongrupo' );</script>
-    <script type="text/javascript">CKEDITOR.replace( 'fm_addgrupo_inputdescripcion' );</script>
     
     {{HTML::script('assets/js/admin.js')}}
   
