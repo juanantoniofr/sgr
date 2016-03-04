@@ -1,5 +1,111 @@
 $(function(e){
 
+    activelinkeditgrupo();
+    activelinkdelgrupo();
+
+    //Muestra ventana modal para eliminar grupo
+    function activelinkdelgrupo(){
+        $(".linkdelgrupo").on('click',function(e){
+            e.preventDefault();
+            if($(this).data('numeroelementos') > 0){
+                $('#malert_text').html('No se pueden eliminar un grupo con recursos asignados.');
+                $('#m_alert').modal('show');
+            }
+            else {
+                $idgrupo = $(this).data('idgrupo');
+                $nombre = $(this).data('nombre');
+                $('#mdgrupo_nombre').html($nombre);
+                $('form#fm_delgrupo input[name="grupo_id"]').val($idgrupo);
+                hideMsg();
+                $('#m_delgrupo').modal('show');
+            }
+        });
+    }
+    
+    //Muestra ventana modal para editar grupo de recursos
+   function activelinkeditgrupo(){
+        $(".linkEditGrupo").on('click',function(e){
+            e.preventDefault();
+            $idgrupo = $(this).data('idgrupo');
+            $descripcion = $(this).data('descripcion');
+            $nombre = $(this).data('nombre');
+            $('form#fm_editgrupo input[name="nombre"]').val($nombre);
+            $('form#fm_editgrupo input[name="descripcion"]').val($descripcion);
+            $('form#fm_editgrupo input[name="grupo_id"]').val($idgrupo);
+            CKEDITOR.instances['fm_editgrupo_inputdescripcion'].setData($descripcion);
+            CKEDITOR.instances['fm_editgrupo_inputdescripcion'].updateElement();
+            hideMsg();
+            $('#m_editgrupo').modal('show');
+        });
+    }
+
+    //Ajax del grupo
+    $('#fm_delgrupo_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "delgrupo",
+            data: $('form#fm_delgrupo').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){  
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_delgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_delgrupo_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_delgrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+            });
+    });
+
+    //Ajax save edición de grupo
+    $('#fm_editgrupo_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "editgrupo",
+            data: $('form#fm_editgrupo').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){  
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_editgrupo_textError').fadeIn('8000');
+                    //updateChkeditorInstances();
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_editgrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+            });
+    });
+
     //Muestra ventana modal para crear nuevo grupo de recursos
     $('#btnNuevoGrupo').on('click',function(e){
         e.preventDefault();
@@ -20,9 +126,9 @@ $(function(e){
                 if($respuesta.error === true){
                     hideGifEspera();
                     $.each($respuesta.errors,function(index,value){
-                        $('.msgError').html('').fadeOut();
-                        $('#fm_addgrupo_input'+index).addClass('has-error');
-                        $('#fm_addgrupo_textError').append(value + '<br />');
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
                     });
                     $('#fm_addgrupo_textError').fadeIn('8000');
                 }
@@ -44,13 +150,13 @@ $(function(e){
     
 
     function getListado(){
-        console.log('traer el nuevo listado de grupos por ajax...');
         $.ajax({
             type:"GET",
             url:"getTableGrupos",
             data:{'orderby':'','order':''},
             success:function($html){
                 $('#tableRecursos').fadeOut('8000').html($html).fadeIn('8000');
+                activelinkeditgrupo();
             },
             error:function(xhr, ajaxOptions, thrownError){
                 hideGifEspera();
@@ -61,15 +167,16 @@ $(function(e){
     }
 
     function showMsg($msg){
-        console.log('muestro msg: ' + $msg);
         $('#success_recurselist_msg').removeClass().addClass('alert text-center alert-success').fadeOut('4000').html($msg).fadeIn('8000');
     }
 
     function hideMsg(){
-        $('#success_recurselist_msg').fadeOut('4000').html('');
-        $('.msgError').html('').css('display','none');
-        $('.form-group').removeClass('has-error');
+        $('#success_recurselist_msg').fadeOut('4000').html('');//Resetea a vacio y oculta mensajes en la vista activa
+        $('.divmodal_msgError').html('').css('display','none');//Resetea a vacio y oculta cualquier mensaje en cualquier ventana modal
+        $('.form-group').removeClass('has-error');//Elimina errores en campos de formulario de cualquier ventana modal
     }
+
+    //**************
 
     //Muestra modal confirmación baja supervisor // validador y/o técnico
     $('.removeUserWithRol').on('click',function(e){
@@ -313,50 +420,6 @@ $(function(e){
             });
     });
     
-    //Muestra ventana modal para editar grupo
-    $(".linkEditgrupo").on('click',function(e){
-        e.preventDefault();
-        $idRecurso = $(this).data('idrecurso');
-        $descripciongrupo = $(this).data('descripciongrupo');
-        $nombregrupo = $(this).data('nombregrupo');
-        $('#titlenombregrupo').html($nombregrupo);
-        $('input#grupo').val($nombregrupo);
-        $('input#updatedescripciongrupo').val($descripciongrupo);
-        $('input#modaldescripcionid').val($idRecurso);
-        CKEDITOR.instances['updatedescripciongrupo'].setData($descripciongrupo);
-        CKEDITOR.instances['updatedescripciongrupo'].updateElement();
-        $('#modalEditarGrupo').modal('show');
-    });
-
-    $('#saveChangeDescriptionGroup').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        $.ajax({
-            type: "POST",
-            url:  "salvarDesecripcion.html",
-            data: $('form#formeditargrupo').serialize(),
-            success: function($respuesta){
-                if($respuesta.hasError == true){  
-                    $.each($respuesta.errores,function(key,value){
-                        $('b#text_error_'+key).html(value);
-                        $('div#error_'+key).removeClass('hidden');
-                    });
-                    updateChkeditorInstances();
-                }
-                else {
-                    
-                    location.reload();
-                }
-                
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    //hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-            });
-            
-    });
-
     $('#btnEditarRecurso').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();

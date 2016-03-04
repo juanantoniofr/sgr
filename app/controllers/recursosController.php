@@ -2,10 +2,7 @@
 
 class recursosController extends BaseController{
 
-  
-
-
- /**
+  /**
   * 
   */
   public function listar(){
@@ -465,46 +462,7 @@ class recursosController extends BaseController{
     return $respuesta;
   }
 
-  public function updateDescripcionGrupo(){
-    //Input
-    $idRecurso = Input::get('idRecurso','');
-    $grupo = Input::get('grupo','');
-    $descripcionGrupo = Input::get('descripcion','');
- 
-    //Output
-    $respuesta = array( 'errores'   => array(),
-                        'hasError'  => false);
-    //check input
-    if ( empty($idRecurso) ) {
-      $respuesta['hasError']=true;
-      Session::flash('message','Error en el envío del formulario...');
-      return $respuesta;
-    }
 
-    $rules = array(
-        'grupo'      => 'required',
-        );
-
-     $messages = array(
-          'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
-          );
-    
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    if ($validator->fails()){
-        $respuesta['errores'] = $validator->errors()->toArray();
-        $respuesta['hasError'] = true;
-        return $respuesta;
-      }
-    else{  
-        $groupToUpdate = Recurso::find($idRecurso)->grupo;
-        $recursosDelMismoGrupo = Recurso::where('grupo','=',$groupToUpdate)->update(array('descripcionGrupo' => $descripcionGrupo, 'grupo' => $grupo));
-        Session::flash('message', 'Cambios en <strong>'. $grupo . $idRecurso . ' </strong> salvados con éxito...');
-      }
-    
-
-    //$respuesta = Input::all();
-    return $respuesta;
-  }
 
   //private
   private function getNombre(){

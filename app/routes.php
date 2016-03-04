@@ -121,9 +121,10 @@ Route::get('admin/listarecursos.html',array('as' => 'recursos','uses' => 'recurs
 
 //Gestión de recursos
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
-Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//añade nuevo recurso
 Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
-
+Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
+Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Edita propiedades grupo (nombre y descripción)
+Route::post('admin/delgrupo',array('uses' => 'GruposController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Elimian grupo
 
 
 
@@ -133,7 +134,6 @@ Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','b
 
 Route::get('admin/editarecurso.html',array('as' => 'editarecurso.html','uses' => 'recursosController@formEdit','before' => array('auth','capacidad:4-6,msg')));
 Route::post('admin/updateRecurso.html',array('uses' => 'recursosController@editRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
-Route::post('admin/salvarDesecripcion.html',array('as' => 'updateDescripcionGrupo','uses' => 'recursosController@updateDescripcionGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades grupo (nombre y descripción)
 
 
 

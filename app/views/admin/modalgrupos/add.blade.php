@@ -7,11 +7,11 @@
         
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h2 class="modal-title" id="myModalLabel"><i class="fa fa-plus fa-fw"></i> Añadir nuevo grupo  </h2>
+        <h2 class="modal-title text-info" id="myModalLabel"><i class="fa fa-plus fa-fw"></i> Añadir nuevo grupo  </h2>
       </div><!-- ./modal-header -->
       
       <div class="modal-body">
-        <div class="msgError alert alert-danger text-center" role="alert" id="fm_addgrupo_textError"></div>
+        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addgrupo_textError"></div>
         <!-- nombre del grupo -->
         <div class="form-group" id="fm_addgrupo_inputnombre">  
           {{Form::label('nombre', 'Nombre',array('class' => 'control-label'))}}

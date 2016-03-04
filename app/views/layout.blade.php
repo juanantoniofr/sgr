@@ -81,6 +81,30 @@
 @yield('modal')
 <!-- scripts -->
 
+<!-- modal alert -->
+<div class="modal fade" id="m_alert" tabindex="-100" role="dialog" aria-labelledby="alert" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+      
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title text-warning"><i class="fa fa-warning fa-fw"></i> Aviso</h2>
+            </div>
+
+            <div class="modal-body">
+                <!--Div warning --> 
+                <div class="alert alert-warning text-center" role = "alert"><p id="malert_text"></p></div>
+            </div><!-- ./.modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-lg-12" style="margin-top:10px">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div><!-- ./.modal-content -->
+    </div><!-- ./.modal-dialog -->
+</div><!-- ./#m_alert -->
+
 {{HTML::script('assets/js/jquery-1.11.0.js')}}
 {{HTML::script('assets/js/jquery-ui.js')}}
 {{HTML::script('assets/js/bootstrap.min.js')}}
