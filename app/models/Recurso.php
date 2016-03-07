@@ -4,7 +4,7 @@ class Recurso extends Eloquent {
 
  	protected $table = 'recursos';
 
- 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo');
+ 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id');
 
 
 	//Devuelve los usuarios supervisores de un recurso
@@ -57,6 +57,20 @@ class Recurso extends Eloquent {
         $result = false;
         
         if ($this->tecnicos->contains($id)) $result = true;
+
+        return $result;
+    }
+
+    /**
+    *   Devuelve true si el identificador de usuario es uno de los supervisores del recurso o pertenece al rol administradores (root)
+    *   @param $id 
+    *   @return boolean
+    */
+
+    public function esSupervisadoPor($id = ''){
+        $result = false;
+        
+        if ($this->supervisores->contains($id) || User::findOrFail($id)->capacidad == Config::get('options.idroladministrador')) $result = true;
 
         return $result;
     }

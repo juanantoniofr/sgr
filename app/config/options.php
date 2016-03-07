@@ -51,5 +51,8 @@ return array (
 	//tiempo cortesia para liberar una reserva (20 minutos) en segundos
 	'tiempocortesia'	=> '1200',
 	'horarioApertura'  	=> array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30'),
+	'tipoRecursos'		=> array('espacio','equipo','puesto'),
+	'modoGestion'		=> array('0','1'), //0 => con validación, 1 => sin validación
+	'idroladministrador'	=> '4', 
 	);
 ?>

@@ -11,7 +11,7 @@
     <!--
     <form class="navbar-form navbar-left">
         <div class="form-group ">
-            <a href="{{route('addRecurso')}}" class="btn btn-danger" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-institution fa-fw"></i> Nuevo Recurso</a>
+            <a href="" class="btn btn-danger" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-institution fa-fw"></i> Nuevo Recurso</a>
         </div>
         <div class="form-group ">
             <a href="" class="btn btn-primary" id="btnNuevoGrupo" title="Añade nueva agrupación de recursos"><i class="fa fa-object-group fa-fw"></i> Nuevo Grupo</a>

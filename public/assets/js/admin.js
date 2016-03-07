@@ -1,7 +1,147 @@
 $(function(e){
 
+    //Muestra ventana modal Addrecurso
+    $("#btnNuevoRecurso").on('click',function(e){
+        e.preventDefault();
+        hideMsg();
+        $('#m_addrecurso').modal('show');
+    });
+
+     //Ajax: Salvar nuevo recurso
+    $('#fm_addrecurso_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $data = $('form#fm_addrecurso').serialize();
+        $.ajax({
+            type: "POST",
+            url: "addrecurso",
+            data: $data,
+            success: function($respuesta){
+                
+                if($respuesta.error === true){
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_addrecurso_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addrecurso').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
+            }
+        });
+    }); 
+    
+    //Ajax: Salvar edición recurso
+    $('#fm_editrecurso_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "updaterecurso",
+            data: $('form#fm_editrecurso').serialize(),
+            success: function($respuesta){
+                if($respuesta.error == true){ 
+                    hideGifEspera(); 
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                   
+                    $('#fm_editrecurso_textError').fadeIn('8000');
+                    
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_editrecurso').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');}
+            });
+    });
+
     activelinkeditgrupo();
     activelinkdelgrupo();
+    activeLinkeditrecurso();
+    activeLinkaddrecursotogrupo();
+    
+    function activeLinkaddrecursotogrupo(){
+        //Muestra ventana modal addrecursotogrupo
+        $(".addrecursotogrupo").on('click',function(e){
+            e.preventDefault();
+            showGifEspera();
+            console.log($(this).data('idgrupo'));
+            $('#m_addrecursotogrupo_nombre').html($(this).data('nombre'));
+            $('form#fm_addrecursotogrupo input[name="grupo_id"]').val($(this).data('idgrupo'));
+            $.ajax({
+                type: "GET",
+                url:  "recursosSinGrupo",
+                data: {id:$(this).data('idgrupo')},
+                success: function($html){
+                    hideGifEspera();
+                    $('#m_addrecursotogrupo span#recursosSinGrupo').html($html);
+                    $('#m_addrecursotogrupo').modal('show');
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                }
+            });
+        });
+    }
+
+    function activeLinkeditrecurso(){
+        //Muestra ventana modal editRecurso
+        $(".linkEditRecurso").on('click',function(e){
+            e.preventDefault();
+            showGifEspera();
+            $.ajax({
+                type: "GET",
+                url:  "getrecurso",
+                data: {idrecurso:$(this).data('idrecurso')},
+                success: function($recurso){
+                    hideGifEspera();
+                    console.log($recurso.descripcion);
+                    CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
+                    CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
+                    $('#fm_editrecurso input[name="id"]').val($recurso.id);
+                    $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
+                    $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
+                    $('#fm_editrecurso select[name="grupo_id"]').val($recurso.grupo_id);
+                    $('#fm_editrecurso select[name="tipo"]').val($recurso.tipo);
+                    $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+                    
+                    $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
+                    
+                    $.each($arrayRoles,function(index,value){
+                        $('#fm_editrecurso input#fm_editrecurso_roles'+value).prop( "checked", true );
+                    });
+                    hideMsg();
+                    $('#m_editrecurso').modal('show');
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                }
+            });
+        });
+    }
 
     //Muestra ventana modal para eliminar grupo
     function activelinkdelgrupo(){
@@ -39,7 +179,7 @@ $(function(e){
         });
     }
 
-    //Ajax del grupo
+    //Ajax: Delete grupo
     $('#fm_delgrupo_save').on('click',function(e){
         e.preventDefault();
         showGifEspera();
@@ -71,7 +211,7 @@ $(function(e){
             });
     });
 
-    //Ajax save edición de grupo
+    //Ajax: Salvar edición de grupo
     $('#fm_editgrupo_save').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();
@@ -113,7 +253,7 @@ $(function(e){
         $('#m_addgrupo').modal('show');
     });
 
-    //Ajax save nuevo grupo
+    //Ajax: Salvar nuevo grupo
     $('#fm_addgrupo_save').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();
@@ -155,8 +295,11 @@ $(function(e){
             url:"getTableGrupos",
             data:{'orderby':'','order':''},
             success:function($html){
-                $('#tableRecursos').fadeOut('8000').html($html).fadeIn('8000');
+                $('#tableRecursos').html($html);
                 activelinkeditgrupo();
+                activelinkdelgrupo();
+                activeLinkeditrecurso();
+                activeLinkaddrecursotogrupo();
             },
             error:function(xhr, ajaxOptions, thrownError){
                 hideGifEspera();
@@ -227,7 +370,7 @@ $(function(e){
             url:  "removeUsersWithRol",
             data: $('form#removeUserWithRol').serialize(),
             success: function($respuesta){
-               console.log($respuesta);
+               //console.log($respuesta);
                hideGifEspera();
                if ($respuesta['error'] === true) {
                     $('#msg_modalRemoveUserWithRol').fadeOut('8000').html($respuesta['msg']).fadeIn('16000');
@@ -242,7 +385,7 @@ $(function(e){
                     $('#supervisores_'+$idrecurso).html('');
                     $('#validadores_'+$idrecurso).html('');
                     $('#tecnicos_'+$idrecurso).html('');
-                    console.log($respuesta['supervisores']);
+                    //console.log($respuesta['supervisores']);
                     $.each($respuesta['supervisores'],function(index,value){
                         $('#supervisores_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
                     });
@@ -312,6 +455,7 @@ $(function(e){
                     }
             },
             error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
                 alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
                }
 
@@ -390,108 +534,18 @@ $(function(e){
         });
     });
 
-   //Muestra ventana modal editRecurso
-    $(".linkEditrecurso").on('click',function(e){
-        e.preventDefault();
-        //Cargar valores del recurso a editar en #modalEditRecurso
-        $.ajax({
-            type: "GET",
-            url:  "getrecurso",
-            data: {id:$(this).data('idrecurso')},
-            success: function($respuesta){
-                $atributos = $respuesta['atributos'];
-                CKEDITOR.instances['editdescripcion'].setData($atributos['descripcion']);
-                CKEDITOR.instances['editdescripcion'].updateElement();
-                //console.log($atributos['descripcion']);
-                $.each($atributos,function(key,value){ 
-                                            $('#modalEditRecurso input#'+key).val(value);
-                                            $('#modalEditRecurso #select_'+key).val(value);
-                                        });
-                $('#modalEditRecurso #select_modo').val($.parseJSON($atributos['acl']).m);
-                $('#modalEditRecurso .check_colectivos').val($respuesta['visibilidad']);
-                $('#modalEditRecurso .text-danger').slideDown();
-                $('#modalEditRecurso').modal('show');
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    //hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-
-            });
-    });
+   
     
-    $('#btnEditarRecurso').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        $.ajax({
-            type: "POST",
-            url:  "updateRecurso.html",
-            data: $('form#editRecurso').serialize(),
-            success: function($respuesta){
-                if($respuesta.hasError == true){  
-                    $.each($respuesta.errores,function(key,value){
-                        $('b#text_error_'+key).html(value);
-                        $('div#error_'+key).removeClass('hidden');
-                    });
-                    updateChkeditorInstances();
-                }
-                else location.reload();
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    //hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');}
-            });
-    });
+    
     
     function updateChkeditorInstances(){
         for ( instance in CKEDITOR.instances )
             CKEDITOR.instances[instance].updateElement();
     }    
 
-    //Muestra ventana modal Addrecurso
-    $("#btnNuevoRecurso").on('click',function(e){
-        e.preventDefault();
-        $('#modalAddRecurso').modal('show');
-    });
+    
 
-    //Lanza ajax function para salvar nuevo recurso
-    $('#btnSalvarRecurso').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        $data = $('form#nuevoRecurso').serialize();
-        $.ajax({
-            type: "GET",
-            url: "salvarNuevoRecurso",
-            data: $data,
-            success: function($respuesta){
-                if ($respuesta['error'] == false){
-                    $('#modalAddRecurso').modal('hide');
-                    location.reload();
-                }
-                //Hay errores de validación del formulario
-                else {
-                   //console.log($respuesta['errors']);
-                   //reset
-                   $('#modalAddRecurso .has-error').removeClass('has-error');//borrar errores anteriores
-                   $('#modalAddRecurso .spanerror').each(function(){$(this).slideUp();});
-                   //new errors
-                   $.each($respuesta['errors'],function(key,value){
-                        $('#modalAddRecurso #fg'+key).addClass('has-error');
-                        $('#modalAddRecurso #'+key+'_error > span#text_error').html(value);
-                        $('#modalAddRecurso #'+key+'_error').fadeIn("4000");
-                        $('#modalAddRecurso #'+key+'_error').fadeIn("4000");
-
-                        $('#aviso').slideDown("slow");
-                        
-                    });     
-                }
-                },
-                error: function(xhr, ajaxOptions, thrownError){
-                        //hideGifEspera();
-                        alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
-                    }
-                });
-    }); 
+   
 
     $(".eliminarRecurso").on('click',function(e){
         e.preventDefault();

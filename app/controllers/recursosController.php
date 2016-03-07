@@ -2,6 +2,151 @@
 
 class recursosController extends BaseController{
 
+
+   /**
+   * @param Input::get('nombre')      string
+   * @param Input::get('descripcion') string
+   * @param Input::get('tipo')        string
+   * @param Input::get('id_lugar')    string
+   * @param Input::get('grupo_id')    int 
+   * @param Input::get('modo')        int (0|1)
+   * @param Input::get('roles')       array
+   *
+   * @return $result                  array    
+   */ 
+
+  public function add(){
+    
+    //Input
+    $nombre = Input::get('nombre');
+    $tipo =  Input::get('tipo'); //espacio|puesto|equipo
+    $grupo_id = Input::get('grupo_id');
+    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
+    
+    $descripcion = Input::get('descripcion','');
+    $id_lugar = Input::get('id_lugar','');
+    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    //out
+    $result = array('error' => false,
+                    'msg'   => '',
+                    'errors' => array());
+    
+    //Validación de formulario   
+    $rules = array(
+        'nombre'    => 'required|unique:recursos',
+        'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
+        'grupo_id'  => 'required|exists:grupoRecursos,id',
+        'modo'      => 'required|in:'.implode(',',Config::get('options.modoGestion')),
+        );
+
+     $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+          'unique'    => 'Existe un recurso con el mismo nombre...',
+          'tipo.in'   => 'El tipo de recurso no está definido...',
+          'modo.in'   => 'Modo de Gestión de solicitudes de reserva no definido....',
+          'exists'    => 'No existe identificador de grupo...',
+        );
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{  
+      //Si no hay errores en el formulario
+      $recurso = new Recurso;
+      $recurso->nombre = $nombre;
+      $recurso->grupo_id = $grupo_id;
+      $recurso->tipo = $tipo;
+      $recurso->descripcion = $descripcion;
+      $recurso->id_lugar = $id_lugar;
+      $recurso->acl = $this->buildJsonAcl($modo,$roles);
+          
+
+      $recurso->save();
+
+      $result['msg'] = Config::get('msg.success');
+    
+      //Establecer relación de supervisor 
+      $recurso->supervisores()->attach(Auth::user()->id); //El propio usuario que lo añade si no es administrador
+    }
+
+    return $result;
+  }
+
+  /**
+   * @param Input::get('nombre')      string
+   * @param Input::get('descripcion') string
+   * @param Input::get('tipo')        string
+   * @param Input::get('id_lugar')    string
+   * @param Input::get('grupo_id')    int 
+   * @param Input::get('modo')        int (0|1)
+   * @param Input::get('roles')       array
+   *
+   * @return $result                  array    
+   */ 
+  public function update(){
+   
+    //return Recurso::find(Input::get('id',''));
+    //Input
+    $id = Input::get('id','');
+    $nombre = Input::get('nombre');
+    $tipo =  Input::get('tipo'); //espacio|puesto|equipo
+    $grupo_id = Input::get('grupo_id');
+    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
+    
+    $descripcion = Input::get('descripcion','');
+    $id_lugar = Input::get('id_lugar','');
+    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    //out
+    $result = array('error' => false,
+                    'msg'   => '',
+                    'errors' => array());
+    
+    //Validación de formulario   
+    $rules = array(
+        'id'        => 'required|exists:recursos',
+        'nombre'    => 'required|unique:recursos,nombre,'.Input::get('id'),
+        'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
+        'grupo_id'  => 'required|exists:grupoRecursos,id',
+        'modo'      => 'required|in:'.implode(',',Config::get('options.modoGestion')),
+        );
+
+     $messages = array(
+          'id.exists' => 'Identificador de recurso no encontrado....',
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+          'unique'    => 'Existe un recurso con el mismo nombre...',
+          'tipo.in'   => 'El tipo de recurso no está definido...',
+          'modo.in'   => 'Modo de Gestión de solicitudes de reserva no definido....',
+          'exists'    => 'No existe identificador de grupo...',
+        );
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{  
+      Recurso::find($id)->update(array( 'nombre'      => $nombre,
+                                        'tipo'        => $tipo,
+                                        'grupo_id'    => $grupo_id,
+                                        'modo'        => $modo,
+                                        'descripcion' => $descripcion,
+                                        'id_lugar'    => $id_lugar,
+                                        'acl'         => $this->buildJsonAcl($modo,$roles),)
+                                 );
+
+      
+
+      $result['msg'] = Config::get('msg.success');
+    }
+    return $result;
+  }
+
   /**
   * 
   */
@@ -32,7 +177,6 @@ class recursosController extends BaseController{
   } 
 
   //Devuelve los recursos de una misma agrupación/grupo en forma de html options
-
   public function getRecursos(){
     
     //Default output 
@@ -119,16 +263,16 @@ class recursosController extends BaseController{
 
   //devuelve el recurso dado id y su visibilidad
   public function getrecurso(){
-    
-    $respuesta = array( 'atributos' => '',
-                        'visibilidad' => array());
-    $id = Input::get('id','');
-    $recurso = Recurso::find($id)->toArray();
-    $respuesta['atributos'] = $recurso;
-    $acl = json_decode($recurso['acl']);
-    $respuesta['visibilidad'] = explode(',',$acl->r);
-    
-    return $respuesta;
+    return Recurso::findOrFail(Input::get('idrecurso'));
+  }
+
+  /**
+  * @param void
+  *
+  * @return $recursos Array(Recurso)  
+  */
+  public function recursosSinGrupo(){
+    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
   }
 
  
@@ -337,72 +481,17 @@ class recursosController extends BaseController{
     return $respuesta;
   }
 
-
+  /**?????**/
 	public function formAdd(){
 
     $recursos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
     return View::make('admin.recurseAdd')->with(compact('recursos'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos');
   }
 
-  public function addRecurso(){
-    
-    //@params
-    $idgrupo = Input::get('idgrupo','');
-    $nuevogrupo = Input::get('nuevogrupo','');
-    //out
-    $respuesta = array( 'error' => false,
-                        'msg'   => 'Mensaje para el usuario....idgrupo = ' . $idgrupo .' y, nuevogrupo = ' . $nuevogrupo,
-                        'errors' => array());
-    
-    
-
-    
-    $rules = array(
-        'nombre'      => 'required|unique:recursos',
-        'nuevogrupo'  => 'required_if:idgrupo,0',
-        );
-
-     $messages = array(
-          'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
-          'unique'        => 'Existe un recurso con el mismo nombre....',
-          'nuevogrupo.required_if'  => 'Campo requerido....',
-        );
-    
-    $validator = Validator::make(Input::all(), $rules, $messages);
-
-    
-    if ($validator->fails()){
-        $respuesta['error'] = true;
-        $respuesta['errors'] = $validator->errors()->toArray();
-      }
-
-    else{  
-      $recurso = new Recurso;
-      $recurso->nombre = Input::get('nombre');
-      $recurso->grupo = $this->getNombre();
-      $recurso->grupo_id = $this->getIdGrupo();
-      $recurso->tipo = Input::get('tipo');
-      $recurso->descripcion = Input::get('descripcion');
-      $recurso->acl = $this->getACL();
-      $recurso->id_lugar = Input::get('id_lugar');
-
-      if ($recurso->save()) Session::flash('message', 'Recurso <strong>'. $recurso->nombre .' </strong>añadido con éxito');
-    
-      //Añadir administradores
-      $ids = array();
-      if (Auth::user()->capacidad != 4) $ids[] = Auth::user()->id; //El propio usuario que lo añade si no es administrador
-     
-      if (!empty($ids)) $recurso->administradores()->attach($ids);
-
-      
-    }
-
-    return $respuesta;
-  }
-
+ 
   
-
-  public function formEdit(){
+  /*****??????***/
+ /* public function formEdit(){
 
     $id = Input::get('id');
     $recursos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
@@ -415,56 +504,14 @@ class recursosController extends BaseController{
     $capacidades = $permisos['r']; //array con los valores de la capacidades con acceso
 
     return View::make('admin.recurseEdit')->with(compact('recursos','recurso','modo','capacidades'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos');
-  }
+  }*/
 
-  public function editRecurso(){
-   
-    $id = Input::get('id');
-    $idgrupo = Input::get('idgrupo','');
-    $nuevogrupo = Input::get('nuevogrupo','');
-    //Output
-    $respuesta = array( 'errores'   => array(),
-                        'hasError'  => false);
-    $rules = array(
-        'nombre'      => 'required|unique:recursos,nombre,'.$id,
-        'nuevogrupo'  => 'required_if:idgrupo,0',
-        );
-
-     $messages = array(
-          'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
-          'unique'        => 'Existe un recurso con el mismo nombre....',
-          'nuevogrupo.required_if'  => 'El valor no puede quedar vacio....',
-        );
-    
-    $validator = Validator::make(Input::all(), $rules, $messages);
-
-    //$url = URL::route('editarecurso.html',['id' => $id]); 
-    if ($validator->fails()){
-        //return Redirect::to($url)->withErrors($validator->errors())->withInput(Input::all());;
-        $respuesta['errores'] = $validator->errors()->toArray();
-        $respuesta['hasError'] = true;
-        return $respuesta;
-      }
-    else{  
-      
-      $recurso = Recurso::find($id);
-
-      $recurso->nombre = Input::get('nombre');
-      $recurso->grupo = $this->getNombre();
-      $recurso->grupo_id = $this->getIdGrupo();
-      $recurso->tipo = Input::get('tipo','espacio');
-      $recurso->descripcion = Input::get('descripcion');
-      $recurso->acl = $this->getACL();
-      $recurso->id_lugar = Input::get('id_lugar');
-
-      if ($recurso->save()) Session::flash('message', 'Cambios en <strong>'. $recurso->nombre .' </strong> salvados...');
-    }
-    return $respuesta;
-  }
+  
 
 
 
   //private
+  /******* ??? *******/
   private function getNombre(){
 
     $idgrupo = Input::get('idgrupo');
@@ -475,7 +522,7 @@ class recursosController extends BaseController{
    
     return $nombregrupo;
   }
-
+  /******* ??? *******/
   private function getIdGrupo(){
 
     $idgrupo = Input::get('idgrupo');
@@ -494,18 +541,18 @@ class recursosController extends BaseController{
     return $idgrupo;
   }
 
-  private function getACL(){
+  private function buildJsonAcl($modo,$roles){
 
-    $aACL = array('r' => '',
+    $acl = array('r' => '',
                   'm' => '0',//por defecto gestión Atendida de las solicitudes de uso.
                   );
-    $aACL['m'] = Input::get('modo','0');
-    $acceso = Input::get('acceso',array());
-    $acceso[] = 4; //Añadir rol administrador
-    $listIdRolesConAcceso = implode(',',$acceso);
-    $aACL['r'] = $listIdRolesConAcceso;
+    $acl['m'] = $modo;
+    $roles = $roles;
+    $roles[] = Config::get('options.idroladministrador'); //Administrador tiene accseso
+    $listIdRolesConAcceso = implode(',',$roles);
+    $acl['r'] = $listIdRolesConAcceso;
 
-    return json_encode($aACL);
+    return json_encode($acl);
   }
 
 

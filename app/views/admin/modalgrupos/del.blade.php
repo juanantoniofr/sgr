@@ -1,7 +1,7 @@
 <!-- modal eliminar recurso -->
 <div class="modal fade" id="m_delgrupo" tabindex="-3" role="dialog" aria-labelledby="borrarGrupo" aria-hidden="true">
    {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_delgrupo'))}}  
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-md">
         
         <div class="modal-content">
       

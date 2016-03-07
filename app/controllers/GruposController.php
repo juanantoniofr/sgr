@@ -66,7 +66,7 @@ class GruposController extends BaseController {
    		//Validate
     	$rules = array(
     		'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
-        	'nombre'    => 'required|unique:grupoRecursos',
+        	'nombre'    => 'required|unique:grupoRecursos,nombre,'.$id,
         );
 
      	$messages = array(
@@ -157,7 +157,7 @@ class GruposController extends BaseController {
 	     });*/
 
 
-	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del');
+	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso');
   	}
 
   	/**

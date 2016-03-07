@@ -108,8 +108,32 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 		));
 
 //EE de equipo (capacidad = 6) y administradores de la aplicación (capacidad = 4)
-Route::get('admin/addrecurso.html',array('as' => 'addRecurso','uses' => 'recursosController@formAdd','before' => array('auth','capacidad:4-6,msg')));
-Route::get('admin/salvarNuevoRecurso',array('as' => 'postAddRecurso','uses' => 'recursosController@addRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+//Route::get('admin/addrecurso.html',array('as' => 'addRecurso','uses' => 'recursosController@formAdd','before' => array('auth','capacidad:4-6,msg')));
+
+
+
+
+
+
+
+
+
+Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','capacidad:4-6,msg')));
+Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','capacidad:4-6,msg')));
+
+Route::post('admin/updaterecurso',array('uses' => 'recursosController@update','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -132,8 +156,8 @@ Route::post('admin/delgrupo',array('uses' => 'GruposController@del','before' => 
 
 
 
-Route::get('admin/editarecurso.html',array('as' => 'editarecurso.html','uses' => 'recursosController@formEdit','before' => array('auth','capacidad:4-6,msg')));
-Route::post('admin/updateRecurso.html',array('uses' => 'recursosController@editRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
+//Route::get('admin/editarecurso.html',array('as' => 'editarecurso.html','uses' => 'recursosController@formEdit','before' => array('auth','capacidad:4-6,msg')));
+
 
 
 
@@ -142,7 +166,6 @@ Route::get('admin/eliminarecurso.html',array('uses'=>'RecursosController@elimina
 Route::post('admin/deshabilitarRecurso.html',array('uses'=>'RecursosController@deshabilitar','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/habilitarRecurso.html',array('uses'=>'RecursosController@habilitar','before' => array('auth','capacidad:4-6,msg')));
 
-Route::get('admin/getrecurso',array('uses'=>'RecursosController@getrecurso','before' => array('auth','capacidad:4-6,msg')));
 
 //Calendarios
 Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth','inicioCurso')));

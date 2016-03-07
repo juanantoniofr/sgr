@@ -1,8 +1,7 @@
 <!-- / Modal add grupo  -->
-<div class="modal fade myModal-md " id="m_addgrupo" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade myModal-md" id="m_addgrupo" tabindex="-1" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addgrupo'))}}          
-  <div class="modal-dialog modal-lg">
-    
+  <div class="modal-dialog modal-md">
     <div class="modal-content">
         
       <div class="modal-header">

@@ -40,7 +40,9 @@
                         <!-- editar -->
                         <a href="#" title="Editar grupo" class="linkEditGrupo" data-idgrupo="{{$grupo->id}}" data-descripcion="{{$grupo->descripcion}}" data-nombre="{{$grupo->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar -->
-                        <a href="#" title="Eliminar grupo" class = "linkdelgrupo" data-idgrupo="{{$grupo->id}}" data-nombre="{{$grupo->nombre}}" data-numeroelementos="{{$grupo->recursos->count()}}" title = "Eliminar recurso"><i class="fa fa-trash-o fa-fw"></i></a>
+                        <a href="#" title="Eliminar grupo" class = "linkdelgrupo" data-idgrupo="{{$grupo->id}}" data-nombre="{{$grupo->nombre}}" data-numeroelementos="{{$grupo->recursos->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                        <!-- añadir recursos al grupo -->
+                        <a href="#" title="Añadir recursos al grupo" class = "addrecursotogrupo" data-nombre="{{$grupo->nombre}}" data-idgrupo="{{$grupo->id}}" ><i class="fa fa-plus fa-fw"></i></a>
                         {{$grupo->nombre}}
                     </li>
                 </ul>
@@ -48,7 +50,12 @@
             <td>
                 <ul class="list-unstyled">
                 @foreach($grupo->recursos as $recurso)
-                    <li>{{$recurso->nombre}} @if ($recurso->supervisores->contains(Auth::user()->id)) (Supervisa) @endif</li>
+                    <li>{{$recurso->nombre}} 
+                        @if ( $recurso->esSupervisadoPor(Auth::user()->id) ) 
+                            <!-- editar -->
+                            <a href="#" title="Editar recurso" class="linkEditRecurso" data-idrecurso="{{$recurso->id}}"><i class="fa fa-pencil fa-fw"></i></a>    
+                        @endif
+                    </li>
                 @endforeach
                 </ul>
             </td>
