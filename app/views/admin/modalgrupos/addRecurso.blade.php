@@ -11,9 +11,10 @@
         </div><!-- ./modal-header -->
       
         <div class="modal-body">
+            <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addrecursotogrupo_textError"></div>
             <span id="recursosSinGrupo"></span>
             <div class="form-group hidden">
-            {{Form::text('grupo_id','ss',array('class' => 'form-control'))}}
+            {{Form::text('grupo_id','',array('class' => 'form-control'))}}
             </div>
         </div><!-- /#modal-body -->
         

@@ -2,7 +2,7 @@
     @foreach($recursos as $recurso)
         <div class="checkbox">
             <label>
-                <input type="checkbox" name="idrecurso[]" value="{{$recurso->id}}">{{$recurso->nombre}}    
+                <input type="checkbox" name="idrecursos[]" value="{{$recurso->id}}">{{$recurso->nombre}}    
             </label>
         </div>    
     @endforeach

@@ -95,7 +95,6 @@ class GruposController extends BaseController {
 		*
 		*	@return $result array
 	*/
-
 	public function add(){
 
 		//out
@@ -157,7 +156,7 @@ class GruposController extends BaseController {
 	     });*/
 
 
-	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso');
+	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled');
   	}
 
   	/**
@@ -178,5 +177,39 @@ class GruposController extends BaseController {
 	    $grupos = GrupoRecurso::all();
 	    return View::make('admin.tableRecursos',compact('grupos','sortby','order'));
   	}
+
+  	/**
+  		* @param Input::get('grupo_id') int indetificador de grupo
+  		* @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
+  		*
+  		* @return $result array(boleano,string)
+  	*/
+  	public function addrecursos(){
+
+  		//input
+  		$id = Input::get('grupo_id','');
+  		$idrecursos = Input::get('idrecursos',array());
+  		//out
+		$result = array('error'	=> false,
+						'msg'	=> Config::get('msg.success'),
+						);
+
+		//Validación input
+		if (empty($id) || GrupoRecurso::where('id','=',$id)->count() != 1) {
+			$result['msg'] = Config::get('msg.idempty') . ' o ' . Config::get('msg.idnotfound');
+			$result['error'] = true;
+  		}
+  		else {
+  			foreach ($idrecursos as $idrecurso) {
+  				Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
+  			}
+  		}
+  			
+  		return $result;
+  	}
+
+
+
+
 
 }

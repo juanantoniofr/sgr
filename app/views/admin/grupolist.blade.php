@@ -70,11 +70,14 @@
 {{ $modalAddGrupo           or '' }}
 {{ $modalEditGrupo          or '' }}
 {{ $modalDelGrupo           or '' }}
-{{ $modalAddRecursosToGrupo or ''}}
+{{ $modalAddRecursosToGrupo or '' }}
 
 <!-- recursos -->
-{{ $modalAddRecurso      or '' }}
-{{ $modalEditRecurso     or '' }}
+{{ $modalAddRecurso         or '' }}
+{{ $modalEditRecurso        or '' }}
+{{ $modalDelRecurso         or '' }}
+{{ $modalEnabledRecurso     or '' }}
+
 
 
 

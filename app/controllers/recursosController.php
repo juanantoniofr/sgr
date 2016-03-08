@@ -2,19 +2,17 @@
 
 class recursosController extends BaseController{
 
-
    /**
-   * @param Input::get('nombre')      string
-   * @param Input::get('descripcion') string
-   * @param Input::get('tipo')        string
-   * @param Input::get('id_lugar')    string
-   * @param Input::get('grupo_id')    int 
-   * @param Input::get('modo')        int (0|1)
-   * @param Input::get('roles')       array
-   *
-   * @return $result                  array    
+     * @param Input::get('nombre')      string
+     * @param Input::get('descripcion') string
+     * @param Input::get('tipo')        string
+     * @param Input::get('id_lugar')    string
+     * @param Input::get('grupo_id')    int 
+     * @param Input::get('modo')        int (0|1)
+     * @param Input::get('roles')       array
+     *
+     * @return $result                  array    
    */ 
-
   public function add(){
     
     //Input
@@ -148,35 +146,70 @@ class recursosController extends BaseController{
   }
 
   /**
-  * 
+    * @param Input::get('idrecurso') int
+    *
+    * @return $result array(boolean|string) 
   */
-  public function listar(){
+  public function del(){
     
-    //Input      
-    $sortby = Input::get('sortby','nombre');
-    $order = Input::get('order','asc');
-    $offset = Input::get('offset','10');
-    $search = Input::get('search','');
-    $idgruposelected = Input::get('grupoid','');
+    //input
+    $id = Input::get('idrecurso','');
     
-    $recursosListados = 'Todos los recursos';
-    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
+    //Output 
+    $respuesta = array( 'errors'    => array(),
+                        'msg'   => '',    
+                        'error'   => false,
+                      );
 
-    //Output
-    if (Auth::user()->isAdmin()){
-      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+          'exists'    => 'No existe identificador de grupo...', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
     }
-    else {
-      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
+    else{
+
+      //Enviar mail a usuarios con reserva futuras
+      $sgrMail = new sgrMail();
+      $sgrMail->notificaDeleteRecurso($id,$motivo);
+      
+      //Softdelete recurso y eventos
+      Recurso::find($id)->events()->delete();
+      Recurso::find($id)->delete();
+      $result['msg'] = Config::get('msg.actionSuccess');
     }
     
+    return $result;
+  }
 
-    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
-  } 
+  
+  /**
+    * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
+    * 
+    * @param void
+    *
+    * @return object Recurso
+  */
+  public function getrecurso(){
+    return Recurso::findOrFail(Input::get('idrecurso'));
+  }
 
-  //Devuelve los recursos de una misma agrupación/grupo en forma de html options
+  //Devuelve los recursos de una misma agrupación/grupo en forma de html options ?????
+  /**
+    * @param void
+    *
+    * @return View::make('calendario.optionsRecursos') string
+  */
   public function getRecursos(){
     
     //Default output 
@@ -204,8 +237,35 @@ class recursosController extends BaseController{
 
     return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
   }
+  
+  /**
+  * ?????
+  */
+  public function listar(){
+    
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+    $offset = Input::get('offset','10');
+    $search = Input::get('search','');
+    $idgruposelected = Input::get('grupoid','');
+    
+    $recursosListados = 'Todos los recursos';
+    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
 
+    //Output
+    if (Auth::user()->isAdmin()){
+      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
+    }
+    else {
+      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
+      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
+    }
+    
 
+    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
+  } 
 
   public function deshabilitar(){
  
@@ -242,7 +302,6 @@ class recursosController extends BaseController{
     $recurso = Recurso::findOrFail($id);
     $respuesta = 'Recurso <i>'.$recurso->nombre.' ('.$recurso->grupo.')</i> <b>habilitado</b> con éxito....';
     return $respuesta;
-    
   } 
   
 
@@ -261,11 +320,6 @@ class recursosController extends BaseController{
     return $descripcion;
   } 
 
-  //devuelve el recurso dado id y su visibilidad
-  public function getrecurso(){
-    return Recurso::findOrFail(Input::get('idrecurso'));
-  }
-
   /**
   * @param void
   *
@@ -277,23 +331,7 @@ class recursosController extends BaseController{
 
  
 
-  public function eliminar(){
- 
-    $id = Input::get('id','');
-
-    
-    if (empty($id)){
-      Session::flash('message', 'Identificador vacio: No se ha realizado ninguna acción....');
-      return Redirect::to($url);
-    }
-
-    $recurso = Recurso::findOrFail($id);
-    $recurso->delete();
-    $recurso->administradores()->detach();
-    Session::flash('message', 'Recurso eliminado con éxito....');
-    return Redirect::back();
-    
-  }
+  
 
   /**
   * Devuelve los usuarios con relación de supervisor // tecnico // validador

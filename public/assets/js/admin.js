@@ -1,13 +1,6 @@
 $(function(e){
 
-    //Muestra ventana modal Addrecurso
-    $("#btnNuevoRecurso").on('click',function(e){
-        e.preventDefault();
-        hideMsg();
-        $('#m_addrecurso').modal('show');
-    });
-
-     //Ajax: Salvar nuevo recurso
+    //Ajax: Salvar nuevo recurso
     $('#fm_addrecurso_save').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();
@@ -76,17 +69,216 @@ $(function(e){
             });
     });
 
-    activelinkeditgrupo();
-    activelinkdelgrupo();
-    activeLinkeditrecurso();
-    activeLinkaddrecursotogrupo();
+    //Ajax: Añadir Recurso a Grupo
+    $('#fm_addrecursotogrupo_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "addrecursotogrupo",
+            data: $('form#fm_addrecursotogrupo').serialize(),
+            success: function($respuesta){
+                console.log($respuesta);
+                if($respuesta.error == true){ 
+                    hideGifEspera(); 
+                    $('.divmodal_msgError').html('').fadeOut();
+                    $('#fm_addrecursotogrupo_textError').append($respuesta.smg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addrecursotogrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');}
+            });
+    });
     
+    //Ajax: Delete grupo
+    $('#fm_delgrupo_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "delgrupo",
+            data: $('form#fm_delgrupo').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){  
+                    hideGifEspera(); 
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_editrecurso_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_delgrupo').modal('hide');   
+                    showMsg($respuesta.msg);
+                    getListado(); 
+                }
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+            });
+    });
+
+    //Ajax: Delete recurso
+    $('#fm_delrecurso_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "delrecurso",
+            data: $('form#fm_delrecurso').serialize(),
+            success: function($respuesta){
+                console.log($respuesta);
+                if($respuesta.error === true){  
+                    hideGifEspera(); 
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                   $('#fm_editrecurso_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_delrecurso').modal('hide');   
+                    showMsg($respuesta.msg);
+                    getListado(); 
+                }
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+            });
+    });
+
+    //Ajax: Salvar edición de grupo
+    $('#fm_editgrupo_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "editgrupo",
+            data: $('form#fm_editgrupo').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){  
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_editgrupo_textError').fadeIn('8000');
+                    //updateChkeditorInstances();
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_editgrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+            });
+    });
+
+    //Ajax: Salvar nuevo grupo
+    $('#fm_addgrupo_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:"addgrupo",
+            data: $('#fm_addgrupo').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_addgrupo_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addgrupo').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            }
+            ,
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+        });//<--./ajax-->
+    });
+
+    activelinks();
+    
+    function activelinks(){
+        activelinkeditgrupo();
+        activelinkdelgrupo();
+        activeLinkeditrecurso();
+        activeLinkaddrecursotogrupo();
+        activelinkeliminarrecurso();
+        activelinkenabled();
+    }
+
+    function activelinkenabled(){
+        
+        $(".enabled").on('click',function(e){
+            e.preventDefault();
+            $('#m_enabled_nombre').html($(this).data('nombrerecurso'));
+            $('form#fm_enabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
+            //if ($(this).data('switch') == 'On'){
+            hideMsg();
+            $('#m_enabledrecurso').modal('show');
+            //}
+            //else { 
+            //if ($(this).data('switch') == 'Off') $('#modaldisabledRecurso').modal('show');
+            //}
+        });
+    }
+
+    function activelinkeliminarrecurso(){
+        $(".linkEliminaRecurso").on('click',function(e){
+            e.preventDefault();
+            $idrecurso = $(this).data('idrecurso');
+            $nombre = $(this).data('nombre');
+            $('#mdrecurso_nombre').html($nombre);
+            $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+            hideMsg();
+            $('#m_delrecurso').modal('show');
+        });
+    }
+
     function activeLinkaddrecursotogrupo(){
         //Muestra ventana modal addrecursotogrupo
         $(".addrecursotogrupo").on('click',function(e){
             e.preventDefault();
             showGifEspera();
-            console.log($(this).data('idgrupo'));
+            //console.log($(this).data('idgrupo'));
             $('#m_addrecursotogrupo_nombre').html($(this).data('nombre'));
             $('form#fm_addrecursotogrupo input[name="grupo_id"]').val($(this).data('idgrupo'));
             $.ajax({
@@ -96,6 +288,7 @@ $(function(e){
                 success: function($html){
                     hideGifEspera();
                     $('#m_addrecursotogrupo span#recursosSinGrupo').html($html);
+                    hideMsg();
                     $('#m_addrecursotogrupo').modal('show');
                 },
                 error: function(xhr, ajaxOptions, thrownError){
@@ -163,7 +356,7 @@ $(function(e){
     }
     
     //Muestra ventana modal para editar grupo de recursos
-   function activelinkeditgrupo(){
+    function activelinkeditgrupo(){
         $(".linkEditGrupo").on('click',function(e){
             e.preventDefault();
             $idgrupo = $(this).data('idgrupo');
@@ -179,73 +372,6 @@ $(function(e){
         });
     }
 
-    //Ajax: Delete grupo
-    $('#fm_delgrupo_save').on('click',function(e){
-        e.preventDefault();
-        showGifEspera();
-        $.ajax({
-            type: "POST",
-            url:  "delgrupo",
-            data: $('form#fm_delgrupo').serialize(),
-            success: function($respuesta){
-                if($respuesta.error === true){  
-                    hideGifEspera();
-                    $.each($respuesta.errors,function(index,value){
-                        $('.divmodal_msgError').html('').fadeOut();
-                        $('#fm_delgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                    });
-                    $('#fm_delgrupo_textError').fadeIn('8000');
-                }
-                else {
-                    hideGifEspera();
-                    $('#m_delgrupo').modal('hide');   
-                    showMsg($respuesta['msg']);
-                    getListado(); 
-                }
-                
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-            });
-    });
-
-    //Ajax: Salvar edición de grupo
-    $('#fm_editgrupo_save').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        showGifEspera();
-        $.ajax({
-            type: "POST",
-            url:  "editgrupo",
-            data: $('form#fm_editgrupo').serialize(),
-            success: function($respuesta){
-                if($respuesta.error === true){  
-                    hideGifEspera();
-                    $.each($respuesta.errors,function(index,value){
-                        $('.divmodal_msgError').html('').fadeOut();
-                        $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                        $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                    });
-                    $('#fm_editgrupo_textError').fadeIn('8000');
-                    //updateChkeditorInstances();
-                }
-                else {
-                    hideGifEspera();
-                    $('#m_editgrupo').modal('hide');   
-                    showMsg($respuesta['msg']);
-                    getListado(); 
-                }
-                
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-            });
-    });
-
     //Muestra ventana modal para crear nuevo grupo de recursos
     $('#btnNuevoGrupo').on('click',function(e){
         e.preventDefault();
@@ -253,41 +379,12 @@ $(function(e){
         $('#m_addgrupo').modal('show');
     });
 
-    //Ajax: Salvar nuevo grupo
-    $('#fm_addgrupo_save').on('click',function(e){
+    //Muestra ventana modal Addrecurso
+    $("#btnNuevoRecurso").on('click',function(e){
         e.preventDefault();
-        updateChkeditorInstances();
-        showGifEspera();
-        $.ajax({
-            type:"POST",
-            url:"addgrupo",
-            data: $('#fm_addgrupo').serialize(),
-            success: function($respuesta){
-                if($respuesta.error === true){
-                    hideGifEspera();
-                    $.each($respuesta.errors,function(index,value){
-                        $('.divmodal_msgError').html('').fadeOut();
-                        $('#fm_addgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                        $('#fm_addgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                    });
-                    $('#fm_addgrupo_textError').fadeIn('8000');
-                }
-                else {
-                    hideGifEspera();
-                    $('#m_addgrupo').modal('hide');   
-                    showMsg($respuesta['msg']);
-                    getListado(); 
-                }
-                
-            }
-            ,
-            error:function(xhr, ajaxOptions, thrownError){
-                hideGifEspera();
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-        });//<--./ajax-->
+        hideMsg();
+        $('#m_addrecurso').modal('show');
     });
-    
 
     function getListado(){
         $.ajax({
@@ -296,10 +393,7 @@ $(function(e){
             data:{'orderby':'','order':''},
             success:function($html){
                 $('#tableRecursos').html($html);
-                activelinkeditgrupo();
-                activelinkdelgrupo();
-                activeLinkeditrecurso();
-                activeLinkaddrecursotogrupo();
+                activelinks();
             },
             error:function(xhr, ajaxOptions, thrownError){
                 hideGifEspera();
@@ -462,20 +556,7 @@ $(function(e){
             });
     });
     
-    $(".enabled").on('click',function(e){
-        e.preventDefault();
-        console.log($(this).data('switch'));
-        //Init modal
-        $('#nombrerecurso_switchenabled').html($(this).data('nombrerecurso'));
-        $('input[name|="idDisableRecurso"]').val($(this).data('idrecurso'));
-        //select habilitar//deshabilitar recurso
-        if ($(this).data('switch') == 'On'){
-            $('#modalenabledRecurso').modal('show');
-        }
-        else { 
-            if ($(this).data('switch') == 'Off') $('#modaldisabledRecurso').modal('show');
-        }
-    });
+    
 
     $('#btnDeshabilitar').on('click',function(e){
         e.preventDefault();
@@ -533,28 +614,11 @@ $(function(e){
                     }
         });
     });
-
-   
-    
-    
     
     function updateChkeditorInstances(){
         for ( instance in CKEDITOR.instances )
             CKEDITOR.instances[instance].updateElement();
     }    
-
-    
-
-   
-
-    $(".eliminarRecurso").on('click',function(e){
-        e.preventDefault();
-        $('#nombrerecurso').html($(this).data('nombrerecurso'));
-        $('a#btnEliminar').data('idrecurso',$(this).data('idrecurso'));
-        $('a#btnEliminar').attr('href', 'eliminarecurso.html' + '?'+'id='+$(this).data('idrecurso'));
-        $('#modalborrarRecurso').modal('show');
-    });
-
     
     $("#caducidad").datepicker({
             showOtherMonths: true,

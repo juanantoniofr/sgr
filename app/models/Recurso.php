@@ -4,8 +4,8 @@ class Recurso extends Eloquent {
 
  	protected $table = 'recursos';
 
- 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id');
-
+ 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id','deleted_at');
+    protected $softDelete = true;
 
 	//Devuelve los usuarios supervisores de un recurso
     public function supervisores(){

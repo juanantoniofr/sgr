@@ -13,9 +13,34 @@ class sgrMail {
 								'activacion'	=> 'Usuario UVUS activado en SGR (Sistema de Gestión de Reservas fcom)',
 								'deshabilita'	=> 'Espacio o medio deshabilitado',
 								'habilita'		=> 'Espacio o medio habilitado',
+								'deleterecurso'	=> 'Espacio o medio eliminado'
 							);
 
-	
+	public function notificaDeleteRecurso($id,$motivo = ''){
+
+		if (empty($id)) return true;
+
+		//Subject 
+		$s = date('d-m-Y H:i') .': '.$this->subject['deleterecurso'];
+		//Notifica a todos los usuarios con reservas futuras en el recurso deshabilitado
+		$eventos = Evento::where('recurso_id','=',$id)->get();
+		$eventosToMail = $eventos->filter(function($evento){
+			return strtotime($evento->fechaEvento) >= strtotime('today');
+		});
+
+		foreach ($eventosToMail as $evento) {
+			
+			$data = array('evento' => serialize($evento),'motivo' => $motivo);
+
+			if (!empty($evento->user->email)){
+				$mailUser = $evento->user->email;
+				Mail::queue(array('html'=>'emails.deleteRecurso'),$data,function($m) use ($mailUser,$s){
+				$m->to($mailUser)->subject($s);});
+			}//fin if		
+		}//fin foreach			
+	}//fin notificaDeleteRecurso
+
+
 	public function notificaDeshabilitaRecurso($id,$motivo = ''){
 
 		if (empty($id)) return true;
