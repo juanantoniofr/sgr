@@ -11,7 +11,7 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delgrupo_textError"></div>
+                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_enabledrecurso_textError"></div>
         
                 <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>Habilitar</b> el recurso: "<b><span id="m_enabled_nombre"></span>"</b> ?</div>
                 <div class="alert alert-warning"> Al habilitar el recurso:

@@ -156,7 +156,7 @@ class recursosController extends BaseController{
     $id = Input::get('idrecurso','');
     
     //Output 
-    $respuesta = array( 'errors'    => array(),
+    $result = array( 'errors'    => array(),
                         'msg'   => '',    
                         'error'   => false,
                       );
@@ -191,7 +191,6 @@ class recursosController extends BaseController{
     
     return $result;
   }
-
   
   /**
     * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
@@ -204,8 +203,9 @@ class recursosController extends BaseController{
     return Recurso::findOrFail(Input::get('idrecurso'));
   }
 
-  //Devuelve los recursos de una misma agrupación/grupo en forma de html options ?????
+  
   /**
+    * //Devuelve los recursos de una misma agrupación/grupo en forma de html options ?????
     * @param void
     *
     * @return View::make('calendario.optionsRecursos') string
@@ -237,7 +237,110 @@ class recursosController extends BaseController{
 
     return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
   }
-  
+
+  /**
+    * //habilita un recursos para su reserva
+    *
+    * @param Input::get('idrecurso') int
+    *
+    * @return $result array
+  */
+  public function enabled(){
+ 
+    //input
+    $id = Input::get('idrecurso','');
+    
+    //Output 
+    $result = array( 'errors'    => array(),
+                        'msg'   => '',    
+                        'error'   => false,
+                      );
+
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+
+      //Enviar mail a usuarios con reserva futuras
+      $sgrMail = new sgrMail();
+      $sgrMail->notificaHabilitaRecurso($id);
+      
+      //Update campo disabled
+      $recurso = Recurso::find($id);
+      $recurso->disabled =  0;
+      $recurso->save();
+      $result['msg'] = Config::get('msg.actionSuccess');
+    }
+    
+    return $result;
+  } 
+
+  /**
+    * //Deshabilita un recursos para su reserva
+    *
+    * @param Input::get('idrecurso') int
+    * @param Input::get('motivo') string
+    *
+    * @return $result array
+  */
+  public function disabled(){
+ 
+    //input
+    $id = Input::get('idrecurso','');
+    $motivo = Input::get('motivo','');
+
+    //Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+     //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+
+      //Enviar mail a usuarios con reserva futuras
+      $sgrMail = new sgrMail();
+      $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
+      
+      //Update campo disabled
+      $recurso = Recurso::find($id);
+      $recurso->disabled =  1;
+      $recurso->motivoDisabled = $motivo;
+      $recurso->save();
+      $result['msg'] = Config::get('msg.actionSuccess');
+    }
+    
+    return $result;
+  }
+
+
   /**
   * ?????
   */
@@ -267,42 +370,9 @@ class recursosController extends BaseController{
     return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
   } 
 
-  public function deshabilitar(){
- 
-    $id = Input::get('idDisableRecurso','');
-    $motivo = Input::get('motivo','');
-
-    
-    if (empty($id)) return 'Identificador vacio: No se ha realizado ninguna acción....';
-    
-    $result = Recurso::where('id','=',$id)->update(array('disabled' => true,'motivoDisabled' => $motivo));
-    
-    //Enviar mail a usuarios con reserva futuras
-    $sgrMail = new sgrMail();
-    $sgrMail->notificaDeshabilitaRecurso($id,$motivo);         
-    
-    $recurso = Recurso::findOrFail($id);
-    $respuesta = 'Recurso <i>'.$recurso->nombre.' ('.$recurso->grupo.')</i> <b>deshabilitado</b> con éxito....';
-    return $respuesta;
-  }
   
-  public function habilitar(){
+  
  
-    $id = Input::get('idDisableRecurso','');
-
-    
-    if (empty($id)) return 'Identificador vacio: No se ha realizado ninguna acción....';
-
-    $recurso = Recurso::where('id','=',$id)->update(array('disabled' => false,'motivoDisabled' => ''));
-    
-    //Enviar mail a usuarios con reserva futuras
-    $sgrMail = new sgrMail();
-    $sgrMail->notificaHabilitaRecurso($id); 
-
-    $recurso = Recurso::findOrFail($id);
-    $respuesta = 'Recurso <i>'.$recurso->nombre.' ('.$recurso->grupo.')</i> <b>habilitado</b> con éxito....';
-    return $respuesta;
-  } 
   
 
   //Devuelve el campo descripción dado un id_recurso

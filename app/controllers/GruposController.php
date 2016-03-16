@@ -4,10 +4,10 @@ class GruposController extends BaseController {
 
 
 	/**
-	*
-	*	@param Input::get('grupo_id')		int
-	*
-	*	@return $result array
+		*
+		*	@param Input::get('grupo_id')		int
+		*
+		*	@return $result array
 	*/
 	public function del(){
     
@@ -44,12 +44,12 @@ class GruposController extends BaseController {
   	}
 
 	/**
-	*
-	*	@param Input::get('grupo_id')		int
-	*	@param Input::get('nombre')			string
-	*	@param Input::get('descripcion')	string 
-	*
-	*	@return $result array
+		*
+		*	@param Input::get('grupo_id')		int
+		*	@param Input::get('nombre')			string
+		*	@param Input::get('descripcion')	string 
+		*
+		*	@return $result array
 	*/
 	public function edit(){
     
@@ -156,7 +156,7 @@ class GruposController extends BaseController {
 	     });*/
 
 
-	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled');
+	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled');
   	}
 
   	/**

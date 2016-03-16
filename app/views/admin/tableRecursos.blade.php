@@ -50,19 +50,19 @@
             <td>
                 <ul class="list-unstyled">
                 @foreach($grupo->recursos as $recurso)
-                    <li>{{$recurso->nombre}} 
+                    <li><span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span> 
                         @if ( $recurso->esSupervisadoPor(Auth::user()->id) ) 
                             <!-- editar -->
                             <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}"><i class="fa fa-pencil fa-fw"></i></a>
                             <!-- eliminar -->
                             <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
                             <!-- enabled/disabled -->
-                            @if($recurso->disabled == false)
-                                <!-- deshabilitar -->
-                                <a id="link_{{$recurso->id}}" href="" class = "disabled" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Deshabilitar recurso"><i class="fa fa-unlock fa-fw "></i></a>
-                            @else    
+                            @if($recurso->disabled)
                                 <!-- habilitar -->
-                                <a id="link_{{$recurso->id}}" href="" class = "enabled text-danger" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Habilitar recurso"><i class="fa fa-lock fa-fw"></i></a>
+                                <a id="link_{{$recurso->id}}" href="" class = "enabled text-success" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Habilitar recurso"><i class="fa fa-toggle-off fa-fw"></i></a>
+                            @else    
+                                <!-- deshabilitar -->
+                                <a id="link_{{$recurso->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title = "Deshabilitar recurso"><i class="fa fa-toggle-on fa-fw "></i></a>
                             @endif    
                         @endif
                     </li>

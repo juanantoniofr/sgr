@@ -49,7 +49,8 @@
                 </form>
                 
                 
-                <div class="" id = "success_recurselist_msg" style="display:none" role="alert"> 
+                <div class=""  id="success_recurselist_msg" style="display:none" role="alert">
+                    <i class="fa fa-check fa-fw text-success"></i><span id="success_recurselist_textmsg"></span> 
                 </div>
                 
 
@@ -77,9 +78,7 @@
 {{ $modalEditRecurso        or '' }}
 {{ $modalDelRecurso         or '' }}
 {{ $modalEnabledRecurso     or '' }}
-
-
-
+{{ $modalDisabledRecurso    or '' }}
 
 
 @stop
@@ -90,6 +89,7 @@
     <script type="text/javascript">CKEDITOR.replace( 'fm_editgrupo_inputdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'fm_addrecurso_inputdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'fm_editrecurso_inputdescripcion' );</script>
+    <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
 
     
     {{HTML::script('assets/js/admin.js')}}

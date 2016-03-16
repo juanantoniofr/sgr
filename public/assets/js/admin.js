@@ -234,6 +234,80 @@ $(function(e){
         });//<--./ajax-->
     });
 
+    //Ajax: enabled recurso
+    $('#fm_enabledrecurso_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:"enabled",
+            data: $('#fm_enabledrecurso').serialize(),
+            success: function($respuesta){
+                if($respuesta.error === true){
+                    hideGifEspera();
+
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_enabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_enabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_enabledrecurso_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_enabledrecurso').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            }
+            ,
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+        });//<--./ajax-->
+    });
+
+    //Ajax: Disabled recurso
+    $('#fm_disabledrecurso_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $.ajax({
+            type:"POST",
+            url:"disabled",
+            data: $('#fm_disabledrecurso').serialize(),
+            success: function($respuesta){
+                console.log($respuesta);
+                if($respuesta.error === true){
+                    console.log($respuesta);
+                    hideGifEspera();
+
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_disabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_disabledrecurso_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_disabledrecurso').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }
+                
+            }
+            ,
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+        });//<--./ajax-->
+    });
+
+
     activelinks();
     
     function activelinks(){
@@ -243,8 +317,21 @@ $(function(e){
         activeLinkaddrecursotogrupo();
         activelinkeliminarrecurso();
         activelinkenabled();
+        activelinkdisabled();
     }
 
+
+    function activelinkdisabled(){
+        
+        $(".disabled").on('click',function(e){
+            e.preventDefault();
+            $('#m_disabled_nombre').html($(this).data('nombrerecurso'));
+            $('form#fm_disabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
+            hideMsg();
+            $('#m_disabledrecurso').modal('show');
+        });
+    }
+   
     function activelinkenabled(){
         
         $(".enabled").on('click',function(e){
@@ -404,11 +491,14 @@ $(function(e){
     }
 
     function showMsg($msg){
-        $('#success_recurselist_msg').removeClass().addClass('alert text-center alert-success').fadeOut('4000').html($msg).fadeIn('8000');
+        $('#success_recurselist_msg').removeClass().addClass('alert text-center alert-success').fadeOut('4000');
+        $('#success_recurselist_textmsg').html($msg);
+        $('#success_recurselist_msg').fadeIn('8000');
     }
 
     function hideMsg(){
-        $('#success_recurselist_msg').fadeOut('4000').html('');//Resetea a vacio y oculta mensajes en la vista activa
+        $('#success_recurselist_msg').fadeOut('4000');//oculta mensajes en la vista activa
+        $('#success_recurselist_textmsg').html('');//Resetea a vacio y 
         $('.divmodal_msgError').html('').css('display','none');//Resetea a vacio y oculta cualquier mensaje en cualquier ventana modal
         $('.form-group').removeClass('has-error');//Elimina errores en campos de formulario de cualquier ventana modal
     }
@@ -554,65 +644,6 @@ $(function(e){
                }
 
             });
-    });
-    
-    
-
-    $('#btnDeshabilitar').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        showGifEspera();
-        $.ajax({
-            type:"POST",
-            url:'deshabilitarRecurso.html',
-            data:$('form#deshabilitarecurso').serialize(),
-            success:function($respuesta){
-                $('#modaldisabledRecurso').modal('hide');
-                hideGifEspera();
-                $idrecurso = $('#modaldisable_idrecurso').val();
-
-                $('#link_'+ $idrecurso +' i').removeClass('fa-toggle-off').addClass('fa-toggle-on');
-                $('#link_'+ $idrecurso).data('switch','On');
-                $('#tr_'+ $idrecurso +' td').each(function(){
-                    $(this).fadeOut('8000').fadeIn('16000');
-                });
-                
-                $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');
-                
-                },
-            error:function(xhr, ajaxOptions, thrownError){
-                        hideGifEspera();
-                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-        });
-    });   
-   
-    $('#btnHabilitar').on('click',function(e){
-        e.preventDefault();
-        showGifEspera();
-        $.ajax({
-            type:"POST",
-            url:'habilitarRecurso.html',
-            data:$('form#deshabilitarecurso').serialize(),
-            success:function($respuesta){
-                $('#modalenabledRecurso').modal('hide');
-                hideGifEspera();
-                
-                $idrecurso = $('#modaldisable_idrecurso').val();
-                $('#link_'+ $idrecurso +' i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
-                $('#link_'+ $idrecurso).data('switch','Off');
-                $('#tr_'+ $idrecurso +' td').each(function(){
-                    $(this).fadeOut('slow').fadeIn('4000');
-                });
-                
-                $('#success_recurselist_msg p').html($respuesta);
-                $('#success_recurselist_msg').fadeIn('4000');
-                },
-            error:function(xhr, ajaxOptions, thrownError){
-                        hideGifEspera();
-                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-        });
     });
     
     function updateChkeditorInstances(){
