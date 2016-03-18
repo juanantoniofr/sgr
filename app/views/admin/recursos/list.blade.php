@@ -14,14 +14,6 @@
     
     <div class="row">
         <h2 class=""><i class="fa fa-institution fa-fw"></i> Gestión de espacios y equipos</h2>
-        <!--
-        <div class="col-md-12">
-            <ul class="nav nav-pills">
-                <li ><a  href="{{route('recursos')}}"> <i class="fa fa-list fa-fw"></i> Recursos</a></li>
-                <li class="active"><a href="{{route('getListadoGrupos')}}"> <i class="fa fa-list fa-fw"></i> Grupos</a></li>
-            </ul>
-        </div>
-        -->
     </div><!-- ./row -->
 
 
@@ -55,7 +47,7 @@
                 
 
                 <div id="tableRecursos">
-                    {{$tableRecursos or ''}}
+                    {{$table or ''}}
                 </div>
                 
                     
@@ -79,6 +71,7 @@
 {{ $modalDelRecurso         or '' }}
 {{ $modalEnabledRecurso     or '' }}
 {{ $modalDisabledRecurso    or '' }}
+{{ $modalAddPersona         or '' }}
 
 
 @stop

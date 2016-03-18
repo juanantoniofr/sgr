@@ -40,7 +40,7 @@ class Recurso extends Eloquent {
 
     //identifica el grupo al que pertence un recurso
     public function grupo(){
-     return $this->hasOne('GrupoRecurso','grupo_id','id');   
+     return $this->hasOne('GrupoRecurso','id','grupo_id');   
     }
 
     public function events(){

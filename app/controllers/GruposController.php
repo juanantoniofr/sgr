@@ -137,7 +137,7 @@ class GruposController extends BaseController {
   		* @param Input::get('sortby')	string
   		* @param Input::get('order')	string
   		*
-  		* @return View::make('admin.grupolist')  
+  		* @return View::make('admin.recursos.list')  
   	*/
 	public function listar(){
     
@@ -156,7 +156,7 @@ class GruposController extends BaseController {
 	     });*/
 
 
-	    return View::make('admin.grupolist')->nest('tableRecursos','admin.tableRecursos',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled');
+	    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalrecursos.addPersona');
   	}
 
   	/**
@@ -165,7 +165,7 @@ class GruposController extends BaseController {
   		* @param Input::get('sortby')	string
   		* @param Input::get('order')	string
   		*
-  		* @return View::make('admin.tableRecursos)  
+  		* @return View::make('admin.recursos.table)  
   	*/
 	public function getTable(){
     	
@@ -175,7 +175,7 @@ class GruposController extends BaseController {
 
 	    //Todos los grupos
 	    $grupos = GrupoRecurso::all();
-	    return View::make('admin.tableRecursos',compact('grupos','sortby','order'));
+	    return View::make('admin.recursos.table',compact('grupos','sortby','order'));
   	}
 
   	/**

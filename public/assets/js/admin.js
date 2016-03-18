@@ -279,11 +279,8 @@ $(function(e){
             url:"disabled",
             data: $('#fm_disabledrecurso').serialize(),
             success: function($respuesta){
-                console.log($respuesta);
                 if($respuesta.error === true){
-                    console.log($respuesta);
                     hideGifEspera();
-
                     $.each($respuesta.errors,function(index,value){
                         $('.divmodal_msgError').html('').fadeOut();
                         $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
@@ -307,6 +304,41 @@ $(function(e){
         });//<--./ajax-->
     });
 
+    //Ajax: Save user with relation supervisor // técnico // validador
+    $('#fm_addPersona_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+          
+        $.ajax({
+            type: "POST",
+            url:  "addPersona",
+            data: $('form#fm_addPersona').serialize(),
+            success: function($respuesta){
+                console.log($respuesta);
+                if ($respuesta.error === true) {
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addPersona_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addPersona_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_addPersona_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addPersona').modal('hide');   
+                    showMsg($respuesta['msg']);
+                    getListado(); 
+                }   
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+
+            });
+    });
+
 
     activelinks();
     
@@ -318,6 +350,8 @@ $(function(e){
         activelinkeliminarrecurso();
         activelinkenabled();
         activelinkdisabled();
+        activelinkpersonas();
+        activelinkaddpersonas();
     }
 
 
@@ -338,13 +372,8 @@ $(function(e){
             e.preventDefault();
             $('#m_enabled_nombre').html($(this).data('nombrerecurso'));
             $('form#fm_enabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
-            //if ($(this).data('switch') == 'On'){
             hideMsg();
             $('#m_enabledrecurso').modal('show');
-            //}
-            //else { 
-            //if ($(this).data('switch') == 'Off') $('#modaldisabledRecurso').modal('show');
-            //}
         });
     }
 
@@ -397,7 +426,6 @@ $(function(e){
                 data: {idrecurso:$(this).data('idrecurso')},
                 success: function($recurso){
                     hideGifEspera();
-                    console.log($recurso.descripcion);
                     CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
                     CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
                     $('#fm_editrecurso input[name="id"]').val($recurso.id);
@@ -458,7 +486,28 @@ $(function(e){
             $('#m_editgrupo').modal('show');
         });
     }
+    
+    //Muestra ventana modal para establecer relación persona-recurso
+    function activelinkaddpersonas(){
+        
+        $('.addUserWithRol').on('click',function(e){
+            e.preventDefault();
+            $('#m_addPersona_title_nombrerecurso').html($(this).data('nombrerecurso'));
+            $('form#fm_addPersona input[name="idrecurso"]').val($(this).data('idrecurso'));
+            hideMsg();
+            $('#m_addPersona').modal('show');
 
+        });
+    }
+    //Muestra div personas 
+    function activelinkpersonas(){
+        $('.thpersonas').on('click',function(e){
+            e.preventDefault();
+            $(this).next('div.personas').fadeToggle('4000');
+        });
+    }
+
+    
     //Muestra ventana modal para crear nuevo grupo de recursos
     $('#btnNuevoGrupo').on('click',function(e){
         e.preventDefault();
@@ -589,62 +638,9 @@ $(function(e){
             });
     });
 
-    //show modal add user with relation supervisor // técnico // validador
-    $(".addUserWithRol").on('click',function(e){
-        e.preventDefault();
+    
 
-        $('#ModalUsuerAviso').fadeOut();
-        $('#ModalUsuerNombreRecurso').html($(this).data('nombrerecurso'));
-        $('#ModalUserNombreGrupo').html($(this).data('nombregrupo'));
-        $('#ModalUsuerIdRecurso').val($(this).data('idrecurso'));
-        
-        $('#modalAddUserWithRol').modal('show');
-    });
-
-    //Save user with relation supervisor // técnico // validador
-    $('#btnAddUserWithRol').on('click',function(e){
-        e.preventDefault();
-        showGifEspera();
-          
-        $.ajax({
-            type: "POST",
-            url:  "addUserWithRol",
-            data: $('form#addUserWithRol').serialize(),
-            success: function($respuesta){
-               //console.log($respuesta);
-               if ($respuesta['error'] === true) {
-                    $('#msg_modalAddUserWithRol').fadeOut('8000').html($respuesta['msg']).removeClass('alert-success').addClass('alert-danger').fadeIn('16000');
-                    hideGifEspera();
-                }
-               else {
-                    $idrecurso = $('form#addUserWithRol input[name="idRecurso"]').val();
-                    //console.log($idrecurso);
-                    if($respuesta['relacion'] == 'supervisor'){
-                        $('#supervisores_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
-                    }
-                    if($respuesta['relacion'] == 'validador'){
-                        
-                        $('#validadores_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
-                    }
-                    if($respuesta['relacion'] == 'tecnico'){
-                        $('#tecnicos_'+$idrecurso).append($respuesta["user"].nombre + ' ' + $respuesta["user"].apellidos +'<br />');
-                    }
-                    
-                    
-                    
-                    $('#modalAddUserWithRol').modal('hide');//oculta modal
-                    hideGifEspera();//oculta gif
-                    $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');//muestra mensage
-                    $('tr#tr_'+$respuesta["recurso"].id+' td').fadeOut('8000').fadeIn('8000');//toggle tr
-                    }
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                hideGifEspera();
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-
-            });
-    });
+   
     
     function updateChkeditorInstances(){
         for ( instance in CKEDITOR.instances )

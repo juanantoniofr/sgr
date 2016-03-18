@@ -340,6 +340,109 @@ class recursosController extends BaseController{
     return $result;
   }
 
+  /**
+    * //Establece la relación presona-recurso (supervisor-validador-tecnico)
+    *
+    * @param Input::get('idrecurso')  int
+    * @param Input::get('username')   string
+    * @param Input::get('rol')        string
+    *
+    * @return $result array
+    * 
+  */
+  
+  public function addPersona(){
+    
+    //input
+    $idRecurso = Input::get('idrecurso','');
+    $username  = Input::get('username','');
+    $rol       = Input::get('rol','');      
+    
+    
+    //Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        'username'   => 'required|exists:users,username',
+        'rol'        => 'required|in:1,2,3'
+        );
+
+    $messages = array(
+          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'idrecurso.exists'    => 'No existe identificador de recurso en BD.',
+          'username.exists'     => 'No existe usuario en la BD.',
+          'in'                  => 'El campo <strong>:attribute</strong> no coincide con ninguno de los valores aceptados.',
+          );
+
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+        return $result;
+    }
+    else{
+      $recurso = Recurso::find($idRecurso);
+      $user = User::where('username','=',$username)->first();
+      //$respuesta['user']= $user->toArray();
+      //$respuesta['recurso'] = $recurso->toArray();
+      $idUser = $user->id;
+      switch ($rol) {
+        //tecnicos
+        case '1':
+          $tecnicos = $recurso->tecnicos;
+          if ($tecnicos->contains($idUser)){
+            $result['error'] = true;
+            $result['errors']['tecnico'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recurso.';
+            return $result;
+          }
+          $recurso->tecnicos()->attach($idUser);
+          break;
+        
+        //Supervisor
+        case '2':
+          $supervisores = $recurso->supervisores;
+          if ($supervisores->contains($idUser)){
+            $result['error'] = true;
+            $result['errors']['supervisor'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
+            return $result;
+          }
+          $recurso->supervisores()->attach($idUser);
+          
+          //$respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>supervisor</b></i> con éxito.';
+          //$respuesta['relacion'] = 'supervisor';
+          break;
+      
+        //Validador
+        case '3':
+          $validadores = $recurso->validadores;
+          if ($validadores->contains($idUser)){
+            $result['error'] = true;
+            $result['errors']['validador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
+            return $respuesta;
+          }
+          $recurso->validadores()->attach($idUser);
+          //$respuesta['error'] = false;
+          $result['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
+          //$respuesta['relacion'] = 'validador';
+          break;
+      
+        default:
+          $result['error'] = false;
+          $result['msg'] = 'Identificador de rol no esperado: ' . $rol;
+        break;
+      }//fin case
+    }//fin else
+
+    $result['msg'] = Config::get('msg.actionSuccess');
+    return $result;
+
+  }
 
   /**
   * ?????
@@ -436,112 +539,7 @@ class recursosController extends BaseController{
    // return View::make('admin.supervisores')->with(compact('recurso','supervisores','sortby','order','offset','search'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menu','admin.menuSupervisores',['idRecurso' => $recurso->id, 'recurso' => $recurso->nombre])->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol',['recurso' => $recurso])->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol');
   }
 
-  //añade relación usuario recurso
-  public function addUserWithRol(){
-    
-    //input
-    $idRecurso = Input::get('idRecurso','');
-    $username  = Input::get('username','');
-    $rol       = Input::get('rol','');      
-    //output
-    $respuesta = array( 'error'     => false,
-                        'msg'       => '',
-                        'user'      => array(),
-                        'recurso'   => array(),
-                        'relacion'  => '',
-                        );
-
-    if (empty($rol)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Rol no seleccionado.';
-      return $respuesta;
-    }
-
-    if (empty($idRecurso)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Identificador de recurso vacio.';
-      return $respuesta;
-    }
-
-    if (empty($username)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = 'Identificador de usuario UVUS vacio.';
-      return $respuesta;
-    }
-
-    if (User::where('username','=',$username)->count() == 0) {
-       $respuesta['error'] = true;
-       $respuesta['msg'] = 'No existe usuario con UVUS <i>'.$username.'</i>.';
-       return $respuesta;
-    }
-
-    if (Recurso::where('id','=',$idRecurso)->count() == 0) {
-       $respuesta['error'] = true;
-       $respuesta['msg'] = 'No existe recurso con identificador <i>'.$idRecurso.'</i>.';
-       return $respuesta;
-    }
-
-    
-
-    $recurso = Recurso::find($idRecurso);
-    $user = User::where('username','=',$username)->first();
-    $respuesta['user']= $user->toArray();
-    $respuesta['recurso'] = $recurso->toArray();
-    $idUser = $user->id;
-    switch ($rol) {
-      //tecnicos
-      case '1':
-        $tecnicos = Recurso::find($idRecurso)->tecnicos;
-        if ($tecnicos->contains($idUser)){
-          $respuesta['error'] = true;
-          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recurso.';
-          
-          return $respuesta;
-        }
-        $recurso->tecnicos()->attach($idUser);
-        $respuesta['error'] = false;
-        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>técnico</b></i> con éxito.';
-        $respuesta['relacion'] = 'tecnico';
-        break;
-      //Supervisor
-      case '2':
-        $supervisores = Recurso::find($idRecurso)->supervisores;
-        if ($supervisores->contains($idUser)){
-          $respuesta['error'] = true;
-          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
-         
-          return $respuesta;
-        }
-        $recurso->supervisores()->attach($idUser);
-        $respuesta['error'] = false;
-        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>supervisor</b></i> con éxito.';
-         $respuesta['relacion'] = 'supervisor';
-        break;
-      //Validador
-      case '3':
-        $validadores = Recurso::find($idRecurso)->validadores;
-        if ($validadores->contains($idUser)){
-          $respuesta['error'] = true;
-          $respuesta['msg'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
-          
-          return $respuesta;
-        }
-        $recurso->validadores()->attach($idUser);
-        $respuesta['error'] = false;
-        $respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
-        $respuesta['relacion'] = 'validador';
-        break;
-      
-      default:
-        $respuesta['error'] = false;
-        $respuesta['msg'] = 'Identificador de rol no esperado: ' . $rol;
-        break;
-    }
-
-    
-
-    return $respuesta;
-  }
+  
   //elimina la relación 
   public function removeUsersWithRol(){
     

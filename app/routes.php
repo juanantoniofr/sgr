@@ -122,7 +122,9 @@ Route::post('admin/updaterecurso',array('uses' => 'recursosController@update','b
 Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/usersWithRelation.html',array('uses' => 'recursosController@usersWithRelation','before' => array('auth','auth_ajax','capacidad:4,msg')));	
-Route::post('admin/addUserWithRol',array('uses' => 'recursosController@addUserWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
+
+Route::post('admin/addPersona',array('uses' => 'recursosController@addPersona','before' => array('auth','auth_ajax','capacidad:4,msg')));
+
 Route::post('admin/removeUsersWithRol',array('uses' => 'recursosController@removeUsersWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
 Route::get('admin/listarecursos.html',array('as' => 'recursos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::get('admin/eliminarecurso.html',array('uses'=>'RecursosController@eliminar','before' => array('auth','capacidad:4-6,msg')));
