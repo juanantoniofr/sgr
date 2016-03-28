@@ -78,7 +78,6 @@ $(function(e){
             url:  "addrecursotogrupo",
             data: $('form#fm_addrecursotogrupo').serialize(),
             success: function($respuesta){
-                console.log($respuesta);
                 if($respuesta.error == true){ 
                     hideGifEspera(); 
                     $('.divmodal_msgError').html('').fadeOut();
@@ -139,7 +138,6 @@ $(function(e){
             url:  "delrecurso",
             data: $('form#fm_delrecurso').serialize(),
             success: function($respuesta){
-                console.log($respuesta);
                 if($respuesta.error === true){  
                     hideGifEspera(); 
                     $.each($respuesta.errors,function(index,value){
@@ -187,7 +185,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_editgrupo').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }
                 
@@ -221,7 +219,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_addgrupo').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }
                 
@@ -256,7 +254,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_enabledrecurso').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }
                 
@@ -291,7 +289,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_disabledrecurso').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }
                 
@@ -314,7 +312,6 @@ $(function(e){
             url:  "addPersona",
             data: $('form#fm_addPersona').serialize(),
             success: function($respuesta){
-                console.log($respuesta);
                 if ($respuesta.error === true) {
                     hideGifEspera();
                     $.each($respuesta.errors,function(index,value){
@@ -327,7 +324,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_addPersona').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }   
             },
@@ -339,6 +336,39 @@ $(function(e){
             });
     });
 
+    //Ajax: baja supervisor, validor y/o técnico
+    $('#fm_removePersona_save').on('click',function(e){
+        e.preventDefault();
+        showGifEspera();
+        $.ajax({
+            type: "POST",
+            url:  "removePersonas",
+            data: $('form#fm_removePersona').serialize(),
+            success: function($respuesta){
+                if ($respuesta.error === true) {
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addPersona_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addPersona_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_addPersona_textError').fadeIn('8000');
+                }
+
+               else {
+                    hideGifEspera();
+                    $('#m_removePersona').modal('hide');   
+                    showMsg($respuesta.msg);
+                    getListado(); 
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+               }
+
+            });
+    });
 
     activelinks();
     
@@ -352,6 +382,7 @@ $(function(e){
         activelinkdisabled();
         activelinkpersonas();
         activelinkaddpersonas();
+        activelinkremovepersonas();
     }
 
 
@@ -499,6 +530,34 @@ $(function(e){
 
         });
     }
+
+    //Muestra ventana modal para eliminar relación persona-recurso
+    function activelinkremovepersonas(){
+        
+        $('.removeUserWithRol').on('click',function(e){
+            e.preventDefault();
+            showGifEspera();
+            $('#m_removePersona_title_nombrerecurso').html($(this).data('nombrerecurso'));
+            $('form#fm_removePersona input[name="idrecurso"]').val($(this).data('idrecurso'));
+            hideMsg();
+            $.ajax({
+                type:"GET",
+                url:"htmlCheckboxPersonas",
+                data:{idrecurso : $(this).data('idrecurso')},
+                success: function($respuesta){
+                    //Añade input formulario en ventana modal
+                    hideGifEspera();
+                    $('form#fm_removePersona div#fm_removePersonas-checkboxes').html($respuesta.htmlCheckboxPersonas);
+                    $('#m_removePersona').modal('show');
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    hideGifEspera();
+                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                }
+            });
+        });
+    }
+
     //Muestra div personas 
     function activelinkpersonas(){
         $('.thpersonas').on('click',function(e){
@@ -552,124 +611,12 @@ $(function(e){
         $('.form-group').removeClass('has-error');//Elimina errores en campos de formulario de cualquier ventana modal
     }
 
-    //**************
-
-    //Muestra modal confirmación baja supervisor // validador y/o técnico
-    $('.removeUserWithRol').on('click',function(e){
-        e.preventDefault();
-
-        $('form#removeUserWithRol input[name="idrecurso"]').val($(this).data('idrecurso'));
-        //obtiene supervisores//validadores//técnico del un recurso
-        $.ajax({
-            type:"GET",
-            url:"usersWithRelation.html",
-            data:{idrecurso : $(this).data('idrecurso')},
-            success: function($respuesta){
-                //console.log($respuesta);
-                //Añade input formualrio en ventana modal
-                $('form#removeUserWithRol div#supervisores').html('');
-                $('form#removeUserWithRol div#validadores').html('');
-                $('form#removeUserWithRol div#tecnicos').html('');
-                $.each($respuesta['supervisores'],function(index,value){
-                    
-                    $('form#removeUserWithRol div#supervisores').append('<label><input type="checkbox" value = "'+value.id+'" name="supervisores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
-                });
-                
-                $.each($respuesta['validadores'],function(index,value){
-                    
-                    $('form#removeUserWithRol div#validadores').append('<label><input type="checkbox" value = "'+value.id+'" name="validadores[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
-                });
-
-                $.each($respuesta['tecnicos'],function(index,value){
-                    //console.log('tecnicos '+value.pivot.recurso_id);
-                    $('form#removeUserWithRol div#tecnicos').append('<label><input type="checkbox" value = "'+value.id+'" name="tecnicos[]" >'+ value.username +', '+value.nombre + ' '+ value.apellidos+' </label><br />');
-                });
-
-                $('#modalRemoveUserWithRol').modal('show');
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                hideGifEspera();
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-        });
-    });
-
-    //Ajax: baja supervisor, validor y/o técnico
-    $('#btnremoveUserWithRol').on('click',function(e){
-        e.preventDefault();
-        showGifEspera();
-        $.ajax({
-            type: "POST",
-            url:  "removeUsersWithRol",
-            data: $('form#removeUserWithRol').serialize(),
-            success: function($respuesta){
-               //console.log($respuesta);
-               hideGifEspera();
-               if ($respuesta['error'] === true) {
-                    $('#msg_modalRemoveUserWithRol').fadeOut('8000').html($respuesta['msg']).fadeIn('16000');
-                    
-                }
-               else {
-                    $('#modalRemoveUserWithRol').modal('hide');
-                    $('#success_recurselist_msg').html($respuesta['msg']).fadeOut('8000').fadeIn('16000');
-
-                    //actualiza td
-                    $idrecurso = $('form#removeUserWithRol input[name="idrecurso"]').val();
-                    $('#supervisores_'+$idrecurso).html('');
-                    $('#validadores_'+$idrecurso).html('');
-                    $('#tecnicos_'+$idrecurso).html('');
-                    //console.log($respuesta['supervisores']);
-                    $.each($respuesta['supervisores'],function(index,value){
-                        $('#supervisores_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
-                    });
-                    $.each($respuesta['validadores'],function(index,value){
-                        $('#validadores_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
-                    });
-                    $.each($respuesta['tecnicos'],function(index,value){
-                        $('#tecnicos_'+value.pivot.recurso_id).append(value.nombre + ' ' + value.apellidos +' ('+ value.username +').<br />');
-                    });
-                }
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                hideGifEspera();
-                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-               }
-
-            });
-    });
-
-    
-
-   
     
     function updateChkeditorInstances(){
         for ( instance in CKEDITOR.instances )
             CKEDITOR.instances[instance].updateElement();
     }    
     
-    $("#caducidad").datepicker({
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            showAnim: 'slideDown',
-            dateFormat: 'd-m-yy',
-            showButtonPanel: true,
-            firstDay: 1,
-            monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
-            dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
-        });
-
-
-    $('#grupoNuevo').on('click',function(e){
-        e.preventDefault();
-        $('#nuevoGrupo').toggle('slow');
-       
-    });
-    
-    $('#grupoNuevo_edit').on('click',function(e){
-        e.preventDefault();
-        $('#nuevoGrupo_edit').toggle('slow');
-    });
-
     function showGifEspera(){
         $('#espera').css('display','inline').css('z-index','10000');
     }

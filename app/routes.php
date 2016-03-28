@@ -119,37 +119,14 @@ Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before'
 Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@update','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
-Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
-Route::get('admin/usersWithRelation.html',array('uses' => 'recursosController@usersWithRelation','before' => array('auth','auth_ajax','capacidad:4,msg')));	
-
+Route::get('admin/htmlCheckboxPersonas',array('uses' => 'recursosController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4,msg')));	
 Route::post('admin/addPersona',array('uses' => 'recursosController@addPersona','before' => array('auth','auth_ajax','capacidad:4,msg')));
-
-Route::post('admin/removeUsersWithRol',array('uses' => 'recursosController@removeUsersWithRol','before' => array('auth','auth_ajax','capacidad:4,msg')));
-Route::get('admin/listarecursos.html',array('as' => 'recursos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
-Route::get('admin/eliminarecurso.html',array('uses'=>'RecursosController@eliminar','before' => array('auth','capacidad:4-6,msg')));
-
+Route::post('admin/removePersonas',array('uses' => 'recursosController@removePersonas','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 
 //************************************************
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Gestión de recursos
+//GruposController routes
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
@@ -224,8 +201,8 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 
-	$grupo = GrupoRecurso::find(1);
-	$grupo->recursos()->attach(['2','3']);
+	$grupos = GruposController::gruposVisibles('58');
+	var_dump($grupos);
 	
  }));
 

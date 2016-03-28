@@ -40,8 +40,8 @@ class GruposController extends BaseController {
         	$result['msg'] = Config::get('msg.actionSuccess');
       	}
     
-		return $result;
-  	}
+		  return $result;
+  }
 
 	/**
 		*
@@ -86,7 +86,7 @@ class GruposController extends BaseController {
       	}
     
 		return $result;
-  	}
+  }
 
 	/**
 		*
@@ -138,7 +138,7 @@ class GruposController extends BaseController {
   		* @param Input::get('order')	string
   		*
   		* @return View::make('admin.recursos.list')  
-  	*/
+  */
 	public function listar(){
     
 	    //Input      
@@ -146,17 +146,10 @@ class GruposController extends BaseController {
 	    $order = Input::get('order','asc');
 	         
 	    //Todos los grupos
-	    $grupos = GrupoRecurso::all();/*->filter(function($grupo){
-	      
-	      $recursos = $grupo->recursos->each(function($recurso){
-	        return $recurso->supervisores->contains(Auth::user()->id);  
-	      }); 
-	      if ($recursos->count() > 0) return true;
-	      
-	     });*/
+	    $grupos = GrupoRecurso::all();
 
 
-	    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalrecursos.addPersona');
+	    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalrecursos.addPersona')->nest('modalRemovePersona','admin.modalrecursos.removePersona');
   	}
 
   	/**
@@ -190,25 +183,45 @@ class GruposController extends BaseController {
   		$id = Input::get('grupo_id','');
   		$idrecursos = Input::get('idrecursos',array());
   		//out
-		$result = array('error'	=> false,
+	   	$result = array('error'	=> false,
 						'msg'	=> Config::get('msg.success'),
 						);
 
-		//Validación input
-		if (empty($id) || GrupoRecurso::where('id','=',$id)->count() != 1) {
-			$result['msg'] = Config::get('msg.idempty') . ' o ' . Config::get('msg.idnotfound');
-			$result['error'] = true;
-  		}
-  		else {
-  			foreach ($idrecursos as $idrecurso) {
-  				Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
-  			}
-  		}
+		  //Validación input
+		  if (empty($id) || GrupoRecurso::where('id','=',$id)->count() != 1) {
+			 $result['msg'] = Config::get('msg.idempty') . ' o ' . Config::get('msg.idnotfound');
+		  	$result['error'] = true;
+  		  }
+  		  else {
+  			 foreach ($idrecursos as $idrecurso) {
+  			  Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
+  			 }
+  		  }
   			
   		return $result;
   	}
 
-
+  /**
+    * //devuelve array con los nombres de los grupos con algún recurso visible para reserva para el usuario con identificador igual a $id
+    * 
+    * @param $id int
+    *
+    * @return $grupos Object GrupoRecursos
+    * 
+  */
+  static public function gruposVisibles(){
+  
+    $grupos = GrupoRecurso::all()->filter(function($grupo){
+      $recursos = $grupo->recursos->filter(function($recurso){
+            return $recurso->visible();
+        }); 
+      if ($recursos->count() > 0 ) return true;
+    });
+    
+    
+    
+    return $grupos;
+  }
 
 
 

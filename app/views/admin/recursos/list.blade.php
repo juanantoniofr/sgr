@@ -72,6 +72,7 @@
 {{ $modalEnabledRecurso     or '' }}
 {{ $modalDisabledRecurso    or '' }}
 {{ $modalAddPersona         or '' }}
+{{ $modalRemovePersona      or '' }}
 
 
 @stop

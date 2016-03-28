@@ -205,37 +205,43 @@ class recursosController extends BaseController{
 
   
   /**
-    * //Devuelve los recursos de una misma agrupación/grupo en forma de html options ?????
+    * //Devuelve los recursos de un mismo grupo en forma de html options para select en sidebar
     * @param void
     *
     * @return View::make('calendario.optionsRecursos') string
   */
   public function getRecursos(){
     
-    //Default output 
+    //Input
+    $id = Input::get('groupID','');
+      
+    //Output 
     $addOptionAll = false;
     $tipoRecurso = '';
     $disabledAll = 0;
-
-    $grupo = Input::get('groupID','');
     
-    if(empty($grupo)) $recursos = array();
-    else {
-      $recursos = Recurso::where('grupo_id','=',$grupo)->get();  
-      //se filtran para obtener sólo aquellos con visibles o atendidos para el usuario logeado
-      $recursos = $recursos->filter(function($recurso){
+    if(!empty($id)){
+      $grupo = GrupoRecurso::findOrFail($id);
+      
+      //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
+      $recursos = $grupo->recursos->filter(function($recurso){
           return $recurso->visible() || $recurso->esAtendidoPor(Auth::user()->id); });
-      //Añadir opción reservar "todos los puestos o equipos"
-      if (!Auth::user()->isUser() && $recursos[0]->tipo != 'espacio') $addOptionAll = true;
-      //tipo de recurso
-      $tipoRecurso = $recursos[0]->tipo;
-      //número de puestos//equipos disabled
-      $numerodeitemsdisabled = Recurso::where('grupo_id','=',$grupo)->where('disabled','=','1')->count();
+      //tipo de recurso && número de puestos or equipos disabled
+      $numerodeitemsdisabled = 0;
+      foreach ($recursos as $recurso) {
+        $tipoRecurso = $recurso->tipo;
+        if($recurso->disabled == '1') $numerodeitemsdisabled++;
+      }
       if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
-
+      
+      //Añadir opción reservar "todos los puestos o equipos"
+      if (!Auth::user()->isUser() && $tipoRecurso != 'espacio' && !$disabledAll) $addOptionAll = true;
+      
+      return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
     }
 
-    return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
+    return '';
+    
   }
 
   /**
@@ -318,7 +324,7 @@ class recursosController extends BaseController{
           );
     $validator = Validator::make(Input::all(), $rules, $messages);
     
-     //Save Input or return error
+    //Save Input or return error
     if ($validator->fails()){
         $result['errors'] = $validator->errors()->toArray();
         $result['error'] = true;
@@ -350,7 +356,6 @@ class recursosController extends BaseController{
     * @return $result array
     * 
   */
-  
   public function addPersona(){
     
     //input
@@ -441,44 +446,148 @@ class recursosController extends BaseController{
 
     $result['msg'] = Config::get('msg.actionSuccess');
     return $result;
+  }
 
+  /**
+    * // Devuelve listas de input type checkbox para formulario con las personas que tienen alguna de las relaciones de supervisor//técnico//validador
+    * 
+    * @param Input::get('idrecurso') int identificador de recurso
+    *
+    * @return $result array
+  */
+  public function htmlCheckboxPersonas(){
+
+    //input
+    $id = Input::get('idrecurso','');
+
+    //Output
+    $result = array( 'errors'                 => array(),
+                     'error'                 => false,
+                     'htmlCheckboxPersonas'  => '',
+                    );
+    
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //get personas or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+      $recurso = Recurso::findOrFail($id);
+      $result['htmlCheckboxPersonas'] = (string) View::make('admin.modalrecursos.checkboxPersonas')->with(compact('recurso'));
+    }
+      
+    return $result;  
+  }
+
+
+  /**
+    * //elimina la relación recurso-persona
+    *
+    * @param Input::get('idrecurso') int
+    * @param Input::get('supervisores_id) array
+    * @param Input::get('validadores_id') array
+    * @param Input::get('tecnicos_id') array
+    *
+    * @return $result array    
+    *
+  */
+  public function removePersonas(){
+    
+    //input
+    $idrecurso                = Input::get('idrecurso','');
+    $detachSupervisores       = Input::get('supervisores_id',array());
+    $detachValidadores        = Input::get('validadores_id',array());
+    $detachTecnicos           = Input::get('tecnicos_id',array());
+    
+    //Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
+
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'idrecurso.exists'    => 'No existe identificador de recurso en BD.',
+          );
+
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+      return $result;
+    }
+    else {
+      $recurso = Recurso::findOrFail($idrecurso);
+      foreach ($detachSupervisores as $idSupervisor) {
+        $recurso->supervisores()->detach($idSupervisor);
+      }
+      foreach ($detachValidadores as $idValidador) {
+        $recurso->validadores()->detach($idValidador);
+      }
+      foreach ($detachTecnicos as $idTecnico) {
+        $recurso->tecnicos()->detach($idTecnico);
+      }
+      $result['msg'] = Config::get('msg.success');
+    }
+
+    return $result;
+  }
+
+
+  /**
+    * @param void
+    *
+    * @return $recursos Array(Recurso)  
+  */
+  public function recursosSinGrupo(){
+    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
+  }
+
+  /**
+    *
+    * // Devuelve en formato json los roles con acceso a un recurso
+    *
+    * @param $modo int (1|0) gestión de soliticitudes de reserva atendida o desantendida 
+    * @param $roles array
+    *
+    * @return $acl string 
+  */
+  private function buildJsonAcl($modo,$roles){
+
+    $acl = array('r' => '',
+                  'm' => '0',//por defecto gestión Atendida de las solicitudes de uso.
+                  );
+    $acl['m'] = $modo;
+    $roles[] = Config::get('options.idroladministrador'); //Administrador tiene accseso
+    $listIdRolesConAcceso = implode(',',$roles);
+    $acl['r'] = $listIdRolesConAcceso;
+
+    return json_encode($acl);
   }
 
   /**
   * ?????
   */
-  public function listar(){
-    
-    //Input      
-    $sortby = Input::get('sortby','nombre');
-    $order = Input::get('order','asc');
-    $offset = Input::get('offset','10');
-    $search = Input::get('search','');
-    $idgruposelected = Input::get('grupoid','');
-    
-    $recursosListados = 'Todos los recursos';
-    if (!empty($idgruposelected)) $recursosListados = Recurso::where('grupo_id','=',$idgruposelected)->first()->grupo;
-
-    //Output
-    if (Auth::user()->isAdmin()){
-      $grupos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = Recurso::where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset);
-    }
-    else {
-      $grupos = User::find(Auth::user()->id)->supervisa()->groupby('grupo_id')->orderby('grupo','asc')->get();
-      $recursos = User::find(Auth::user()->id)->supervisa()->where('nombre','like',"%$search%")->where('grupo_id','like','%'.$idgruposelected.'%')->orderby($sortby,$order)->paginate($offset); 
-    }
-    
-
-    return View::make('admin.recurselist')->with(compact('recursos','sortby','order','grupos','idgruposelected','recursosListados'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos')->nest('modalAdd','admin.recurseModalAdd',compact('grupos'))->nest('modalEdit','admin.recurseModalEdit',array('recursos'=>$grupos))->nest('modalEditGrupo','admin.modaleditgrupo')->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol')->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol')->nest('modaldeshabilitarecurso','admin.modaldeshabilitarecurso');
-  } 
-
-  
-  
  
-  
-
-  //Devuelve el campo descripción dado un id_recurso
+  //Devuelve el campo descripción dado un id_recurso ???
   public function getDescripcion(){
 
     $idRecurso = Input::get('idrecurso','');
@@ -492,174 +601,5 @@ class recursosController extends BaseController{
     
     return $descripcion;
   } 
-
-  /**
-  * @param void
-  *
-  * @return $recursos Array(Recurso)  
-  */
-  public function recursosSinGrupo(){
-    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
-  }
-
- 
-
-  
-
-  /**
-  * Devuelve los usuarios con relación de supervisor // tecnico // validador
-  * @param Input::get('idrecurso') int identificador de recurso
-  */
-  public function usersWithRelation(){
-
-    //Input 
-    $idrecurso = Input::get('idrecurso','');
-
-    //Output
-    $result = array('error'         => false,
-                    'supervisores'  => array(),
-                    'validadores'   => array(),
-                    'tecnicos'      => array(),
-                    'msg'           => '');
-    //check $idrecurso
-    if (empty($idrecurso)){
-      $result['error'] = true;
-      $result['mgs']  = Config::get('msg.idnotfound');
-      return $result;
-    }
-    else{
-      $recurso = Recurso::findOrFail($idrecurso);
-      if ($recurso->supervisores->count() > 0) $result['supervisores'] = $recurso->supervisores->toArray();
-      if ($recurso->validadores->count() > 0) $result['validadores'] = $recurso->validadores->toArray();
-      if ($recurso->tecnicos->count() > 0) $result['tecnicos'] = $recurso->tecnicos->toArray();  
-    }
-      
-    return $result;  
-    
-   // return View::make('admin.supervisores')->with(compact('recurso','supervisores','sortby','order','offset','search'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menu','admin.menuSupervisores',['idRecurso' => $recurso->id, 'recurso' => $recurso->nombre])->nest('recurseModalAddUserWithRol','admin.recurseModalAddUserWithRol',['recurso' => $recurso])->nest('recurseModalRemoveUserWithRol','admin.recurseModalRemoveUserWithRol');
-  }
-
-  
-  //elimina la relación 
-  public function removeUsersWithRol(){
-    
-    //input
-    $idRecurso                = Input::get('idrecurso','');
-    $detachSupervisores       = Input::get('supervisores','');
-    $detachValidadores        = Input::get('validadores','');
-    $detachTecnicos           = Input::get('tecnicos','');
-    
-    //output
-    $respuesta = array( 'error' => false,
-                        'msg' => '',
-                        'supervisores' => '',
-                        'validadores' => '',
-                        'tecnicos' => '',
-                        );
-
-    if (empty($idRecurso)){
-      $respuesta['error'] = true;
-      $respuesta['msg'] = Config::get('msg.idnotfound');
-      return $respuesta;
-    }
-
-    $recurso = Recurso::findOrFail($idRecurso);
-    if (!empty($detachSupervisores))
-      foreach ($detachSupervisores as $idSupervisor) {
-        $recurso->supervisores()->detach($idSupervisor);
-        
-      }
-    if (!empty($detachValidadores))  
-      foreach ($detachValidadores as $idValidador) {
-        $recurso->validadores()->detach($idValidador);
-        
-      }
-    if (!empty($detachTecnicos))
-      foreach ($detachTecnicos as $idTecnico) {
-        $recurso->tecnicos()->detach($idTecnico);
-        
-      }
-    
-    $respuesta['msg'] = Config::get('msg.success');
-    $respuesta['supervisores'] = $recurso->supervisores->toArray();
-    $respuesta['validadores'] = $recurso->validadores->toArray();
-    $respuesta['tecnicos'] = $recurso->tecnicos->toArray();
-    return $respuesta;
-  }
-
-  /**?????**/
-	public function formAdd(){
-
-    $recursos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-    return View::make('admin.recurseAdd')->with(compact('recursos'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos');
-  }
-
- 
-  
-  /*****??????***/
- /* public function formEdit(){
-
-    $id = Input::get('id');
-    $recursos = Recurso::groupby('grupo_id')->orderby('grupo','asc')->get();
-    $recurso = Recurso::find($id);
-    
-    $modo = 0;//Con validación
-    if (!$recurso->validacion()) $modo = 1;//sin validación
-    
-    $permisos = json_decode($recurso->acl,true);
-    $capacidades = $permisos['r']; //array con los valores de la capacidades con acceso
-
-    return View::make('admin.recurseEdit')->with(compact('recursos','recurso','modo','capacidades'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuRecursos','admin.menuRecursos');
-  }*/
-
-  
-
-
-
-  //private
-  /******* ??? *******/
-  private function getNombre(){
-
-    $idgrupo = Input::get('idgrupo');
-    $nuevogrupo = Input::get('nuevogrupo','');
-
-    if (empty($nuevogrupo)) $nombregrupo = Recurso::where('grupo_id','=',$idgrupo)->first()->grupo;
-    else $nombregrupo = $nuevogrupo;
-   
-    return $nombregrupo;
-  }
-  /******* ??? *******/
-  private function getIdGrupo(){
-
-    $idgrupo = Input::get('idgrupo');
-    $nuevogrupo = Input::get('nuevogrupo','');
-
-    if (!empty($nuevogrupo)){
-      //
-      $identificadores = Recurso::select('grupo_id')->groupby('grupo_id')->get()->toArray();
-      $idgrupo = 1;
-      $salir = false;
-      while(array_search(['grupo_id' => $idgrupo], $identificadores) !== false){
-        $idgrupo++;
-      }
-    }
-
-    return $idgrupo;
-  }
-
-  private function buildJsonAcl($modo,$roles){
-
-    $acl = array('r' => '',
-                  'm' => '0',//por defecto gestión Atendida de las solicitudes de uso.
-                  );
-    $acl['m'] = $modo;
-    $roles = $roles;
-    $roles[] = Config::get('options.idroladministrador'); //Administrador tiene accseso
-    $listIdRolesConAcceso = implode(',',$roles);
-    $acl['r'] = $listIdRolesConAcceso;
-
-    return json_encode($acl);
-  }
-
 
 }

@@ -6,16 +6,12 @@
       <select class="form-control" id="selectGroupRecurse" name="groupID" >
           <option value="0" disabled selected>Espacio o equipo:</option>
           @foreach ($grupos as $grupo)
-            <option value="{{$grupo->grupo_id}}">{{$grupo->grupo}}</option>
+            <option value="{{$grupo->id}}">{{$grupo->nombre}}</option>
           @endforeach
         </select>
     
         <div  id="selectRecurseInGroup" style="display:none;margin-top:5px;">
           <select class="form-control" id="recurse" name="recurseName" > 
-            <option value="0" disabled selected> --- </option>
-              @foreach ($recursos as $recurso)
-                <option value="{{$recurso->id}}" data-atendido = "@if ($recurso->esAtendidoPor(Auth::user()->id)) 1 @else 0 @endif">{{$recurso->nombre}}</option>
-              @endforeach         
           </select>
         </div>
       </div>

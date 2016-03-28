@@ -147,7 +147,7 @@ $(function(e){
 						$("select#recurse option:first").prop("selected", "selected");
 						$('select#recurse').change();
 					});
-					//hideGifEspera();
+					hideGifEspera();
 				},
 				error: function(xhr, ajaxOptions, thrownError){
 						hideGifEspera();
@@ -446,12 +446,11 @@ $(function(e){
 	function programerEventClickToCalendarCell(){	
 		
 		$('.formlaunch').click(function(e){
-			
 			if($('select#recurse option:selected').data('disabled')){
 				$('#modalMsg').modal('show');
 			}	
 			else{
-				if (!$('select#recurse option:selected').val()) {
+				if ($('select#recurse option:selected').val() === undefined) {
 					//alert('Espacio o medio a reservar no seleccionado');
 					$('#alert').fadeOut('slow');
 					$('#alert').fadeIn('slow');
