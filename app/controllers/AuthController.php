@@ -9,13 +9,17 @@ class AuthController extends BaseController {
 
         if (Cas::authenticate()){
             // login en sso ok 
-            //$attributes = phpCAS::getAttributes();
+            
             $attributes = Cas::attr();
             $statusUvus = stripos($attributes['schacuserstatus'],'uvus:OK');
 
             if ($statusUvus == false){
-                $msg = 'Has iniciado sesión correctamente pero, <b>su UVUS no es válido</b><br />';
-                return View::make('loginError')->with(compact('msg'));
+                $pagetitle   = Config::get('msg.pagetitleLogin');
+                $paneltitle  = Config::get('msg.paneltitle');
+                $msg         = Config::get('msg.uvusNoValido');
+                $alertLevel  = 'danger';
+
+                return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
             }
 
 
@@ -26,13 +30,22 @@ class AuthController extends BaseController {
             if (!empty($user)){
                 // Registrado pero -> No activo
                 if (!$user->estado) {
-                    $msg = '<b>Usuario sin activar</b><br />
-                    Si en 24/48 horas persiste esta situación, puede ponerse en contacto con la Unidad TIC de la F. de Comunicación para solucionarlo.';
-                    return View::make('loginError')->with(compact('msg'));
+                    $pagetitle   = Config::get('msg.pagetitleLogin');
+                    $paneltitle  = Config::get('msg.paneltitle');
+                    $msg         = Config::get('msg.uvusNoActivo');
+                    $alertLevel  = 'danger';
+                    
+                    return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
                 }
 
                 //Registrado pero -> Caducada
-                if (strtotime($user->caducidad) < strtotime(date('Y-m-d'))) return View::make('loginError')->with('msg','Su acceso a <i>reservas fcom</i></b> ha caducado.<br />Puede ponerse en contacto con la Unidad TIC de la F. de Comunicación para solucionarlo.');
+                if (strtotime($user->caducidad) < strtotime(date('Y-m-d'))){
+                    $pagetitle   = Config::get('msg.pagetitleLogin');
+                    $paneltitle  = Config::get('msg.paneltitle');
+                    $msg         = Config::get('msg.cuentaCaducada');
+                    $alertLevel  = 'danger'; 
+                    return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+                }
 
                 //-> login en laravel
                 Auth::loginUsingId($user->id); 
@@ -90,16 +103,21 @@ class AuthController extends BaseController {
                 //-> login en laravel
                 Auth::loginUsingId($user->id); 
 
-                $msg = 'Usuario registrado en <i>reservas fcom</i>.<br />
-                En 24/48 horas activaremos su cuenta<br />';
-                return View::make('loginError')->with(compact('msg'));
+                $pagetitle   = Config::get('msg.pagetitleLogin');
+                $paneltitle  = Config::get('msg.paneltitle');
+                $msg         = Config::get('msg.uvusRegistrado');
+                $alertLevel  = 'success'; 
+                return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
             }
 
             
         }
         else{
-            $msg = '<b>error autenticación sso</b><br />';
-            return View::make('loginError')->with(compact('msg'));
+            $pagetitle   = Config::get('msg.pagetitleLogin');
+            $paneltitle  = Config::get('msg.paneltitle');
+            $msg         = Config::get('msg.errorSSO');
+            $alertLevel  = 'danger'; 
+            return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
             }
     
         }

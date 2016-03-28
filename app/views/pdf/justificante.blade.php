@@ -1,47 +1,48 @@
 <style>
 
-* {
-	font-family:verdana;
-	font-size: 12px; 
-}
+	* {
+		font-family:verdana;
+		font-size: 12px; 
+	}
 
-div{
-	border-top:none;
-	border-bottom: 1px solid #333;
-	border-top: 1px solid #333;
-	margin-top:20px;
-}
+	div{
+		border-top:none;
+		border-bottom: 1px solid #333;
+		border-top: 1px solid #333;
+		margin-top:20px;
+	}
 
-#title {
-	font-size: 14px;
-}
+	#title {
+		font-size: 14px;
+	}
 
-.subtitle{
-	font-style: italic;
-}
+	.subtitle{
+		font-style: italic;
+	}
 
-span {
-	color:blue;
-}
+	span {
+		color:blue;
+	}
 
-p.label{text-align:right;font-size:12px}
+	p.label{text-align:right;font-size:12px}
 
-table {
-	margin-top:10px;
-	padding:20px;
-	width: 100%;
+	table {
+		margin-top:10px;
+		padding:20px;
+		width: 100%;
 
-}
- td {
- 	border:1px solid #aaa;
- }
-#first{
-	background-color: #aaa;
-}
-#estado {
-	boder:1px solid green;
-}
+	}
+	 td {
+	 	border:1px solid #aaa;
+	 }
+	#first{
+		background-color: #aaa;
+	}
+	#estado {
+		boder:1px solid green;
+	}
 </style>
+
 <h2>Comprobante de Reserva</h2>
 <div>
 
@@ -49,7 +50,8 @@ table {
 	<p class = "subtitle">Código: <span>{{$event->evento_id}}</span></p>
 	<p class = "subtitle">Reservado para: <span>{{$event->user->nombre .' '. $event->user->apellidos}} ({{$event->user->username}})</span></p>
 	<p class = "subtitle">Reservado por: <span>{{$event->reservadoPor->nombre .' '. $event->reservadoPor->apellidos}} ({{$event->reservadoPor->username}})</span></p>
-	<p class = "subtitle">Fecha de registro: <span>{{utf8_decode($created_at)}}</span></p>
+	<p class = "subtitle">Fecha de registro: <span>{{$created_at}}</span></p>
+	<p class = "subtitle">Fecha de impresión: <span>{{$impreso_at}}</span></p>
 
 
 </div>
@@ -61,7 +63,7 @@ table {
 		
 		@foreach ($recursos as $recurso)	
 		
-			{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo}} )</small>
+			{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo->nombre}} )</small>
 			<br />
 		@endforeach
 		

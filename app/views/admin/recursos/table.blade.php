@@ -71,8 +71,8 @@
                         @endif
                         
                         <div class="personas" style="display:none">
-                            <a class="addUserWithRol" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo->nombre}}" title="Añade usuarios con las relaciones de supervisor, tecnico y/o validador" ><i class="fa fa-user-plus fa-fw"></i></a>
-                            <a class="removeUserWithRol" href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title="Elimina usuarios con  relación de supervisor, tecnico y/o validador" ><i class="fa fa-user-times fa-fw"></i></a>
+                            <a class="addUserWithRol text-danger"  href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" data-nombregrupo="{{$recurso->grupo->nombre}}" title="Añade usuarios con las relaciones de supervisor, tecnico y/o validador" ><i class="fa fa-user-plus fa-fw"></i></a>
+                            <a class="removeUserWithRol text-danger"  href="" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" title="Elimina usuarios con  relación de supervisor, tecnico y/o validador" ><i class="fa fa-user-times fa-fw"></i></a>
                             
     
                             <table class="table table-hover table-striped" >

@@ -192,11 +192,12 @@ class Evento extends Eloquent{
 			'date'					=>	'<strong>Fecha no válida</strong>. <br />',
 			'date_format'  			=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
 
-			'fInicio.after' 		=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
-			'fInicio.req1' 			=>	'',
-			'fInicio.req5' 			=>	'',
-			'fInicio.req6' 			=>	'',
-
+			'fInicio.after' 			=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
+			'fInicio.req1' 				=>	'',
+			'fInicio.req5' 				=>	'',
+			'fInicio.req6' 				=>	'',
+			'fInicio.dateiniciocurso' 	=>	'',
+			
 			'fFin.after'			=>	' La <strong>"fecha de finalización"</strong> debe ser posterior a la <strong>"fecha de inicio"</strong>. <br />',
 			'fFin.datefincurso' 	=>  '',
 
@@ -224,7 +225,8 @@ class Evento extends Eloquent{
     		//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
     		//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
 			//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
-    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico
+    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico para alumnos y pdi
+    		//dateiniciocurso: las reservas no pueden empezar antes del inicio del presente curso académico para alumnos y pdi
     		//deshabilitado: no permite añadir reservas en espacios deshabilitados 
     
     public function validate($data)
@@ -258,6 +260,10 @@ class Evento extends Eloquent{
     		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
     	}
 
+    	if ( !empty($data['fInicio']) ){
+    		$this->messages['fInicio.dateiniciocurso'] = 'No es posible realizar reservas hasta que se finalice la carga del POD: fecha prevista a partir del día ' . date('d-m-Y',strtotime(Config::get('options.inicio_gestiondesatendida')));
+    	}
+
     	if (!empty($data['reservarParaUvus'])){
     		$this->messages['reservarParaUvus.existeuvus'] = 'Usuario "'. $data['reservarParaUvus'] .'" no registrado.';
     	}
@@ -275,9 +281,7 @@ class Evento extends Eloquent{
         	});	
         }
 
- 	
-
-        //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
+ 	    //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
 		if ( !empty($data['fEvento']) && !empty($data['hFin']) && !empty($data['hInicio']) ){
 			$v->sometimes('fEvento','reservaunica',function($data){
 				if (Auth::user()->capacidad == '1'){
@@ -460,10 +464,18 @@ class Evento extends Eloquent{
 		    	if ($data['repetir'] == 'CS') $fechaMaximaEvento = $data['fFin']; //Reptición cada semana
 		    		
 		    	if (strtotime(sgrDate::parsedatetime($fechaMaximaEvento,'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
-			    });
+			});
         }
 
-        
+        // requisito dateiniciocurso: lasreservas debe de ser posteriores a la fecha de inicio curso actual (Restringido a usuarios alumnos, pdi, supervisores y tecnicos)
+        if (!empty($data['fInicio'])  && !Auth::user()->isValidador() && !Auth::user()->isAdmin() ){
+
+			$v->sometimes('fInicio','dateiniciocurso',function($data){
+		    	$hoy = strtotime('today');
+				$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
+				if ($diaInicio > $hoy) return true;
+			});
+        }
 
 		//}
         // check for failure

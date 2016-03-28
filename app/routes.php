@@ -12,16 +12,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 |
 */
 
-Route::get('loginerror',array('as' => 'msg',function(){
-	$msg = Session::get('msg');//Privilegios insuficientes';
-	$title = Session::get('title');//Error de acceso';
-	return View::make('loginerror')->with(compact('msg','title'));
-}));
-
 Route::get('msg',array('as' => 'msg',function(){
-	$msg = Session::get('msg');//Privilegios insuficientes';
-	$title = Session::get('title');//Error de acceso';
-	return View::make('msg')->with(compact('msg','title'));
+	$pagetitle   = Config::get('msg.pagetitlefilterCapacidad');
+    $paneltitle  = Config::get('msg.paneltitlefilterCapacidad');
+    $msg         = Config::get('msg.filterCapacidadmsg');
+    $alertLevel  = 'danger';
+	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
 }));
 
 Route::get('wellcome',array('as'=>'wellcome','uses' => 'HomeController@showWellcome'));
@@ -31,39 +27,12 @@ Route::get('ayuda.html',array('as'=>'ayuda','uses'=>'HomeController@ayuda'));
 Route::get('contactar.html',array('as'=>'contactar','uses'=>'HomeController@contacto','before'=>'auth'));
 Route::post('contactar.html',array('as'=>'enviaformulariocontacto','uses'=>'HomeController@sendmailcontact','before'=>'auth'));
 
-Route::get('justificante', array('as' => 'justificante', function(){
-	
-	if (Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->count() == 0) return View::make('pdf.msg'); 
-
-	$event = Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->first();
-	$events = Evento::withTrashed()->where('evento_id','=',Input::get('idEventos'))->get();
-		
-
-	$recursos = Evento::where('evento_id','=',Input::get('idEventos'))->groupby('recurso_id')->get();
-	
-	setlocale(LC_TIME,'es_ES@euro','es_ES.UTF-8','esp');
-	
-   	$strDayWeek = sgrDate::getStrDayWeek($event->fechaEvento);
-	$strDayWeekInicio = sgrDate::getStrDayWeek($event->fechaInicio);
-	$strDayWeekFin = sgrDate::getStrDayWeek($event->fechaFin);
-	$created_at = utf8_encode(ucfirst(strftime('%A %d de %B  a las %H:%M:%S',strtotime($event->created_at))));
-   
-    $html = View::make('pdf.justificante')->with(compact('event','events','strDayWeek','strDayWeekInicio','strDayWeekFin','recursos','created_at'));
-   	
-   	$result = myPDF::getPDF($html,'comprobante');
-
-   	return Response::make($result)->header('Content-Type', 'application/pdf');
-	})
-);
 
 Route::get('/',array('as' => 'loginsso','uses' => 'AuthController@doLogin'));
 Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'));
 
 
-//Validador (roles 4 (admin) y 5 (validador))
-Route::get('validador/home.html',array('as' => 'validadorHome.html','uses' => 'ValidacionController@index','before' => array('auth','capacidad:4-5,msg')));
 
-Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'ValidacionController@valida','before' => array('auth','capacidad:4-5,msg')));
 
 //Admin (rol = 4)
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
@@ -105,12 +74,6 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 
 //EE de equipo (capacidad = 6) y administradores de la aplicación (capacidad = 4)
 
-
-
-
-
-
-
 // recursosController routes ***********************
 Route::post('admin/disabled',array('uses'=>'recursosController@disabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/enabled',array('uses'=>'recursosController@enabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
@@ -125,8 +88,8 @@ Route::post('admin/addPersona',array('uses' => 'recursosController@addPersona','
 Route::post('admin/removePersonas',array('uses' => 'recursosController@removePersonas','before' => array('auth','auth_ajax','capacidad:4,msg')));
 Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 
-//************************************************
-//GruposController routes
+
+//GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
@@ -134,18 +97,18 @@ Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' =
 Route::post('admin/delgrupo',array('uses' => 'GruposController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Elimian grupo
 Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
 
+//ValidacionController routes **********************
+//(roles 4 (admin) y 5 (validador))
+Route::get('validador/home.html',array('as' => 'validadorHome.html','uses' => 'ValidacionController@index','before' => array('auth','capacidad:4-5,msg')));
+Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'ValidacionController@valida','before' => array('auth','capacidad:4-5,msg')));
 
-
-
-
-
-
-
+//PdfController routes *****************************
+Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
 
 
 
 //Calendarios
-Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth','inicioCurso')));
+Route::get('calendarios.html',array('as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth')));
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
 
 
@@ -186,9 +149,13 @@ Route::get('print',array('uses' => 'CalendarController@imprime'));
 
 
 App::missing(function($exception)
-{
-    return View::make('404');
-});
+	{
+    	$pagetitle   = Config::get('msg.404pagetitleLogin');
+        $paneltitle  = Config::get('msg.404paneltitle');
+        $msg         = Config::get('msg.404msg');
+        $alertLevel  = 'warning'; 
+    	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+	});
 
 
 App::error(function(ModelNotFoundException $e)
@@ -205,37 +172,3 @@ Route::get('test',array('as'=>'test',function(){
 	var_dump($grupos);
 	
  }));
-
-
-Route::get('data',array('as'=>'ToValidate',function(){
-	
-	
-	$limit = Input::get('limit','10');
-	$offset = Input::get('offset','0');
-	$sort = Input::get('sort','asc');	
-	$order = Input::get('order','asc');
-	$search = Input::get('search','');
-	
-	if($search == "") {
-		$events = Evento::Where('estado','=','pendiente')->get()->toArray();
-	} else {
-		$events = Evento::Where('estado','=','pendiente')->Where('titulo','like','%'.$search.'%')->get()->toArray();
-	}
-	
-	$count = count($events);
-
-	if($order != "asc") {
-		$events = array_reverse($events);
-	}
-		
-	$events = array_slice($events, $offset, $limit);
-	
-	$jsonString =  "{";
-	$jsonString .= '"total": ' . $count . ',';
-	$jsonString .= '"rows": ';
-	$jsonString .=	json_encode($events);
-	$jsonString .= "}"; 
-	
-	return $jsonString;
-
-}));

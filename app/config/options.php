@@ -25,7 +25,7 @@ return array (
 
 	'fin_cursoAcademico' => '2016-07-15',
 	
-	'inicio_gestiondesatendida' => '2015-09-1',
+	'inicio_gestiondesatendida' => '2016-05-1',
 	
 	//definición de perfiles (roles//capacidades)
 	'perfiles' => array(	'1' =>	'Usuarios (Alumnos)',

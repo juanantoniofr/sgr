@@ -14,7 +14,7 @@ class ValidacionController extends BaseController {
 		$veraprobadas = Input::get('veraprobadas',false);
 		$verdenegadas = Input::get('verdenegadas',false);
 		$msgforuser = Input::get('msgforuser','');
-	   	$espaciosConValidacion = $this->espaciosConValidacion(); //por ejemplo array('10,'11,'21') DONDE 10 -> Salón de actos,11->Sala de juntas, 21->Seminario B2
+	   	$espaciosConValidacion = $this->espaciosConValidacion(); //array de identificadores
 
 		$solapamientos = Input::get('solapamientos',false);
 		$idEventoValidado = Input::get('idEventoValidado',''); 
@@ -50,24 +50,13 @@ class ValidacionController extends BaseController {
 			$events = Evento::where('recurso_id','=',$id_recurso)->where('user_id','=',$id_user)->whereIn('estado',$estados)->groupby('evento_id')->orderby('fechaInicio','Asc')->orderby($sortby,$order)->paginate(10);
 		}
 		
-		
-		 
-
-
-		//Recursos q requiren validación
-		//$eventsByrecurso = Evento::whereIn('recurso_id',$espaciosConValidacion)->groupby('recurso_id')->get();
 
 		//Usuarios con solicitudes en espacios con validadción
 		$eventsByUser = Evento::whereIn('recurso_id',$espaciosConValidacion)->groupby('user_id')->get();
 		
 		$recursos = Auth::user()->valida;
 		
-		
-
-				
-
 		return View::make('validador.validaciones')->with('msg',$msgforuser)->with(compact('events','verpendientes','veraprobadas','verdenegadas'))->with('sortby',$sortby)->with('order',$order)->with('idrecurso',$id_recurso)->with('iduser',$id_user)->with('solapamientos',$solapamientos)->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuValidador','validador.menuValidador',compact('recursos','id_recurso','id_user','eventsByUser','verpendientes','veraprobadas','verdenegadas'));
-
 	}
 
 	public function valida(){
@@ -144,7 +133,6 @@ class ValidacionController extends BaseController {
 																'verdenegadas'		=> $verdenegadas,
 																'msgforuser'		=> $msgforuser,
 															)));
-
 	}
 
 	private function espaciosConValidacion(){

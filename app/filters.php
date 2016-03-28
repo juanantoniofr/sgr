@@ -32,19 +32,9 @@ App::after(function($request, $response)
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
-/*		El filtro req2 permite bloquear el acceso al calendario para reservar a los alumnos con el número de horas máximo a la semana (12h) agotado
-*/
 
-//Developed
-/*Route::filter('auth', function()
-{
-	//$user = User::find('30');
-	//Auth::login($user);
-	if (Auth::guest()) return Redirect::to(route('loginsso'));
-	
-});*/
-Route::filter('auth', function()
-{
+
+Route::filter('auth', function(){
 	
     if (!Cas::isAuthenticated() || !Auth::check()) 
     	if (Request::ajax()) {
@@ -58,37 +48,16 @@ Route::filter('auth', function()
 Route::filter('ajax_check',function(){
 		
 	if(!Request::ajax()) return Redirect::to(route('wellcome'));
-	
 });
 
 //Comprobar si el usuario autentivcado tiene privilegios para realizar la acción requerida
 Route::filter('capacidad',function($ruta,$peticion,$capacidad,$redirect) {
-	
 	$roles  = explode("-",$capacidad);
-	if (!in_array(Auth::user()->capacidad, $roles)){
-		$msg = 'Privilegios insuficientes';
-		$title = 'Error de acceso';
-		return Redirect::to($redirect)->with(compact('title','msg'));
-	}
-});
-
-//Comprobar si el sistema permite a los usarios registrar reservas.
-Route::filter('inicioCurso',function(){
-
-	if (Auth::user()->isUser() || Auth::user()->isAvanceUser()){
-		$hoy = strtotime('today');
-		$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
-		if ($diaInicio > $hoy) {
-			$title = 'Acceso limitado';
-			$msg = 'No es posible realizar reservas hasta que se finalice la carga del POD: fecha prevista a partir del día ' . date('d-m-Y',strtotime(Config::get('options.inicio_gestiondesatendida')));
-			return Redirect::to('loginerror')->with(compact('title','msg'));
-		}
-	}
+	if (!in_array(Auth::user()->capacidad, $roles))	return Redirect::to($redirect);
 });
 
 
-Route::filter('auth.basic', function()
-{
+Route::filter('auth.basic', function(){
 	return Auth::basic();
 });
 
