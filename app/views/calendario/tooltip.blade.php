@@ -30,6 +30,6 @@
 	<!-- anular -->
 	<a  href="#"  class="anula" id="anula_{{$event->id}}" data-idevento="{{$event->id}}" data-idserie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->user->nombre}}" data-periodica="{{$event->repeticion}}" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
 @endif
-@if($event->esFinalizable() && Auth::user()->atiendeRecurso($event->recurso->id) )
+@if($event->esFinalizable() && $event->recurso->esAtendidoPor(Auth::user()->id) )
 	<a  href="#" class="finaliza" id="finaliza_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-titulo="{{$event->titulo}}" data-usuario="{{$event->user->nombre}}" data-periodica="{{$event->repeticion}}" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>
 @endif

@@ -11,18 +11,18 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	//devuelve los grupos de recursos que supervisa (gestiona recurso -> añade/elimina/edita/deshabilita)
 	public function supervisa(){
-    	return $this->belongsToMany('Recurso','grupoRecursos_supervisor');
+    	return $this->belongsToMany('GrupoRecurso','grupoRecursos_supervisor','user_id','grupoRecursos_id');
     }
 
     //devuelve los grupos de recurso que atiende (gestiona reservas)
 	public function atiende(){
-        return $this->belongsToMany('Recurso','grupoRecursos_tecnico');
+        return $this->belongsToMany('GrupoRecurso','grupoRecursos_tecnico','user_id','grupoRecursos_id');
     }
 
     //devuelve los grupos de recurso que valida (aprueba//deniega reservas)
 	public function valida()
     {
-        return $this->belongsToMany('Recurso','grupoRecursos_validador');
+        return $this->belongsToMany('GrupoRecurso','grupoRecursos_validador','user_id','grupoRecursos_id');
     }
 	
     //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
@@ -39,29 +39,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	
 	}
 
-	/**
-	*	user puede finalizar las reservas de los recursos que atiende
-	*	@param $idrecurso
-	* 	@return boolean
-	*/
-	public function atiendeRecurso($idrecurso){
-		$atiendeRecurso = false;
 		
-		//Auth::user tiene que atender las reservas en el recurso donde se realiza el evento
-		$recursos = $this->atiende;
-		if ($recursos->contains($idrecurso)) {
-			$atiendeRecurso = true;
-		}
-
-		return $atiendeRecurso;
-	}
-	
 	/**
-	*
-	* 	Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
-	* 	@param $timestamp int fecha a valorar
-	* 	@return $isAviable boolean 
-	*
+		*
+		* 	Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
+		* 	@param $timestamp int fecha a valorar
+		* 	@return $isAviable boolean 
+		*
 	*/
 	public function isDayAviable($timestamp,$idrecurso){
 		

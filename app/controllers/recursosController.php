@@ -2,7 +2,7 @@
 
 class recursosController extends BaseController{
 
-   /**
+  /**
      * //Añade un nuevo recurso a la base de datos
      * @param Input::get('nombre')      string
      * @param Input::get('descripcion') string
@@ -13,12 +13,12 @@ class recursosController extends BaseController{
      * @param Input::get('roles')       array
      *
      * @return $result                  array    
-   */ 
+  */ 
   public function add(){
     
     //Input
     $nombre = Input::get('nombre');
-    $tipo =  Input::get('tipo'); //espacio|puesto|equipo
+    $tipo =  Input::get('tipo'); //espacio|equipo
     $grupo_id = Input::get('grupo_id');
     $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
     
@@ -73,6 +73,77 @@ class recursosController extends BaseController{
     return $result;
   }
 
+  /**
+     * //Añade un nuevo puesto
+     *
+     * @param Input::get('idrecurso')   int
+     * @param Input::get('nombre')      string
+     * @param Input::get('descripcion') string
+     * @param Input::get('tipo')        string
+     * @param Input::get('id_lugar')    string
+     * @param Input::get('modo')        int (0|1)
+     * @param Input::get('roles')       array
+     *
+     * @return $result                  array    
+   */ 
+  public function addPuesto(){
+    
+    //Input
+    $idrecurso = Input::get('idrecurso');
+    $nombre = Input::get('nombre');
+    $tipo =  Input::get('tipo'); //puesto
+    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
+    
+    $descripcion = Input::get('descripcion','');
+    $id_lugar = Input::get('id_lugar','');
+    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    //out
+    $result = array('error' => false,
+                    'msg'   => '',
+                    'errors' => array());
+    
+    //Validación de formulario   
+    $rules = array(
+        'idrecurso' =>  'required|exists:recursos,id',
+        'nombre'    =>  'required|unique:recursos',
+        'tipo'      =>  'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
+        'modo'      =>  'required|in:'.implode(',',Config::get('options.modoGestion')),
+        );
+
+     $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+          'unique'    => 'Existe un recurso con el mismo nombre...',
+          'tipo.in'   => 'El tipo de recurso no está definido...',
+          'modo.in'   => 'Modo de Gestión de solicitudes de reserva no definido....',
+          'exists'    => 'No existe identificador de grupo...',
+        );
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    if ($validator->fails()){
+      //Si hay errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{  
+      //Si no hay errores en el formulario
+      $recurso = new Recurso;
+      $recurso->nombre = $nombre;
+      $recurso->tipo = $tipo;
+      $recurso->descripcion = $descripcion;
+      $recurso->id_lugar = $id_lugar;
+      $recurso->acl = $this->buildJsonAcl($modo,$roles);
+      $recurso->espacio_id = $idrecurso;
+      $recurso->save();
+
+
+
+      $result['msg'] = Config::get('msg.success');
+    
+    }
+
+    return $result;
+  }
   /**
    * @param Input::get('nombre')      string
    * @param Input::get('descripcion') string
@@ -346,10 +417,6 @@ class recursosController extends BaseController{
     return $result;
   }
 
-  
-
- 
-
   /**
     * @param void
     *
@@ -393,8 +460,8 @@ class recursosController extends BaseController{
     $idRecurso = Input::get('idrecurso','');
     //Output 
     $result = array( 'errors'         => array(),
-                      'descripcion'   => '',    
-                      'error'         => false,
+                     'descripcion'   => '',    
+                     'error'         => false,
                     );
     //Validate
     $rules = array(
@@ -416,7 +483,7 @@ class recursosController extends BaseController{
     else{
       $recurso = Recurso::find($idRecurso);
       if (empty($recurso->descripcion)) $result['descripcion'] = $recurso->grupo->descripcion; //descripción general de todos los espacios,equipos o puestos del grupo
-      else $resutl['descripcion'] = $recurso->descripcion; //descripción del elemento
+      else $result['descripcion'] = $recurso->descripcion; //descripción del elemento
     }
     
     return $result;

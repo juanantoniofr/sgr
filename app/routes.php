@@ -85,6 +85,7 @@ Route::post('admin/updaterecurso',array('uses' => 'recursosController@update','b
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 
+Route::post('admin/addpuesto',array('uses' => 'recursosController@addPuesto','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -168,7 +169,11 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 
-	$grupos = GruposController::gruposVisibles('58');
-	var_dump($grupos);
+	$user = User::find('58');
+	echo "<pre>";
+	var_dump($user->atiende);
+	echo "</pre>";
+	
+	//var_dump($user);
 	
  }));

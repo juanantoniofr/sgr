@@ -78,6 +78,9 @@
 {{ $modalAddPersona         or '' }}
 {{ $modalRemovePersona      or '' }}
 
+<!-- Puestos -->
+{{ $modalAddPuesto          or '' }}
+
 
 @stop
 
@@ -87,6 +90,7 @@
     <script type="text/javascript">CKEDITOR.replace( 'fm_editgrupo_inputdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'fm_addrecurso_inputdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'fm_editrecurso_inputdescripcion' );</script>
+    <script type="text/javascript">CKEDITOR.replace( 'fm_addpuesto_inputdescripcion' );</script>
     <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
 
     

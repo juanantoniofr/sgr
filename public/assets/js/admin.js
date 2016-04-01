@@ -1,6 +1,6 @@
 $(function(e){
 
-    //Ajax: Salvar nuevo recurso
+    //Ajax: Salvar nuevo recurso (Espacio // Equipo)
     $('#fm_addrecurso_save').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();
@@ -24,7 +24,7 @@ $(function(e){
                 else {
                     hideGifEspera();
                     $('#m_addrecurso').modal('hide');   
-                    showMsg($respuesta['msg']);
+                    showMsg($respuesta.msg);
                     getListado(); 
                 }
             },
@@ -35,6 +35,40 @@ $(function(e){
         });
     }); 
     
+    //Ajax: Salvar nuevo Puesto 
+    $('#fm_addpuesto_save').on('click',function(e){
+        e.preventDefault();
+        updateChkeditorInstances();
+        showGifEspera();
+        $data = $('form#fm_addpuesto').serialize();
+        $.ajax({
+            type: "POST",
+            url: "addpuesto",
+            data: $data,
+            success: function($respuesta){
+                
+                if($respuesta.error === true){
+                    hideGifEspera();
+                    $.each($respuesta.errors,function(index,value){
+                        $('.divmodal_msgError').html('').fadeOut();
+                        $('#fm_addpuesto_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                        $('#fm_addpuesto_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+                    });
+                    $('#fm_addpuesto_textError').fadeIn('8000');
+                }
+                else {
+                    hideGifEspera();
+                    $('#m_addpuesto').modal('hide');   
+                    showMsg($respuesta.msg);
+                    getListado(); 
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
+            }
+        });
+    }); 
     //Ajax: Salvar edición recurso
     $('#fm_editrecurso_save').on('click',function(e){
         e.preventDefault();
@@ -380,11 +414,20 @@ $(function(e){
         activelinkeliminarrecurso();
         activelinkenabled();
         activelinkdisabled();
-        //activelinkpersonas();
         activelinkaddpersonas();
         activelinkremovepersonas();
+        activelinkaddpuestos();
     }
 
+    function activelinkaddpuestos(){
+        $(".linkAddPuesto").on('click',function(e){
+            e.preventDefault();
+            $('#m_addpuesto_title_nombrerecurso').html($(this).data('nombrerecurso'));
+            $('form#fm_addpuesto input[name="idrecurso"]').val($(this).data('idrecurso'));
+            hideMsg();
+            $('#m_addpuesto').modal('show');
+        });
+    }
 
     function activelinkdisabled(){
         

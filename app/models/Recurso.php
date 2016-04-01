@@ -42,7 +42,7 @@ class Recurso extends Eloquent {
     public function esAtendidoPor($id = ''){
         $result = false;
         
-        if ($this->tecnicos->contains($id)) $result = true;
+        if ($this->grupo->tecnicos->contains($id)) $result = true;
 
         return $result;
     }
