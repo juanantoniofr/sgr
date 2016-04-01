@@ -24,10 +24,8 @@
               
         <div class="form-group" id="fm_addrecurso_inputgrupo_id">
           {{Form::label('grupo_id', 'Grupo')}}
-          <select name="grupo_id" class="form-control">
-            @foreach($grupos as $grupo)
-              <option value = "{{$grupo->id}}">{{$grupo->nombre}}</option>
-            @endforeach
+          <select name="grupo_id" class="form-control" id="fm_addrecurso_optionsGrupos">
+           
           </select>
         </div>
         

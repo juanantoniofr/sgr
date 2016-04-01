@@ -23,7 +23,7 @@
         <span class="help-block">Marque los usuarios para eliminar la relación con el recurso.</span>
           
         <div class="form-group hidden">
-            {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+            {{Form::text('idgrupo','',array('class' => 'form-control'))}}
         </div>  
       </div><!-- ./.modal-body -->
 

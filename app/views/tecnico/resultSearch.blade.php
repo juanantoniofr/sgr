@@ -8,7 +8,9 @@
             <input type="radio" name="idevento" value="{{$event->id}}" data-observaciones="{{$event->atencion->observaciones or ''}}">
             <span id = "infoEvento_{{$event->id}}" class="@if($event->atendido()) text-success @else text-info @endif">
                 <i class="fa @if($event->atendido()) fa-calendar-check-o @else fa-calendar-o @endif fa-fw"></i>
-                {{$event->recurso->nombre}} ({{$event->recurso->grupo}}): {{date('d-m-Y',strtotime($event->fechaEvento))}}, {{date('G:i',strtotime($event->horaInicio))}}-{{date('G:i',strtotime($event->horaFin))}}
+                {{$event->recurso->nombre}} ({{$event->recurso->grupo->nombre}}):
+                <br /><b class="text-info">Fecha:</b> {{date('d-m-Y',strtotime($event->fechaEvento))}}
+                <br /><b class="text-info">Horario:</b> {{date('G:i',strtotime($event->horaInicio))}}-{{date('G:i',strtotime($event->horaFin))}}
             </span>
         </label>
        </div>    

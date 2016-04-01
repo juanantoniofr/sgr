@@ -380,7 +380,7 @@ $(function(e){
         activelinkeliminarrecurso();
         activelinkenabled();
         activelinkdisabled();
-        activelinkpersonas();
+        //activelinkpersonas();
         activelinkaddpersonas();
         activelinkremovepersonas();
     }
@@ -523,8 +523,8 @@ $(function(e){
         
         $('.addUserWithRol').on('click',function(e){
             e.preventDefault();
-            $('#m_addPersona_title_nombrerecurso').html($(this).data('nombrerecurso'));
-            $('form#fm_addPersona input[name="idrecurso"]').val($(this).data('idrecurso'));
+            $('#m_addPersona_title_nombregrupo').html($(this).data('nombregrupo'));
+            $('form#fm_addPersona input[name="idgrupo"]').val($(this).data('idgrupo'));
             hideMsg();
             $('#m_addPersona').modal('show');
 
@@ -537,13 +537,13 @@ $(function(e){
         $('.removeUserWithRol').on('click',function(e){
             e.preventDefault();
             showGifEspera();
-            $('#m_removePersona_title_nombrerecurso').html($(this).data('nombrerecurso'));
-            $('form#fm_removePersona input[name="idrecurso"]').val($(this).data('idrecurso'));
+            $('#m_removePersona_title_nombregrupo').html($(this).data('nombregrupo'));
+            $('form#fm_removePersona input[name="idgrupo"]').val($(this).data('idgrupo'));
             hideMsg();
             $.ajax({
                 type:"GET",
                 url:"htmlCheckboxPersonas",
-                data:{idrecurso : $(this).data('idrecurso')},
+                data:{idgrupo : $(this).data('idgrupo')},
                 success: function($respuesta){
                     //Añade input formulario en ventana modal
                     hideGifEspera();
@@ -558,13 +558,7 @@ $(function(e){
         });
     }
 
-    //Muestra div personas 
-    function activelinkpersonas(){
-        $('.thpersonas').on('click',function(e){
-            e.preventDefault();
-            $(this).next('div.personas').fadeToggle('4000');
-        });
-    }
+    
 
     
     //Muestra ventana modal para crear nuevo grupo de recursos
@@ -578,7 +572,21 @@ $(function(e){
     $("#btnNuevoRecurso").on('click',function(e){
         e.preventDefault();
         hideMsg();
-        $('#m_addrecurso').modal('show');
+        showGifEspera();
+        $.ajax({
+            type:"GET",
+            url:"htmlOptionGrupos",
+            data:{},
+            success:function($html){
+                $('#fm_addrecurso_optionsGrupos').html($html);
+                hideGifEspera();
+                $('#m_addrecurso').modal('show');        
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                hideGifEspera();
+                alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+            }
+        });
     });
 
     function getListado(){

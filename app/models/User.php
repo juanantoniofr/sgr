@@ -9,32 +9,28 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	protected $softDelete = false;
 	//protected $hidden = array('password');
 
-	//devuelve los recurso que supervisa (gestiona recurso -> añade/elimina/edita/deshabilita)
+	//devuelve los grupos de recursos que supervisa (gestiona recurso -> añade/elimina/edita/deshabilita)
 	public function supervisa(){
-    	//if ($this->isAdmin()) return Recurso::all(); 	
-        return $this->belongsToMany('Recurso','recurso_supervisor');
-    	}
+    	return $this->belongsToMany('Recurso','grupoRecursos_supervisor');
+    }
 
-    public function supervisaGrupos()
-    {
-        return $this->hasManyThrough('Recurso', 'GrupoRecurso');
-    }	
-    //devuelve los recurso que atiende (gestiona reservas)
+    //devuelve los grupos de recurso que atiende (gestiona reservas)
 	public function atiende(){
-        return $this->belongsToMany('Recurso','recurso_tecnico');
-    	}
+        return $this->belongsToMany('Recurso','grupoRecursos_tecnico');
+    }
 
+    //devuelve los grupos de recurso que valida (aprueba//deniega reservas)
+	public function valida()
+    {
+        return $this->belongsToMany('Recurso','grupoRecursos_validador');
+    }
 	
     //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
 	public function atenciones(){
         return $this->hasMany('atencionEventos','tecnico_id');
     	}
 
-    //devuelve los recurso que valida (aprueba//deniega reservas)
-	public function valida()
-    {
-        return $this->belongsToMany('Recurso','recurso_validador');
-    }
+
 
     //devuelve los eventos del usuario
 	public function userEvents(){

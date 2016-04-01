@@ -1112,23 +1112,20 @@ $(function(e){
 				url:"getDescripcion",
 				data: { idrecurso:$idrecurso },
 				success: function($respuesta){
-					//-1 -> 'Error: identificador de recurso vacio...'
-					if('-1' != $respuesta && '' != $respuesta) { 					
+					if($respuesta.error !== true) { 					
 						$('#nombrerecurso').html($strCalendar);
-						$('#descripcionRecurso').html($respuesta);
-						if ($respuesta != '') $('#infoButton').fadeIn();
-						}
+						$('#descripcionRecurso').html($respuesta.descripcion);
+						$('#infoButton').fadeIn();
+					}
 					else $('#infoButton').fadeOut();
 					},
-					error: function(xhr, ajaxOptions, thrownError){
-						$('#infoButton').fadeOut();
-						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-					}
-				});
+				error: function(xhr, ajaxOptions, thrownError){
+					$('#infoButton').fadeOut();
+					hideGifEspera();
+					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+				}
+			});
 			
-			
-
 			}
 			$('#recurseName').html($strCalendar).fadeIn();
 	}

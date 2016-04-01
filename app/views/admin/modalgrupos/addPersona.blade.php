@@ -8,7 +8,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title text-info">
-          <i class="fa fa-users fa-fw"></i> Añadir persona para el recurso:<b> <span id ="m_addPersona_title_nombrerecurso"></span></b> 
+          <i class="fa fa-users fa-fw"></i> Añadir persona para el grupo:<b> <span id ="m_addPersona_title_nombregrupo"></span></b> 
         </h2>
       </div><!-- ./modal-header -->
 
@@ -26,7 +26,7 @@
         </div>
 
         <div class="form-group hidden">
-          {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+          {{Form::text('idgrupo','',array('class' => 'form-control'))}}
         </div>  
         
       </div><!-- ./modal-body --> 

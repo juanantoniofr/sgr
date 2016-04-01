@@ -33,7 +33,7 @@
                 codebase="https://juanantonio.us.es/sgr1/public/assets/applet"
                 archive="LectorCarnetUniversitario.jar, json-simple-1.1.1.jar" 
                 width=100%
-                height=100% >
+                height=300px>
         </applet><!-- ./applet -->
       </div>
     </div>

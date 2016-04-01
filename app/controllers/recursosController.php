@@ -3,6 +3,7 @@
 class recursosController extends BaseController{
 
    /**
+     * //Añade un nuevo recurso a la base de datos
      * @param Input::get('nombre')      string
      * @param Input::get('descripcion') string
      * @param Input::get('tipo')        string
@@ -67,8 +68,6 @@ class recursosController extends BaseController{
 
       $result['msg'] = Config::get('msg.success');
     
-      //Establecer relación de supervisor 
-      $recurso->supervisores()->attach(Auth::user()->id); //El propio usuario que lo añade si no es administrador
     }
 
     return $result;
@@ -258,8 +257,8 @@ class recursosController extends BaseController{
     
     //Output 
     $result = array( 'errors'    => array(),
-                        'msg'   => '',    
-                        'error'   => false,
+                     'msg'       => '',    
+                     'error'     => false,
                       );
 
     //Validate
@@ -284,10 +283,11 @@ class recursosController extends BaseController{
       $sgrMail = new sgrMail();
       $sgrMail->notificaHabilitaRecurso($id);
       
-      //Update campo disabled
-      $recurso = Recurso::find($id);
-      $recurso->disabled =  0;
-      $recurso->save();
+      //enable
+      $sgrRecurso = RecursoFactory::getRecursoInstance($id);
+      $sgrRecurso->enabled();
+      $sgrRecurso->save();
+     
       $result['msg'] = Config::get('msg.actionSuccess');
     }
     
@@ -335,222 +335,20 @@ class recursosController extends BaseController{
       $sgrMail = new sgrMail();
       $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
       
-      //Update campo disabled
-      $recurso = Recurso::find($id);
-      $recurso->disabled =  1;
-      $recurso->motivoDisabled = $motivo;
-      $recurso->save();
+      //disabled
+      $sgrRecurso = RecursoFactory::getRecursoInstance($id);
+      $sgrRecurso->disabled();
+      $sgrRecurso->save();
+
       $result['msg'] = Config::get('msg.actionSuccess');
     }
     
     return $result;
   }
 
-  /**
-    * //Establece la relación presona-recurso (supervisor-validador-tecnico)
-    *
-    * @param Input::get('idrecurso')  int
-    * @param Input::get('username')   string
-    * @param Input::get('rol')        string
-    *
-    * @return $result array
-    * 
-  */
-  public function addPersona(){
-    
-    //input
-    $idRecurso = Input::get('idrecurso','');
-    $username  = Input::get('username','');
-    $rol       = Input::get('rol','');      
-    
-    
-    //Output 
-    $result = array( 'errors'    => array(),
-                      'msg'   => '',    
-                      'error'   => false,
-                    );
-    //Validate
-    $rules = array(
-        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
-        'username'   => 'required|exists:users,username',
-        'rol'        => 'required|in:1,2,3'
-        );
+  
 
-    $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idrecurso.exists'    => 'No existe identificador de recurso en BD.',
-          'username.exists'     => 'No existe usuario en la BD.',
-          'in'                  => 'El campo <strong>:attribute</strong> no coincide con ninguno de los valores aceptados.',
-          );
-
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-    //Save Input or return error
-    if ($validator->fails()){
-        $result['errors'] = $validator->errors()->toArray();
-        $result['error'] = true;
-        return $result;
-    }
-    else{
-      $recurso = Recurso::find($idRecurso);
-      $user = User::where('username','=',$username)->first();
-      //$respuesta['user']= $user->toArray();
-      //$respuesta['recurso'] = $recurso->toArray();
-      $idUser = $user->id;
-      switch ($rol) {
-        //tecnicos
-        case '1':
-          $tecnicos = $recurso->tecnicos;
-          if ($tecnicos->contains($idUser)){
-            $result['error'] = true;
-            $result['errors']['tecnico'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recurso.';
-            return $result;
-          }
-          $recurso->tecnicos()->attach($idUser);
-          break;
-        
-        //Supervisor
-        case '2':
-          $supervisores = $recurso->supervisores;
-          if ($supervisores->contains($idUser)){
-            $result['error'] = true;
-            $result['errors']['supervisor'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
-            return $result;
-          }
-          $recurso->supervisores()->attach($idUser);
-          
-          //$respuesta['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>supervisor</b></i> con éxito.';
-          //$respuesta['relacion'] = 'supervisor';
-          break;
-      
-        //Validador
-        case '3':
-          $validadores = $recurso->validadores;
-          if ($validadores->contains($idUser)){
-            $result['error'] = true;
-            $result['errors']['validador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
-            return $respuesta;
-          }
-          $recurso->validadores()->attach($idUser);
-          //$respuesta['error'] = false;
-          $result['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
-          //$respuesta['relacion'] = 'validador';
-          break;
-      
-        default:
-          $result['error'] = false;
-          $result['msg'] = 'Identificador de rol no esperado: ' . $rol;
-        break;
-      }//fin case
-    }//fin else
-
-    $result['msg'] = Config::get('msg.actionSuccess');
-    return $result;
-  }
-
-  /**
-    * // Devuelve listas de input type checkbox para formulario con las personas que tienen alguna de las relaciones de supervisor//técnico//validador
-    * 
-    * @param Input::get('idrecurso') int identificador de recurso
-    *
-    * @return $result array
-  */
-  public function htmlCheckboxPersonas(){
-
-    //input
-    $id = Input::get('idrecurso','');
-
-    //Output
-    $result = array( 'errors'                 => array(),
-                     'error'                 => false,
-                     'htmlCheckboxPersonas'  => '',
-                    );
-    
-    //Validate
-    $rules = array(
-        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
-        );
-
-    $messages = array(
-          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'exists'    => 'No existe identificador de recurso en BD.', 
-          );
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-    //get personas or return error
-    if ($validator->fails()){
-        $result['errors'] = $validator->errors()->toArray();
-        $result['error'] = true;
-    }
-    else{
-      $recurso = Recurso::findOrFail($id);
-      $result['htmlCheckboxPersonas'] = (string) View::make('admin.modalrecursos.checkboxPersonas')->with(compact('recurso'));
-    }
-      
-    return $result;  
-  }
-
-
-  /**
-    * //elimina la relación recurso-persona
-    *
-    * @param Input::get('idrecurso') int
-    * @param Input::get('supervisores_id) array
-    * @param Input::get('validadores_id') array
-    * @param Input::get('tecnicos_id') array
-    *
-    * @return $result array    
-    *
-  */
-  public function removePersonas(){
-    
-    //input
-    $idrecurso                = Input::get('idrecurso','');
-    $detachSupervisores       = Input::get('supervisores_id',array());
-    $detachValidadores        = Input::get('validadores_id',array());
-    $detachTecnicos           = Input::get('tecnicos_id',array());
-    
-    //Output 
-    $result = array( 'errors'    => array(),
-                      'msg'   => '',    
-                      'error'   => false,
-                    );
-
-    //Validate
-    $rules = array(
-        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
-        );
-
-    $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idrecurso.exists'    => 'No existe identificador de recurso en BD.',
-          );
-
-    $validator = Validator::make(Input::all(), $rules, $messages);
-
-    //Save Input or return error
-    if ($validator->fails()){
-      $result['errors'] = $validator->errors()->toArray();
-      $result['error'] = true;
-      return $result;
-    }
-    else {
-      $recurso = Recurso::findOrFail($idrecurso);
-      foreach ($detachSupervisores as $idSupervisor) {
-        $recurso->supervisores()->detach($idSupervisor);
-      }
-      foreach ($detachValidadores as $idValidador) {
-        $recurso->validadores()->detach($idValidador);
-      }
-      foreach ($detachTecnicos as $idTecnico) {
-        $recurso->tecnicos()->detach($idTecnico);
-      }
-      $result['msg'] = Config::get('msg.success');
-    }
-
-    return $result;
-  }
-
+ 
 
   /**
     * @param void
@@ -584,22 +382,44 @@ class recursosController extends BaseController{
   }
 
   /**
-  * ?????
+    * //Devuelve el campo descripción dado un idrecurso
+    * @param Input::get('idrecurso','') int identificador de recurso
+    *
+    * @return $descripcion string
   */
- 
-  //Devuelve el campo descripción dado un id_recurso ???
   public function getDescripcion(){
 
+    //Input
     $idRecurso = Input::get('idrecurso','');
-    if (empty($idRecurso)) return '-1';
+    //Output 
+    $result = array( 'errors'         => array(),
+                      'descripcion'   => '',    
+                      'error'         => false,
+                    );
+    //Validate
+    $rules = array(
+        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
+        );
 
-    $descripcion = '';
-    $recurso = Recurso::find($idRecurso);
-    $descripcion = $recurso->descripcion; //descripción del elemento
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+
+    $validator = Validator::make(Input::all(), $rules, $messages);
     
-    if (empty($descripcion)) $descripcion = $recurso->descripcionGrupo; //descripción general de todos los espacios,equipos o puestos del grupo
+    //Obtener descripción or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      $recurso = Recurso::find($idRecurso);
+      if (empty($recurso->descripcion)) $result['descripcion'] = $recurso->grupo->descripcion; //descripción general de todos los espacios,equipos o puestos del grupo
+      else $resutl['descripcion'] = $recurso->descripcion; //descripción del elemento
+    }
     
-    return $descripcion;
+    return $result;
   } 
 
 }

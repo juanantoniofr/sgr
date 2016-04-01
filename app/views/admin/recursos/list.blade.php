@@ -17,28 +17,32 @@
     </div><!-- ./row -->
 
 
-    <div class="row" style="margin-top:5px" >
-        <div id = "espera" style="display:none"></div>
-        <div class="panel panel-info">
+  <div class="row" style="margin-top:5px" >
+    <div id = "espera" style="display:none"></div>
+    <div class="panel panel-info">
                 
-            <div class="panel-heading">
-                <h3><i class="fa fa-list fa-fw"></i> Listado de recursos</h3>
-            </div>
+      <div class="panel-heading">
+          <h3><i class="fa fa-list fa-fw"></i> Listado de recursos</h3>
+      </div>
 
-            <div class="panel-body">
+      <div class="panel-body">
                                         
-              
-                <form class="navbar-form">
-                    <div class="form-group ">
-                        <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-plus fa-fw"></i> Añadir Espacio o Equipo</a>
-                    </div>
-                    <div class="form-group ">
-                        <a  href="#" class="btn btn-info" id="btnNuevoRecurso" title="Añadir nuevo Espacio o Equipo"><i class="fa fa-plus fa-fw"></i> Añadir Puesto</a>
-                    </div>
-                    <div class="form-group ">
-                        <a href="#" class="btn btn-warning" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Añadir Grupo</a>
-                    </div>
-                </form>
+        <form class="navbar-form">
+          <div class="form-group ">
+            <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Espacio"><i class="fa fa-plus fa-fw"></i> Añadir Recurso</a>
+          </div>
+          <!--
+          <div class="form-group ">
+            <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Equipo"><i class="fa fa-plus fa-fw"></i> Añadir Equipo</a>
+          </div>
+          <div class="form-group ">
+            <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Puesto"><i class="fa fa-plus fa-fw"></i> Añadir Puesto</a>
+          </div>
+          -->
+          <div class="form-group ">
+            <a href="#" class="btn btn-warning" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Añadir Grupo</a>
+          </div>
+        </form>
                 
                 
                 <div class=""  id="success_recurselist_msg" style="display:none" role="alert">

@@ -7,21 +7,7 @@ class Recurso extends Eloquent {
  	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id','deleted_at','disabled');
     protected $softDelete = true;
 
-	//Devuelve los usuarios supervisores de un recurso
-    public function supervisores(){
-        return $this->belongsToMany('User','recurso_supervisor');
-    }
-
-    //Devuelve los usuarios técnicos que atienden un recurso
-    public function tecnicos(){
-        return $this->belongsToMany('User','recurso_tecnico');
-    }
-
-    //Devuelve los usuarios validadores de un recurso
-    public function validadores(){
-        return $this->belongsToMany('User','recurso_validador');
-    }
-    
+	    
     
     //devuelve los puestos de un recurso (espacio) (Relación Reflexiva)
     public function puestos(){
@@ -61,20 +47,7 @@ class Recurso extends Eloquent {
         return $result;
     }
 
-    /**
-    *   Devuelve true si el identificador de usuario es uno de los supervisores del recurso o pertenece al rol administradores (root)
-    *   @param $id 
-    *   @return boolean
-    */
-
-    public function esSupervisadoPor($id = ''){
-        $result = false;
-        
-        if ($this->supervisores->contains($id) || User::findOrFail($id)->capacidad == Config::get('options.idroladministrador')) $result = true;
-
-        return $result;
-    }
-
+   
     /**
      * @param void
      * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
