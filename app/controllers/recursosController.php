@@ -3,16 +3,16 @@
 class recursosController extends BaseController{
 
   /**
-     * //Añade un nuevo recurso a la base de datos
-     * @param Input::get('nombre')      string
-     * @param Input::get('descripcion') string
-     * @param Input::get('tipo')        string
-     * @param Input::get('id_lugar')    string
-     * @param Input::get('grupo_id')    int 
-     * @param Input::get('modo')        int (0|1)
-     * @param Input::get('roles')       array
-     *
-     * @return $result                  array    
+    * //Añade un nuevo recurso a la base de datos
+    * @param Input::get('nombre')      string
+    * @param Input::get('descripcion') string
+    * @param Input::get('tipo')        string
+    * @param Input::get('id_lugar')    string
+    * @param Input::get('grupo_id')    int 
+    * @param Input::get('modo')        int (0|1)
+    * @param Input::get('roles')       array
+    *
+    * @return $result                  array    
   */ 
   public function add(){
     
@@ -62,12 +62,9 @@ class recursosController extends BaseController{
       $recurso->descripcion = $descripcion;
       $recurso->id_lugar = $id_lugar;
       $recurso->acl = $this->buildJsonAcl($modo,$roles);
-          
-
       $recurso->save();
 
       $result['msg'] = Config::get('msg.success');
-    
     }
 
     return $result;
@@ -85,7 +82,7 @@ class recursosController extends BaseController{
      * @param Input::get('roles')       array
      *
      * @return $result                  array    
-   */ 
+  */ 
   public function addPuesto(){
     
     //Input
@@ -136,25 +133,23 @@ class recursosController extends BaseController{
       $recurso->espacio_id = $idrecurso;
       $recurso->save();
 
-
-
       $result['msg'] = Config::get('msg.success');
-    
     }
 
     return $result;
   }
+  
   /**
-   * @param Input::get('nombre')      string
-   * @param Input::get('descripcion') string
-   * @param Input::get('tipo')        string
-   * @param Input::get('id_lugar')    string
-   * @param Input::get('grupo_id')    int 
-   * @param Input::get('modo')        int (0|1)
-   * @param Input::get('roles')       array
-   *
-   * @return $result                  array    
-   */ 
+    * @param Input::get('nombre')      string
+    * @param Input::get('descripcion') string
+    * @param Input::get('tipo')        string
+    * @param Input::get('id_lugar')    string
+    * @param Input::get('grupo_id')    int 
+    * @param Input::get('modo')        int (0|1)
+    * @param Input::get('roles')       array
+    *
+    * @return $result                  array    
+  */ 
   public function update(){
    
     //return Recurso::find(Input::get('id',''));
@@ -227,9 +222,9 @@ class recursosController extends BaseController{
     
     //Output 
     $result = array( 'errors'    => array(),
-                        'msg'   => '',    
-                        'error'   => false,
-                      );
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
 
     //Validate
     $rules = array(
@@ -249,13 +244,17 @@ class recursosController extends BaseController{
     }
     else{
 
+      //Softdelete recurso y eventos
+      $recurso = Recurso::findOrFail($id);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso->delEvents();
+      $sgrRecurso->del();
+      
       //Enviar mail a usuarios con reserva futuras
       $sgrMail = new sgrMail();
-      $sgrMail->notificaDeleteRecurso($id,$motivo);
-      
-      //Softdelete recurso y eventos
-      Recurso::find($id)->events()->delete();
-      Recurso::find($id)->delete();
+      $sgrMail->notificaDeleteRecurso($id);
+
       $result['msg'] = Config::get('msg.actionSuccess');
     }
     
@@ -349,15 +348,16 @@ class recursosController extends BaseController{
         $result['error'] = true;
     }
     else{
+      //enable
+      $recurso = Recurso::findOrFail($id);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso->enabled();
+      $sgrRecurso->save();
 
       //Enviar mail a usuarios con reserva futuras
       $sgrMail = new sgrMail();
       $sgrMail->notificaHabilitaRecurso($id);
-      
-      //enable
-      $sgrRecurso = RecursoFactory::getRecursoInstance($id);
-      $sgrRecurso->enabled();
-      $sgrRecurso->save();
      
       $result['msg'] = Config::get('msg.actionSuccess');
     }
@@ -401,15 +401,16 @@ class recursosController extends BaseController{
         $result['error'] = true;
     }
     else{
+      //disabled
+      $recurso = Recurso::findOrFail($id);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso->disabled();
+      $sgrRecurso->save();
 
       //Enviar mail a usuarios con reserva futuras
       $sgrMail = new sgrMail();
       $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
-      
-      //disabled
-      $sgrRecurso = RecursoFactory::getRecursoInstance($id);
-      $sgrRecurso->disabled();
-      $sgrRecurso->save();
 
       $result['msg'] = Config::get('msg.actionSuccess');
     }

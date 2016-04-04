@@ -489,11 +489,46 @@ $(function(e){
         });
     }
 
+    function activeLinkeditpuesto(){
+        //Muestra ventana modal editpuesto
+        $(".linkEditPuesto").on('click',function(e){
+                e.preventDefault();
+                showGifEspera();
+                $.ajax({
+                    type: "GET",
+                    url:  "getrecurso",
+                    data: {idrecurso:$(this).data('idrecurso')},
+                    success: function($recurso){
+                        hideGifEspera();
+                        CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
+                        CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
+                        $('#fm_editpuesto input[name="idrecurso"]').val($recurso.id);
+                        $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
+                        $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
+                        $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+                        
+                        $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
+                        
+                        $.each($arrayRoles,function(index,value){
+                            $('#fm_editpuesto input#fm_editrecurso_roles'+value).prop( "checked", true );
+                        });
+                        hideMsg();
+                        $('#m_editpuesto').modal('show');
+                    },
+                    error: function(xhr, ajaxOptions, thrownError){
+                        hideGifEspera();
+                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+                    }
+                });
+            });
+        }
+
     function activeLinkeditrecurso(){
         //Muestra ventana modal editRecurso
         $(".linkEditRecurso").on('click',function(e){
             e.preventDefault();
             showGifEspera();
+                       
             $.ajax({
                 type: "GET",
                 url:  "getrecurso",
@@ -505,7 +540,7 @@ $(function(e){
                     $('#fm_editrecurso input[name="id"]').val($recurso.id);
                     $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
                     $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
-                    $('#fm_editrecurso select[name="grupo_id"]').val($recurso.grupo_id);
+                    setGrupos('#fm_editrecurso_optionsGrupos','#fm_editrecurso select[name="grupo_id"]',$recurso.grupo_id);
                     $('#fm_editrecurso select[name="tipo"]').val($recurso.tipo);
                     $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
                     
@@ -600,9 +635,6 @@ $(function(e){
             });
         });
     }
-
-    
-
     
     //Muestra ventana modal para crear nuevo grupo de recursos
     $('#btnNuevoGrupo').on('click',function(e){
@@ -616,21 +648,31 @@ $(function(e){
         e.preventDefault();
         hideMsg();
         showGifEspera();
-        $.ajax({
+        setGrupos('#fm_addrecurso_optionsGrupos');
+        //console.log($html);
+        //$('#fm_addrecurso_optionsGrupos').html($html);
+        hideGifEspera();
+        $('#m_addrecurso').modal('show');        
+    });
+
+    //Obtine el listado de grupos 
+    function setGrupos($idSelect,$idInput,$optionSelected){
+       $.ajax({
             type:"GET",
             url:"htmlOptionGrupos",
             data:{},
             success:function($html){
-                $('#fm_addrecurso_optionsGrupos').html($html);
-                hideGifEspera();
-                $('#m_addrecurso').modal('show');        
+                $($idSelect).html($html);
+                if ($idInput != '') $($idInput).val($optionSelected);
+                //$('#m_addrecurso').modal('show');        
+                //return $html;
             },
             error:function(xhr, ajaxOptions, thrownError){
                 hideGifEspera();
                 alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
             }
-        });
-    });
+        }); 
+    }
 
     function getListado(){
         $.ajax({

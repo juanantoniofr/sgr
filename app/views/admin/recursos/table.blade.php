@@ -44,20 +44,10 @@
             <a href="#" title="Editar grupo" class="linkEditGrupo" data-idgrupo="{{$grupo->id}}" data-descripcion="{{$grupo->descripcion}}" data-nombre="{{$grupo->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
             <!-- eliminar -->
             <a href="#" title="Eliminar grupo" class = "linkdelgrupo" data-idgrupo="{{$grupo->id}}" data-nombre="{{$grupo->nombre}}" data-numeroelementos="{{$grupo->recursos->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
-            
-            @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) )
-              <!-- personas 
-              <a href="#" class="thpersonas" data-grupoid="{{$grupo->id}}"><i class="fa fa-users fa-fw"></i></a>-->
-            @endif
-            
             <!-- añadir recursos al grupo -->
             <a href="#" title="Añadir recursos al grupo" class = "addrecursotogrupo" data-nombre="{{$grupo->nombre}}" data-idgrupo="{{$grupo->id}}" ><i class="fa fa-plus fa-fw"></i></a>
             {{$grupo->nombre}}
           </li>
-          
-                 
-                
-
         </ul>
       </td>
       <!-- recursos -->
@@ -82,16 +72,32 @@
                 @if( $recurso->tipo == Config::get('options.espacio') )
                   <!-- Añadir Puesto -->
                   <a href="#" title="Añadir Puesto" class = "linkAddPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
-                  <!-- eliminar Puesto -->
-                  <a href="#" title="Eliminar Puesto" class = "linkEliminaPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-minus-square fa-fw"></i></a>
                   <!-- Ver Puestos -->
                   <a href="#" title="Ver Puestos" class = "linkVerPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                 @endif   
               @endif
               <span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span>
+              
+              <!-- puestos -->
+              <ul class="list-unstyled">
               @foreach ($recurso->puestos as $puesto)
-                <span>{{$puesto->nombre}}</span>
+                <li>
+                  <!-- editar -->
+                  <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}"><i class="fa fa-pencil fa-fw"></i></a>
+                  <!-- eliminar Puesto -->
+                  <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
+                   @if($puesto->disabled)
+                  <!-- habilitar Puesto -->
+                  <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto"><i class="fa fa-toggle-off fa-fw"></i></a>
+                @else    
+                  <!-- deshabilitar Puesto-->
+                  <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto"><i class="fa fa-toggle-on fa-fw "></i></a>
+                @endif 
+                  <span class="@if($puesto->disabled) text-warning @else text-success @endif">{{$puesto->nombre}}</span>
+                </li>
               @endforeach
+              </ul>
+            
             </li>
           @endforeach
         </ul>

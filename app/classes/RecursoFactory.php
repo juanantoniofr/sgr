@@ -2,22 +2,19 @@
   
   class RecursoFactory{
   
-    public static function getRecursoInstance($id){
+    public static function getRecursoInstance($tipo){
         
-        $recurso = Recurso::findOrFail($id);
-        $tipo = $recurso->tipo;
-       
         switch($tipo){
           case Config::get('options.espacio'):
-            return new sgrEspacio($id);
+            return new sgrEspacio();
             break;
         
           case Config::get('options.equipo'):
-            return new sgrEquipo($id);
+            return new sgrEquipo();
             break;
         
           case Config::get('options.puesto'):
-            return new sgrPuesto($id);
+            return new sgrPuesto();
             break;
           
           default:

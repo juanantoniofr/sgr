@@ -5,11 +5,15 @@
 		private $recurso;
 		private $puestos;
 
-		public function __construct($id){
-			$this->recurso = Recurso::findOrFail($id);
-			$this->puestos = $this->recurso->puestos;
+		public function __construct(){
+			$this->recurso = new Recurso;
 		}
 
+		public function setRecurso($recurso){
+			$this->recurso = $recurso;
+			$this->puestos = $this->recurso->puestos;
+		}
+		
 		public function enabled(){
 		
 			foreach ($this->puestos as $puesto) {
@@ -36,6 +40,24 @@
 			}		
 			$this->recurso->save();
 			return true;
+		}
+
+		public function del(){
+			//Softdelete recurso
+      foreach ($this->puestos as $puesto) {
+				$puesto->delete();
+			}
+
+			$this->recurso->delete();		
+		}
+
+		public function delEvents(){
+			//Softdelete eventos
+			foreach ($this->puestos as $puesto) {
+				$puesto->events()->delete();
+			}
+			$this->recurso->events()->delete();
+		
 		}
 
 	}	
