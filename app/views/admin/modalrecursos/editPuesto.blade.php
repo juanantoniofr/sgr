@@ -6,7 +6,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-info"><i class="fa fa-pencil fa-fw"></i> <b><span id ="m_editpuesto_title_nombrerecurso"></span>: </b>Editar Puesto</h2>
+        <h2 class="modal-title text-info"><i class="fa fa-pencil fa-fw"></i> <b>Editar Puesto:</b> <span id ="m_editpuesto_title_nombrepuesto"></span></h2>
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
@@ -25,6 +25,13 @@
         <div class="form-group" id="fm_editpuesto_inputtipo">  
           {{Form::label('tipo', 'Tipo de recurso')}}
           {{Form::select('tipo', array('puesto' => 'Puesto'),'puesto',array('class' => 'form-control'))}}
+        </div>
+
+        <div class="form-group" id="fm_editpuesto_inputespacio_id">
+          {{Form::label('espacio_id', 'Espacio')}}
+          <select name="espacio_id" class="form-control" id="fm_editpuesto_optionsEspacios">
+           
+          </select>
         </div>
             
         <div class="form-group" id="fm_editpuesto_inputmodo">  
@@ -57,7 +64,10 @@
         </div>
 
         <div class="form-group hidden">
-            {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+            {{Form::text('id','',array('class' => 'form-control'))}}
+        </div> 
+        <div class="form-group hidden">
+            {{Form::text('tipo','puesto',array('class' => 'form-control'))}}
         </div> 
       </div><!-- ./modal-body --> 
       

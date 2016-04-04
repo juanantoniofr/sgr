@@ -38,7 +38,6 @@ Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'))
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
 
 
-
 //routes gestión de usuarios
 Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listUsers','before' => array('auth','capacidad:4,msg')));
 Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg')));
@@ -47,11 +46,6 @@ Route::get('admin/editarUsuario.html',array('as' => 'updateUser.html','uses' => 
 Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg')));
 //Route::post('admin/user/new',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','capacidad:4,msg')));
 Route::post('admin/salvarNuevoUsuario',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','ajax_check','capacidad:4,msg')));
-
-
-
-
-
 Route::get('admin/eliminaUser.html',array('as' => 'eliminaUser.html','uses' => 'UsersController@delete','before' => array('auth','capacidad:4,msg')));
 Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
 
@@ -81,11 +75,10 @@ Route::post('admin/delrecurso',array('uses' => 'recursosController@del','before'
 Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::post('admin/updaterecurso',array('uses' => 'recursosController@update','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
+Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
-
-Route::post('admin/addpuesto',array('uses' => 'recursosController@addPuesto','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -98,6 +91,8 @@ Route::post('admin/addPersona',array('uses' => 'GruposController@addPersona','be
 Route::post('admin/removePersonas',array('uses' => 'GruposController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('admin/htmlCheckboxPersonas',array('uses' => 'GruposController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));	
 Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+
+
 //ValidacionController routes **********************
 //(roles 4 (admin) y 5 (validador))
 Route::get('validador/home.html',array('as' => 'validadorHome.html','uses' => 'ValidacionController@index','before' => array('auth','capacidad:4-5,msg')));

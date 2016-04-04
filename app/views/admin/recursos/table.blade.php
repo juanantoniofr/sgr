@@ -73,32 +73,40 @@
                   <!-- Añadir Puesto -->
                   <a href="#" title="Añadir Puesto" class = "linkAddPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                   <!-- Ver Puestos -->
-                  <a href="#" title="Ver Puestos" class = "linkVerPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
+                  @if($recurso->puestos->count() > 0)
+                    <a href="#" title="Ver Puestos" class = "linkVerPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
+                  @endif    
                 @endif   
               @endif
               <span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span>
               
               <!-- puestos -->
-              <ul class="list-unstyled">
-              @foreach ($recurso->puestos as $puesto)
-                <li>
-                  <!-- editar -->
-                  <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}"><i class="fa fa-pencil fa-fw"></i></a>
-                  <!-- eliminar Puesto -->
-                  <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
-                   @if($puesto->disabled)
-                  <!-- habilitar Puesto -->
-                  <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto"><i class="fa fa-toggle-off fa-fw"></i></a>
-                @else    
-                  <!-- deshabilitar Puesto-->
-                  <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto"><i class="fa fa-toggle-on fa-fw "></i></a>
-                @endif 
-                  <span class="@if($puesto->disabled) text-warning @else text-success @endif">{{$puesto->nombre}}</span>
-                </li>
-              @endforeach
-              </ul>
-            
-            </li>
+              <div id="puestos_{{$recurso->id}}" style="display:none">
+              
+                <ul class="list-unstyled">
+                @foreach ($recurso->puestos as $puesto)
+                  <li>
+
+                    <span class="@if($puesto->disabled) text-warning @else text-success @endif">{{$puesto->nombre}}</span>
+                    <!-- editar -->
+                    <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}"><i class="fa fa-pencil fa-fw"></i></a>
+                    <!-- eliminar Puesto -->
+                    <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
+                    @if($puesto->disabled)
+                      <!-- habilitar Puesto -->
+                      <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto"><i class="fa fa-toggle-off fa-fw"></i></a>
+                    @else    
+                      <!-- deshabilitar Puesto-->
+                      <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto"><i class="fa fa-toggle-on fa-fw "></i></a>
+                    @endif 
+                    
+                  </li>
+                @endforeach
+                </ul>
+              
+              </div>
+
+           </li>
           @endforeach
         </ul>
       </td>

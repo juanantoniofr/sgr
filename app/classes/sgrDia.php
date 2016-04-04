@@ -17,8 +17,8 @@ class sgrDia {
 	
 
 	/**
-	*	@param $tsfecha int timestamp 
-	*	@param $horasdisponibles array intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
+		*	@param $tsfecha int timestamp 
+		*	@param $horasdisponibles array intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
 	*/
 	public function __construct($tsfecha = '',$horario = ''){
 
@@ -53,6 +53,25 @@ class sgrDia {
 		
 		$abreviatura = ucfirst(strftime('%a',$this->timestamp));
 		return $abreviatura;
+	}
+
+	/**
+		*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
+		*	@param $id_recurso int
+		*	@param $id_gruppo int
+		*	@return array objetos Evento
+	*/
+	public function getEvents($recurso){
+		
+		$numMes = $this->numMes;
+		$year = $this->year;
+		
+		$fechaEvento = date('Y-m-d',mktime(0,0,0,(int) $numMes,(int) $this->numdiames,(int) $year));
+		
+		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+		$events = $sgrRecurso->getEvents($fechaEvento);
+
+		return $events;
 	}
 
 	/**

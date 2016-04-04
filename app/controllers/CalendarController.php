@@ -28,7 +28,7 @@ class CalendarController extends BaseController {
 		$tHead = CalendarController::head($viewActive,$day,$numMonth,$year);
 		
 		$tBody = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-				
+		//$tBody = '';			
 		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
 		$recursos = array();//No hay recurso seleccionado la primera vez
 		$dropdown = Auth::user()->dropdownMenu();
@@ -208,7 +208,8 @@ class CalendarController extends BaseController {
 				return '<p>Aún en desarrollo....</p>';
 				break;
 			case 'month':
-				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+				//return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+				return (string) View::make('calendario.testbodyMonth')->with('sgrCalendario',$sgrCalendario)->with('recurso',Recurso::find($id_recurso));//->with('id_grupo',$id_grupo);
 				break;
 			case 'week':
 					$sgrWeek = $sgrCalendario->sgrWeek(strtotime($year.'-'.$numMonth.'-'.$day));

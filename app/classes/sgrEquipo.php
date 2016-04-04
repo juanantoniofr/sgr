@@ -12,6 +12,10 @@
 			$this->recurso = $recurso;
 		}
 
+		public function getEvents($fechaEvento){
+			return $this->recurso->where('fechaEvento','=',$fechaEvento)->get();
+		}
+
 		public function enabled(){
 			$this->disabled =  0;
 			return true;
@@ -28,13 +32,25 @@
 
 		public function del(){
 			//Softdelete recurso
-      return $this->recurso->delete();
+     	return $this->recurso->delete();
 		}
 
 		public function delEvents(){
 			//Softdelete eventos
 			return $this->recurso->events()->delete();
 		}
+
+		public function update($data){
+			return $this->recurso->update($data);
+		}
+
+		public function add($data){
+			foreach ($data as $key => $value) {
+				$this->recurso->$key = $value;
+			}
+			return true;
+		}
+
 
 	}	
 

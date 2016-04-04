@@ -57,7 +57,10 @@
         </div>
 
         <div class="form-group hidden">
-            {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+            {{Form::text('espacio_id','',array('class' => 'form-control'))}}
+        </div> 
+        <div class="form-group hidden">
+            {{Form::text('id','',array('class' => 'form-control'))}}
         </div> 
       </div><!-- ./modal-body --> 
       

@@ -21,14 +21,14 @@
           {{Form::label('nombre', 'Nombre')}}
           {{Form::text('nombre',Input::old('nombre'),array('class' => 'form-control'))}}
         </div>
-              
+             
         <div class="form-group" id="fm_editrecurso_inputgrupo_id">
           {{Form::label('grupo_id', 'Grupo')}}
           <select name="grupo_id" class="form-control" id="fm_editrecurso_optionsGrupos">
            
           </select>
         </div>
-        
+       
         <div class="form-group" id="fm_editrecurso_inputtipo">  
           {{Form::label('tipo', 'Tipo de recurso')}}
           {{Form::select('tipo', array('espacio' => 'Espacio', 'equipo' => 'Equipo'),'espacio',array('class' => 'form-control'))}}
