@@ -3,6 +3,8 @@
 class sgrDia {
 
 	private $timestamp; //timestamp de la fecha
+	private $eventos;
+
 	private $events; 	//array de objetos de tipo Eventos
 	private $esDomingo;
 	private $esSabado;
@@ -20,10 +22,12 @@ class sgrDia {
 		*	@param $tsfecha int timestamp 
 		*	@param $horasdisponibles array intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
 	*/
-	public function __construct($tsfecha = '',$horario = ''){
+	public function __construct($tsfecha = '',$eventos = '',$horario = ''){
 
 		if(empty($tsfecha)) $tsfecha = strtotime('1970-1-1');
 		$this->timestamp = $tsfecha;
+
+		$this->eventos = $eventos;
 
 		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			

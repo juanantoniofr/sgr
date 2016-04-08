@@ -563,11 +563,12 @@ $(function(e){
 				success: function(respuesta){
 					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
 					
-
-					$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
+					//console.log(respuesta);
+					$('#loadCalendar').html(respuesta);
+					//$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
 					
-					$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
-					$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
+					//$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
+					//$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
 										
 					init();
 					//if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();

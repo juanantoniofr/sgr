@@ -54,9 +54,11 @@ return array (
 	'modoGestion'		=> array('0','1'), //0 => con validación, 1 => sin validación
 	'idroladministrador'	=> '4', 
 	
-	'tipoRecursos'		=> array('espacio','equipo','puesto'),
-	'espacio'	=> 'espacio',
-	'equipo'	=> 'equipo',
-	'puesto'	=> 'puesto',	
+	'tipoRecursos'				=> 	array('espacio','equipo','puesto'),
+	'espacio'							=> 	'espacio',
+	'equipo'							=> 	'equipo',
+	'puesto'							=> 	'puesto',
+	'defaulttiporecurso' 	=> 	'espacio',	
+	'defaultview'					=>	'month',
 	);
 ?>

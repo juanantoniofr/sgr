@@ -9,6 +9,10 @@
 		$this->recurso = new Recurso;
 	}
 
+	public function recurso(){
+			return $this->recurso;
+	}
+
 	public function setRecurso($recurso){
 		$this->recurso = $recurso;
 		$this->puestos = $this->recurso->puestos;

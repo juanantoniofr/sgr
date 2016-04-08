@@ -104,8 +104,8 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 
 
 //Calendarios
-Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@showCalendarViewMonth','before' => array('auth')));
-Route::get('ajaxCalendar',array('uses' => 'CalendarController@getTablebyajax','before' => array('auth','ajax_check')));
+Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
+Route::get('ajaxCalendar',array('uses' => 'CalendarController@calendar','before' => array('auth','ajax_check')));
 
 
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
@@ -164,11 +164,20 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 
-	$user = User::find('58');
-	echo "<pre>";
-	var_dump($user->atiende);
-	echo "</pre>";
+	$fecha = new DateTime();
+	$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.defaulttiporecurso'));
+	$sgrRecurso->setRecurso(Recurso::find('42'));
+	$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+	foreach($sgrCalendario->sgrWeeks() as $sgrWeek){
+		echo '<tr>';	
+		foreach($sgrWeek->sgrDays() as $sgrDia){
+			echo '<td>';
+			//echo $sgrCalendario->sgrRecurso()->recurso()->id;
+			 echo (string) View::make('calendario.td')->with('sgrDia',$sgrDia)->with('view','month')->with('hora',0)->with('minuto',0)->with('id_recurso',$sgrCalendario->sgrRecurso()->recurso()->id)->with('id_grupo',$sgrCalendario->sgrRecurso()->recurso()->grupo_id);
+			echo '</td>';		
+		}
+		echo '</tr>';
+	}
 	
-	//var_dump($user);
 	
  }));

@@ -2,16 +2,14 @@
 
 class sgrWeek {
 
-	private $dias;
-	//public $year;
-
-
+	private $sgrDias;
+	
 	/**
 	*	@param $day
 	*	@param $numMes
 	*	@param $year
 	*/
-	function __construct($day = '',$month = '',$year = ''){
+	function __construct($sgrRecurso,$day = '',$month = '',$year = ''){
 
 		if (empty($day)) $day = date('d');//dia actual
 		if (empty($month)) $month = date('m');//mes actual
@@ -19,7 +17,15 @@ class sgrWeek {
 
 		//timeStamp del lunes 
 		$timestamplunes = $this->timestamplunesanterior((int) $day,(int) $month,(int) $year);
-		for($i=0;$i<7;$i++) $this->dias[$i] = new sgrDia(strtotime('+ '.$i.' days',$timestamplunes));
+		
+		//sgrDias
+		for($i=0;$i<7;$i++) {
+			$currentday = strtotime('+ '.$i.' days',$timestamplunes);
+			$eventos = $sgrRecurso->recurso()->events->filter(function($event) use ($currentday){
+				return $event->fechaEvento == date('Y-m-d',$currentday);
+				});
+			$this->sgrDias[$i] = new sgrDia(strtotime('+ '.$i.' days',$timestamplunes),$eventos);
+		}
 	}
 
 	/**
@@ -30,7 +36,7 @@ class sgrWeek {
 	*/
 	public function dia($numDia){
 		
-		if (isset($this->dias[$numDia])) return $this->dias[$numDia];
+		if (isset($this->sgrDias[$numDia])) return $this->sgrDias[$numDia];
 		return false;
 		
 	}
@@ -39,7 +45,7 @@ class sgrWeek {
 	* @return array object sgrDia
 	*/
 	public function sgrDays(){
-		return $this->dias;
+		return $this->sgrDias;
 	}
 
 

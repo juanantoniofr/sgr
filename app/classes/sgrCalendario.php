@@ -2,83 +2,100 @@
 
 class sgrCalendario {
 	
-	private $numeroMes; //int numero del mes entre 1 y 12
-	private $nombreMes; //string nombre del mes en español
-	private $year;	//int año cuatro dígitos
-	private $ultimodiasmes; //int timestamp
-	private $sgrWeeks; //array de objetos sgrWeek
+	private $fecha;						//objeto DateTime (php) 
+	private $sgrRecurso;			//Objeto sgrRecurso
+	private $currentDay;			//timestamp	
+	private $sgrWeeks; 				//array de objetos sgrWeek
+
 	
 	
 	/**
-	*	@param $numMes
-	*	@param $year
+		*	@param $fecha 			DateTime
+		* @param $sgrRecurso 	sgrRecurso
 	*/
-	function __construct($numMes = '',$year = ''){
+	function __construct($fecha = '',$sgrRecurso = ''){
 		
-		if (empty($numMes)) $numMes = date('m');//mes actual
-		if (empty($year)) $year = date('Y');//año actual
+		//sgrRecurso
+		$this->sgrRecurso = $sgrRecurso;
 		
+		//DateTime
+		if (empty($fecha)) $this->fecha = new DateTime();
+		else $this->fecha = $fecha;
 
-		//$this->setNumeroMes($numMes);
-		$this->numeroMes = (int) $numMes;
-		//$this->setYear($year);
-		$this->year = (int) $year;
-		$this->setUltimoDiaMes();//28|29|30|31
-		$this->setNombreMes($numMes);//establece el nombre del mes en español
-		//$this->setDias();//construye un array con los días del mes
+		//timestamp
+		$this->currentDay 	= $this->fecha->getTimestamp();
+		
+		//sgrWeeks
 		$this->setSemanas();
-
-		
 		return $this;
 	}
 
-	//public functions
-	public function sgrWeeks(){
-		return $this->sgrWeeks;
+	//$fecha debe ser un objeto DateTime
+	public function setFecha($fecha){
+		$this->fecha = $fecha;
+	}
+
+	public function dia(){
+		return $this->fecha->format('d');
+	}
+
+	public function mes(){
+		return $this->fecha->format('m');
+	}
+
+	public function year(){
+		return $this->fecha->format('Y');
+	}
+
+	public function fecha(){
+		return $this->fecha;
+	}
+
+	public function sgrRecurso(){
+		return $this->sgrRecurso;
 	}
 
 	/**
-	*	@param $timestamp int timestamp fecha
-	*	@return $sgrWeek array object srgDia || false si timestamp no es de $this
+		*	@param $timestamp int timestamp fecha
+		*	@return $sgrWeek array object srgDia || false si timestamp no es de $this
 	*/
-	public function sgrWeek($timestamp = 0){
+	public function sgrWeek(){
 
 		foreach ($this->sgrWeeks as $sgrWeek) {
 			foreach ($sgrWeek->sgrDays() as $sgrDia) {
-				if ($timestamp == $sgrDia->timestamp()) return $sgrWeek;
+				if ($this->fecha->getTimestamp() == $sgrDia->timestamp()) return $sgrWeek;
 			}
 		}
 		
 		return false;//no existe la semana que contenga $timestamp
 	}
 
-	public function numeroMes(){
-		
-		return $this->numeroMes;
+	//public functions
+	public function sgrWeeks(){
+		return $this->sgrWeeks;
 	}
-
-	public function getYear(){
-		
-		return $this->year;
-	}
-
+	
 	public function nombreMes(){
-		
-		return $this->nombreMes;
+		$nombreMes = '';
+		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
+			  		$nombreMes="Error setlocale";}
+		$m = $this->fecha->format('m');	  		
+		$timestamp = strtotime('1970-'.$m.'-1');
+		$nombreMes = ucfirst(strftime('%B',$timestamp));
+		return $nombreMes;
 	}
 
 	public function ultimoDia(){
-
-		return (int) $this->ultimodiasmes;
+		return (int) date('t', mktime(0,0,0,$this->fecha->format('m'),1,$this->fecha->format('Y')));
 	}
-
+	
 	/**
 	 * Devuelve el objeto sgrDia cuyo numero de dia es $numDia si existe, en caso contrario devuelve false
  	 * 
  	 * @param $numDia int Número del día mes [1-31]
  	 * @return Obj sgrDia | false
 	*/
-	public function dia($numDia){
+	public function sgrDia($numDia){
 		
 		if (array_key_exists($numDia, $this->diasMes))	return $this->diasMes[$numDia];
 		return false;
@@ -94,10 +111,10 @@ class sgrCalendario {
 		$semanas = array();
 		$day = 1;
 		$i=0;
-		$timestamp = mktime(0,0,0,(int) $this->numeroMes,1,(int) $this->year);
+		$timestamp = mktime(0,0,0,(int) $this->fecha->format('m'),1,(int) $this->fecha->format('Y'));
 		$maxday = date("t",$timestamp);
 		while ($day <= $maxday){
-			$semanas[$i] =  new sgrWeek((int) $day,(int) $this->numeroMes,(int) $this->year);
+			$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
 			$day = $day + 7;
 		 	$i = $i + 1;
 		} 
@@ -105,62 +122,7 @@ class sgrCalendario {
 		return $this->sgrWeeks = $semanas;
 	}
 
-	private function setUltimoDiaMes(){
-		
-		return $this->ultimodiasmes = (int) date('t', mktime(0,0,0,$this->numeroMes,1,$this->year));
-	}
 	
-
-	/*private function setNumeroMes($numeroMes){
-		if (empty($numeroMes)) $numeroMes = date('m');
-		return $this->numeroMes = (int) $numeroMes;
-	}*/
-
-	/*private function setYear($year){
-		if (empty($year)) $year = date('Y');
-		return $this->year = (int) $year;
-	}*/
-
-	/**
-	 * Genera un array con indice los días del mes y valor objetos sgrDia
- 	 * 
- 	 * @return $diasmes array 
-	*/
-	private function setDias(){
-
-		// Falta por escribir la función validDate
-		// if (!validDate($month,$year)) return false;
-
-		$diasmes = array();
-		$timestamp = mktime(0,0,0,$this->numeroMes,1,$this->year);
-		$maxday = date("t",$timestamp); // número de días de $month
-		for($i=1;$i<=$maxday;$i++) {
-			$timestamp = mktime(0,0,0,$this->numeroMes,$i,$this->year);
-			$diasmes[$i] = new sgrDia($timestamp);
-		}
-
-		return $this->diasMes = $diasmes;
-		
-	}
-	
-	/**
-	 * Establece el nombre del mes en español
- 	 * 
- 	 * @param $month int Número del mes, 1=enero... 12=diciembre
- 	 * @return $mes string Mes en español
-	*/
-	private function setNombreMes ($month = ''){
-
-		$mes = '';
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$nombremes="Error setlocale";}
-		$m = (int) $month;	  		
-		$timestamp = strtotime('1970-'.$m.'-1');
-		$mes = ucfirst(strftime('%B',$timestamp));
-		return $this->nombreMes = $mes;
-	}
-
-
 	//static functions
 
 	/**

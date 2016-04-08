@@ -42,7 +42,7 @@
                         <!-- Icono -->
                         <span   data-toggle="tooltip" title="Solicitud {{$event->estado}}" 
                                 class=" fa fa-fw
-                                    @if($event->estado == 'aprobada'  && !$event->finalizada()) fa-check text-success
+                                    @if($event->estado == 'aprobada' && !$event->finalizada()) fa-check text-success
                                     @elseif($event->finalizada()) fa-clock-o text-info
                                     @elseif ($event->estado == 'pendiente') fa-question text-info
                                     @elseif ($event->estado == 'denegada') fa-ban text-warning

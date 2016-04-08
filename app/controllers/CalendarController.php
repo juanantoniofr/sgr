@@ -3,39 +3,103 @@
 class CalendarController extends BaseController {
 	
 	//Carga la vista por defecto: Mensual
-	public function showCalendarViewMonth(){
+	public function index(){
+		$viewActive = Config::get('options.defaultview'); //vista por defecto
+		$fecha = new DateTime();
+		$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.defaulttiporecurso'));
+		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
+		$dropdown = Auth::user()->dropdownMenu();
+		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown);
 		
-		$viewActive = Input::get('view','month'); //vista por defecto
-		$uvus = Input::get('uvus','');
-		$msg = '';
-		$nh = Auth::user()->numHorasReservadas();//Número de horas reservadas
+	}
 
-			
+	//Ajax functions
+	public function calendar(){
+		
+		//input
+		$viewActive = Input::get('viewActive',Config::get('options.defaultview')); //vista por defecto
 		$day = Input::get('day',date('d'));
-		$numMonth = Input::get('numMonth',date('m'));
+		$month = Input::get('month',date('n'));
 		$year = Input::get('year',date('Y'));
 		$id_recurso = Input::get('id_recurso','');
 		$id_grupo = Input::get('groupID','');
-		$tsPrimerLunes = sgrCalendario::fristMonday();//timestamp primer lunes reservable...
-		$datefirstmonday = getdate($tsPrimerLunes);
-		$sgrCalendario = new sgrCalendario((int) $numMonth,(int) $year);
-			
-		//Los usuarios del rol "alumnos" sólo pueden reservar 12 horas a la semana como máximo
-		if (Auth::user()->isUser() && $nh >=12 ){
-			$msg = 'Has completado el número máximo de horas que puede reservar (' . Config::get('options.max_horas').' horas a la semana )'; 
-		}	
-		
-		$tHead = CalendarController::head($viewActive,$day,$numMonth,$year);
-		
-		$tBody = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		//$tBody = '';			
-		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
-		$recursos = array();//No hay recurso seleccionado la primera vez
-		$dropdown = Auth::user()->dropdownMenu();
 
-		//se devuelve la vista calendario.
-		return View::make('Calendarios')->with('tsPrimerLunes',$tsPrimerLunes)->with('day',$day)->with('numMonth',$numMonth)->with('year',$year)->with('tHead',$tHead)->with('tBody',$tBody)->with('nh',$nh)->with('viewActive',$viewActive)->with('uvusUser',$uvus)->nest('sidebar','sidebar',array('tsPrimerLunes' => $tsPrimerLunes,'msg' => $msg,'grupos' => $gruposderecursos,'recursos' => $recursos))->nest('dropdown',$dropdown)->nest('modaldescripcion','modaldescripcion')->nest('modalAddReserva','modalAddReserva')->nest('modalDeleteReserva','modalDeleteReserva')->nest('modalfinalizareserva','modalfinalizareserva')->nest('modalanulareserva','modalanulareserva')->nest('modalMsg','modalMsg')->nest('modalAtenderReserva','modalAtenderReserva')->nest('viewCaption','calendario.caption',array('view'=>$viewActive,'day' => $day,'nombreMes' => $sgrCalendario->nombreMes(),'year' => $sgrCalendario->getYear()))->nest('viewHead','calendario.headMonth');
+		//Var
+		$fecha = new DateTime($year.'-'.$month.'-'.$day);
+		$tipo = Config::get('options.defaulttiporecurso');
+		$recurso = new Recurso;
+		if (!empty($id_recurso) && Recurso::where('id','=',$id_recurso)->count() > 0) {
+			$tipo = Recurso::findOrFail($id_recurso)->tipo;
+			$recurso = Recurso::findOrFail($id_recurso);
+		}
+
+		$sgrRecurso = RecursoFactory::getRecursoInstance($tipo);
+		$sgrRecurso->setRecurso($recurso);
+		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+		$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
+		$head = (string) CalendarController::head($viewActive,$sgrCalendario);
+		$body = (string) CalendarController::body($viewActive,$sgrCalendario);
 		
+		return (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
+    
+	}
+
+	public static function head($viewActive,$sgrCalendario){
+		switch ($viewActive) {
+			case 'month':
+				return (string) View::make('calendario.headMonth');
+				break;
+			
+			case 'week':
+				$sgrWeek = $sgrCalendario->sgrWeek();
+				return (string) View::make('calendario.headWeek')->with('sgrWeek',$sgrWeek);
+				break;
+		}
+	}
+
+	public static function caption($viewActive,$day,$nombreMes,$year){
+		
+		return (string) View::make('calendario.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
+	}
+
+	public static function body($viewActive,$sgrCalendario){
+		
+		$diaActual = 1;
+		$j=1;
+		
+		switch ($viewActive) {
+			
+			case 'month':
+				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario);//->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+				break;
+			
+			case 'week':
+				$sgrWeek = $sgrCalendario->sgrWeek();
+				$horarioApertura = Config::get('options.horarioApertura');	
+				return (string) View::make('calendario.bodyWeek')->with('horarioApertura',$horarioApertura)->with('sgrWeek',$sgrWeek)->with('sgrCalendario',$sgrCalendario);	
+				break;
+			
+			case 'agenda':
+				$maxEventsByPage = 10;
+				$startDate = date('Y-m-d',strtotime($year . '-' . $numMonth .'-'. $day));
+				$events = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->orderby('fechaEvento','Asc')->orderby('horaInicio','Asc')->orderby('titulo','Asc')->paginate($maxEventsByPage);
+		
+				return (string) View::make('calendario.bodyAgenda')->with('events',$events);
+				break;
+			
+			case 'day':
+				return '<p>Aún en desarrollo.....</p>';	
+				break;
+
+			case 'year':
+				return '<p>Aún en desarrollo....</p>';
+				break;	
+			
+			default:
+				$table['tBody'] = 'Error al generar vista...';
+				break;	
+		}
 	}
 
 	//Generación de pdf's para imprimir
@@ -62,7 +126,7 @@ class CalendarController extends BaseController {
 		$sgrCalendario = new sgrCalendario($month,$year);
 
 
-		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
+		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->year());
 		$table['tHead'] = CalendarController::head($viewActive,$day,$month,$year);
 
 		switch ($viewActive) {
@@ -163,92 +227,5 @@ class CalendarController extends BaseController {
 		
 		return $respuesta;
 	}	
-
-	
-	//Ajax functions
-	public function getTablebyajax(){
-		
-		$table = array( 'tHead' => '',
-						'tBody' => '',
-						'disabled' => array('title' => '',
-											'msg'	=> ''),
-						);
-		
-		$viewActive = Input::get('viewActive','month'); //vista por defecto
-		$day = Input::get('day',date('d'));
-		$numMonth = Input::get('month',date('n'));
-		$year = Input::get('year',date('Y'));
-		$id_recurso = Input::get('id_recurso','');
-		$id_grupo = Input::get('groupID','');
-
-       	$sgrCalendario = new sgrCalendario($numMonth,$year);
-       	$table['tHead'] = CalendarController::head($viewActive,$day,$numMonth,$year);
-		$table['tBody'] = CalendarController::body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo);
-		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->getYear());
-       	
-		if ($id_recurso != 0){
-			$recurso = Recurso::findOrFail($id_recurso);
-			if (1 == $recurso->disabled){
-				$table['disabled']['title'] = $recurso->nombre . ' deshabilitado temporalmente';
-				$table['disabled']['msg'] = '<p class="text-center"><b>Vicedecanato de Desarrollo de Proyectos e Infraestructuras</b></p><p>Nos hemos visto en la necesidad de acometer reformas integrales importantes (cableado de sonido y video, equipos, sistema eléctrico, mesas de mezcla, cambio de matriz) en el Salón de Actos, después de doce años de actividad ininterrumpida y de los cambios tecnológicos que se han ido produciendo. El sistema de distribución de señales ha dejado de funcionar y el paso del sistema analógico obsoleto al digital requiere una inversión importante, además de un cierre de este espacio que va a durar previsiblemente sobre dos meses.</p>';
-			}
-		} 
-
-	    return $table;
-	}
-
-	public static function body($viewActive,$day,$numMonth,$year,$id_recurso,$id_grupo){
-		
-		$sgrCalendario = new sgrCalendario($numMonth,$year);
-		$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-		$diaActual = 1;
-		$j=1;
-		switch ($viewActive) {
-			case 'year':
-				return '<p>Aún en desarrollo....</p>';
-				break;
-			case 'month':
-				//return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
-				return (string) View::make('calendario.testbodyMonth')->with('sgrCalendario',$sgrCalendario)->with('recurso',Recurso::find($id_recurso));//->with('id_grupo',$id_grupo);
-				break;
-			case 'week':
-					$sgrWeek = $sgrCalendario->sgrWeek(strtotime($year.'-'.$numMonth.'-'.$day));
-					$horarioApertura = Config::get('options.horarioApertura');	
-					return (string) View::make('calendario.bodyWeek')->with('horarioApertura',$horarioApertura)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);	
-				break;
-			case 'day':
-				return '<p>Aún en desarrollo.....</p>';	
-				break;
-			case 'agenda':
-				$maxEventsByPage = 10;
-				$startDate = date('Y-m-d',strtotime($year . '-' . $numMonth .'-'. $day));
-				$events = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','>=',$startDate)->orderby('fechaEvento','Asc')->orderby('horaInicio','Asc')->orderby('titulo','Asc')->paginate($maxEventsByPage);
-		
-				return (string) View::make('calendario.bodyAgenda')->with('events',$events);
-				break;
-			default:
-				$table['tBody'] = 'Error al generar vista...';
-				break;	
-		}
-	}
-
-	public static function head($viewActive,$day,$numMonth,$year){
-		
-		switch ($viewActive) {
-			case 'month':
-				return (string) View::make('calendario.headMonth');
-				break;
-			
-			case 'week':
-				$sgrWeek = new sgrWeek($day,$numMonth,$year);
-				return (string) View::make('calendario.headWeek')->with('sgrWeek',$sgrWeek);
-				break;
-		}
-	}
-
-	public static function caption($viewActive,$day,$nombreMes,$year){
-
-		return (string) View::make('calendario.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
-	}
 
 }//fin del controlador

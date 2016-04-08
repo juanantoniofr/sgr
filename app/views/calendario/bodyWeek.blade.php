@@ -6,7 +6,7 @@
             @foreach($sgrWeek->sgrDays() as $sgrDia)
             
                   <td>
-                        {{ (string) View::make('calendario.td')->with('sgrDia',$sgrDia)->with('view','week')->with('hora',sgrDate::parsedatetime($horarioApertura[$j],'H:i','H'))->with('minuto',30)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo) }}
+                        {{ (string) View::make('calendario.td')->with('sgrDia',$sgrDia)->with('view','week')->with('hora',sgrDate::parsedatetime($horarioApertura[$j],'H:i','H'))->with('minuto',30)->with('id_recurso',$sgrCalendario->sgrRecurso()->recurso()->id)->with('id_grupo',$sgrCalendario->sgrRecurso()->recurso()->grupo_id) }}
                   </td> 
             
             @endforeach
