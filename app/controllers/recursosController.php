@@ -2,6 +2,7 @@
 
 class recursosController extends BaseController{
 
+   
   /**
     * //Añade un nuevo recurso a la base de datos
     * @param Input::get('nombre')      string
@@ -217,47 +218,6 @@ class recursosController extends BaseController{
   */
   public function getrecurso(){
     return Recurso::findOrFail(Input::get('idrecurso'));
-  }
-
-  
-  /**
-    * //Devuelve los recursos de un mismo grupo en forma de html options para select en sidebar
-    * @param void
-    *
-    * @return View::make('calendario.optionsRecursos') string
-  */
-  public function getRecursos(){
-    
-    //Input
-    $id = Input::get('groupID','');
-      
-    //Output 
-    $addOptionAll = false;
-    $tipoRecurso = '';
-    $disabledAll = 0;
-    
-    if(!empty($id)){
-      $grupo = GrupoRecurso::findOrFail($id);
-      
-      //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
-      $recursos = $grupo->recursos->filter(function($recurso){
-          return $recurso->visible() || $recurso->esAtendidoPor(Auth::user()->id); });
-      //tipo de recurso && número de puestos or equipos disabled
-      $numerodeitemsdisabled = 0;
-      foreach ($recursos as $recurso) {
-        $tipoRecurso = $recurso->tipo;
-        if($recurso->disabled == '1') $numerodeitemsdisabled++;
-      }
-      if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
-      
-      //Añadir opción reservar "todos los puestos o equipos"
-      if (!Auth::user()->isUser() && $tipoRecurso != 'espacio' && !$disabledAll) $addOptionAll = true;
-      
-      return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
-    }
-
-    return '';
-    
   }
 
   /**

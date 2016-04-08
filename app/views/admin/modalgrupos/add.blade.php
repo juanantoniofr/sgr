@@ -17,6 +17,11 @@
           {{Form::text('nombre','',array('class' => 'form-control', 'id' => 'nombre'))}}
         </div>
 
+        <div class="form-group" id="fm_addgrupo_inputtipo">  
+          {{Form::label('tipo', 'Tipo de recurso')}}
+          {{Form::select('tipo', array('espacio' => 'Espacio', 'equipo' => 'Equipo'),'espacio',array('class' => 'form-control'))}}
+        </div>
+
         <!-- Descripción del grupo --> 
         <div class="form-group">  
           {{Form::label('descripcion', 'Descripción')}}

@@ -432,9 +432,11 @@ $(function(e){
             $idgrupo = $(this).data('idgrupo');
             $descripcion = $(this).data('descripcion');
             $nombre = $(this).data('nombre');
+            $tipo = $(this).data('tipo');
             $('form#fm_editgrupo input[name="nombre"]').val($nombre);
             $('form#fm_editgrupo input[name="descripcion"]').val($descripcion);
             $('form#fm_editgrupo input[name="grupo_id"]').val($idgrupo);
+            $('form#fm_editgrupo select[name="tipo"]').val($tipo);
             CKEDITOR.instances['fm_editgrupo_inputdescripcion'].setData($descripcion);
             CKEDITOR.instances['fm_editgrupo_inputdescripcion'].updateElement();
             hideMsg();

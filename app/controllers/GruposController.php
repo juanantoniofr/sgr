@@ -2,7 +2,49 @@
 
 class GruposController extends BaseController {
 
+  /**
+    * //Devuelve los recursos de un mismo grupo en forma de html options para select en sidebar
+    * @param void
+    *
+    * @return View::make('calendario.optionsRecursos') string
+  */
+  public function getRecursos(){
+    
+    //Input
+    $id = Input::get('groupID','');
+      
+    //Output 
+    $htmloptionsrecursos = '';
+    
+    if(!empty($id)){
+      $grupo = GrupoRecurso::findOrFail($id);
+      
+      //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
+      $recursos = $grupo->recursos->filter(function($recurso){
+          return $recurso->visible(); });
+      $addOptionReservarTodo = $grupo->usuariopuedereservartodo(Auth::user()->id);
+      $htmloptionsrecursos = (string ) View::make('calendario.optionsRecursos')->with(compact('recursos','addOptionReservarTodo'));//,'tipoRecurso','addOptionAll','disabledAll'));
+      
 
+      /*
+      //tipo de recurso && número de puestos or equipos disabled
+      $numerodeitemsdisabled = 0;
+      foreach ($recursos as $recurso) {
+        $tipoRecurso = $recurso->tipo;
+        if($recurso->disabled == '1') $numerodeitemsdisabled++;
+      }
+      if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
+      
+      //Añadir opción reservar "todos los puestos o equipos"
+      if (!Auth::user()->isUser() && $tipoRecurso != 'espacio' && !$disabledAll) $addOptionAll = true;
+      
+      return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
+      */
+    }
+
+    return $htmloptionsrecursos;
+    
+  }
 	/**
 		*
 		*	@param Input::get('grupo_id')		int
@@ -68,26 +110,28 @@ class GruposController extends BaseController {
 	public function edit(){
     
     	//Input
-    	$id 	     = Input::get('grupo_id','');
-    	$nombre 	 = Input::get('nombre','');
+    	$id 	       = Input::get('grupo_id','');
+    	$nombre 	   = Input::get('nombre','');
+      $tipo        = Input::get('tipo');
     	$descripcion = Input::get('descripcion','');
  
     	//Output 
     	$respuesta = array(	'errors'   	=> array(),
-    						'msg'		=> '',		
+    						          'msg'		=> '',		
                       		'error' 	=> false,
                       		);
    		//Validate
     	$rules = array(
-    		'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
+    		  'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
         	'nombre'    => 'required|unique:grupoRecursos,nombre,'.$id,
+          'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
         );
 
      	$messages = array(
         	'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
-          	'exists'		=> 'No existe identificador de grupo...',	
-          );
-      	$validator = Validator::make(Input::all(), $rules, $messages);
+          'exists'		=> 'No existe identificador de grupo...',	
+        );
+      $validator = Validator::make(Input::all(), $rules, $messages);
     	
     	//Save Input or return error
     	if ($validator->fails()){
@@ -95,7 +139,7 @@ class GruposController extends BaseController {
         	$result['error'] = true;
     	}
     	else{  
-        	$grupo = GrupoRecurso::findOrFail($id)->update(array('nombre' => $nombre,'descripcion' => $descripcion));
+        	$grupo = GrupoRecurso::findOrFail($id)->update(array('nombre' => $nombre,'descripcion' => $descripcion, 'tipo' => $tipo));
         	$result['msg'] = Config::get('msg.success');
       	}
     
@@ -113,19 +157,20 @@ class GruposController extends BaseController {
 
 		//out
 		$result = array('errors'	=> array(),
-						'msg'		=> '',
-						'error'		=> false,
-						);
+						        'msg'		=> '',
+						        'error'		=> false,
+						      );
 		
-
 		//validate
 		$rules = array(
         	'nombre'      => 'required|unique:grupoRecursos',
+          'tipo'        => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
         );
 
      	$messages = array(
         	'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
         	'unique'        => 'Existe un <b>grupo</b> con el mismo nombre....',
+          'in'            => 'El valor especificado en tipo no está permitido....',
         );
     
     	$validator = Validator::make(Input::all(), $rules, $messages);
@@ -139,6 +184,7 @@ class GruposController extends BaseController {
       	$grupo = new GrupoRecurso;
 			  $grupo->nombre = Input::get('nombre','');
 			  $grupo->descripcion = Input::get('descripcion','');
+        $grupo->tipo = Input::get('tipo');
 			  $grupo->save();
 
         //El propio usuario que crea el grupo es supervisor del mismo

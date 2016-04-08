@@ -77,7 +77,6 @@ Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','bef
 Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
-Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'recursosController@getRecursos','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 
 //GruposController routes ************************
@@ -91,6 +90,7 @@ Route::post('admin/addPersona',array('uses' => 'GruposController@addPersona','be
 Route::post('admin/removePersonas',array('uses' => 'GruposController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('admin/htmlCheckboxPersonas',array('uses' => 'GruposController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));	
 Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'GruposController@getRecursos','before' => array('auth','ajax_check')));
 
 
 //ValidacionController routes **********************

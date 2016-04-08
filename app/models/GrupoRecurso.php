@@ -4,7 +4,7 @@ class GrupoRecurso extends Eloquent{
 
  	protected $table = 'grupoRecursos';
 
- 	protected $fillable = array('nombre','descripcion');
+ 	protected $fillable = array('nombre','descripcion','tipo');
 
  	
  	//Devuelve los recursos del grupo
@@ -27,5 +27,10 @@ class GrupoRecurso extends Eloquent{
         return $this->belongsToMany('User','grupoRecursos_validador','grupoRecursos_id');
     }
 	
+    public function usuariopuedereservartodo($id){
+
+        if (User::findOrFail($id)->isUser() || $this->tipo != Config::get('options.equipo') ) return false;
+        return true;    
+    }
 
  }// fin clase GrupoRecurso

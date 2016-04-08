@@ -143,6 +143,7 @@ $(function(e){
 				success: function(respuesta){
 					$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
 					$('#selectRecurseInGroup').fadeIn('fast',function(){
+						
 						$('#recurse').html(respuesta);
 						$("select#recurse option:first").prop("selected", "selected");
 						$('select#recurse').change();
