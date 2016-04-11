@@ -121,14 +121,24 @@ $(function(e){
 	function whenChangeRecurseSelected(){
 		
 		//When change recurse selected
+		$('#puestos').on('change',function(){
+			$('#message').fadeOut("slow");
+			var $str = 'Nueva reserva: ' +  $('select#puestos option:selected').text();
+			$('#myModalLabel').html($str);
+			setLabelRecurseName();
+			$('input[name$=id_recurso]').val($('select#puesto option:selected').val());
+			printCalendar();
+		});
+
+		//When change recurse selected
 		$('#recurse').on('change',function(){
 			$('#message').fadeOut("slow");
 			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
-			//alert($('select#recurse option:selected').val());
 			$('input[name$=id_recurso]').val($('select#recurse option:selected').val());
-			printCalendar();
+			if ($(this).data('numeropuestos') > 0) printCalendarAllPuestos();
+			else printCalendar();
 		});
 
 		//When select group recurse
@@ -146,7 +156,31 @@ $(function(e){
 						
 						$('#recurse').html(respuesta);
 						$("select#recurse option:first").prop("selected", "selected");
-						$('select#recurse').change();
+						if($("select#recurse option:first").data('numeropuestos') > 0){
+							console.log($("select#recurse option:first").val());
+							$.ajax({
+								type:"GET",
+								url:"getpuestos",
+								data:{ idrecurso:$("select#recurse option:first").val()},
+								success: function($result){
+									console.log($result);
+									$('#selectPuestos').fadeOut('fast',function(){$('select#puestos option').detach();});
+									$('#selectPuestos').fadeIn('fast',function(){
+										$('#puestos').html($result.listoptions);
+										$("select#puestos option:first").prop("selected", "selected");
+										$('select#puestos').change();
+									});
+								},
+								error: function(xhr, ajaxOptions, thrownError){
+								alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+								}
+							});
+							$('select#puestos').change();
+						}
+						else {
+							$('#selectPuestos').fadeOut('fast',function(){$('select#puestos option').detach();});
+							$('select#recurse').change();
+						}
 					});
 					hideGifEspera();
 				},
@@ -157,6 +191,130 @@ $(function(e){
 			});
 		});
 	}
+
+	/*
+		display new data in calendar (call from functions in onLaod....)
+		********************************************************************************
+		********************************************************************************
+	*/
+
+	
+	function printCalendar(){
+		
+		updatePrintButton();
+		var $val = $('#datepicker').val();
+		var $aDate = parseDate($val,'-','es-ES');
+		var date = new Date($aDate[2],$aDate[1],$aDate[0]);
+		var $viewActive = $('#btnView .active').data('calendarView');
+		//Si recurso es un puesto => toma id_recurso del puesto seleccionado
+		if(!$('select#puestos option:selected').val()){
+				var $id_recurso = $('select#puestos option:selected').val();
+		}
+		//Si no => toma id_recurso del select recurso 
+		else 	var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
+		//grupo
+		var $grupo_id = $('select#selectGroupRecurse option:selected').val();
+
+		if ($grupo_id == '0' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
+		else {
+			$('#btnprint').removeClass('disabled');
+			$('#btnNuevaReserva').removeClass('disabled');
+			showGifEspera();
+			
+			$.ajax({
+				type:"GET",
+				url:"ajaxCalendar",
+				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso,groupID: $grupo_id},
+				success: function(respuesta){
+					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
+					
+					//console.log(respuesta);
+					$('#loadCalendar').html(respuesta);
+					//$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
+					
+					//$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
+					//$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
+										
+					init();
+					//if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
+					programerEventClickToCalendarCell();
+					if ($viewActive == 'agenda') {
+						setLinkDeleteEvent();
+						}
+					
+					hideGifEspera();
+
+					if ($('select#recurse option:selected').data('disabled')) {
+						
+							$('#btnNuevaReserva').addClass('disabled');
+							//muestra modal disabled recurso
+							$('#modalMsgTitle').html(respuesta['disabled']['title']);
+							$('#textMsg').addClass('alert');
+							$('#textMsg').addClass('alert-warning');
+							$('#textMsg').html(respuesta['disabled']['msg']);
+							$('#modalMsg').modal('show');
+				
+						}
+					
+					},
+					error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(' (codeError: ' + xhr.status +')' + xhr.responseText );
+					}
+				});
+				
+		}
+
+	}
+
+	function printCalendarAllPuestos(){
+		
+		updatePrintButton();
+		var $val = $('#datepicker').val();
+		var $aDate = parseDate($val,'-','es-ES');
+		var date = new Date($aDate[2],$aDate[1],$aDate[0]);
+		var $viewActive = $('#btnView .active').data('calendarView');
+		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
+		$('#btnprint').removeClass('disabled');
+		$('#btnNuevaReserva').removeClass('disabled');
+		showGifEspera();
+			
+			$.ajax({
+				type:"GET",
+				url:"ajaxCalendarAllPuestos",
+				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso},
+				success: function(respuesta){
+					$('#loadCalendar').html(respuesta);
+					init();
+					programerEventClickToCalendarCell();
+					if ($viewActive == 'agenda') {
+						setLinkDeleteEvent();
+						}
+					hideGifEspera();
+
+					if ($('select#recurse option:selected').data('disabled')) {
+						
+							$('#btnNuevaReserva').addClass('disabled');
+							//muestra modal disabled recurso
+							$('#modalMsgTitle').html(respuesta['disabled']['title']);
+							$('#textMsg').addClass('alert');
+							$('#textMsg').addClass('alert-warning');
+							$('#textMsg').html(respuesta['disabled']['msg']);
+							$('#modalMsg').modal('show');
+				
+						}
+					
+					},
+					error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(' (codeError: ' + xhr.status +')' + xhr.responseText );
+					}
+				});
+				
+		}
+
+	}
+
 
 	function whenClickButtonNav(){
 		
@@ -470,6 +628,7 @@ $(function(e){
 
 					setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
 					$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
+					console.log('launch modal add');
 					$('#modalAdd').modal('show');
 				}
 			}
@@ -534,74 +693,7 @@ $(function(e){
 		}
 		$('#errorsModalAdd').slideUp();
 	}
-	/*
-		display new data in calendar (call from functions in onLaod....)
-		********************************************************************************
-		********************************************************************************
-	*/
-
 	
-	function printCalendar(){
-		
-		updatePrintButton();
-		var $val = $('#datepicker').val();
-		var $aDate = parseDate($val,'-','es-ES');
-		var date = new Date($aDate[2],$aDate[1],$aDate[0]);
-		var $viewActive = $('#btnView .active').data('calendarView');
-		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
-		var $grupo_id = $('select#selectGroupRecurse option:selected').val();
-
-		if ($grupo_id == '0' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
-		else {
-			$('#btnprint').removeClass('disabled');
-			$('#btnNuevaReserva').removeClass('disabled');
-			showGifEspera();
-			
-			$.ajax({
-				type:"GET",
-				url:"ajaxCalendar",
-				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso,groupID: $grupo_id},
-				success: function(respuesta){
-					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
-					
-					//console.log(respuesta);
-					$('#loadCalendar').html(respuesta);
-					//$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
-					
-					//$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
-					//$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
-										
-					init();
-					//if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
-					programerEventClickToCalendarCell();
-					if ($viewActive == 'agenda') {
-						setLinkDeleteEvent();
-						}
-					
-					hideGifEspera();
-
-					if ($('select#recurse option:selected').data('disabled')) {
-						
-						$('#btnNuevaReserva').addClass('disabled');
-						//muestra modal disabled recurso
-						$('#modalMsgTitle').html(respuesta['disabled']['title']);
-						$('#textMsg').addClass('alert');
-						$('#textMsg').addClass('alert-warning');
-						$('#textMsg').html(respuesta['disabled']['msg']);
-						$('#modalMsg').modal('show');
-			
-					}
-					
-					},
-					error: function(xhr, ajaxOptions, thrownError){
-						hideGifEspera();
-						alert(' (codeError: ' + xhr.status +')' + xhr.responseText );
-					}
-				});
-				
-		}
-
-	}
 
 	/*Action: 1. save new event
 		********************************************************************************

@@ -78,6 +78,7 @@ Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSi
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+Route::get('getpuestos',array('uses'=>'recursosController@getpuestos','before' => array('auth','ajax_check')));
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -106,6 +107,7 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 //Calendarios
 Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@calendar','before' => array('auth','ajax_check')));
+Route::get('ajaxCalendarAllPuestos',array('uses' => 'CalendarController@calendarAllPuestos','before' => array('auth','ajax_check')));
 
 
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
@@ -146,38 +148,34 @@ Route::get('print',array('uses' => 'CalendarController@imprime'));
 
 App::missing(function($exception)
 	{
-    	$pagetitle   = Config::get('msg.404pagetitleLogin');
-        $paneltitle  = Config::get('msg.404paneltitle');
-        $msg         = Config::get('msg.404msg');
-        $alertLevel  = 'warning'; 
-    	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+    $pagetitle   = Config::get('msg.404pagetitleLogin');
+    $paneltitle  = Config::get('msg.404paneltitle');
+    $msg         = Config::get('msg.404msg');
+    $alertLevel  = 'warning'; 
+    return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
 	});
 
 
 App::error(function(ModelNotFoundException $e)
   {
-    $msg = 'Error base de datos: Objeto no encontrado.... ';
-    $title = 'Error';
-	return View::make('msg')->with(compact('msg','title'));
-  
+    $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
+    $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
+    $msg 					= Config::get('msg.objectNoFoundmsg');
+    $alertLevel 	= 'danger';
+		return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
   });
 
 Route::get('test',array('as'=>'test',function(){
 
-	$fecha = new DateTime();
-	$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.defaulttiporecurso'));
-	$sgrRecurso->setRecurso(Recurso::find('42'));
-	$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-	foreach($sgrCalendario->sgrWeeks() as $sgrWeek){
-		echo '<tr>';	
-		foreach($sgrWeek->sgrDays() as $sgrDia){
-			echo '<td>';
-			//echo $sgrCalendario->sgrRecurso()->recurso()->id;
-			 echo (string) View::make('calendario.td')->with('sgrDia',$sgrDia)->with('view','month')->with('hora',0)->with('minuto',0)->with('id_recurso',$sgrCalendario->sgrRecurso()->recurso()->id)->with('id_grupo',$sgrCalendario->sgrRecurso()->recurso()->grupo_id);
-			echo '</td>';		
-		}
-		echo '</tr>';
-	}
-	
-	
+  $recurso = Recurso::findOrFail('42');
+  foreach($recurso->puestos as $puesto)
+    $id_puestos[] = $puesto->id;
+  echo "<pre>";
+	 var_dump(implode(",",$id_puestos));
+  echo "</pre>";
+  $id_recursos = implode(",",$id_puestos);
+  $eventos = Evento::where('recurso_id','IN',$id_recursos)->get();
+  echo "<pre>";
+  var_dump($eventos);
+  echo "</pre>";
  }));

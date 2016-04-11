@@ -8,9 +8,9 @@
     @endif </div>
      <div class="divEvents" data-numero-de-eventos="{{count($sgrDia->events())}}">
         
-        @if ($sgrDia->events()->count() > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+        @if (count($sgrDia->events(sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
     
-        @foreach($sgrDia->events() as $event)
+        @foreach($sgrDia->events(sgrDate::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
 
            
             <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
@@ -64,7 +64,7 @@
     </div> <!-- ./divEvents -->
     
 
-    @if ($sgrDia->events()->count() > 4) <a class="linkMasEvents" href=""> + {{ ($sgrDia->events()->count()-4) }}  más </a>@endif
+    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
    
     
 </div>

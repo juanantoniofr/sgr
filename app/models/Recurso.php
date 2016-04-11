@@ -33,6 +33,12 @@ class Recurso extends Eloquent {
         return $this->hasMany('Evento','recurso_id','id');
     }
 
+    public function usuariopuedereservartodoslospuestos($id){
+
+        if (User::findOrFail($id)->isUser() || $this->puestos->count() == 0 )  return false;
+        return true;    
+    }
+
     /**
     *   Devuelve true si el identificador de usuario es uno de los técnicos que atienden el recurso
     *   @param $id 
@@ -52,13 +58,13 @@ class Recurso extends Eloquent {
      * @param void
      * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
     */
-    public function visible(){
+    public function visible($capacidad = ''){
 
         $visible = false;
-
+        if (empty($capacidad)) $capacidad = Auth::user()->capacidad;
         //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
         $permisos = json_decode($this->acl,true); //array con key = 'r', y value igual a '2,3'
-        if (strpos($permisos['r'],Auth::user()->capacidad) !== false) $visible = true; // si la capacidad del usuario forma parte de la cadena $permisos['r'], entonces es visible (puede reservar)
+        if (strpos($permisos['r'],$capacidad) !== false) $visible = true; // si la capacidad del usuario forma parte de la cadena $permisos['r'], entonces es visible (puede reservar)
         
         return $visible;
     }

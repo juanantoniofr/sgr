@@ -10,8 +10,34 @@ class CalendarController extends BaseController {
 		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
 		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
 		$dropdown = Auth::user()->dropdownMenu();
-		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown);
+		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown)->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
 		
+ 
+
+	}
+
+	//Ajax functions
+	public function calendarAllPuestos(){
+		
+		//input
+		$viewActive = Input::get('viewActive',Config::get('options.defaultview')); //vista por defecto
+		$day = Input::get('day',date('d'));
+		$month = Input::get('month',date('n'));
+		$year = Input::get('year',date('Y'));
+		$id_recurso = Input::get('id_recurso','');
+		
+		//Var
+		$fecha = new DateTime($year.'-'.$month.'-'.$day);
+		$recurso = Recurso::findOrFail($id_recurso);
+		$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.espacio'));
+		$sgrRecurso->setRecurso($recurso);
+		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+		$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
+		$head = (string) CalendarController::head($viewActive,$sgrCalendario);
+		$body = (string) CalendarController::body($viewActive,$sgrCalendario);
+		
+		return (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
+    
 	}
 
 	//Ajax functions
@@ -24,6 +50,14 @@ class CalendarController extends BaseController {
 		$year = Input::get('year',date('Y'));
 		$id_recurso = Input::get('id_recurso','');
 		$id_grupo = Input::get('groupID','');
+		//$id_puesto = Input::get('id_puesto','');
+		/*
+		valores posibles para $id_recurso
+		empty => error, valor no esperado
+		0 		=> tipo debe ser equipo o espacio con puestos
+		int 	=> identificador de un espacio // equipo // puesto
+
+		*/
 
 		//Var
 		$fecha = new DateTime($year.'-'.$month.'-'.$day);

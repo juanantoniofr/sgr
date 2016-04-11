@@ -3,6 +3,48 @@
 class recursosController extends BaseController{
 
    
+  public function getpuestos(){
+
+    //Input
+    $idrecurso = Input::get('idrecurso','');
+    //Output
+    $result = array('error' => false,
+                    'listoptions'   => '',
+                    'errors' => array());
+    //Validación
+    //Validación de formulario   
+    $rules = array(
+        'idrecurso' => 'required|exists:recursos,id');
+    $messages = array(
+          'exists'  => 'Identificador de recurso no encontrado....',
+          'required'=> 'El campo <strong>:attribute</strong> es obligatorio....');
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{ 
+      $recurso = Recurso::findOrFail($idrecurso);
+      //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
+      $puestos = $recurso->puestos->filter(function($puesto){
+          return $puesto->visible(); });
+      $addOptionReservarTodo = $recurso->usuariopuedereservartodoslospuestos(Auth::user()->id);
+      
+      //número de puestos or equipos disabled
+      $numerodeitemsdisabled = 0;
+      $disabledAll = 0;
+      foreach ($puestos as $puesto) {
+        if($puesto->disabled == '1') $numerodeitemsdisabled++;
+      }
+      if($numerodeitemsdisabled == $puestos->count()) $disabledAll = 1;
+      
+      //Añadir opción reservar "todos los puestos"
+      $result['listoptions'] = (string) View::make('calendario.optionsPuestos')->with(compact('puestos','addOptionReservarTodo','disabledAll'));
+    }
+    return $result;
+  }
+
   /**
     * //Añade un nuevo recurso a la base de datos
     * @param Input::get('nombre')      string

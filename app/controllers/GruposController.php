@@ -23,23 +23,17 @@ class GruposController extends BaseController {
       $recursos = $grupo->recursos->filter(function($recurso){
           return $recurso->visible(); });
       $addOptionReservarTodo = $grupo->usuariopuedereservartodo(Auth::user()->id);
-      $htmloptionsrecursos = (string ) View::make('calendario.optionsRecursos')->with(compact('recursos','addOptionReservarTodo'));//,'tipoRecurso','addOptionAll','disabledAll'));
       
-
-      /*
-      //tipo de recurso && número de puestos or equipos disabled
+      //número de puestos or equipos disabled
       $numerodeitemsdisabled = 0;
+      $disabledAll = 0;
       foreach ($recursos as $recurso) {
-        $tipoRecurso = $recurso->tipo;
         if($recurso->disabled == '1') $numerodeitemsdisabled++;
       }
       if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
+      $tipoRecursos = $grupo->tipo;     
+      $htmloptionsrecursos = (string ) View::make('calendario.optionsRecursos')->with(compact('recursos','addOptionReservarTodo','disabledAll','tipoRecursos'));
       
-      //Añadir opción reservar "todos los puestos o equipos"
-      if (!Auth::user()->isUser() && $tipoRecurso != 'espacio' && !$disabledAll) $addOptionAll = true;
-      
-      return View::make('calendario.optionsRecursos')->with(compact('recursos','tipoRecurso','addOptionAll','disabledAll'));
-      */
     }
 
     return $htmloptionsrecursos;

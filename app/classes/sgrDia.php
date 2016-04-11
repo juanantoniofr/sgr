@@ -4,7 +4,7 @@ class sgrDia {
 
 	private $timestamp; //timestamp de la fecha
 	private $eventos;
-
+	private $sgrRecurso;
 	private $events; 	//array de objetos de tipo Eventos
 	private $esDomingo;
 	private $esSabado;
@@ -22,12 +22,13 @@ class sgrDia {
 		*	@param $tsfecha int timestamp 
 		*	@param $horasdisponibles array intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
 	*/
-	public function __construct($tsfecha = '',$eventos = '',$horario = ''){
+	public function __construct($tsfecha = '',$sgrRecurso = '',$horario = ''){
 
 		if(empty($tsfecha)) $tsfecha = strtotime('1970-1-1');
 		$this->timestamp = $tsfecha;
 
-		$this->eventos = $eventos;
+		$this->sgrRecurso = $sgrRecurso;
+		$this->eventos = $sgrRecurso->getEvents(date('Y-m-d',$tsfecha));
 
 		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			
@@ -65,7 +66,7 @@ class sgrDia {
 		*	@param $id_gruppo int
 		*	@return array objetos Evento
 	*/
-	public function getEvents($recurso){
+	/*public function getEvents($recurso){
 		
 		$numMes = $this->numMes;
 		$year = $this->year;
@@ -76,7 +77,7 @@ class sgrDia {
 		$events = $sgrRecurso->getEvents($fechaEvento);
 
 		return $events;
-	}
+	}*/
 
 	/**
 	*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
@@ -84,29 +85,14 @@ class sgrDia {
 	*	@param $id_gruppo int
 	*	@return array objetos Evento
 	*/
-	public function events($id_recurso='',$id_grupo='',$view='',$hora = ''){
+	public function events($hora = ''){
 
+		if (empty($hora)) return $this->eventos;
 		
-		$numMes = $this->numMes;
-		$year = $this->year;
+		$whereRaw = "horaInicio <= '".$hora."' and horaFin > '".$hora."'";
+		$eventos = $this->eventos()->whereRaw($whereRaw)->get();
+		return $eventos;
 		
-		$fechaEvento = date('Y-m-d',mktime(0,0,0,(int) $numMes,(int) $this->numdiames,(int) $year));
-		$whereRaw = '1=1';
-		if(!empty($hora) && $view == 'week') {
-			
-			$whereRaw = "horaInicio <= '".$hora."' and horaFin > '".$hora."'";
-		}
-
-		if ($id_recurso == 0){
-			//Eventos para todos los equipos//puestos para fechaEvento del id_grupo
-			$events = Evento::where('fechaEvento','=',$fechaEvento)->whereRaw($whereRaw)->orderBy('horaInicio','asc')->groupby('titulo')->groupby('evento_id')->get();
-			return $events->filter(function($event) use ($id_grupo) {
-				return $event->recurso->grupo_id == $id_grupo;
-			});
-		}		
-		else{
-			return Recurso::find($id_recurso)->events()->where('fechaEvento','=',$fechaEvento)->whereRaw($whereRaw)->orderBy('horaInicio','asc')->get();
-		}	
 	}
 
 	/**

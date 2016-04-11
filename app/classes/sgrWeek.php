@@ -20,11 +20,7 @@ class sgrWeek {
 		
 		//sgrDias
 		for($i=0;$i<7;$i++) {
-			$currentday = strtotime('+ '.$i.' days',$timestamplunes);
-			$eventos = $sgrRecurso->recurso()->events->filter(function($event) use ($currentday){
-				return $event->fechaEvento == date('Y-m-d',$currentday);
-				});
-			$this->sgrDias[$i] = new sgrDia(strtotime('+ '.$i.' days',$timestamplunes),$eventos);
+			$this->sgrDias[$i] = new sgrDia(strtotime('+ '.$i.' days',$timestamplunes),$sgrRecurso);
 		}
 	}
 

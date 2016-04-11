@@ -18,7 +18,7 @@
 		}
 
 		public function getEvents($fechaEvento){
-			return $this->recurso->where('fechaEvento','=',$fechaEvento)->get();
+			return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
 		}
 
 		public function enabled(){

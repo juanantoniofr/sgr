@@ -19,10 +19,13 @@
 	}
 	
 	public function getEvents($fechaEvento){
-			if ($this->recurso->puestos->count() > 0)
-				return $this->recurso->where('fechaEvento','=',$fechaEvento)->where('espacio_id','=',$this->recurso->espacio_id)->get();
+			if ($this->recurso->puestos->count() > 0){
+				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
+  		  $id_recursos = implode(",",$id_puestos);
+  			return Evento::where('recurso_id','IN',$id_recursos)->where('fechaEvento','=',$fechaEvento)->get();
+  		}
 			else
-				return $this->recurso->where('fechaEvento','=',$fechaEvento)->get();
+				return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
 		}
 
 	public function enabled(){
