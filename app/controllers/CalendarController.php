@@ -11,91 +11,75 @@ class CalendarController extends BaseController {
 		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
 		$dropdown = Auth::user()->dropdownMenu();
 		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown)->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
-		
- 
-
 	}
 
-	//Ajax functions
-	public function calendarAllPuestos(){
-		
-		//input
+	public function getCalendar(){
+		//In
+		$id_recurso = Input::get('id_recurso','');
+		$id_item 		= Input::get('id_item',0);
 		$viewActive = Input::get('viewActive',Config::get('options.defaultview')); //vista por defecto
 		$day = Input::get('day',date('d'));
 		$month = Input::get('month',date('n'));
 		$year = Input::get('year',date('Y'));
-		$id_recurso = Input::get('id_recurso','');
-		
-		//Var
-		$fecha = new DateTime($year.'-'.$month.'-'.$day);
-		$recurso = Recurso::findOrFail($id_recurso);
-		$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.espacio'));
-		$sgrRecurso->setRecurso($recurso);
-		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-		$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
-		$head = (string) CalendarController::head($viewActive,$sgrCalendario);
-		$body = (string) CalendarController::body($viewActive,$sgrCalendario);
-		
-		return (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
-    
-	}
 
-	//Ajax functions
-	public function calendar(){
-		
-		//input
-		$viewActive = Input::get('viewActive',Config::get('options.defaultview')); //vista por defecto
-		$day = Input::get('day',date('d'));
-		$month = Input::get('month',date('n'));
-		$year = Input::get('year',date('Y'));
-		$id_recurso = Input::get('id_recurso','');
-		$id_grupo = Input::get('groupID','');
-		//$id_puesto = Input::get('id_puesto','');
-		/*
-		valores posibles para $id_recurso
-		empty => error, valor no esperado
-		0 		=> tipo debe ser equipo o espacio con puestos
-		int 	=> identificador de un espacio // equipo // puesto
+		//out
+    $result = array('error' 		=> false,
+                    'calendar' 	=> '',
+                    'errors' 		=> array());
 
-		*/
-
-		//Var
-		$fecha = new DateTime($year.'-'.$month.'-'.$day);
-		$tipo = Config::get('options.defaulttiporecurso');
-		$recurso = new Recurso;
-		if (!empty($id_recurso) && Recurso::where('id','=',$id_recurso)->count() > 0) {
-			$tipo = Recurso::findOrFail($id_recurso)->tipo;
+		//Validación de formulario   
+    $rules = array(	'id_recurso' 	=> 'required|exists:recursos,id',
+    								'id_item'			=> 'sometimes|required',
+    								'viewActive'	=> 'required|in:'.implode(',',Config::get('options.viewsCalendar')),
+    							);
+    $messages = array(	'id_recurso.exists' => 'id_recurso no encontrado....',
+    										'id_item.exists'  	=> 'id_item no encontrado....',
+          							'required'					=> 'El campo <strong>:attribute</strong> es obligatorio....',
+          							'in'      					=> 'Vista no definida ...',
+          						);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{  
+			if ($id_item != 0) $id_recurso = $id_item;
+			$fecha = new DateTime($year.'-'.$month.'-'.$day);
 			$recurso = Recurso::findOrFail($id_recurso);
-		}
+			$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+			$sgrRecurso->setRecurso($recurso);
+			//$result['calendar'] = $sgrRecurso->getEvents('2016-04-21');
+			//$result['id_recurso'] = $id_recurso;
+			//$result['id_item']	= $id_item;
+			//return $result;
+			$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+			$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
+			$head = (string) CalendarController::head($viewActive,$sgrCalendario);
+			$body = (string) CalendarController::body($viewActive,$sgrCalendario);
+			$result['calendar'] = (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
 
-		$sgrRecurso = RecursoFactory::getRecursoInstance($tipo);
-		$sgrRecurso->setRecurso($recurso);
-		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-		$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
-		$head = (string) CalendarController::head($viewActive,$sgrCalendario);
-		$body = (string) CalendarController::body($viewActive,$sgrCalendario);
-		
-		return (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
-    
+    }
+
+    return $result;
 	}
 
 	public static function head($viewActive,$sgrCalendario){
 		switch ($viewActive) {
 			case 'month':
-				return (string) View::make('calendario.headMonth');
+				return (string) View::make('calendario.month.head');
 				break;
 			
 			case 'week':
 				$sgrWeek = $sgrCalendario->sgrWeek();
-				return (string) View::make('calendario.headWeek')->with('sgrWeek',$sgrWeek);
+				return (string) View::make('calendario.week.head')->with('sgrWeek',$sgrWeek);
 				break;
 		}
 	}
 
 	public static function caption($viewActive,$day,$nombreMes,$year){
-		
 		return (string) View::make('calendario.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
-	}
+		}
 
 	public static function body($viewActive,$sgrCalendario){
 		
@@ -105,13 +89,11 @@ class CalendarController extends BaseController {
 		switch ($viewActive) {
 			
 			case 'month':
-				return (string) View::make('calendario.bodyMonth')->with('sgrCalendario',$sgrCalendario);//->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo);
+				return (string) View::make('calendario.month.body')->with('sgrCalendario',$sgrCalendario);
 				break;
 			
 			case 'week':
-				$sgrWeek = $sgrCalendario->sgrWeek();
-				$horarioApertura = Config::get('options.horarioApertura');	
-				return (string) View::make('calendario.bodyWeek')->with('horarioApertura',$horarioApertura)->with('sgrWeek',$sgrWeek)->with('sgrCalendario',$sgrCalendario);	
+				return (string) View::make('calendario.week.body')->with('sgrCalendario',$sgrCalendario);	
 				break;
 			
 			case 'agenda':

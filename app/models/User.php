@@ -27,22 +27,16 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	
     //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
 	public function atenciones(){
-        return $this->hasMany('atencionEventos','tecnico_id');
-    	}
+    return $this->hasMany('atencionEventos','tecnico_id');
+    }
 
-
-
-    //devuelve los eventos del usuario
+	//devuelve los eventos del usuario
 	public function userEvents(){
-
 		return $this->hasMany('Evento','user_id');
-	
-	}
+		}
 
-		
 	/**
-		*
-		* 	Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
+		* 	//Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
 		* 	@param $timestamp int fecha a valorar
 		* 	@return $isAviable boolean 
 		*
@@ -53,38 +47,35 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		$intCurrentDate = $timestamp; //mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
 		$capacidad = $this->capacidad;
 		switch ($capacidad) {
-				case '1': //alumnos
-					$intfristMondayAviable = sgrCalendario::fristMonday();
-					$intlastFridayAviable = sgrCalendario::lastFriday();
-					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
-					if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
-					break;	
-				case '2': //pdi & pas administración
+			case '1': //alumnos
+				$intfristMondayAviable = sgrCalendario::fristMonday();
+				$intlastFridayAviable = sgrCalendario::lastFriday();
+				if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
+				break;	
+			case '2': //pdi & pas administración
+				$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+				if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+				break;
+			case '3': //Técnicos MAV
+				//No atiende el recurso => igual que case 2	
+				if (!$this->atiendeRecurso($idrecurso)){
 					$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
 					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
-					break;
-				case '3': //Técnicos MAV
-					//No atiende el recurso => igual que case 2	
-					if (!$this->atiendeRecurso($idrecurso)){
-						$intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
-						//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
-						if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
-					}
-					//sí atiende el recurso => igual que case 4, 5 y 6
-					else {
-						$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
-						//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
-						if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
-					}
-					break;
-				case '4': //administradores SGR
-				case '5': //Validadores
-				case '6': //Supervisores (EE MAV)
+				}
+				//sí atiende el recurso => igual que case 4, 5 y 6
+				else {
 					$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
 					//$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
 					if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
-					break;
+				}
+				break;
+			case '4': //administradores SGR
+			case '5': //Validadores
+			case '6': //Supervisores (EE MAV)
+				$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+				if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+				break;
 		}
 
 		return $isAviable;

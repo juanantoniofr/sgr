@@ -137,48 +137,47 @@ $(function(e){
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
 			$('input[name$=id_recurso]').val($('select#recurse option:selected').val());
-			if ($(this).data('numeropuestos') > 0) printCalendarAllPuestos();
-			else printCalendar();
+			printCalendar();
 		});
 
 		//When select group recurse
 		$('#selectGroupRecurse').on('change',function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
-			
+			$('#selectPuestos').fadeOut('fast',function(){
+																							$('select#puestos option:selected').prop('selected', false);
+																							$('select#puestos option').detach();}
+																							);
+			$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
+
+
 			$.ajax({
 				type:"GET",
 				url:"getRecursos",
 				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
 				success: function(respuesta){
-					$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
+					
 					$('#selectRecurseInGroup').fadeIn('fast',function(){
-						
 						$('#recurse').html(respuesta);
-						$("select#recurse option:first").prop("selected", "selected");
+						$('select#recurse option:first').prop('selected', 'selected');
 						if($("select#recurse option:first").data('numeropuestos') > 0){
-							console.log($("select#recurse option:first").val());
 							$.ajax({
 								type:"GET",
 								url:"getpuestos",
 								data:{ idrecurso:$("select#recurse option:first").val()},
 								success: function($result){
-									console.log($result);
-									$('#selectPuestos').fadeOut('fast',function(){$('select#puestos option').detach();});
-									$('#selectPuestos').fadeIn('fast',function(){
-										$('#puestos').html($result.listoptions);
-										$("select#puestos option:first").prop("selected", "selected");
-										$('select#puestos').change();
-									});
+										$('#selectPuestos').fadeIn('fast',function(){
+																												$('#puestos').html($result.listoptions);
+																												$("select#puestos option:first").prop("selected", "selected");
+																												$('select#puestos').change();
+																											});
 								},
 								error: function(xhr, ajaxOptions, thrownError){
 								alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
 								}
 							});
-							$('select#puestos').change();
 						}
 						else {
-							$('#selectPuestos').fadeOut('fast',function(){$('select#puestos option').detach();});
 							$('select#recurse').change();
 						}
 					});
@@ -197,7 +196,41 @@ $(function(e){
 		********************************************************************************
 		********************************************************************************
 	*/
-
+		function setLabelRecurseName(){
+		
+		$viewActive = $('#btnView .active').data('calendarView');
+		if ($viewActive == 'agenda'){
+			$('#infoButton').fadeOut();
+			$strCalendar = 'todos lo espacios o medios';
+		} 
+		else {
+			$strCalendar = $('select#recurse option:selected').text();
+			$strItem 		= $('select#puestos option:selected').text();
+			if ($strItem != '') $strCalendar = $strCalendar + '(' + $strItem + ')';
+			$idrecurso = $('select#recurse option:selected').val();
+			//Ajax para obtener descripcion recurso y muestra botón si no vacio
+			$.ajax({
+				type:"GET",
+				url:"getDescripcion",
+				data: { idrecurso:$idrecurso },
+				success: function($respuesta){
+					if($respuesta.error !== true) { 					
+						$('#nombrerecurso').html($strCalendar);
+						$('#descripcionRecurso').html($respuesta.descripcion);
+						$('#infoButton').fadeIn();
+					}
+					else $('#infoButton').fadeOut();
+					},
+				error: function(xhr, ajaxOptions, thrownError){
+					$('#infoButton').fadeOut();
+					hideGifEspera();
+					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+				}
+			});
+			
+			}
+			$('#recurseName').html($strCalendar).fadeIn();
+	}
 	
 	function printCalendar(){
 		
@@ -206,90 +239,36 @@ $(function(e){
 		var $aDate = parseDate($val,'-','es-ES');
 		var date = new Date($aDate[2],$aDate[1],$aDate[0]);
 		var $viewActive = $('#btnView .active').data('calendarView');
-		//Si recurso es un puesto => toma id_recurso del puesto seleccionado
-		if(!$('select#puestos option:selected').val()){
-				var $id_recurso = $('select#puestos option:selected').val();
-		}
-		//Si no => toma id_recurso del select recurso 
-		else 	var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
+		
+		
+		var $id_item = (!$('select#puestos option:selected').val()) ? '' : $('select#puestos option:selected').val();
+		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
 		//grupo
-		var $grupo_id = $('select#selectGroupRecurse option:selected').val();
+		//var $grupo_id = $('select#selectGroupRecurse option:selected').val();
 
-		if ($grupo_id == '0' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
+		if ($id_item == '' && $id_recurso == '' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
 		else {
 			$('#btnprint').removeClass('disabled');
 			$('#btnNuevaReserva').removeClass('disabled');
 			showGifEspera();
 			
+			if ($id_item != '') $data = {viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso,id_item: $id_item};
+			else $data = {viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso};
+
 			$.ajax({
 				type:"GET",
 				url:"ajaxCalendar",
-				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso,groupID: $grupo_id},
+				data:$data,
 				success: function(respuesta){
-					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
-					
-					//console.log(respuesta);
-					$('#loadCalendar').html(respuesta);
-					//$('#tableCaption').fadeIn('slow').html(respuesta['tCaption']);
-					
-					//$('#tableHead').fadeIn('slow').html(respuesta['tHead']);
-					//$('#tableBody').fadeIn('slow').html(respuesta['tBody']);
-										
-					init();
-					//if (!$('select#recurse option:selected').data('disabled')) programerEventClickToCalendarCell();
-					programerEventClickToCalendarCell();
-					if ($viewActive == 'agenda') {
-						setLinkDeleteEvent();
-						}
-					
-					hideGifEspera();
-
-					if ($('select#recurse option:selected').data('disabled')) {
-						
-							$('#btnNuevaReserva').addClass('disabled');
-							//muestra modal disabled recurso
-							$('#modalMsgTitle').html(respuesta['disabled']['title']);
-							$('#textMsg').addClass('alert');
-							$('#textMsg').addClass('alert-warning');
-							$('#textMsg').html(respuesta['disabled']['msg']);
-							$('#modalMsg').modal('show');
-				
-						}
-					
-					},
-					error: function(xhr, ajaxOptions, thrownError){
-						hideGifEspera();
-						alert(' (codeError: ' + xhr.status +')' + xhr.responseText );
-					}
-				});
-				
-		}
-
-	}
-
-	function printCalendarAllPuestos(){
-		
-		updatePrintButton();
-		var $val = $('#datepicker').val();
-		var $aDate = parseDate($val,'-','es-ES');
-		var date = new Date($aDate[2],$aDate[1],$aDate[0]);
-		var $viewActive = $('#btnView .active').data('calendarView');
-		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
-		$('#btnprint').removeClass('disabled');
-		$('#btnNuevaReserva').removeClass('disabled');
-		showGifEspera();
 			
-			$.ajax({
-				type:"GET",
-				url:"ajaxCalendarAllPuestos",
-				data:{viewActive: $viewActive,day: $aDate[0],month: $aDate[1], year: $aDate[2],id_recurso: $id_recurso},
-				success: function(respuesta){
-					$('#loadCalendar').html(respuesta);
+					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
+					$('#loadCalendar').html(respuesta.calendar);
 					init();
 					programerEventClickToCalendarCell();
 					if ($viewActive == 'agenda') {
 						setLinkDeleteEvent();
 						}
+					
 					hideGifEspera();
 
 					if ($('select#recurse option:selected').data('disabled')) {
@@ -315,7 +294,7 @@ $(function(e){
 
 	}
 
-
+	
 	function whenClickButtonNav(){
 		
 		$('#navprev').click(function(){
@@ -628,7 +607,6 @@ $(function(e){
 
 					setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
 					$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
-					console.log('launch modal add');
 					$('#modalAdd').modal('show');
 				}
 			}
@@ -724,13 +702,10 @@ $(function(e){
  		       		$('.has-error').removeClass('has-error');
  		       		$('.is_slide').each(function(){$(this).slideUp();});
  		       		resetMsgErrors();
- 		       		//console.log(respuesta['msgErrors']);
  		       		$.each(respuesta['msgErrors'],function(key,value){
-
- 		       			$('#'+key).addClass('has-error');
+								$('#'+key).addClass('has-error');
  		       			$('#'+key+'_Error').html(value).fadeIn("slow");
  		       			$('#errorsModalAdd').slideDown("slow");
- 		       			
  		       		});
 	        	}
  		        },
@@ -826,88 +801,80 @@ $(function(e){
 		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
 		resetMsgErrors();
 		$.ajax({
-    	   	type: "GET",
+    	type: "GET",
 			url: "geteventbyId",
 			data: {'id':$idEvento},
         	success: function($respuesta){
-        		//console.log($respuesta);
         		$evento = $respuesta['event'];
         		$usernameReservadoPara = $respuesta['usernameReservadoPara'];
         		$usernameReservadoPor = $respuesta['usernameReservadoPor'];
         		$('#contentModalAdd').html($respuesta);
         		
-        		//console.log($respuesta + $reservadoPara);
-				//titulo
-				$('form#addEvent input#newReservaTitle').val($evento.titulo);
-				//Actividad
-				$('select[name|="actividad"] option').each(function(){
-					if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
-					else $(this).prop('selected',false);
-				});
+		     		//titulo
+						$('form#addEvent input#newReservaTitle').val($evento.titulo);
+						//Actividad
+						$('select[name|="actividad"] option').each(function(){
+																													if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
+																													else $(this).prop('selected',false);
+																											});
+						$('form#addEvent input#reservadoPara').val($usernameReservadoPara);
+						$('form#addEvent input#reservadoPor').val($usernameReservadoPor);
 
-				$('form#addEvent input#reservadoPara').val($usernameReservadoPara);
-				$('form#addEvent input#reservadoPor').val($usernameReservadoPor);
-
-				//Fecha inicio: campo día
-								//hora inicio
-				$('select[name|="hInicio"] option').each(function(){
-					if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
-					else $(this).prop('selected',false);
-				});
-				//hora fin
-				$('select[name|="hFin"] option').each(function(){
-					if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
-					else $(this).prop('selected',false);
-				});
-				
-
-				//repetir
-				
-				if ($evento.repeticion == '1'){
-					$('select[name|="repetir"]').val('CS');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFinicio').prop('disabled',true);
-					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
-					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
-					$aDias = eval($evento.diasRepeticion);
-					$("input:checkbox").each(function(index,value){
-						$(this).prop('checked',false);
-						if ($.inArray($(this).val(),$aDias) != -1){	$(this).prop('checked',true);}  
-						
-					});
-					$('#inputRepeticion').show();
-					}
-				else{
-					$('select[name|="repetir"]').val('SR');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
-					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
-					$("input:checkbox").each(function(index,value){
-						$(this).prop('checked',false);
-						if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
-					});
-
-					$('#inputRepeticion').hide();
+						//Fecha inicio: campo día
+						//hora inicio
+						$('select[name|="hInicio"] option').each(function(){
+																											if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
+																											else $(this).prop('selected',false);
+																									});
+						//hora fin
+						$('select[name|="hFin"] option').each(function(){
+																											if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
+																											else $(this).prop('selected',false);
+																										});
+						//repetir
+						if ($evento.repeticion == '1'){
+							$('select[name|="repetir"]').val('CS');
+							$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
+							$('#datepickerFinicio').prop('disabled',true);
+							$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+							$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+							$aDias = eval($evento.diasRepeticion);
+							$("input:checkbox").each(function(index,value){
+																					$(this).prop('checked',false);
+																					if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
+																				});
+							$('#inputRepeticion').show();
+						}
+					else{
+						$('select[name|="repetir"]').val('SR');
+						$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
+						$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+						$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+						$("input:checkbox").each(function(index,value){
+																					$(this).prop('checked',false);
+																					if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
+																				});
+						$('#inputRepeticion').hide();
 					}
 				
-				setResumen();
-				$('button#save').hide();
-				$('#editOptions').show();
-				$('#modalAdd').modal('show');
+					setResumen();
+					$('button#save').hide();
+					$('#editOptions').show();
+					$('#modalAdd').modal('show');
  		    },
-			error: function(xhr, ajaxOptions, thrownError){
-				hideGifEspera();
-				alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+				error: function(xhr, ajaxOptions, thrownError){
+					hideGifEspera();
+					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
 				}
-      		});
+      });
 
-		$('#actionType').val('edit');
-		$('#myModalLabel').html('Editar evento');
+			$('#actionType').val('edit');
+			$('#myModalLabel').html('Editar evento');
 		
-		$('button#editOption1').off();
+			$('button#editOption1').off();
 		
 
-		$('button#editOption1').click(function(){
+			$('button#editOption1').click(function(){
 			$('#EditOption1').data('idEvento',$idEvento);
 			$('#EditOption1').data('idSerie',$idSerie);
 			editEvents('1',$idEvento,$idSerie);
@@ -1044,18 +1011,16 @@ $(function(e){
 		$($selector + '_' + $id).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			//alert('lanza evento');
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
-			//console.log($idEvento);
+
 			$('#editOption1').data('idEvento',$idEvento);
 			$('#editOption1').data('idSerie',$idSerie);
 			//Cargar datos del evento en al ventana Modal para editar el evento
 			initModalEdit($idEvento,$idSerie);
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
 			
-			//$('#modalAdd').modal('show');
 		});
 	}
 	
@@ -1190,39 +1155,7 @@ $(function(e){
 			);
 	}
 	
-	function setLabelRecurseName(){
-		
-		$viewActive = $('#btnView .active').data('calendarView');
-		if ($viewActive == 'agenda'){
-			$('#infoButton').fadeOut();
-			$strCalendar = 'todos lo espacios o medios';
-		} 
-		else {
-			$strCalendar = $('select#recurse option:selected').text();
-			$idrecurso = $('select#recurse option:selected').val();
-			//Ajax para obtener descripcion recurso y muestra botón si no vacio
-			$.ajax({
-				type:"GET",
-				url:"getDescripcion",
-				data: { idrecurso:$idrecurso },
-				success: function($respuesta){
-					if($respuesta.error !== true) { 					
-						$('#nombrerecurso').html($strCalendar);
-						$('#descripcionRecurso').html($respuesta.descripcion);
-						$('#infoButton').fadeIn();
-					}
-					else $('#infoButton').fadeOut();
-					},
-				error: function(xhr, ajaxOptions, thrownError){
-					$('#infoButton').fadeOut();
-					hideGifEspera();
-					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-				}
-			});
-			
-			}
-			$('#recurseName').html($strCalendar).fadeIn();
-	}
+
 
 	//Other functions
 	//***************************************************************
@@ -1381,8 +1314,6 @@ $(function(e){
 	function strDateCurrentMonth($date){
 		$aDate = parseDate($date,'-','es-ES');	
 		var $day = new Date($aDate[2],$aDate[1],$aDate[0]);//date(año,mes,dia)
-		//$day.setTime($day.getTime() + (24 * 60 * 60 * 1000));
-	
 		return '1-'+$day.getMonth()+'-'+$day.getFullYear();		
 	}
 

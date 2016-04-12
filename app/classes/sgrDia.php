@@ -3,9 +3,9 @@
 class sgrDia {
 
 	private $timestamp; //timestamp de la fecha
-	private $eventos;
+	private $eventos;//array de objetos de tipo Eventos
 	private $sgrRecurso;
-	private $events; 	//array de objetos de tipo Eventos
+	//private $events; 	
 	private $esDomingo;
 	private $esSabado;
 	
@@ -15,8 +15,6 @@ class sgrDia {
 	private $year;
 	private $numdiames;
 	private $horario = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30'); //array -> intervalos horarios disponibles (por defecto de 8:30 a 21:30 en incrementos de horas completas)
-
-	
 
 	/**
 		*	@param $tsfecha int timestamp 
@@ -44,11 +42,22 @@ class sgrDia {
 		
 		return $this;
 	}
+	
+	/**
+		*
+		* @return boolean true|false 
+	*/
+	public function  reservable($id_user){
+		$reservable = false;
+		$user = User::findOrFail($id_user);
+		$reservable = $user->isDayAviable($this->timestamp(),$this->sgrRecurso->recurso()->id);
+		return $reservable;
+	}	
 
 	/**
-	* Devuelve una abreviatura de tres letras del día de la semana en español
-	* @param $month número del mes
-	* @return $abreviatura 
+		* Devuelve una abreviatura de tres letras del día de la semana en español
+		* @param $month número del mes
+		* @return $abreviatura 
 	*/
 	public function abrDiaSemana(){
 
@@ -66,41 +75,23 @@ class sgrDia {
 		*	@param $id_gruppo int
 		*	@return array objetos Evento
 	*/
-	/*public function getEvents($recurso){
-		
-		$numMes = $this->numMes;
-		$year = $this->year;
-		
-		$fechaEvento = date('Y-m-d',mktime(0,0,0,(int) $numMes,(int) $this->numdiames,(int) $year));
-		
-		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-		$events = $sgrRecurso->getEvents($fechaEvento);
-
-		return $events;
-	}*/
-
-	/**
-	*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
-	*	@param $id_recurso int
-	*	@param $id_gruppo int
-	*	@return array objetos Evento
-	*/
 	public function events($hora = ''){
 
 		if (empty($hora)) return $this->eventos;
 		
-		$whereRaw = "horaInicio <= '".$hora."' and horaFin > '".$hora."'";
-		$eventos = $this->eventos()->whereRaw($whereRaw)->get();
-		return $eventos;
 		
+		if ($this->eventos->count()>0) {
+			$eventos = $this->eventos->where('horaInicio','<=',$hora.':30')->where('horaFin','>',$hora.':30')->get();
+		}
+		else $eventos = $this->eventos;
+		return $eventos;
 	}
 
 	/**
-	* Boolean si $day es de $month
-	* @param $month int
-	* @return boolean true si $this es un día de month
+		* Boolean si $day es de $month
+		* @param $month int
+		* @return boolean true si $this es un día de month
 	*/
-
 	public function isDayOfMonth($month){
 		$isDay = false;
 		if ((int) $month == (int) $this->numMes) $isDay = true;
@@ -109,49 +100,48 @@ class sgrDia {
 
 	public function fecha(){
 		return $this->fecha;
-	}
+		}
 
 	public function mes(){
 		return $this->numMes;
-	}
+		}
 
 	public function year(){
 		return $this->year;
-	}
+		}
 
 	public function numerodia(){
 		return $this->numdiames;
-	}
+		}
 
 	public function festivo(){
 		return $this->festivo;
-	}
+		}
+	
 	/**
-	*	@param $hora int hora del día
-	*	@param $minuto int minuto del día
-	* 	@return $timestamp int
+		*
+		*	@param $hora int hora del día
+		*	@param $minuto int minuto del día
+		* 	@return $timestamp int
 	*/
 	public function timestamp($hora = 0,$minuto = 0){
 		return $this->timestamp + (60 * 60 * (int) $hora) + (60 * (int) $minuto);		
-	}
+		}
 
 	//private
 	/**
-	 * Determina si el día es festivo (domingo || sábabo)
- 	 * 
- 	 * @param $tsfecha int timestamp 
- 	 * @return true 
+		* Determina si el día es festivo (domingo || sábabo)
+ 	 	* 
+ 	 	* @param $tsfecha int timestamp 
+ 	 	* @return true 
 	*/
 	private function setFestivo($tsfecha){
 		
 		if (date('N',$tsfecha) == '7') $this->esDomingo = true;
-
 		if (date('N',$tsfecha) == '6') $this->esSabado = true; 
-			
 		if($this->esSabado || $this->esDomingo) return $this->festivo = true;
 		else return $this->festivo = false;
-	
-	}
+		}
 
-}
+}//fin sgrDia Class
 ?>

@@ -106,8 +106,8 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 
 //Calendarios
 Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
-Route::get('ajaxCalendar',array('uses' => 'CalendarController@calendar','before' => array('auth','ajax_check')));
-Route::get('ajaxCalendarAllPuestos',array('uses' => 'CalendarController@calendarAllPuestos','before' => array('auth','ajax_check')));
+Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
+//Route::get('ajaxCalendarAllPuestos',array('uses' => 'CalendarController@calendarAllPuestos','before' => array('auth','ajax_check')));
 
 
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
@@ -167,14 +167,9 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 
-  $recurso = Recurso::findOrFail('42');
-  foreach($recurso->puestos as $puesto)
-    $id_puestos[] = $puesto->id;
-  echo "<pre>";
-	 var_dump(implode(",",$id_puestos));
-  echo "</pre>";
-  $id_recursos = implode(",",$id_puestos);
-  $eventos = Evento::where('recurso_id','IN',$id_recursos)->get();
+  $ids = array('43','44','45','46','47','48','49');
+  $fecha = "2016-04-21";
+  $eventos = Evento::whereIn('recurso_id',$ids)->get();//->where('fechaEvento','=',$fecha)->get();
   echo "<pre>";
   var_dump($eventos);
   echo "</pre>";

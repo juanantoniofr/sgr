@@ -11,7 +11,6 @@ class recursosController extends BaseController{
     $result = array('error' => false,
                     'listoptions'   => '',
                     'errors' => array());
-    //Validación
     //Validación de formulario   
     $rules = array(
         'idrecurso' => 'required|exists:recursos,id');

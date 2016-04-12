@@ -33,31 +33,31 @@ class sgrCalendario {
 	//$fecha debe ser un objeto DateTime
 	public function setFecha($fecha){
 		$this->fecha = $fecha;
-	}
+		}
 
 	public function dia(){
 		return $this->fecha->format('d');
-	}
+		}
 
 	public function mes(){
 		return $this->fecha->format('m');
-	}
+		}
 
 	public function year(){
 		return $this->fecha->format('Y');
-	}
+		}
 
 	public function fecha(){
 		return $this->fecha;
-	}
+		}
 
 	public function sgrRecurso(){
 		return $this->sgrRecurso;
-	}
+		}
 
 	/**
-		*	@param $timestamp int timestamp fecha
-		*	@return $sgrWeek array object srgDia || false si timestamp no es de $this
+		*	
+		*	@return $sgrWeek array object srgDia 
 	*/
 	public function sgrWeek(){
 
@@ -67,7 +67,7 @@ class sgrCalendario {
 			}
 		}
 		
-		return false;//no existe la semana que contenga $timestamp
+		return false;//no existe la semana que contenga $this->fecha->getTimestamp()
 	}
 
 	//public functions

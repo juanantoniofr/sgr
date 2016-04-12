@@ -60,5 +60,6 @@ return array (
 	'puesto'							=> 	'puesto',
 	'defaulttiporecurso' 	=> 	'espacio',	
 	'defaultview'					=>	'month',
+	'viewsCalendar'				=> 	array('month','week','year','day'),
 	);
 ?>

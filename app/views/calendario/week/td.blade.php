@@ -1,16 +1,14 @@
 <div 
-    class = "day {{ $view or '' }} @if(Auth::user()->isDayAviable($sgrDia->timestamp(),$id_recurso) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
-    id = "{{date('jnYGi',$sgrDia->timestamp($hora,$minuto))}}" 
-    data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" 
-    data-hora="{{date('G:i',$sgrDia->timestamp($hora,$minuto))}}">
+  class = "day week @if(  $sgrDia->reservable(Auth::user()->id) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" 
+  id = "{{date('jnYGi',$sgrDia->timestamp($hora,'30'))}}" 
+  data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" 
+  data-hora="{{date('G:i',$sgrDia->timestamp($hora,'30'))}}">
 
-    <div class="titleEvents"> @if($view == 'month') <small>{{ $sgrDia->numerodia() }}</small> 
-    @endif </div>
+    <div class="titleEvents"></div>
      <div class="divEvents" data-numero-de-eventos="{{count($sgrDia->events())}}">
-        
-        @if (count($sgrDia->events(sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
+       @if (count($sgrDia->events($hora))) > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
     
-        @foreach($sgrDia->events(sgrDate::parsedatetime($hora.':30','H:i','H:i:s')) as $event)
+        @foreach($sgrDia->events($hora) as $event)
 
            
             <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
@@ -26,15 +24,9 @@
                         id="{{$event->id}}" 
                         data-id-serie="{{$event->evento_id}}" data-id="{{$event->id}}"  href="" rel="popover" data-html="true" 
                         
-                        data-title="
-                            @if($view != 'week') 
-                                {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
-                            @endif
-                            
-                            {{ $event->titulo }}
-                            {{ htmlentities('<a href="" class="closePopover"> X </a>') }}
-                            " 
-                        data-content="{{htmlentities( (string) View::make('calendario.tooltip')->with('time',$sgrDia->timestamp($hora,$minuto))->with('event',$event) )}}"    
+                        data-title="{{ $event->titulo }}
+                                    {{ htmlentities('<a href="" class="closePopover"> X </a>') }}" 
+                        data-content="{{htmlentities( (string) View::make('calendario.tooltip')->with('time',$sgrDia->timestamp($hora,'30'))->with('event',$event) )}}"    
                         >
                         @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
                             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
@@ -51,10 +43,8 @@
                         <!-- ./Icono -->
                          @endif
                          <!-- Title -->
-                         @if($view != 'week') 
-                            {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
-                        @endif
-                        {{ $event->titulo }}
+                         {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
+                         {{ $event->titulo }}
                         <!-- ./Title -->
                 </a>
             </div> <!-- ./divEvent -->  
@@ -64,7 +54,7 @@
     </div> <!-- ./divEvents -->
     
 
-    @if (count($sgrDia->events($id_recurso,$id_grupo,$view,sgrDate::parsedatetime($hora.':30','H:i','H:i:s'))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($id_recurso,$id_grupo))-4) }}  más </a>@endif
+    @if (count($sgrDia->events($hora))) > 4) <a class="linkMasEvents" href=""> + {{ (count($sgrDia->events($hora))) - 4 }}  más </a>@endif
    
     
 </div>
