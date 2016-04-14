@@ -113,11 +113,12 @@ class sgrCalendario {
 		$i=0;
 		$timestamp = mktime(0,0,0,(int) $this->fecha->format('m'),1,(int) $this->fecha->format('Y'));
 		$maxday = date("t",$timestamp);
-		while ($day <= $maxday){
-			$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
+		$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
+		do {
 			$day = $day + 7;
 		 	$i = $i + 1;
-		} 
+		 	$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
+		} while ($day <= $maxday);
 		
 		return $this->sgrWeeks = $semanas;
 	}

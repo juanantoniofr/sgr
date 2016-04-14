@@ -22,7 +22,7 @@
                         {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
                         {{ $event->titulo }}
                         {{ htmlentities('<a href="" class="closePopover"> X </a>') }}" 
-            data-content="{{htmlentities( (string) View::make('calendario.tooltip')->with('time',$sgrDia->timestamp())->with('event',$event) )}}"    
+            data-content="{{htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$event) )}}"    
         >
           @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
             <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
