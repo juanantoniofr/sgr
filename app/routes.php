@@ -107,8 +107,6 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 //Calendarios
 Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
-//Route::get('ajaxCalendarAllPuestos',array('uses' => 'CalendarController@calendarAllPuestos','before' => array('auth','ajax_check')));
-
 
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
 
