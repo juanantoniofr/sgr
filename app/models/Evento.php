@@ -36,18 +36,22 @@ class Evento extends Eloquent{
  		return $this->hasOne('FinalizarEvento','evento_id','id');
  	}
  	
+ 	public function numeroHoras(){
+ 		return (strtotime($this->horaFin) - strtotime($this->horaInicio)) / (60*60) ;
+ 	}
+
 	//devuelve true si hay la reserva fue finalizada y false en caso contrario
 	public function finalizada(){
 		return $this->finalizacion()->count() > 0;
-	} 	
+	} 
+
  	/**
- 	* Determina si el evento es editable (Auth::user es propietario || Auth::user reservo en favor de otro && la fecha del evento es un día disponible para el Auth::user)
- 	* @param $idUser int identificador de usuario para comprobar si tiene permiso para editar el evento
- 	* @return boolean
+ 		* Determina si el evento es editable (Auth::user es propietario || Auth::user reservo en favor de otro && la fecha del evento es un día disponible para el Auth::user)
+ 		* @param $idUser int identificador de usuario para comprobar si tiene permiso para editar el evento
+ 		* @return boolean
  	*/
  	public function esEditable($idUser){
- 		
- 		
+ 	
  		$user = User::findOrFail($idUser); //@param identificador de usuario autenticado
  		if ($user->count() == 0) return false;//no hay usuario
  		
@@ -63,11 +67,10 @@ class Evento extends Eloquent{
  	}
 
  	/**
-	* Los eventos se podrán anular hasta el día anterior a su fecha de realización.
-	* @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
-	* @return boolean
+		* Los eventos se podrán anular hasta el día anterior a su fecha de realización.
+		* @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
+		* @return boolean
 	*/
-
 	public function esAnulable($idUser){
 		
 		//$idUser no existe	
@@ -83,7 +86,7 @@ class Evento extends Eloquent{
 	}
 
  	/**
- 	* Devevelve el número de recurso (equipos o espacios reservados por un evento)
+ 		* Devevelve el número de recurso (equipos o espacios reservados por un evento)
  	*/
  	public function numeroRecursos(){
  		$muestraItem = '';
@@ -110,12 +113,13 @@ class Evento extends Eloquent{
         }
         return $numRecursos;
  	}
+ 
  	/**
- 	* Determina si un evento en BD tiene solape 
- 	* @param $mon mes dos dígitos
- 	* @param $day día dos dígitos
- 	* @param $year año cuatro dígitos
- 	* @return $solapado boolean
+ 		* Determina si un evento en BD tiene solape 
+ 		* @param $mon mes dos dígitos
+ 		* @param $day día dos dígitos
+ 		* @param $year año cuatro dígitos
+ 		* @return $solapado boolean
  	*/
  	public function solape($timestamp){
  		$solapado = false;
@@ -135,8 +139,8 @@ class Evento extends Eloquent{
  	}
  	
  	/**
- 	* determina si un evento puede ser finalizado 
- 	* @return boolean
+ 		* determina si un evento puede ser finalizado 
+ 		* @return boolean
  	*/
 	public function esFinalizable(){
 		$eventoEsFinalizable = false;

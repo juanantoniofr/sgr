@@ -44,6 +44,26 @@ class sgrDia {
 	}
 	
 	/**
+		*	Devuelve un array de objetos Evento 
+		*	@return array objetos Evento
+	*/
+	public function events(){
+		return $this->eventos;
+	}
+
+	/**
+		*	Devuelve un array de objetos Evento con horaInicio <= $hora:30 && horaFin > $hora:30
+		*	@return array objetos Evento
+	*/
+
+	public function eventsByHora($hora){
+		$eventosByHora = $this->eventos->filter(function($evento) use ($hora){
+			return strtotime($evento->horaInicio) == strtotime($hora.':30');// && strtotime($evento->horaFin) > strtotime($hora.':30'));
+		});
+		return $eventosByHora;
+	}
+
+	/**
 		*
 		* @return boolean true|false 
 	*/
@@ -70,24 +90,6 @@ class sgrDia {
 	}
 
 	/**
-		*	Devuelve un array de objetos Evento para $this en el recurso $id_recurso || en el grupo de de recurso identificados por $id_grupo
-		*	@param $id_recurso int
-		*	@param $id_gruppo int
-		*	@return array objetos Evento
-	*/
-	public function events($hora = ''){
-
-		if (empty($hora)) return $this->eventos;
-		
-		
-		if ($this->eventos->count()>0) {
-			$eventos = $this->eventos->where('horaInicio','<=',$hora.':30')->where('horaFin','>',$hora.':30')->get();
-		}
-		else $eventos = $this->eventos;
-		return $eventos;
-	}
-
-	/**
 		* Boolean si $day es de $month
 		* @param $month int
 		* @return boolean true si $this es un día de month
@@ -96,6 +98,10 @@ class sgrDia {
 		$isDay = false;
 		if ((int) $month == (int) $this->numMes) $isDay = true;
 		return $isDay;
+	}
+
+	public function sgrRecurso(){
+		return $this->sgrRecurso;
 	}
 
 	public function fecha(){

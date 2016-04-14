@@ -11,6 +11,17 @@
 		public function recurso(){
 			return $this->recurso;
 		}
+
+		/**
+			* // Devuelve true si User con id = $id atiende $this->recurso
+			* @param $id int
+			* @return $atendido boolean
+		*/
+		public function atendidoPor($id){
+			$atendido = false;
+			if (User::findOrFail($id)->atiende->count() > 0) $atendido = true;
+			return $atendido;
+		}
 		
 		public function setRecurso($recurso){
 			$this->recurso = $recurso;

@@ -10,6 +10,7 @@
 		public function add($data);
 		public function getEvents($fecha);
 		public function recurso();
+		public function atendidoPor($id);
 	
 	}
 

@@ -44,22 +44,17 @@ class CalendarController extends BaseController {
       $result['errors'] = $validator->errors()->toArray();
     }
     else{  
-			if ($id_item != 0) $id_recurso = $id_item;
+			if ($id_item != 0) $id_recurso = $id_item; //$id_item es id_recurso para puesto
 			$fecha = new DateTime($year.'-'.$month.'-'.$day);
 			$recurso = Recurso::findOrFail($id_recurso);
 			$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
 			$sgrRecurso->setRecurso($recurso);
-			//$result['calendar'] = $sgrRecurso->getEvents('2016-04-21');
-			//$result['id_recurso'] = $id_recurso;
-			//$result['id_item']	= $id_item;
-			//return $result;
 			$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
 			$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
 			$head = (string) CalendarController::head($viewActive,$sgrCalendario);
 			$body = (string) CalendarController::body($viewActive,$sgrCalendario);
 			$result['calendar'] = (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
-
-    }
+		}
 
     return $result;
 	}
@@ -78,7 +73,7 @@ class CalendarController extends BaseController {
 	}
 
 	public static function caption($viewActive,$day,$nombreMes,$year){
-		return (string) View::make('calendario.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
+		return (string) View::make('calendario.allViews.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
 		}
 
 	public static function body($viewActive,$sgrCalendario){
@@ -93,7 +88,7 @@ class CalendarController extends BaseController {
 				break;
 			
 			case 'week':
-				return (string) View::make('calendario.week.body')->with('sgrCalendario',$sgrCalendario);	
+				return (string) View::make('calendario.week.test')->with('sgrCalendario',$sgrCalendario);	
 				break;
 			
 			case 'agenda':
