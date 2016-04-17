@@ -38,6 +38,7 @@ class Evento extends Eloquent{
  	
  	public function numeroHoras(){
  		return (strtotime($this->horaFin) - strtotime($this->horaInicio)) / (60*60) ;
+ 		//return floor(( strtotime(date('H:00',strtotime($this->horaFin))) - strtotime(date('H:00',strtotime($this->horaInicio))) ) / (60*60));
  	}
 
 	//devuelve true si hay la reserva fue finalizada y false en caso contrario
@@ -125,14 +126,13 @@ class Evento extends Eloquent{
  		$solapado = false;
 		$hi = date('H:i:s',strtotime($this->horaInicio));
 		$hf = date('H:i:s',strtotime('+1 hour',strtotime($this->horaInicio)));
-	    $where  = "fechaEvento = '".date('Y-m-d',$timestamp)."' and ";
-	    $where .= "estado != 'denegada' and ";
-	    $where .= "evento_id != '".$this->evento_id."' and ";
+	  $where  = "fechaEvento = '".date('Y-m-d',$timestamp)."' and ";
+	  $where .= "estado != 'denegada' and ";
+	  $where .= "evento_id != '".$this->evento_id."' and ";
 		$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
 		$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
 		$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
 		$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
-		//$nSolapamientos = Recurso::find($this->recurso_id)->events()->whereRaw($where)->count();
 		$nSolapamientos = $this->recurso->events()->whereRaw($where)->count();
  		if ($nSolapamientos > 0) $solapado = true;
  		return $solapado;

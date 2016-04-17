@@ -51,17 +51,70 @@ class sgrDia {
 		return $this->eventos;
 	}
 
+
+	public function left($event){
+		$left = 0;
+		$numeroDeEventosSolapaIntervalo = 0;
+		$indiceEnEventosQueSolapaIntervalo = 0;
+
+		
+
+		$eventos = $this->eventos->filter(function($evento) use ($event){
+			return ( strtotime($evento->horaInicio) < strtotime($event->horaFin) && strtotime($event->horaFin) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($event->horaInicio) && strtotime($evento->horaFin) > strtotime($event->horaInicio));
+		});
+		
+		$numeroDeEventosSolapaIntervalo = $eventos->count();
+
+		$encontrado = false;
+		$indice = 0;
+		foreach ($eventos as $evento) {
+			if ($evento->id != $event->id && !$encontrado) $indice++;
+			else $encontrado = true;
+		}
+		if ($encontrado) $indiceEnEventosQueSolapaIntervalo = $indice;
+
+		$left = 100 - (( 100 / $numeroDeEventosSolapaIntervalo) * ($eventos->count() - $indiceEnEventosQueSolapaIntervalo));
+		//if ($event->id == 8) return 0;
+		//if ($event->id == 6) return 50;
+		//return 0;
+		return floor($left);
+	}
+
+	public function width($event){
+		$width = 100;
+		$numeroDeEventosSolapaIntervalo = 0;
+		$indiceEnEventosQueSolapaIntervalo = 0;
+
+		
+
+		$eventos = $this->eventos->filter(function($evento) use ($event){
+			return ( strtotime($evento->horaInicio) < strtotime($event->horaFin) && strtotime($event->horaFin) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($event->horaInicio) && strtotime($evento->horaFin) > strtotime($event->horaInicio));
+		});
+		
+		$numeroDeEventosSolapaIntervalo = $eventos->count();
+
+		$encontrado = false;
+		foreach ($eventos as $evento) {
+			if ($evento->id != $event->id && !$encontrado) $indiceEnEventosQueSolapaIntervalo++;
+			else $encontrado = true;
+		}
+
+		$width = 100 - (( 100 / $numeroDeEventosSolapaIntervalo) * $indiceEnEventosQueSolapaIntervalo);
+		return floor($width);
+	}
+
+
 	/**
 		*	Devuelve un array de objetos Evento con horaInicio <= $hora:30 && horaFin > $hora:30
 		*	@return array objetos Evento
 	*/
 
-	public function eventsByHora($hora){
+	/*public function eventsByHora($hora){
 		$eventosByHora = $this->eventos->filter(function($evento) use ($hora){
 			return strtotime($evento->horaInicio) == strtotime($hora.':30');// && strtotime($evento->horaFin) > strtotime($hora.':30'));
 		});
 		return $eventosByHora;
-	}
+	}*/
 
 	/**
 		*
@@ -82,10 +135,18 @@ class sgrDia {
 	public function abrDiaSemana(){
 
 		$abreviatura = '';
-		if(!setlocale(LC_ALL,'es_ES@euro','es_ES','esp')){
-			  		$abreviatura="Error setlocale";}
-		
-		$abreviatura = ucfirst(strftime('%a',$this->timestamp));
+		$locale = array('es','es_ES');
+		try {
+       setlocale(LC_ALL,$locale);
+        $abreviatura = utf8_encode(ucfirst(strftime('%a',$this->timestamp)));
+        }
+    catch (Exception $e) {
+       
+        $abreviatura=utf8_encode(ucfirst(date('D',$this->timestamp)));
+    } 
+		/*if(setlocale(LC_ALL,$locale) === false) $abreviatura=ucfirst(date('D',$this->timestamp));
+		else $abreviatura = ucfirst(strftime('%a',$this->timestamp));
+		*/
 		return $abreviatura;
 	}
 

@@ -164,23 +164,12 @@ App::error(function(ModelNotFoundException $e)
   });
 
 Route::get('test',array('as'=>'test',function(){
-
-  $fecha = new DateTime('2016-04-16');
-  $recurso = Recurso::findOrFail('42');
-  $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-  $sgrRecurso->setRecurso($recurso);
-  $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso); 
-  
-  foreach($sgrCalendario->sgrWeek()->sgrDays() as $sgrDia){
-    foreach ($sgrDia->events('15:30') as $evento) {
-      echo $evento->titulo . ' ('.$evento->recurso_id.')';
-    }
-      echo "<hr>";
-    }
-    /*$sgrDia->events('15:30')
-    echo "<pre>";
-      var_dump($sgrDia->events('15:30'));
-    echo "</pre>";*/
-    
-  
+  $horaFin = '14:30:00';
+  echo strtotime('14:00');
+  echo ", ";
+  echo strtotime($horaFin);
+  echo ", ";
+  echo date('H',strtotime($horaFin));
+  echo ", ";
+  echo strtotime(date('H:00',strtotime($horaFin)));
  }));

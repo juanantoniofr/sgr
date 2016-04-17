@@ -53,6 +53,7 @@ class CalendarController extends BaseController {
 			$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
 			$head = (string) CalendarController::head($viewActive,$sgrCalendario);
 			$body = (string) CalendarController::body($viewActive,$sgrCalendario);
+			//$body = '';
 			$result['calendar'] = (string) View::make('calendario.calendar')->with(compact('caption','head','body'));
 		}
 
@@ -66,8 +67,8 @@ class CalendarController extends BaseController {
 				break;
 			
 			case 'week':
-				$sgrWeek = $sgrCalendario->sgrWeek();
-				return (string) View::make('calendario.week.head')->with('sgrWeek',$sgrWeek);
+				//$sgrWeek = $sgrCalendario->sgrWeek();
+				return (string) View::make('calendario.week.head')->with('sgrCalendario',$sgrCalendario);
 				break;
 		}
 	}
