@@ -9,26 +9,33 @@
     
     @foreach($sgrDia->events() as $event)
       <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
-        <a class = "@if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada') text-danger
-                    @elseif($event->estado == 'aprobada' && !$event->finalizada())   text-success
-                    @elseif($event->finalizada())   text-info
-                    @elseif ($event->estado == 'pendiente') text-info
-                    @elseif ($event->estado == 'denegada')  text-warning
+        <a class = "linkpopover linkEvento
+                    @if ($event->solape($sgrDia->timestamp())) text-danger
+                    @else
+                      @if($event->estado == 'aprobada' && !$event->finalizada()) text-success
+                        @elseif($event->finalizada())   text-info
+                        @elseif ($event->estado == 'pendiente') text-info
+                        @elseif ($event->estado == 'denegada')  text-warning
+                      @endif
                     @endif
-                    linkpopover linkEvento {{$event->evento_id}}  {{$event->id}}"
-            id="{{$event->id}}" 
-            data-id-serie="{{$event->evento_id}}" data-id="{{$event->id}}"  href="" rel="popover" data-html="true" 
-            data-title="
-                        {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
-                        {{ $event->titulo }}
-                        {{ htmlentities('<a href="" class="closePopover"> X </a>') }}" 
-            data-content="{{htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$event) )}}"    
+                     {{$event->evento_id}}  {{$event->id}}"
+            id="{{$event->id}}"
+            data-id-serie="{{$event->evento_id}}" 
+            data-id="{{$event->id}}"
+            href=""
+            rel="popover"
+            data-html="true" 
+            data-title="{{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
+                        {{ $event->titulo }}" 
+            data-content="{{htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$event) )}}"
+            data-toggle="popover"
+            data-trigger="focus"    
         >
           @if ($event->solape($sgrDia->timestamp()) && $event->estado != 'aprobada')
-            <span data-toggle="tooltip" title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
+            <span title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
           @else
             <!-- Icono -->
-            <span data-toggle="tooltip" title="Solicitud {{$event->estado}}" 
+            <span title="Solicitud {{$event->estado}}" 
                   class=" fa fa-fw
                           @if($event->estado == 'aprobada' && !$event->finalizada()) fa-check text-success
                           @elseif($event->finalizada()) fa-clock-o text-info

@@ -89,7 +89,7 @@ class CalendarController extends BaseController {
 				break;
 			
 			case 'week':
-				return (string) View::make('calendario.week.test')->with('sgrCalendario',$sgrCalendario);	
+				return (string) View::make('calendario.week.body')->with('sgrCalendario',$sgrCalendario);	
 				break;
 			
 			case 'agenda':

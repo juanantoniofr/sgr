@@ -69,20 +69,15 @@ $(function(e){
 				$('#editOptions').hide();
 				resetMsgErrors();
 				$('#datepickerFinicio').val(firstDayAviable());
-				$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide'); });
 				setInitValueForModalAdd('8:30',firstDayAviable());
 				$('#modalAdd').modal('show');
 			}
 		});
 
-		//1.5.1 When clik button "leer carnet"
-		/*$('#appletLaunch').click(function(e){
-			$('#modalApplet').modal('show');
-		});*/
-
 		//1.6 click infoButton
 		$('#infoButton').on('click',function(e){
 				e.preventDefault();
+				e.stopPropagation();
 				$('#modalDescripcion').modal('show');				
 			});	
 		
@@ -104,7 +99,7 @@ $(function(e){
 		init();
 
 		//7. Programmer Events when user click in Calendar Cell
-		programerEventClickToCalendarCell();
+		//programerEventClickToCalendarCell();
 
 
 		//8. Set initial value for Modal delete window (also, init function, can to be call when change content the table calendar by ajax)
@@ -264,7 +259,7 @@ $(function(e){
 					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
 					$('#loadCalendar').html(respuesta.calendar);
 					init();
-					programerEventClickToCalendarCell();
+					//programerEventClickToCalendarCell();
 					if ($viewActive == 'agenda') {
 						setLinkDeleteEvent();
 						}
@@ -505,13 +500,22 @@ $(function(e){
 		if ($viewActive == 'agenda'){
 			$('a.agendaEdit').each(function(){setLinkEditEvent($(this).data('idEvento'));});
 		}
-		else {
-			//When view != agenda	
-			$('.divEvent a.linkpopover').each(function(){setPopOver($(this));});
+		else if ($viewActive == 'month'){
+			popover();
 			resaltaLinkOnHover();
 			$('a.linkMasEvents').on('click',onMoreEvents);
+			programerEventClickToCalendarCell();
+			$('.divEvents').click(function(e){
+				e.stopPropagation();
+			});
+		}
+		else if ($viewActive == 'week'){
+			popover();
+			resaltaLinkOnHover();
+			programerEventClickToCalendarCell();
 		}
 		//Always
+		linkpopover();
 		$('#modalAdd').on('hidden.bs.modal', function (e) {
   			$('button#save').show();
   			$('#inputRepeticion').hide();
@@ -527,22 +531,17 @@ $(function(e){
 		e.stopPropagation();
 				
 		$ancho = $(this).prev('.divEvents').css('width');
-		$('.divEvent a.linkpopover').each(function(index,value){
-				 $(this).popover('hide');});
+		
 
-		$(this).prev('.divEvents').css({'min-width':'20%','width':'auto','height':'auto','background-color':'#abc','overflow':'visible','border':'1px solid black','position':'absolute','z-index':'180'});
+		$(this).prev('.divEvents').css({'min-width':'20%','width':'auto','max-height':'100%','background-color':'#abc','overflow':'visible','border':'1px solid black','position':'absolute','z-index':'180'});
 				
 		$(this).prev('.divEvents').find('.cerrar').show();
 				
 		$(this).prev('.divEvents').find('.cerrar').click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			$('.divEvent a.linkpopover').each(function(index,value){
-				 $(this).popover('hide');});
-			
-
 			$(this).hide();
-		
+					
 			$(this).find($('a.linkpopover')).hover(
 				function(){
 					$hidden = $(this).parents('.divEvents').css('overflow');
@@ -554,10 +553,7 @@ $(function(e){
 						$(this).css({'overflow':'hidden','position':'inherit'});
 					});
 		
-			$(this).parent('.divEvents').css({'width':$ancho,'height':'68px','background-color':'white','overflow':'hidden','border':'0px','position':'inherit','z-index':'0'});
-
-			
-
+			$(this).parent('.divEvents').css({'width':$ancho,'max-height':'68px','background-color':'white','overflow':'hidden','border':'0px','position':'inherit','z-index':'0'});
 		});
 	}
 
@@ -584,6 +580,8 @@ $(function(e){
 	function programerEventClickToCalendarCell(){	
 		
 		$('.formlaunch').click(function(e){
+			e.stopPropagation();
+			e.preventDefault();
 			if($('select#recurse option:selected').data('disabled')){
 				$('#modalMsg').modal('show');
 			}	
@@ -598,15 +596,12 @@ $(function(e){
 						$('#alert_msg').fadeIn('slow');		
 					}
 				else {
-					$elem = $(this).find($('.divEvents'));
-					$hidden = $elem.css('overflow');
-					if($hidden == 'visible') {
-						$elem.css({'width':$ancho,'height':'68px','background-color':'white','overflow':'hidden','border':'0px','position':'inherit','z-index':'0'});
-						$(this).find($('.cerrar')).hide();
-					}
-
-					setInitValueForModalAdd($(this).data('hora'),$(this).data('fecha'));
-					$('.divEvent a.linkpopover').each(function(index,value){ $(this).popover('hide');});
+					
+					if (undefined === $(this).data('hora')) $hora = '08:30';
+					else  $hora = $(this).data('hora');
+					showGifEspera();
+					setInitValueForModalAdd($hora,$(this).data('fecha'));
+					hideGifEspera();
 					$('#modalAdd').modal('show');
 				}
 			}
@@ -800,6 +795,7 @@ $(function(e){
 	function initModalEdit($idEvento,$idSerie){
 		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
 		resetMsgErrors();
+		showGifEspera();
 		$.ajax({
     	type: "GET",
 			url: "geteventbyId",
@@ -860,6 +856,7 @@ $(function(e){
 					setResumen();
 					$('button#save').hide();
 					$('#editOptions').show();
+					hideGifEspera();
 					$('#modalAdd').modal('show');
  		    },
 				error: function(xhr, ajaxOptions, thrownError){
@@ -881,16 +878,39 @@ $(function(e){
 		});
 	}
 	
+	
+	function linkpopover(){
+		$('a.linkpopover').click(function(e){
+			e.preventDefault();
+			
+			$elem = $(this);
+
+			console.log($elem.data('id'));
+			setLinkEditEvent($elem.data('id'));
+			setLinkDeleteEvent();
+			activarLinkFinalizaReserva($elem.data('id'));
+			activarLinkAnulaReserva($elem.data('id'));
+		});
+
+	}
+
+	function popover(){
+		
+		console.log('popover....');
+		$('[data-toggle="popover"]').popover();
+
+	}
+
 	//popover 
-	function setPopOver($item){
+	/*function setPopOver($item){
+		console.log($item);
 		$item.popover(); 
 		$item.click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
 			var $elem = $(this);
-		
-			$('.divEvent a.linkpopover').each(function(index,value){
-				if (!$elem.is($(this))) $(this).popover('hide');});
+			console.log($elem);
+			
 			
 			//$elem.popover('hide');
 			$('a.comprobante').click(
@@ -902,29 +922,29 @@ $(function(e){
 			$('a.closePopover').click(function(e){
 				e.preventDefault();
 				e.stopPropagation();
+				console.log('cierrate coño...');
 				$elem.popover('hide');
 			});
-			
 			
 			$('div.popover').click(function(e){
 				e.preventDefault();
 				e.stopPropagation();});
 			
 
-			$elem.popover();
+			$elem.popover('show');
 			setLinkEditEvent($elem.data('id'));
 			setLinkDeleteEvent();
 			activarLinkFinalizaReserva($elem.data('id'));
 			activarLinkAnulaReserva($elem.data('id'));
-
 		});
-	}
+	}*/
 	
 	//Programa evento onCLick en el link finalizar de la ventana popover 
 	function activarLinkFinalizaReserva($id){
 		
 		$('#finaliza_'+$id).click(function(e){
 			e.preventDefault();
+			e.stopPropagation();
 			$('span#titulofinaliza').html($(this).data('titulo'));
 			$('span#usuariofinaliza').html($(this).data('usuario'));
 			$('#buttonModalFinaliza').data('idevento',$id);
@@ -935,6 +955,7 @@ $(function(e){
 
 	$('#buttonModalFinaliza').on('click',function(e){
 		e.preventDefault();
+		e.stopPropagation();
 		
 		$('#message').fadeOut("slow");
 		$.ajax({
@@ -964,6 +985,7 @@ $(function(e){
 		
 		$('#anula_'+$id).click(function(e){
 			e.preventDefault();
+			e.stopPropagation();
 			$('span#tituloanula').html($(this).data('titulo'));
 			$('span#usuarioanula').html($(this).data('usuario'));
 			$('#buttonModalAnula').data('idevento',$id);
@@ -974,6 +996,7 @@ $(function(e){
 	//ajax: anular reserva
 	$('#buttonModalAnula').on('click',function(e){
 		e.preventDefault();
+		e.stopPropagation();
 		
 		$('#message').fadeOut("slow");
 		$.ajax({
@@ -1001,6 +1024,8 @@ $(function(e){
 
 	//Programa evento onCLick en el link editar de la ventana popover
 	function setLinkEditEvent($id){
+		
+		
 		var viewActive = '';
 		viewActive = $('#btnView .active').data('calendarView');
 	
@@ -1011,6 +1036,9 @@ $(function(e){
 		$($selector + '_' + $id).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
+			console.log('espera');
+			showGifEspera();
+			
 			$this = $(this);
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
@@ -1018,10 +1046,12 @@ $(function(e){
 			$('#editOption1').data('idEvento',$idEvento);
 			$('#editOption1').data('idSerie',$idSerie);
 			//Cargar datos del evento en al ventana Modal para editar el evento
+			hideGifEspera();
 			initModalEdit($idEvento,$idSerie);
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
 			
 		});
+		
 	}
 	
 	//Programa evento onCLick en el link eliminar de la ventana popover
@@ -1034,15 +1064,15 @@ $(function(e){
 		$($selector).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
+			showGifEspera();
 			$this = $(this);
 			$('#msg').html('').fadeOut();
 			$idEvento = $this.data('idEvento');
 			$idSerie = $this.data('idSerie');
 			$('#option1').data('idEvento',$idEvento);
 			$('#option1').data('idSerie',$idSerie);
-			
-			
 			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
+			hideGifEspera();
 			$('#deleteOptionsModal').modal('show');
 
 		});
@@ -1112,28 +1142,32 @@ $(function(e){
 		
 		$('.linkEvento').hover(
 			function(){
+				console.log('in hover');
 				$oldColor = $(this).parents('.divEvent').css('background-color');
 				$idSerie = $(this).data('idSerie');
-				$hidden = $(this).parents('.divEvents').css('overflow');
-				
-				$thisWidth = $(this).css('width');
-				if($hidden == 'hidden'){
+				//$hidden = $(this).parents('.divEvents').css('overflow');
+				//console.log($(this).parents('.divEvents').css('overflow'));
+				//$thisWidth = $(this).css('width');
+				//console.log($(this).css('width'));
+				/*if($hidden == 'hidden'){
+					console.log('entro aquí?....');
 					$(this).parent('divEvent').css({'background-color':'#abc'});
-					 $(this).css({'background-color':'transparent','position':'absolute','z-index':'180','border':'1px solid #333'});
+					 $(this).css({'background-color':'transparent','z-index':'1000'});
 					 $width = $(this).parent('.divEvent').css('width');
-				}
+				}*/
 					
 				
 				$('.linkEvento').each(function(){
 					if ($(this).data('idSerie') == $idSerie) 
-						$(this).css({'background-color':'#abc','border':'1px solid #333'});
+						$(this).css({'background-color':'#abc'});
 					});
 			}	
 			,
 			function(){
+					console.log('out hover');
 					$('.linkEvento').each(function(){
 					if ($(this).data('idSerie') == $idSerie) 
-						$(this).css({'background-color':$oldColor,'border':'1px solid transparent','position':'inherit','z-index':'0'});
+						$(this).css({'background-color':$oldColor,'z-index':'0'});
 				});
 			}
 			);		
@@ -1318,11 +1352,11 @@ $(function(e){
 	}
 
 	function showGifEspera(){
-		$('#espera').css('display','inline').css('z-index','100');
+		$('#espera').css('display','inline').css('z-index','1000');
 	}
 
 	function hideGifEspera(){
-		$('#espera').css('display','none').css('z-index','-100');
+		$('#espera').css('display','none').css('z-index','-1000');
 	}
 
 });
