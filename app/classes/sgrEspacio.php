@@ -33,7 +33,7 @@
 
 			if ($this->recurso->puestos->count() > 0){
 				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
-  		  return Evento::whereIn('recurso_id',$id_puestos)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaInicio')->orderby('horaFin','desc')->get();
+  		  return Evento::whereIn('recurso_id',$id_puestos)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->get();
   		}
 			else
 				return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();

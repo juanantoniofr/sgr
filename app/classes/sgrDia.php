@@ -56,9 +56,6 @@ class sgrDia {
 		$left = 0;
 		$numeroDeEventosSolapaIntervalo = 0;
 		$indiceEnEventosQueSolapaIntervalo = 0;
-
-		
-
 		$eventos = $this->eventos->filter(function($evento) use ($event){
 			return ( strtotime($evento->horaInicio) < strtotime($event->horaFin) && strtotime($event->horaFin) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($event->horaInicio) && strtotime($evento->horaFin) > strtotime($event->horaInicio));
 		});
@@ -73,6 +70,8 @@ class sgrDia {
 		}
 		if ($encontrado) $indiceEnEventosQueSolapaIntervalo = $indice;
 
+		if (1 < $numeroDeEventosSolapaIntervalo) $razon = $numeroDeEventosSolapaIntervalo-1;
+		else $razon = $numeroDeEventosSolapaIntervalo;
 		$left = 90 - (( 90 / $numeroDeEventosSolapaIntervalo) * ($eventos->count() - $indiceEnEventosQueSolapaIntervalo));
 		
 		return floor($left);
@@ -98,7 +97,9 @@ class sgrDia {
 		}
 
 		//$width = 95 - (( 100 / $numeroDeEventosSolapaIntervalo) * $indiceEnEventosQueSolapaIntervalo);
-		$width = $indiceEnEventosQueSolapaIntervalo +  ( 95 / $numeroDeEventosSolapaIntervalo);
+		if (1 < $numeroDeEventosSolapaIntervalo) $razon = $numeroDeEventosSolapaIntervalo-1;
+		else $razon = $numeroDeEventosSolapaIntervalo;
+		$width = $indiceEnEventosQueSolapaIntervalo +  ( 95 / $razon);
 		return floor($width);
 	}
 
