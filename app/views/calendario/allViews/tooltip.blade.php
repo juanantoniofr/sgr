@@ -1,6 +1,6 @@
-	<p style="width=100%;text-align:center" class=" alert @if ($event->estado == 'aprobada') alert-success @endif @if ($event->estado == 'pendiente') alert-danger @endif">
+	<p style="width=100%;text-align:center" class=" alert @if ($event->solape($time)) alert-danger @elseif ($event->estado == 'aprobada') alert-success @elseif ($event->estado == 'pendiente') alert-danger @endif">
 		
-		Estado:<strong> {{ucfirst($event->estado)}}</strong>
+		Estado:<strong> Solicitud @if ($event->solape($time)) Solapada @else {{ucfirst($event->estado)}} @endif</strong>
 
 		 @if ($event->numeroRecursos() > 1) ({{$event->numeroRecursos()}} {{$event->recurso->tipo}}/s)
 	     @else ({{$event->recurso->nombre}})

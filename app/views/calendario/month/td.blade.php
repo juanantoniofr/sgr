@@ -35,15 +35,17 @@
             <span title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
           @else
             <!-- Icono -->
-            <span title="Solicitud {{$event->estado}}" 
-                  class=" fa fa-fw
-                          @if($event->estado == 'aprobada' && !$event->finalizada()) fa-check text-success
-                          @elseif($event->finalizada()) fa-clock-o text-info
-                          @elseif ($event->estado == 'pendiente') fa-question text-info
-                          @elseif ($event->estado == 'denegada') fa-ban text-warning
-                          @endif" 
-                  aria-hidden="true">
-            </span>
+            <span  title="Solicitud @if ($event->solape($sgrDia->timestamp())) solapada @else {{$event->estado}} @endif" 
+            class=" fa fa-fw
+                    @if ($event->solape($sgrDia->timestamp())) fa-ban text-danger
+                    @else
+                      @if($event->estado == 'aprobada' && !$event->finalizada()) fa-check text-success
+                        @elseif($event->finalizada())  fa-clock-o text-info
+                        @elseif ($event->estado == 'pendiente') fa-question text-primary
+                        @elseif ($event->estado == 'denegada')  fa-ban text-warning
+                      @endif
+                    @endif" 
+            aria-hidden="true"></span>
           @endif
           <!-- Title -->
           {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}

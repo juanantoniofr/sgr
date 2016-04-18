@@ -23,7 +23,7 @@
       <span title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>
     @else
       <!-- Icono -->
-      <span  title="Solicitud {{$event->estado}}" 
+      <span  title="Solicitud @if ($event->solape($sgrDia->timestamp())) solapada @else {{$event->estado}} @endif" 
             class=" fa fa-fw
                     @if ($event->solape($sgrDia->timestamp())) fa-ban text-danger
                     @else

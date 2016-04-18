@@ -129,9 +129,9 @@ class Evento extends Eloquent{
 	  $where  = "fechaEvento = '".date('Y-m-d',$timestamp)."' and ";
 	  $where .= "estado != 'denegada' and ";
 	  $where .= "evento_id != '".$this->evento_id."' and ";
-	  $where .= " horaInicio <= '".$hi."' and horaFin > '".$hi."'"; 
+	  $where .= " ((horaInicio <= '".$hi."' and horaFin > '".$hi."')"; 
 		//$where .= " (( horaInicio <= '".$hi."' and horaFin > '".$hi."' ) "; 
-		//$where .= " or ( horaFin > '".$hf."' and horaInicio < '".$hf."')";
+		$where .= " or ( horaFin > '".$hf."' and horaInicio <= '".$hf."'))";
 		//$where .= " or ( horaInicio > '".$hi."' and horaInicio < '".$hf."')";
 		//$where .= " or (horaFin < '".$hf."' and horaFin > '".$hi."'))";
 		$nSolapamientos = $this->recurso->events()->whereRaw($where)->count();

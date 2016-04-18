@@ -125,7 +125,7 @@ class sgrDia {
 		$locale = array('es','es_ES');
 		try {
        setlocale(LC_ALL,$locale);
-        $abreviatura = ucfirst(strftime('%a',$this->timestamp));
+        $abreviatura = utf8_encode(ucfirst(strftime('%a',$this->timestamp)));
         }
     catch (Exception $e) {
        
