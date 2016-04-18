@@ -119,17 +119,10 @@ a.cerrar {
 /*a.linkpopover{
   display: block;
   line-height: auto;
-<<<<<<< HEAD
-  height: 80px !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /*white-space: nowrap;*/
-}
-=======
   white-space: nowrap;
   word-wrap: break-word;
 }*/
->>>>>>> 4932ae7a0fe00345942754c998ad77888886826f
+
 
 
 .divEvent a:hover, a.linkMasEvents:hover{text-decoration:none;}
