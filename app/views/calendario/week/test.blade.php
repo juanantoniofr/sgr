@@ -1,12 +1,14 @@
 <tr>
-  <td class="primeraColumna" >
-    @for ( $j=0; $j < count(Config::get('options.horarioApertura'))-1 ; $j++ )
-      <div style="text-align:center;font-weight: bold;border:1px solid #fff;height: 82px !important;" >
-        
-          <p>{{Config::get('options.horarioApertura')[$j]}}-{{Config::get('options.horarioApertura')[$j+1]}}</p>
-        
+  <td class="primeraColumna">
+
+    @foreach ( Config::get('options.horaIntervalo') as $hora )
+
+      <div class= "day week" style="text-align:center;font-weight: bold;height: 41px !important;border:1px solid #aaa" >
+        {{$hora}}
       </div>
-    @endfor
+
+    @endforeach
+
   </td>
   @foreach($sgrCalendario->sgrWeek()->sgrDays() as $sgrDia)
     <td class="columna" style="" >
