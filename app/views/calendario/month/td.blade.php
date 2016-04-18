@@ -9,7 +9,7 @@
     
     @foreach($sgrDia->events() as $event)
       <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($event->horaInicio,0,2)}}">
-        <a class = "linkpopover linkEvento
+        <a class = "linkpopover linkEvento linkpopover_month
                     @if ($event->solape($sgrDia->timestamp())) text-danger
                     @else
                       @if($event->estado == 'aprobada' && !$event->finalizada()) text-success
@@ -47,7 +47,7 @@
           @endif
           <!-- Title -->
           {{ sgrDate::parsedatetime($event->horaInicio,'H:i:s','G:i')}}-{{sgrDate::parsedatetime($event->horaFin,'H:i:s','G:i')}}
-          {{ $event->titulo }}
+          {{ substr($event->titulo,0,45) }}
         </a>
       </div> <!-- ./divEvent -->  
     @endforeach

@@ -116,13 +116,13 @@ a.cerrar {
   width: 100%;
 }
 
-/*a.linkpopover{
+a.linkpopover_month{
   display: block;
   line-height: auto;
+
   white-space: nowrap;
   word-wrap: break-word;
-}*/
-
+}
 
 
 .divEvent a:hover, a.linkMasEvents:hover{text-decoration:none;}
