@@ -121,9 +121,13 @@ a.linkpopover_month{
   line-height: auto;
 
   white-space: nowrap;
+  
+}
+a.linkpopover_week{
+  overflow: hidden;
+  text-overflow:ellipsis;
   word-wrap: break-word;
 }
-
 
 .divEvent a:hover, a.linkMasEvents:hover{text-decoration:none;}
 

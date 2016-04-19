@@ -12,6 +12,11 @@
 			return $this->recurso;
 		}
 
+		public function items(){
+          //return $this->recurso->equipos->filter(function($equipo){return $equipo->visible();})
+					return $this->recurso;
+		}
+
 		/**
 			* // Devuelve true si User con id = $id atiende $this->recurso
 			* @param $id int

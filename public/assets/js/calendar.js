@@ -116,9 +116,9 @@ $(function(e){
 	function whenChangeRecurseSelected(){
 		
 		//When change recurse selected
-		$('#puestos').on('change',function(){
+		$('#items').on('change',function(){
 			$('#message').fadeOut("slow");
-			var $str = 'Nueva reserva: ' +  $('select#puestos option:selected').text();
+			var $str = 'Nueva reserva: ' +  $('select#items option:selected').text();
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
 			$('input[name$=id_recurso]').val($('select#puesto option:selected').val());
@@ -139,9 +139,9 @@ $(function(e){
 		$('#selectGroupRecurse').on('change',function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
-			$('#selectPuestos').fadeOut('fast',function(){
-																							$('select#puestos option:selected').prop('selected', false);
-																							$('select#puestos option').detach();}
+			$('#selectItems').fadeOut('fast',function(){
+																							$('select#items option:selected').prop('selected', false);
+																							$('select#items option').detach();}
 																							);
 			$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
 
@@ -158,13 +158,14 @@ $(function(e){
 						if($("select#recurse option:first").data('numeropuestos') > 0){
 							$.ajax({
 								type:"GET",
-								url:"getpuestos",
+								url:"getitems",
 								data:{ idrecurso:$("select#recurse option:first").val()},
 								success: function($result){
-										$('#selectPuestos').fadeIn('fast',function(){
-																												$('#puestos').html($result.listoptions);
-																												$("select#puestos option:first").prop("selected", "selected");
-																												$('select#puestos').change();
+										
+										$('#selectItems').fadeIn('fast',function(){
+																												$('#items').html($result.listoptions);
+																												$("select#items option:first").prop("selected", "selected");
+																												$('select#items').change();
 																											});
 								},
 								error: function(xhr, ajaxOptions, thrownError){
@@ -200,7 +201,7 @@ $(function(e){
 		} 
 		else {
 			$strCalendar = $('select#recurse option:selected').text();
-			$strItem 		= $('select#puestos option:selected').text();
+			$strItem 		= $('select#items option:selected').text();
 			if ($strItem != '') $strCalendar = $strCalendar + '(' + $strItem + ')';
 			$idrecurso = $('select#recurse option:selected').val();
 			//Ajax para obtener descripcion recurso y muestra botón si no vacio
@@ -236,11 +237,9 @@ $(function(e){
 		var $viewActive = $('#btnView .active').data('calendarView');
 		
 		
-		var $id_item = (!$('select#puestos option:selected').val()) ? '' : $('select#puestos option:selected').val();
+		var $id_item = (!$('select#items option:selected').val()) ? '' : $('select#items option:selected').val();
 		var $id_recurso = (!$('select#recurse option:selected').val()) ? '' : $('select#recurse option:selected').val();
-		//grupo
-		//var $grupo_id = $('select#selectGroupRecurse option:selected').val();
-
+		
 		if ($id_item == '' && $id_recurso == '' && $viewActive != 'agenda' ) {$('#alert').fadeOut();$('#alert').fadeIn();}
 		else {
 			$('#btnprint').removeClass('disabled');
@@ -882,66 +881,21 @@ $(function(e){
 	function linkpopover(){
 		$('a.linkpopover').click(function(e){
 			e.preventDefault();
-			
 			$elem = $(this);
-
-			console.log($elem.data('id'));
 			setLinkEditEvent($elem.data('id'));
 			setLinkDeleteEvent();
 			activarLinkFinalizaReserva($elem.data('id'));
 			activarLinkAnulaReserva($elem.data('id'));
 		});
-
 	}
 
 	function popover(){
-		
-		console.log('popover....');
 		$('[data-toggle="popover"]').popover();
-
 	}
 
-	//popover 
-	/*function setPopOver($item){
-		console.log($item);
-		$item.popover(); 
-		$item.click(function(e){
-			e.preventDefault();
-			e.stopPropagation();
-			var $elem = $(this);
-			console.log($elem);
-			
-			
-			//$elem.popover('hide');
-			$('a.comprobante').click(
-				function(e){
-					e.stopPropagation();
-					$elem.popover('hide');
-				});	
 
-			$('a.closePopover').click(function(e){
-				e.preventDefault();
-				e.stopPropagation();
-				console.log('cierrate coño...');
-				$elem.popover('hide');
-			});
-			
-			$('div.popover').click(function(e){
-				e.preventDefault();
-				e.stopPropagation();});
-			
-
-			$elem.popover('show');
-			setLinkEditEvent($elem.data('id'));
-			setLinkDeleteEvent();
-			activarLinkFinalizaReserva($elem.data('id'));
-			activarLinkAnulaReserva($elem.data('id'));
-		});
-	}*/
-	
 	//Programa evento onCLick en el link finalizar de la ventana popover 
 	function activarLinkFinalizaReserva($id){
-		
 		$('#finaliza_'+$id).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
@@ -1036,7 +990,6 @@ $(function(e){
 		$($selector + '_' + $id).click(function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			console.log('espera');
 			showGifEspera();
 			
 			$this = $(this);
@@ -1142,20 +1095,8 @@ $(function(e){
 		
 		$('.linkEvento').hover(
 			function(){
-				console.log('in hover');
 				$oldColor = $(this).parents('.divEvent').css('background-color');
 				$idSerie = $(this).data('idSerie');
-				//$hidden = $(this).parents('.divEvents').css('overflow');
-				//console.log($(this).parents('.divEvents').css('overflow'));
-				//$thisWidth = $(this).css('width');
-				//console.log($(this).css('width'));
-				/*if($hidden == 'hidden'){
-					console.log('entro aquí?....');
-					$(this).parent('divEvent').css({'background-color':'#abc'});
-					 $(this).css({'background-color':'transparent','z-index':'1000'});
-					 $width = $(this).parent('.divEvent').css('width');
-				}*/
-					
 				
 				$('.linkEvento').each(function(){
 					if ($(this).data('idSerie') == $idSerie) 
@@ -1164,7 +1105,6 @@ $(function(e){
 			}	
 			,
 			function(){
-					console.log('out hover');
 					$('.linkEvento').each(function(){
 					if ($(this).data('idSerie') == $idSerie) 
 						$(this).css({'background-color':$oldColor,'z-index':'0'});

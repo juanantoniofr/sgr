@@ -3,7 +3,7 @@
 class recursosController extends BaseController{
 
    
-  public function getpuestos(){
+  public function getitems(){
 
     //Input
     $idrecurso = Input::get('idrecurso','');
@@ -12,11 +12,10 @@ class recursosController extends BaseController{
                     'listoptions'   => '',
                     'errors' => array());
     //Validación de formulario   
-    $rules = array(
-        'idrecurso' => 'required|exists:recursos,id');
-    $messages = array(
-          'exists'  => 'Identificador de recurso no encontrado....',
-          'required'=> 'El campo <strong>:attribute</strong> es obligatorio....');
+    $rules = array('idrecurso' => 'required|exists:recursos,id');
+    $messages = array('exists'  => 'Identificador de recurso no encontrado....',
+                      'required'=> 'El campo <strong>:attribute</strong> es obligatorio....');
+    
     $validator = Validator::make(Input::all(), $rules, $messages);
     if ($validator->fails()){
       //Si errores en el formulario
@@ -25,21 +24,23 @@ class recursosController extends BaseController{
     }
     else{ 
       $recurso = Recurso::findOrFail($idrecurso);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
       //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
-      $puestos = $recurso->puestos->filter(function($puesto){
-          return $puesto->visible(); });
+      $items = $sgrRecurso->items();
+      
       $addOptionReservarTodo = $recurso->usuariopuedereservartodoslospuestos(Auth::user()->id);
       
       //número de puestos or equipos disabled
       $numerodeitemsdisabled = 0;
       $disabledAll = 0;
-      foreach ($puestos as $puesto) {
-        if($puesto->disabled == '1') $numerodeitemsdisabled++;
+      foreach ($items as $item) {
+        if($item->disabled == '1') $numerodeitemsdisabled++;
       }
-      if($numerodeitemsdisabled == $puestos->count()) $disabledAll = 1;
+      if($numerodeitemsdisabled == $items->count()) $disabledAll = 1;
       
       //Añadir opción reservar "todos los puestos"
-      $result['listoptions'] = (string) View::make('calendario.optionsPuestos')->with(compact('puestos','addOptionReservarTodo','disabledAll'));
+      $result['listoptions'] = (string) View::make('calendario.allViews.optionsItems')->with(compact('items','addOptionReservarTodo','disabledAll'));
     }
     return $result;
   }
@@ -372,10 +373,8 @@ class recursosController extends BaseController{
     * @return $recursos Array(Recurso)  
   */
   public function recursosSinGrupo(){
-    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
+    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->where('espacio_id','=','0')->get());
   }
-
-  
 
   /**
     * //Devuelve el campo descripción dado un idrecurso

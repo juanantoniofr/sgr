@@ -97,8 +97,8 @@ class sgrDia {
 		}
 
 		//$width = 95 - (( 100 / $numeroDeEventosSolapaIntervalo) * $indiceEnEventosQueSolapaIntervalo);
-		if (1 < $numeroDeEventosSolapaIntervalo) $razon = $numeroDeEventosSolapaIntervalo-1;
-		else $razon = $numeroDeEventosSolapaIntervalo;
+		if (1 <= $numeroDeEventosSolapaIntervalo) $razon = $numeroDeEventosSolapaIntervalo;
+		else $razon = $numeroDeEventosSolapaIntervalo-1;
 		$width = $indiceEnEventosQueSolapaIntervalo +  ( 95 / $razon);
 		return floor($width);
 	}

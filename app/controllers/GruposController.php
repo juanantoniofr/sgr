@@ -3,6 +3,78 @@
 class GruposController extends BaseController {
 
   /**
+    * @param Input::get('grupo_id') int indetificador de grupo
+    * @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
+    *
+    * @return $result array(boleano,string)
+  */
+  public function addrecursos(){
+    //Input
+    $id = Input::get('grupo_id','');
+    $idrecursos = Input::get('idrecursos',array());
+    
+    //Output 
+    $respuesta = array( 'errors' => array(),
+                        'msg'   => '',    
+                        'error'   => false,);
+    //Validate
+    $rules = array('grupo_id' => 'required|exists:grupoRecursos,id',);
+
+    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'exists'    => Config::get('msg.idnotfound'),);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+      
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      foreach ($idrecursos as $idrecurso) {
+        Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
+      }
+    }
+    return $result;
+  }
+
+  /**
+    * @param Input::get('sortby') string
+    * @param Input::get('order')  string
+    *
+    * @return View::make('admin.recursos.list')  
+  */
+  public function listar(){
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+           
+    //Todos los grupos
+    $grupos = GrupoRecurso::all();
+
+
+    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto');
+  }
+
+  /**
+    * //devuelve array con los nombres de los grupos con algún recurso visible para reserva para el usuario con identificador igual a $id
+    * 
+    * @param $id int
+    *
+    * @return $grupos Object GrupoRecursos
+    * 
+  */
+  static public function gruposVisibles(){
+  
+    $grupos = GrupoRecurso::all()->filter(function($grupo){
+      $recursos = $grupo->recursos->filter(function($recurso){
+            return $recurso->visible();
+        }); 
+      if ($recursos->count() > 0 ) return true;
+    });
+    return $grupos;
+  }
+
+  /**
     * //Devuelve los recursos de un mismo grupo en forma de html options para select en sidebar
     * @param void
     *
@@ -46,51 +118,45 @@ class GruposController extends BaseController {
 		*	@return $result array
 	*/
 	public function del(){
+    //Input
+    $id = Input::get('grupo_id','');
     
-    	//Input
-    	$id 	     = Input::get('grupo_id','');
-    	
-    	//Output 
-    	$respuesta = array(	'errors'   	=> array(),
-    						'msg'		=> '',		
-                      		'error' 	=> false,
-                      		);
-   		//Validate
-    	$rules = array(
-    		'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
-        );
+    //Output 
+    $respuesta = array( 'errors' => array(),
+    						        'msg'		=> '',		
+                      	'error' 	=> false,);
+   	//Validate
+    $rules = array('grupo_id'	=> 'required|exists:grupoRecursos,id',);
 
-     	$messages = array(
-        	'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
-          	'exists'		=> 'No existe identificador de grupo...',	
-          );
-      	$validator = Validator::make(Input::all(), $rules, $messages);
+    $messages = array(  'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
+          	            'exists'		=> 'No existe identificador de grupo...',);
+    $validator = Validator::make(Input::all(), $rules, $messages);
     	
-    	//Save Input or return error
-    	if ($validator->fails()){
-        	$result['errors'] = $validator->errors()->toArray();
-        	$result['error'] = true;
-    	}
-    	else{
-        $grupo = GrupoRecurso::findOrFail($id);
-        $supervisores = $grupo->supervisores();
-        foreach ($supervisores as $supervisor) {
-          $supervisor->detach($supervisor->id);
-        }
-        $validadores = $grupo->validadores();
-        foreach ($validadores as $validador) {
-          $validador->detach($validador->id);
-        }
-        $tecnicos = $grupo->tecnicos();
-        foreach ($tecnicos as $tecnico) {
-          $tecnico->detach($tecnico->id);
-        }
-
-        $grupo->delete();
-        $result['msg'] = Config::get('msg.actionSuccess');
+    //Save Input or return error
+    if ($validator->fails()){
+     	$result['errors'] = $validator->errors()->toArray();
+     	$result['error'] = true;
+    }
+    else{
+      $grupo = GrupoRecurso::findOrFail($id);
+      $supervisores = $grupo->supervisores();
+      foreach ($supervisores as $supervisor) {
+        $supervisor->detach($supervisor->id);
       }
+      $validadores = $grupo->validadores();
+      foreach ($validadores as $validador) {
+        $validador->detach($validador->id);
+      }
+      $tecnicos = $grupo->tecnicos();
+      foreach ($tecnicos as $tecnico) {
+        $tecnico->detach($tecnico->id);
+      }
+
+      $grupo->delete();
+      $result['msg'] = Config::get('msg.actionSuccess');
+    }
     
-		  return $result;
+		return $result;
   }
 
 	/**
@@ -102,42 +168,40 @@ class GruposController extends BaseController {
 		*	@return $result array
 	*/
 	public function edit(){
-    
-    	//Input
-    	$id 	       = Input::get('grupo_id','');
-    	$nombre 	   = Input::get('nombre','');
-      $tipo        = Input::get('tipo');
-    	$descripcion = Input::get('descripcion','');
+    //Input
+    $id 	       = Input::get('grupo_id','');
+    $nombre 	   = Input::get('nombre','');
+    $tipo        = Input::get('tipo');
+    $descripcion = Input::get('descripcion','');
  
-    	//Output 
-    	$respuesta = array(	'errors'   	=> array(),
-    						          'msg'		=> '',		
-                      		'error' 	=> false,
-                      		);
-   		//Validate
-    	$rules = array(
-    		  'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
-        	'nombre'    => 'required|unique:grupoRecursos,nombre,'.$id,
-          'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
-        );
+    //Output 
+    $respuesta = array(	'errors'   	=> array(),
+    					          'msg'		=> '',		
+                     		'error' 	=> false,
+                     		);
+   	//Validate
+    $rules = array(
+    	  'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
+       	'nombre'    => 'required|unique:grupoRecursos,nombre,'.$id,
+        'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
+      );
 
-     	$messages = array(
-        	'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
-          'exists'		=> 'No existe identificador de grupo...',	
-        );
-      $validator = Validator::make(Input::all(), $rules, $messages);
+    $messages = array(
+       	'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
+        'exists'		=> 'No existe identificador de grupo...',	
+      );
+    $validator = Validator::make(Input::all(), $rules, $messages);
     	
-    	//Save Input or return error
-    	if ($validator->fails()){
-        	$result['errors'] = $validator->errors()->toArray();
-        	$result['error'] = true;
-    	}
-    	else{  
-        	$grupo = GrupoRecurso::findOrFail($id)->update(array('nombre' => $nombre,'descripcion' => $descripcion, 'tipo' => $tipo));
-        	$result['msg'] = Config::get('msg.success');
-      	}
-    
-		return $result;
+    //Save Input or return error
+    if ($validator->fails()){
+     	$result['errors'] = $validator->errors()->toArray();
+     	$result['error'] = true;
+    }
+    else{  
+     	$grupo = GrupoRecurso::findOrFail($id)->update(array('nombre' => $nombre,'descripcion' => $descripcion, 'tipo' => $tipo));
+     	$result['msg'] = Config::get('msg.success');
+    }
+   	return $result;
   }
 
 	/**
@@ -190,25 +254,6 @@ class GruposController extends BaseController {
 		return $result;
 	}
 
-	/**
-  		* @param Input::get('sortby')	string
-  		* @param Input::get('order')	string
-  		*
-  		* @return View::make('admin.recursos.list')  
-  */
-	public function listar(){
-    
-	    //Input      
-	    $sortby = Input::get('sortby','nombre');
-	    $order = Input::get('order','asc');
-	         
-	    //Todos los grupos
-	    $grupos = GrupoRecurso::all();
-
-
-	    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto');
-  }
-
   /**
   		* Ajax function: devuelve la lista de grupos en forma de tabla
   		*
@@ -227,69 +272,17 @@ class GruposController extends BaseController {
 	    $grupos = GrupoRecurso::all();
 	    return View::make('admin.recursos.table',compact('grupos','sortby','order'));
   	}
-
-  /**
-  	* @param Input::get('grupo_id') int indetificador de grupo
-  	* @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
-  	*
-  	* @return $result array(boleano,string)
-  */
-  public function addrecursos(){
-
-  		//input
-  		$id = Input::get('grupo_id','');
-  		$idrecursos = Input::get('idrecursos',array());
-  		//out
-	   	$result = array('error'	=> false,
-						'msg'	=> Config::get('msg.success'),
-						);
-
-		  //Validación input
-		  if (empty($id) || GrupoRecurso::where('id','=',$id)->count() != 1) {
-			 $result['msg'] = Config::get('msg.idempty') . ' o ' . Config::get('msg.idnotfound');
-		  	$result['error'] = true;
-  		  }
-  		  else {
-  			 foreach ($idrecursos as $idrecurso) {
-  			  Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
-  			 }
-  		  }
-  			
-  		return $result;
-  	}
-
-  /**
-    * //devuelve array con los nombres de los grupos con algún recurso visible para reserva para el usuario con identificador igual a $id
-    * 
-    * @param $id int
-    *
-    * @return $grupos Object GrupoRecursos
-    * 
-  */
-  static public function gruposVisibles(){
-  
-    $grupos = GrupoRecurso::all()->filter(function($grupo){
-      $recursos = $grupo->recursos->filter(function($recurso){
-            return $recurso->visible();
-        }); 
-      if ($recursos->count() > 0 ) return true;
-    });
-    
-    
-    
-    return $grupos;
-  }
-
-  /**
-    * //Establece la relación persona-grupoRecursos (supervisor-validador-tecnico)
-    *
-    * @param Input::get('idgrupo')    int
-    * @param Input::get('username')   string
-    * @param Input::get('rol')        string
-    *
-    * @return $result array
-    * 
-  */
+ 
+/**
+  * //Establece la relación persona-grupoRecursos (supervisor-validador-tecnico)
+  *
+  * @param Input::get('idgrupo')    int
+  * @param Input::get('username')   string
+  * @param Input::get('rol')        string
+  *
+  * @return $result array
+  * 
+*/
   public function addPersona(){
     
     //input

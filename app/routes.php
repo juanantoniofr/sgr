@@ -78,7 +78,7 @@ Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSi
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
-Route::get('getpuestos',array('uses'=>'recursosController@getpuestos','before' => array('auth','ajax_check')));
+Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -164,12 +164,8 @@ App::error(function(ModelNotFoundException $e)
   });
 
 Route::get('test',array('as'=>'test',function(){
-  $horaFin = '14:30:00';
-  echo strtotime('14:00');
-  echo ", ";
-  echo strtotime($horaFin);
-  echo ", ";
-  echo date('H',strtotime($horaFin));
-  echo ", ";
-  echo strtotime(date('H:00',strtotime($horaFin)));
+  $recursos = Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.equipo'))->get();
+  echo "<pre>";
+  var_dump($recursos);
+  echo "</pre>";
  }));

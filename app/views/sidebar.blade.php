@@ -16,8 +16,8 @@
         </select>
       </div>
       
-      <div  id="selectPuestos" style="display:none;margin-top:5px;">
-        <select class="form-control" id="puestos" name="puestos" > 
+      <div  id="selectItems" style="display:none;margin-top:5px;">
+        <select class="form-control" id="items" name="puestos" > 
         </select>
       </div>
 

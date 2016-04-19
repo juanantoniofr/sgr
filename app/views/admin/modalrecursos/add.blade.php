@@ -31,7 +31,7 @@
         
         <div class="form-group" id="fm_addrecurso_inputtipo">  
           {{Form::label('tipo', 'Tipo de recurso')}}
-          {{Form::select('tipo', array('espacio' => 'Espacio', 'equipo' => 'Equipo'),'espacio',array('class' => 'form-control'))}}
+          {{Form::select('tipo', Config::get('options.tipoRecursos'),'espacio',array('class' => 'form-control'))}}
         </div>
             
         <div class="form-group" id="fm_addrecurso_inputmodo">  
