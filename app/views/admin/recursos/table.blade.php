@@ -74,7 +74,7 @@
                   <!-- Puestos -->
                   @if( $recurso->tipo == Config::get('options.espacio') )
                     <!-- añadir puesto existente -->
-                    <a href="#" title="Añadir puesto existente" class = "addPuestoExistente" data-nombre="{{$recurso->nombre}}" data-idgrupo="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
+                    <a href="#" title="Añadir puesto existente" class = "linkaddPuestoExistente" data-nombre="{{$recurso->nombre}}" data-idgrupo="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
                     <!-- Nuevo Puesto -->
                     <a href="#" title="Nuevo Puesto" class = "linkAddPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Puestos -->

@@ -68,6 +68,7 @@
   <!-- Puestos -->
   {{ $modalAddPuesto          or '' }}
   {{ $modalEditPuesto         or '' }}
+  {{ $modalAddPuestoExistente or '' }}
 
   <!-- Equipos -->
   {{ $modalAddEquipo          or ''}}
