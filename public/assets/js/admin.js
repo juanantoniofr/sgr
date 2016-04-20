@@ -11,7 +11,7 @@ $(function(e){
     $('#m_addrecurso').modal('show');        
   });
 
-  function activelinkaddpuestos(){
+  function activelinkaddpuesto(){
     $(".linkAddPuesto").on('click',function(e){
       e.preventDefault();
       $('#m_addpuesto_title_nombrerecurso').html($(this).data('nombrerecurso'));
@@ -22,7 +22,7 @@ $(function(e){
     });
   }
 
-  function activelinkaddequipos(){
+  function activelinkaddequipo(){
     $(".linkAddEquipo").on('click',function(e){
       e.preventDefault();
       $('#m_addequipo_title_nombrerecurso').html($(this).data('nombrerecurso'));
@@ -33,7 +33,7 @@ $(function(e){
     });
   }
     
-  //Ajax: Salvar nuevo recurso (Espacio // Equipo)
+  //Ajax: Salvar nuevo recurso (Espacio // TipoEquipos)
   $('#fm_addrecurso_save').on('click',function(e){
     e.preventDefault();
     updateChkeditorInstances();
@@ -44,28 +44,27 @@ $(function(e){
       url: "addrecurso",
       data: $data,
       success: function($respuesta){
-                
-          if($respuesta.error === true){
-            hideGifEspera();
-            $.each($respuesta.errors,function(index,value){
-                                        $('.divmodal_msgError').html('').fadeOut();
-                                        $('#fm_addrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                                        $('#fm_addrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                                        });
-            $('#fm_addrecurso_textError').fadeIn('8000');
-          }
-          else {
-            hideGifEspera();
-            $('#m_addrecurso').modal('hide');   
-            showMsg($respuesta.msg);
-            getListado(); 
-          }
+        if($respuesta.error === true){
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+            $('.divmodal_msgError').html('').fadeOut();
+            $('#fm_addrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            $('#fm_addrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_addrecurso_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_addrecurso').modal('hide');   
+          showMsg($respuesta.msg);
+          getListado(); 
+        }
       },
       error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
       }
-    });
+    });//<!-- ajax -->
   }); 
     
   //Ajax: Salvar nuevo Puesto 
@@ -79,27 +78,61 @@ $(function(e){
       url: "addrecurso",
       data: $data,
       success: function($respuesta){
-          if($respuesta.error === true){
-            hideGifEspera();
-            $.each($respuesta.errors,function(index,value){
-              $('.divmodal_msgError').html('').fadeOut();
-              $('#fm_addpuesto_input'+index).addClass('has-error');//resalta el campo de formulario con error
-              $('#fm_addpuesto_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-            });
-            $('#fm_addpuesto_textError').fadeIn('8000');
-          }
-          else {
-            hideGifEspera();
-            $('#m_addpuesto').modal('hide');   
-            showMsg($respuesta.msg);
-            getListado($('#fm_addpuesto input[name="espacio_id"]').val()); 
-          }
+        if($respuesta.error === true){
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+            $('.divmodal_msgError').html('').fadeOut();
+            $('#fm_addpuesto_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            $('#fm_addpuesto_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_addpuesto_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_addpuesto').modal('hide');   
+          showMsg($respuesta.msg);
+          getListado($('#fm_addpuesto input[name="espacio_id"]').val()); 
+        }
       },
       error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
       }
-    });
+    });//<!-- ajax -->
+  });
+  
+  //Ajax: Salvar nuevo Puesto 
+  $('#fm_addequipo_save').on('click',function(e){
+    e.preventDefault();
+    updateChkeditorInstances();
+    showGifEspera();
+    $data = $('form#fm_addequipo').serialize();
+    $.ajax({
+      type: "POST",
+      url: "addrecurso",
+      data: $data,
+      success: function($respuesta){
+        if($respuesta.error === true){
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+            $('.divmodal_msgError').html('').fadeOut();
+            $('#fm_addequipo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            $('#fm_addequipo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_addequipo_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_addequipo').modal('hide');   
+          showMsg($respuesta.msg);
+          getListado($('#fm_addequipo input[name="espacio_id"]').val()); 
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
+      }
+    });//<!-- ajax -->
   });
 
   //Edit recurso*************
@@ -633,23 +666,35 @@ $(function(e){
     activelinkdisabled();
     activelinkaddpersonas();
     activelinkremovepersonas();
-    activelinkaddpuestos();
+    activelinkaddpuesto();
 
     activelinkaddequipo();
 
     activeLinkeditpuesto();
     activelinkverpuestos();
+    activelinkverequipos();
   }
 
   function activelinkverpuestos(){
-    $('.linkVerPuesto').on('click', function(e){
+    $('.linkVerPuestos').on('click', function(e){
       e.preventDefault();
       verPuestos($(this).data('idrecurso'));
     });
   }
 
+  function activelinkverequipos(){
+    $('.linkVerEquipos').on('click', function(e){
+      e.preventDefault();
+      verEquipos($(this).data('idrecurso'));
+    });
+  }
+
   function verPuestos($recursoid){
     $('#puestos_'+$recursoid).fadeToggle();
+  }
+
+  function verEquipos($recursoid){
+    $('#equipos_'+$recursoid).fadeToggle();
   }
 
   function activelinkdisabled(){

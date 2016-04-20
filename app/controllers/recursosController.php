@@ -78,8 +78,9 @@ class recursosController extends BaseController{
     
     //Validación de formulario   
     $rules = array( 'nombre'        => 'required|unique:recursos',
-                    'tipo'          => 'required|in:'.implode(',',array_keys(Config::get('options.tipoRecursos'))),  
-                    'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
+                    'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
+                    //'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
+                    'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
                     'espacio_id'    => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
                     'tipoequipo_id' => 'required_if:tipo,'.Config::get('options.equipo').'|exists:recursos,id',
                     'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);

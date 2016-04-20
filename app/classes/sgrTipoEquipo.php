@@ -98,7 +98,7 @@
 		foreach ($data as $key => $value) {
 			$this->recurso->$key = $value;
 		}
-		$this->recurso->reservable = false; //Los tipo equipos no se pueden reservar, hay que reservar un item concreto
+		//$this->recurso->reservable = false; //Los tipo equipos no se pueden reservar, hay que reservar un item concreto
 		return true;
 	}	
 

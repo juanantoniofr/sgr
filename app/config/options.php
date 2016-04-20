@@ -55,8 +55,8 @@ return array (
 	'modoGestion'		=> array('0','1'), //0 => con validación, 1 => sin validación
 	'idroladministrador'	=> '4', 
 	
+	'recursos'						=> 	array('espacio','tipoequipos','puesto','equipo'),	
 	'tipoRecursos'				=> 	array('espacio' => 'espacio','tipoequipos' => 'Modelo de equipo'),
-	//'tipoRecurso'					=> 	array('espacio','tipoequipos'),
 	'defaulttiporecurso' 	=> 	'espacio',
 	'tipoItem'						=>  array('puesto' => 'puesto','equipo' => 'equipo'),
 	'defaultitem'				 	=> 	'equipo',
