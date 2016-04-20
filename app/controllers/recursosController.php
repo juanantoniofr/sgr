@@ -137,8 +137,6 @@ class recursosController extends BaseController{
     * @return $result                  array    
   */ 
   public function edit(){
-   
-    
     //Input
     $id = Input::get('id','');
     $nombre = Input::get('nombre');
@@ -155,26 +153,21 @@ class recursosController extends BaseController{
                     'errors' => array());
     
     //Validación de formulario   
-    $rules = array(
-        'id'          => 'required|exists:recursos',
-        'nombre'      => 'required|unique:recursos,nombre,'.Input::get('id'),
-        'tipo'        => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
-        'grupo_id'    => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
-        'espacio_id'  => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
-        'modo'        => 'required|in:'.implode(',',Config::get('options.modoGestion')),
-        );
-
-     $messages = array(
-          'id.exists'               => 'Identificador de recurso no encontrado....',
-          'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
-          'unique'                  => 'Existe un recurso con el mismo nombre...',
-          'tipo.in'                 => 'El tipo de recurso no está definido...',
-          'modo.in'                 => 'Modo de Gestión de solicitudes de reserva no definido....',
-          'grupo_id.required_if'    => 'identificador de grupo requerido....',
-          'espacio_id.required_if'  => 'identificador de espacio requerido....',
-          'grupo_id.exists'         => 'No existe identificador de grupo...',
-          'espacio_id.exists'       => 'No existe identificador de espacio...',
-        );
+    $rules = array( 'id'          => 'required|exists:recursos',
+                    'nombre'      => 'required|unique:recursos,nombre,'.Input::get('id'),
+                    'tipo'        => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
+                    'grupo_id'    => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
+                    'espacio_id'  => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
+                    'modo'        => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
+     $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
+                        'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'unique'                  => 'Existe un recurso con el mismo nombre...',
+                        'tipo.in'                 => 'El tipo de recurso no está definido...',
+                        'modo.in'                 => 'Modo de Gestión de solicitudes de reserva no definido....',
+                        'grupo_id.required_if'    => 'identificador de grupo requerido....',
+                        'espacio_id.required_if'  => 'identificador de espacio requerido....',
+                        'grupo_id.exists'         => 'No existe identificador de grupo...',
+                        'espacio_id.exists'       => 'No existe identificador de espacio...',);
     
     $validator = Validator::make(Input::all(), $rules, $messages);
 
@@ -184,14 +177,13 @@ class recursosController extends BaseController{
       $result['errors'] = $validator->errors()->toArray();
     }
     else{  
-      $data = array(  'nombre'      => $nombre,
-                      'tipo'        => $tipo,
-                      'grupo_id'    => $grupo_id,
-                      'espacio_id'  => $espacio_id,
-                      'descripcion' => $descripcion,
-                      'id_lugar'    => $id_lugar,
-                      'acl'         => sgrACL::buildJsonAcl($modo,$roles),
-                    );
+      $data = array('nombre'      => $nombre,
+                    'tipo'        => $tipo,
+                    'grupo_id'    => $grupo_id,
+                    'espacio_id'  => $espacio_id,
+                    'descripcion' => $descripcion,
+                    'id_lugar'    => $id_lugar,
+                    'acl'         => sgrACL::buildJsonAcl($modo,$roles),);
       //$recurso = Recurso::find($id);
       $sgrRecurso = RecursoFactory::getRecursoInstance($tipo);
       $sgrRecurso->setRecurso(Recurso::find($id));
@@ -378,12 +370,10 @@ class recursosController extends BaseController{
                      'error'         => false,);
     //Validate
     $rules = array('idrecurso'  => 'required|exists:recursos,id',);
-
     $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
                       'exists'    => 'No existe identificador de recurso en BD.',);
 
     $validator = Validator::make(Input::all(), $rules, $messages);
-    
     //Obtener descripción or return error
     if ($validator->fails()){
       $result['errors'] = $validator->errors()->toArray();
@@ -405,7 +395,6 @@ class recursosController extends BaseController{
   */
 
   public function htmlOptionEspacios(){
-
     $espacios = Recurso::where('tipo','=',Config::get('options.espacio'))->get();
     return View::make('admin.html.optionEspacios')->with(compact('espacios'));
   }
