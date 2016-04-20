@@ -68,6 +68,9 @@
   <!-- Puestos -->
   {{ $modalAddPuesto          or '' }}
   {{ $modalEditPuesto         or '' }}
+
+  <!-- Equipos -->
+  {{ $modalAddEquipo          or ''}}
 @stop
 
 @section('js')

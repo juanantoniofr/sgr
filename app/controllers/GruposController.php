@@ -8,20 +8,21 @@ class GruposController extends BaseController {
     *
     * @return $result array(boleano,string)
   */
+  //temporal
   public function addrecursos(){
     //Input
     $id = Input::get('grupo_id','');
     $idrecursos = Input::get('idrecursos',array());
     
     //Output 
-    $respuesta = array( 'errors' => array(),
-                        'msg'   => '',    
-                        'error'   => false,);
+    $result = array('errors' => array(),
+                    'msg'    => '',    
+                    'error'  => false,);
     //Validate
     $rules = array('grupo_id' => 'required|exists:grupoRecursos,id',);
 
-    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
-                        'exists'    => Config::get('msg.idnotfound'),);
+    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'   => Config::get('msg.idnotfound'),);
     $validator = Validator::make(Input::all(), $rules, $messages);
       
     //Save Input or return error
@@ -52,7 +53,7 @@ class GruposController extends BaseController {
     $grupos = GrupoRecurso::all();
 
 
-    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto');
+    return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo');
   }
 
   /**
@@ -212,44 +213,34 @@ class GruposController extends BaseController {
 		*	@return $result array
 	*/
 	public function add(){
-
 		//out
-		$result = array('errors'	=> array(),
-						        'msg'		=> '',
-						        'error'		=> false,
-						      );
-		
+		$result = array('errors'  => array(),
+						        'msg'		  => '',
+						        'error'		=> false,);
 		//validate
-		$rules = array(
-        	'nombre'      => 'required|unique:grupoRecursos',
-          'tipo'        => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
-        );
+		$rules = array( 'nombre' => 'required|unique:grupoRecursos',
+                    'tipo'   => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),);
+   	$messages = array(  'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
+        	              'unique'        => 'Existe un <b>grupo</b> con el mismo nombre....',
+                        'in'            => 'El valor especificado en tipo no está permitido....',);
+    $validator = Validator::make(Input::all(), $rules, $messages);
 
-     	$messages = array(
-        	'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
-        	'unique'        => 'Existe un <b>grupo</b> con el mismo nombre....',
-          'in'            => 'El valor especificado en tipo no está permitido....',
-        );
-    
-    	$validator = Validator::make(Input::all(), $rules, $messages);
+    if ($validator->fails()){
+    	$result['error'] = true;
+     	$result['errors'] = $validator->errors()->toArray();
+    }
+    else{
+    	//Salvar el nuevo grupo
+    	$grupo = new GrupoRecurso;
+		  $grupo->nombre = Input::get('nombre','');
+			$grupo->descripcion = Input::get('descripcion','');
+      $grupo->tipo = Input::get('tipo');
+			$grupo->save();
 
-    	if ($validator->fails()){
-    		$result['error'] = true;
-      	$result['errors'] = $validator->errors()->toArray();
-      }
-      else{
-      	//Salvar el nuevo grupo
-      	$grupo = new GrupoRecurso;
-			  $grupo->nombre = Input::get('nombre','');
-			  $grupo->descripcion = Input::get('descripcion','');
-        $grupo->tipo = Input::get('tipo');
-			  $grupo->save();
-
-        //El propio usuario que crea el grupo es supervisor del mismo
-        $grupo->supervisores()->attach(Auth::user()->id); 
-
-			  $result['msg'] = Config::get('msg.success');	
-      }
+      //El propio usuario que crea el grupo es supervisor del mismo
+      $grupo->supervisores()->attach(Auth::user()->id); 
+      $result['msg'] = Config::get('msg.success') . Input::get('tipo');	
+    }
 
 		return $result;
 	}

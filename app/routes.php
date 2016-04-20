@@ -164,8 +164,5 @@ App::error(function(ModelNotFoundException $e)
   });
 
 Route::get('test',array('as'=>'test',function(){
-  $recursos = Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.equipo'))->get();
-  echo "<pre>";
-  var_dump($recursos);
-  echo "</pre>";
+  echo implode(',',array_keys(Config::get('options.tipoRecursos')));
  }));

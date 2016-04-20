@@ -17,6 +17,10 @@
             return new sgrPuesto();
             break;
           
+          case Config::get('options.tipoequipos'):
+            return new sgrTipoEquipo();
+            break;
+
           default:
             throw new InvalidArgumentException('Tipo de recurso no válido');
             break;

@@ -6,7 +6,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> Añadir nuevo recurso (espacio/equipo)</h2>
+        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> Añadir nuevo recurso (espacio / Modelo de Equipo)</h2>
       </div><!-- ./modal-header -->
 
       <div class="modal-body">

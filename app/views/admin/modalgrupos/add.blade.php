@@ -19,7 +19,7 @@
 
         <div class="form-group" id="fm_addgrupo_inputtipo">  
           {{Form::label('tipo', 'Tipo de recurso')}}
-          {{Form::select('tipo', array('espacio' => 'Espacio', 'equipo' => 'Equipo'),'espacio',array('class' => 'form-control'))}}
+          {{Form::select('tipo', Config::get('options.tipoRecursos'),Config::get('options.defaulttiporecurso'),array('class' => 'form-control'))}}
         </div>
 
         <!-- Descripción del grupo --> 

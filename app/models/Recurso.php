@@ -32,6 +32,11 @@ class Recurso extends Eloquent {
     return $this->hasOne('Recurso','id','espacio_id');   
   }
 
+  //devuelve los equipos de un recurso (tipoequipo) (Relación Reflexiva)
+  public function equipos(){
+    return $this->hasMany('Recurso','tipoequipo_id','id');
+  }
+
   //identifica el tipo de equipo al que pertenece un equipo
   public function tipoequipo(){
     return $this->hasOne('Recurso','id','tipoequipo_id');   
