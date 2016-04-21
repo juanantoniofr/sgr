@@ -413,6 +413,7 @@ $(function(e){
     $(".linkaddPuestoExistente").on('click',function(e){
       e.preventDefault();
       showGifEspera();
+      console.log('hola');
       $('#m_addPuestoExistente_nombre').html($(this).data('nombre'));
       $('form#fm_addPuestoExistente input[name="espacio_id"]').val($(this).data('idespacio'));
       $.ajax({
@@ -420,6 +421,7 @@ $(function(e){
         url:  "getpuestosSinEspacio",
         data: {id:$(this).data('idespacio')},
         success: function($html){
+          console.log($html);
           hideGifEspera();
           $('#m_addPuestoExistente span#PuestoSinEspacio').html($html);
           hideMsg();

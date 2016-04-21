@@ -1,7 +1,5 @@
 <?php
-
 class recursosController extends BaseController{
-
    
   public function getitems(){
 
@@ -206,16 +204,11 @@ class recursosController extends BaseController{
     //Output 
     $result = array( 'errors'    => array(),
                       'msg'   => '',    
-                      'error'   => false,
-                    );
+                      'error'   => false,);
     //Validate
-    $rules = array(
-        'idrecurso'  => 'required|exists:recursos,id', //exists:table,column
-        );
-    $messages = array(
-          'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
-          'exists'    => 'No existe identificador de grupo...', 
-          );
+    $rules = array('idrecurso'  => 'required|exists:recursos,id',);
+    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'exists'    => 'No existe identificador de grupo...',);
     $validator = Validator::make(Input::all(), $rules, $messages);
 
     //Save Input or return error
@@ -348,10 +341,19 @@ class recursosController extends BaseController{
   /**
     * @param void
     *
-    * @return $recursos Array(Recurso)  
+    * @return string html checboxes 
   */
   public function recursosSinGrupo(){
-    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->where('espacio_id','=','0')->get());
+    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
+  }
+
+  /**
+    * //checboxes html 
+    * @param void
+    * @return string html checkboxes
+  */
+  public function getpuestosSinEspacio(){
+    return View::make('admin.html.checkboxesPuestos')->with('puestos',Recurso::where('espacio_id','=','0')->get());
   }
 
   /**

@@ -13,7 +13,6 @@ class GruposController extends BaseController {
     //Input
     $id = Input::get('grupo_id','');
     $idrecursos = Input::get('idrecursos',array());
-    
     //Output 
     $result = array('errors' => array(),
                     'msg'    => '',    

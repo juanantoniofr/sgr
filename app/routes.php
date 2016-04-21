@@ -74,11 +74,13 @@ Route::post('admin/enabled',array('uses'=>'recursosController@enabled','before' 
 Route::post('admin/delrecurso',array('uses' => 'recursosController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
+//Temporales
+Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::get('admin/getpuestosSinEspacio',array('uses'=>'recursosController@getpuestosSinEspacio','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -92,7 +94,6 @@ Route::post('admin/removePersonas',array('uses' => 'GruposController@removePerso
 Route::get('admin/htmlCheckboxPersonas',array('uses' => 'GruposController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));	
 Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'GruposController@getRecursos','before' => array('auth','ajax_check')));
-
 
 //ValidacionController routes **********************
 //(roles 4 (admin) y 5 (validador))
