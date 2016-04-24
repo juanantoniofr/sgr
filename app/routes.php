@@ -14,29 +14,22 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 Route::get('msg',array('as' => 'msg',function(){
 	$pagetitle   = Config::get('msg.pagetitlefilterCapacidad');
-    $paneltitle  = Config::get('msg.paneltitlefilterCapacidad');
-    $msg         = Config::get('msg.filterCapacidadmsg');
-    $alertLevel  = 'danger';
+  $paneltitle  = Config::get('msg.paneltitlefilterCapacidad');
+  $msg         = Config::get('msg.filterCapacidadmsg');
+  $alertLevel  = 'danger';
 	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
 }));
 
 Route::get('wellcome',array('as'=>'wellcome','uses' => 'HomeController@showWellcome'));
-
 Route::get('ayuda.html',array('as'=>'ayuda','uses'=>'HomeController@ayuda'));
-
 Route::get('contactar.html',array('as'=>'contactar','uses'=>'HomeController@contacto','before'=>'auth'));
 Route::post('contactar.html',array('as'=>'enviaformulariocontacto','uses'=>'HomeController@sendmailcontact','before'=>'auth'));
-
 
 Route::get('/',array('as' => 'loginsso','uses' => 'AuthController@doLogin'));
 Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'));
 
-
-
-
 //Admin (rol = 4)
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
-
 
 //routes gestión de usuarios
 Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listUsers','before' => array('auth','capacidad:4,msg')));
@@ -55,17 +48,16 @@ Route::post('admin/pod.html',array('as' => 'uploadPOD','uses' => 'PodController@
 
 //routes logs & config
 Route::get('admin/config.html',array('as' => 'config.html',function(){
-			return View::make('admin.config')->nest('dropdown',Auth::user()->dropdownMenu());
-			},
-			'before' => array('auth','capacidad:4,msg')
-		));
+	return View::make('admin.config')->nest('dropdown',Auth::user()->dropdownMenu());
+	},
+	'before' => array('auth','capacidad:4,msg')
+));
 
 Route::get('admin/logs.html',array('as' => 'logs.html',function(){
-			return View::make('admin.logs')->nest('dropdown',Auth::user()->dropdownMenu());
-			},
-			'before' => array('auth','capacidad:4,msg')
-		));
-
+	return View::make('admin.logs')->nest('dropdown',Auth::user()->dropdownMenu());
+	},
+	'before' => array('auth','capacidad:4,msg')
+));
 //EE de equipo (capacidad = 6) y administradores de la aplicación (capacidad = 4)
 
 // recursosController routes ***********************
@@ -78,9 +70,12 @@ Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','bef
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
+
 //Temporales
 Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::get('admin/getpuestosSinEspacio',array('uses'=>'recursosController@getpuestosSinEspacio','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::get('admin/getpuestosSinEspacio',array('uses'=>'recursosController@getpuestosSinEspacio','before' => array('ajax_check','auth','capacidad:4-6,msg')));
+Route::post('admin/addpuestoaespacio',array('uses'  => 'recursosController@addpuestoaespacio','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -88,7 +83,6 @@ Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','b
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
 Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Edita propiedades grupo (nombre y descripción)
 Route::post('admin/delgrupo',array('uses' => 'GruposController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Elimian grupo
-Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
 Route::post('admin/addPersona',array('uses' => 'GruposController@addPersona','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::post('admin/removePersonas',array('uses' => 'GruposController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('admin/htmlCheckboxPersonas',array('uses' => 'GruposController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));	
@@ -103,22 +97,16 @@ Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'Valida
 //PdfController routes *****************************
 Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
 
-
-
 //Calendarios
 Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
 Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
-
 Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
-
 
 //EventoController
 Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
 Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
-
 Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
 Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
-
 Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
 Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
 Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
@@ -126,43 +114,29 @@ Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => 
 //Atención de eventos
 Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
 Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
-
-
-
-
-
-
 Route::post('admin/ajaxActiveUser',array('uses' => 'UsersController@activeUserbyajax','before' => array('auth','ajax_check')));
 Route::post('admin/ajaxDesactiveUser',array('uses' => 'UsersController@desactiveUserbyajax','before' => array('auth','ajax_check')));
 Route::post('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
-
-
-
-
-
 Route::get('print',array('uses' => 'CalendarController@imprime'));
 
+App::missing(function($exception){
+  //Ajax request
+  //if(Request::ajax()) App::abort('404');//Redirect::to(route('wellcome'));    
+    
+  $pagetitle   = Config::get('msg.404pagetitleLogin');
+  $paneltitle  = Config::get('msg.404paneltitle');
+  $msg         = Config::get('msg.404msg');
+  $alertLevel  = 'warning'; 
+  return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+});
 
-
-
-App::missing(function($exception)
-	{
-    $pagetitle   = Config::get('msg.404pagetitleLogin');
-    $paneltitle  = Config::get('msg.404paneltitle');
-    $msg         = Config::get('msg.404msg');
-    $alertLevel  = 'warning'; 
-    return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-	});
-
-
-App::error(function(ModelNotFoundException $e)
-  {
-    $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
-    $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
-    $msg 					= Config::get('msg.objectNoFoundmsg');
-    $alertLevel 	= 'danger';
-		return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-  });
+App::error(function(ModelNotFoundException $e){
+  $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
+  $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
+  $msg 					= Config::get('msg.objectNoFoundmsg');
+  $alertLevel 	= 'danger';
+	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+});
 
 Route::get('test',array('as'=>'test',function(){
   echo implode(',',array_keys(Config::get('options.tipoRecursos')));

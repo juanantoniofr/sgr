@@ -1,6 +1,14 @@
 <?php
 class recursosController extends BaseController{
-   
+  
+  /**
+    * // Obtiene los items (equipos o espacios) de un espacio o tipoequipos
+    *
+    * @param $idrecurso int
+    *
+    * @return $result array()
+    *
+  */ 
   public function getitems(){
 
     //Input
@@ -344,7 +352,7 @@ class recursosController extends BaseController{
     * @return string html checboxes 
   */
   public function recursosSinGrupo(){
-    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->get());
+    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.espacio'))->orwhere('tipo','=',Config::get('options.tipoequipos'))->get());
   }
 
   /**
@@ -353,7 +361,43 @@ class recursosController extends BaseController{
     * @return string html checkboxes
   */
   public function getpuestosSinEspacio(){
-    return View::make('admin.html.checkboxesPuestos')->with('puestos',Recurso::where('espacio_id','=','0')->get());
+    return View::make('admin.html.checkboxesPuestos')->with('puestos',Recurso::where('espacio_id','=','0')->where('tipo','=',Config::get('options.puesto'))->get());
+  }
+
+  /**
+    * @param Input::get('espacio_id') int indetificador de grupo
+    * @param Input::get('idpuestos') array indentificadores de recursos añadir al grupo
+    *
+    * @return $result array(array,boleano,string)
+  */
+  //temporal
+  public function addpuestoaespacio(){
+    //Input
+    $id = Input::get('espacio_id','');
+    $idpuestos = Input::get('idpuestos',array());
+    //Output 
+    $result = array('errors' => array(),
+                    'msg'    => '',    
+                    'error'  => false,);
+    //Validate
+    $rules = array('espacio_id' => 'required|exists:recursos,id',);
+
+    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'   => Config::get('msg.idnotfound'),);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+      
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      foreach ($idpuestos as $idpuesto) {
+        Recurso::find($idpuesto)->update(array('espacio_id'=>$id));
+      }
+      $result['msg'] = Config::get('msg.success');
+    }
+    return $result;
   }
 
   /**
@@ -395,7 +439,6 @@ class recursosController extends BaseController{
     * @param void
     * @return View::make('admin.html.optionEspacios')
   */
-
   public function htmlOptionEspacios(){
     $espacios = Recurso::where('tipo','=',Config::get('options.espacio'))->get();
     return View::make('admin.html.optionEspacios')->with(compact('espacios'));

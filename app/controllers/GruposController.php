@@ -33,6 +33,7 @@ class GruposController extends BaseController {
       foreach ($idrecursos as $idrecurso) {
         Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
       }
+      $result['msg'] = Config::get('msg.success');
     }
     return $result;
   }
@@ -109,10 +110,9 @@ class GruposController extends BaseController {
     }
 
     return $htmloptionsrecursos;
-    
   }
-	/**
-		*
+	
+  /**
 		*	@param Input::get('grupo_id')		int
 		*
 		*	@return $result array
@@ -245,12 +245,12 @@ class GruposController extends BaseController {
 	}
 
   /**
-  		* Ajax function: devuelve la lista de grupos en forma de tabla
-  		*
-  		* @param Input::get('sortby')	string
-  		* @param Input::get('order')	string
-  		*
-  		* @return View::make('admin.recursos.table)  
+  	* Ajax function: devuelve la lista de grupos en forma de tabla
+  	*
+  	* @param Input::get('sortby')	string
+  	* @param Input::get('order')	string
+  	*
+  	* @return View::make('admin.recursos.table)  
   */
 	public function getTable(){
     	

@@ -381,39 +381,38 @@ $(function(e){
   
   //Temporal (añade puestos que ya existen a espacios)
   //Ajax: Añadir Puesto a espacio 
-  /*$('#fm_addrecursotogrupo_save').on('click',function(e){
+  $('#fm_addPuestoExistente_save').on('click',function(e){
     e.preventDefault();
     showGifEspera();
     $.ajax({
       type: "POST",
-      url:  "addrecursotogrupo",
-      data: $('form#fm_addrecursotogrupo').serialize(),
+      url:  "addpuestoaespacio",
+      data: $('form#fm_addPuestoExistente').serialize(),
       success: function($respuesta){
-          if($respuesta.error == true){ 
-            hideGifEspera(); 
-            $('.divmodal_msgError').html('').fadeOut();
-            $('#fm_addrecursotogrupo_textError').append($respuesta.smg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
-          }
-          else {
-            hideGifEspera();
-            $('#m_addrecursotogrupo').modal('hide');   
-            showMsg($respuesta['msg']);
-            getListado(); 
-          }
+        if($respuesta.error == true){ 
+          hideGifEspera(); 
+          $('.divmodal_msgError').html('').fadeOut();
+          $('#fm_addPuestoExistente_textError').append($respuesta.smg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
+        }
+        else {
+          hideGifEspera();
+          $('#m_addPuestoExistente').modal('hide');   
+          showMsg($respuesta['msg']);
+          getListado($('form#fm_addPuestoExistente input[name="espacio_id"]').val());
+        }
       },
       error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
       }
-    });
-  });*/
+    });//<!-- ajax -->
+  });
     
   function activeLinkaddPuestoExistente(){
     //Muestra ventana modal addPuestoExistente
     $(".linkaddPuestoExistente").on('click',function(e){
       e.preventDefault();
       showGifEspera();
-      console.log('hola');
       $('#m_addPuestoExistente_nombre').html($(this).data('nombre'));
       $('form#fm_addPuestoExistente input[name="espacio_id"]').val($(this).data('idespacio'));
       $.ajax({
@@ -421,7 +420,6 @@ $(function(e){
         url:  "getpuestosSinEspacio",
         data: {id:$(this).data('idespacio')},
         success: function($html){
-          console.log($html);
           hideGifEspera();
           $('#m_addPuestoExistente span#PuestoSinEspacio').html($html);
           hideMsg();
@@ -468,24 +466,24 @@ $(function(e){
     });//<!-- ajax -->
   });
     
-    //Muestra ventana modal para eliminar grupo
-    function activelinkdelgrupo(){
-        $(".linkdelgrupo").on('click',function(e){
-            e.preventDefault();
-            if($(this).data('numeroelementos') > 0){
-                $('#malert_text').html('No se pueden eliminar un grupo con recursos asignados.');
-                $('#m_alert').modal('show');
-            }
-            else {
-                $idgrupo = $(this).data('idgrupo');
-                $nombre = $(this).data('nombre');
-                $('#mdgrupo_nombre').html($nombre);
-                $('form#fm_delgrupo input[name="grupo_id"]').val($idgrupo);
-                hideMsg();
-                $('#m_delgrupo').modal('show');
-            }
-        });
-    }
+  //Muestra ventana modal para eliminar grupo
+  function activelinkdelgrupo(){
+    $(".linkdelgrupo").on('click',function(e){
+      e.preventDefault();
+      if($(this).data('numeroelementos') > 0){
+        $('#malert_text').html('No se pueden eliminar un grupo con recursos asignados.');
+        $('#m_alert').modal('show');
+      }
+      else {
+        $idgrupo = $(this).data('idgrupo');
+        $nombre = $(this).data('nombre');
+        $('#mdgrupo_nombre').html($nombre);
+        $('form#fm_delgrupo input[name="grupo_id"]').val($idgrupo);
+        hideMsg();
+        $('#m_delgrupo').modal('show');
+      }
+    });
+  }
 
     //Edit grupo    
     //Ajax: Salvar edición de grupo
@@ -724,33 +722,40 @@ $(function(e){
     activelinkaddequipo();
 
     activeLinkeditpuesto();
-    activelinkverpuestos();
-    activelinkverequipos();
-
+    //activelinkverpuestos();
+    //activelinkverequipos();
+    activelinkveritems();
     activeLinkaddPuestoExistente();
   }
 
-  function activelinkverpuestos(){
+  /*function activelinkverpuestos(){
     $('.linkVerPuestos').on('click', function(e){
       e.preventDefault();
-      verPuestos($(this).data('idrecurso'));
+      verItems($(this).data('idrecurso'));
+    });
+  }*/
+
+  function activelinkveritems(){
+    $('.linkVerItems').on('click', function(e){
+      e.preventDefault();
+      verItems($(this).data('idrecurso'));
     });
   }
 
-  function activelinkverequipos(){
+  /*function activelinkverequipos(){
     $('.linkVerEquipos').on('click', function(e){
       e.preventDefault();
       verEquipos($(this).data('idrecurso'));
     });
+  }*/
+
+  function verItems($recursoid){
+    $('#items_'+$recursoid).fadeToggle();
   }
 
-  function verPuestos($recursoid){
-    $('#puestos_'+$recursoid).fadeToggle();
-  }
-
-  function verEquipos($recursoid){
+  /*function verEquipos($recursoid){
     $('#equipos_'+$recursoid).fadeToggle();
-  }
+  }*/
 
   function activelinkdisabled(){
     $(".disabled").on('click',function(e){
@@ -840,12 +845,12 @@ $(function(e){
       url:"htmlOptionEspacios",
       data:{},
       success:function($html){
-          $($idSelect).html($html);
-          if ($idInput != '') $($idInput).val($optionSelected);
+        $($idSelect).html($html);
+        if ($idInput != '') $($idInput).val($optionSelected);
       },
       error:function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
       }
     }); 
   }
@@ -856,13 +861,15 @@ $(function(e){
       url:"getTableGrupos",
       data:{'orderby':'','order':''},
       success:function($html){
-          $('#tableRecursos').html($html);
-          verPuestos($idrecurso);
-          activelinks();
+        $('#tableRecursos').html($html);
+        //verPuestos($idrecurso);
+        //verItems($idrecurso);
+        $('#items_'+$idrecurso).fadeIn();
+        activelinks();
       },
       error:function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
       }
     });//<!--./ajax-->
   }

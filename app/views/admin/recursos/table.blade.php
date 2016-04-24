@@ -74,12 +74,12 @@
                   <!-- Puestos -->
                   @if( $recurso->tipo == Config::get('options.espacio') )
                     <!-- añadir puesto existente -->
-                    <a href="#" title="Añadir puesto existente" class = "linkaddPuestoExistente" data-nombre="{{$recurso->nombre}}" data-idgrupo="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
+                    <a href="#" title="Añadir puesto existente" class = "linkaddPuestoExistente" data-nombre="{{$recurso->nombre}}" data-idespacio="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
                     <!-- Nuevo Puesto -->
                     <a href="#" title="Nuevo Puesto" class = "linkAddPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Puestos -->
                     @if($recurso->puestos->count() > 0)
-                      <a href="#" title="Ver Puestos" class = "linkVerPuestos text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
+                      <a href="#" title="Ver Puestos" class = "linkVerItems text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                     @endif    
                   @endif
 
@@ -91,7 +91,7 @@
                     <a href="#" title="Nuevo Equipo" class = "linkAddEquipo text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Equipos -->
                     @if($recurso->equipos->count() > 0)
-                      <a href="#" title="Ver Equipos" class = "linkVerEquipos text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
+                      <a href="#" title="Ver Equipos" class = "linkVerItems text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                     @endif    
                   @endif
 
@@ -99,7 +99,7 @@
                 <span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span>
                 
                 <!-- puestos -->
-                <div id="puestos_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
+                <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                 
                   <ul class="list-unstyled">
                   @foreach ($recurso->puestos as $puesto)
@@ -124,7 +124,7 @@
                 </div>
 
                 <!-- equipos -->
-                <div id="equipos_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
+                <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                   <ul class="list-unstyled">
                   @foreach ($recurso->equipos as $equipo)
                     <li>

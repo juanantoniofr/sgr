@@ -4,7 +4,7 @@ class Recurso extends Eloquent {
 
  	protected $table = 'recursos';
 
- 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id','deleted_at','disabled');
+ 	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id','espacio_id','tipoequipo_id','deleted_at','disabled');
   protected $softDelete = true;
 
 	/**

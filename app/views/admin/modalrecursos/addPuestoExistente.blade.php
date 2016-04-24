@@ -1,5 +1,5 @@
 <!-- / Modal añade puesto existente a espacio  -->
-<div class="modal fade myModal-lg " id="addPuestoExistente" tabindex="-15" role="dialog" aria-hidden="true">
+<div class="modal fade myModal-lg " id="m_addPuestoExistente" tabindex="-15" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addPuestoExistente'))}}          
   <div class="modal-dialog modal-lg">
      
@@ -21,7 +21,7 @@
       <div class="modal-footer">
         <div class="col-lg-12" style="margin-top:10px">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" id ="fm_addPuestoExistente_save">
+          <button type="submit" class="btn btn-primary" id="fm_addPuestoExistente_save">
             <i class="fa fa-save fa-fw"></i> Salvar cambios
           </button>
         </div>
