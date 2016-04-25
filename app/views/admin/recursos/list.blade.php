@@ -71,7 +71,7 @@
   {{ $modalAddPuestoExistente or '' }}
 
   <!-- Equipos -->
-  {{ $modalAddEquipo          or ''}}
+  {{ $modalAddEquipoExistente or ''}}
 @stop
 
 @section('js')

@@ -86,7 +86,7 @@
                   <!-- Equipos -->
                   @if( $recurso->tipo == Config::get('options.tipoequipos') )
                     <!-- añadir equipo existente -->
-                    <a href="#" title="Añadir equipo existente" class = "addEquipoExistente" data-nombre="{{$recurso->nombre}}" data-idgrupo="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
+                    <a href="#" title="Añadir equipo existente" class = "addEquipoExistente" data-nombre="{{$recurso->nombre}}" data-idtipoequipo="{{$recurso->id}}" ><i class="fa fa-plus fa-fw"></i></a>
                     <!-- Nuevo Equipo -->
                     <a href="#" title="Nuevo Equipo" class = "linkAddEquipo text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Equipos -->
