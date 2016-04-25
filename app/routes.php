@@ -74,7 +74,12 @@ Route::get('getitems',array('uses'=>'recursosController@getitems','before' => ar
 //Temporales
 Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::get('admin/getpuestosSinEspacio',array('uses'=>'recursosController@getpuestosSinEspacio','before' => array('ajax_check','auth','capacidad:4-6,msg')));
+Route::get('admin/getequiposSinModelo',array('uses'=>'recursosController@getequiposSinModelo','before' => array('ajax_check','auth','capacidad:4-6,msg')));
 Route::post('admin/addpuestoaespacio',array('uses'  => 'recursosController@addpuestoaespacio','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+
+Route::post('admin/addequipoamodelo',array('uses'  => 'recursosController@addequipoamodelo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+
+
 Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
 
 //GruposController routes ************************

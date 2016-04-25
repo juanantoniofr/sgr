@@ -407,6 +407,35 @@ $(function(e){
       }
     });//<!-- ajax -->
   });
+
+  //Temporal (añade equipos que ya existen a tipoequipos)
+  //Ajax: Añadir Puesto a espacio 
+  $('#fm_addEquipoExistente_save').on('click',function(e){
+    e.preventDefault();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "addequipoamodelo",
+      data: $('form#fm_addEquipoExistente').serialize(),
+      success: function($respuesta){
+        if($respuesta.error == true){ 
+          hideGifEspera(); 
+          $('.divmodal_msgError').html('').fadeOut();
+          $('#fm_addEquipoExistente_textError').append($respuesta.smg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
+        }
+        else {
+          hideGifEspera();
+          $('#m_addEquipoExistente').modal('hide');   
+          showMsg($respuesta['msg']);
+          getListado($('form#fm_addEquipoExistente input[name="tipoequipo_id"]').val());
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });//<!-- ajax -->
+  });
     
   function activeLinkaddPuestoExistente(){
     //Muestra ventana modal addPuestoExistente
@@ -424,6 +453,32 @@ $(function(e){
           $('#m_addPuestoExistente span#PuestoSinEspacio').html($html);
           hideMsg();
           $('#m_addPuestoExistente').modal('show');
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });//<!-- ajax -->
+    });
+  }
+
+  //Equipo Existente
+  function activeLinkaddEquipoExistente(){
+    //Muestra ventana modal addEquipoExistente
+    $(".linkaddEquipoExistente").on('click',function(e){
+      e.preventDefault();
+      showGifEspera();
+      $('#m_addEquipoExistente_nombre').html($(this).data('nombre'));
+      $('form#fm_addEquipoExistente input[name="tipoequipo_id"]').val($(this).data('idtipoequipo'));
+      $.ajax({
+        type: "GET",
+        url:  "getequiposSinModelo",
+        data: {id:$(this).data('idtipoequipo')},
+        success: function($html){
+          hideGifEspera();
+          $('#m_addEquipoExistente span#EquipoSinModelo').html($html);
+          hideMsg();
+          $('#m_addEquipoExistente').modal('show');
         },
         error: function(xhr, ajaxOptions, thrownError){
           hideGifEspera();
@@ -718,22 +773,13 @@ $(function(e){
     activelinkaddpersonas();
     activelinkremovepersonas();
     activelinkaddpuesto();
-
     activelinkaddequipo();
-
     activeLinkeditpuesto();
-    //activelinkverpuestos();
-    //activelinkverequipos();
     activelinkveritems();
     activeLinkaddPuestoExistente();
-  }
 
-  /*function activelinkverpuestos(){
-    $('.linkVerPuestos').on('click', function(e){
-      e.preventDefault();
-      verItems($(this).data('idrecurso'));
-    });
-  }*/
+    activeLinkaddEquipoExistente();
+  }
 
   function activelinkveritems(){
     $('.linkVerItems').on('click', function(e){
@@ -742,20 +788,9 @@ $(function(e){
     });
   }
 
-  /*function activelinkverequipos(){
-    $('.linkVerEquipos').on('click', function(e){
-      e.preventDefault();
-      verEquipos($(this).data('idrecurso'));
-    });
-  }*/
-
   function verItems($recursoid){
     $('#items_'+$recursoid).fadeToggle();
   }
-
-  /*function verEquipos($recursoid){
-    $('#equipos_'+$recursoid).fadeToggle();
-  }*/
 
   function activelinkdisabled(){
     $(".disabled").on('click',function(e){

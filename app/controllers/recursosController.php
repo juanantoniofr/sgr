@@ -352,7 +352,7 @@ class recursosController extends BaseController{
     * @return string html checboxes 
   */
   public function recursosSinGrupo(){
-    return View::make('admin.modalgrupos.recursosSinGrupo')->with('recursos',Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.espacio'))->orwhere('tipo','=',Config::get('options.tipoequipos'))->get());
+    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.espacio'))->orwhere('tipo','=',Config::get('options.tipoequipos'))->get());
   }
 
   /**
@@ -361,7 +361,16 @@ class recursosController extends BaseController{
     * @return string html checkboxes
   */
   public function getpuestosSinEspacio(){
-    return View::make('admin.html.checkboxesPuestos')->with('puestos',Recurso::where('espacio_id','=','0')->where('tipo','=',Config::get('options.puesto'))->get());
+    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('espacio_id','=','0')->where('tipo','=',Config::get('options.puesto'))->get());
+  }
+
+  /**
+    * //checboxes html 
+    * @param void
+    * @return string html checkboxes
+  */
+  public function getequiposSinModelo(){
+    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('tipoequipo_id','=','0')->where('tipo','=',Config::get('options.equipo'))->get());
   }
 
   /**
@@ -374,7 +383,7 @@ class recursosController extends BaseController{
   public function addpuestoaespacio(){
     //Input
     $id = Input::get('espacio_id','');
-    $idpuestos = Input::get('idpuestos',array());
+    $idpuestos = Input::get('iditems',array());
     //Output 
     $result = array('errors' => array(),
                     'msg'    => '',    
@@ -394,6 +403,42 @@ class recursosController extends BaseController{
     else{
       foreach ($idpuestos as $idpuesto) {
         Recurso::find($idpuesto)->update(array('espacio_id'=>$id));
+      }
+      $result['msg'] = Config::get('msg.success');
+    }
+    return $result;
+  }
+
+  /**
+    * @param Input::get('espacio_id') int indetificador de grupo
+    * @param Input::get('idpuestos') array indentificadores de recursos añadir al grupo
+    *
+    * @return $result array(array,boleano,string)
+  */
+  //temporal
+  public function addequipoamodelo(){
+    //Input
+    $id = Input::get('tipoequipo_id','');
+    $idequipos = Input::get('iditems',array());
+    //Output 
+    $result = array('errors' => array(),
+                    'msg'    => '',    
+                    'error'  => false,);
+    //Validate
+    $rules = array('tipoequipo_id' => 'required|exists:recursos,id',);
+
+    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'   => Config::get('msg.idnotfound'),);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+      
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      foreach ($idequipos as $idequipo) {
+        Recurso::find($idequipo)->update(array('tipoequipo_id'=>$id));
       }
       $result['msg'] = Config::get('msg.success');
     }
