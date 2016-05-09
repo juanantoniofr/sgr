@@ -13,7 +13,7 @@
             <div class="modal-body">
                 <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_disabledrecurso_textError"></div>
                 
-                <div class="alert alert-danger" role = "alert">
+                <div class="alert alert-danger text-center" role = "alert">
                     ¿Estás seguro que deseas <b>deshabilitar</b> el recurso: "<b><span id="m_disabled_nombre"></span>"</b> ?
                 </div>
 
@@ -27,7 +27,7 @@
                 
                 <!-- mensaje -->  
                 <div class="form-group">
-                    <label for="motivo"  class="control-label" >Motivo <small>(opcional)</small></label> 
+                    <label for="motivo"  class="control-label" >Mensaje para usuarios con reserva en este recurso <small>(opcional)</small>:</label> 
                     <textarea class="form-control" rows="5" name="motivo" id="fm_disabledrecurso_motivo"></textarea>
                 </div>
                 

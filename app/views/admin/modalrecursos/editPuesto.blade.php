@@ -1,4 +1,4 @@
-<!-- / Modal add puesto  -->
+<!-- / Modal edit puesto  -->
 <div class="modal fade myModal-lg" id="m_editpuesto" tabindex="-13" role="dialog" aria-hidden="true" aria-labelledby="modalEditpuestoLabel">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_editpuesto'))}}
   <div class="modal-dialog modal-lg">

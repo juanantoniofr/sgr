@@ -1,5 +1,4 @@
 <table class="table table-hover table-striped">
-    
   <thead>
     <tr>
       <th style="width:2%;text-align:center" >Id.</th>
@@ -56,7 +55,7 @@
         <td>
           <ul class="list-unstyled">
             @foreach($grupo->recursos as $recurso)
-             <li > 
+              <li > 
                 @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) ) 
                   <!-- editar -->
                   <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}"
@@ -67,7 +66,7 @@
                     @endif    
                   ><i class="fa fa-pencil fa-fw"></i></a>
                   <!-- eliminar -->
-                  <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" 
+                  <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" data-numeroeventos="{{$recurso->eventofuturo()->count()}}"
                     @if( $recurso->tipo == Config::get('options.espacio') ) 
                       data-numeroelementos = "{{ $recurso->puestos->count()}}"
                     @elseif( $recurso->tipo == Config::get('options.tipoequipos') ) 
@@ -106,7 +105,6 @@
                       <a href="#" title="Ver Equipos" class = "linkVerItems text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                     @endif    
                   @endif
-
                 @endif
                 <span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span>
                 
@@ -122,7 +120,7 @@
                         <!-- editar -->
                         <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Puesto -->
-                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
+                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" data-numeroeventos="{{$puesto->eventofuturo()->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($puesto->disabled)
                           <!-- habilitar Puesto -->
                           <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto"><i class="fa fa-toggle-off fa-fw"></i></a>
@@ -147,7 +145,7 @@
                         <!-- editar -->
                         <a href="#" title="Editar Equipo" class="linkEditEquipo text-info" data-idrecurso="{{$equipo->id}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Equipo -->
-                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" ><i class="fa fa-trash-o fa-fw"></i></a>
+                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" data-numeroeventos="{{$equipo->eventofuturo()->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($equipo->disabled)
                           <!-- habilitar Equipo -->
                           <a id="link_{{$equipo->id}}" href="" class = "enabled text-success" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Habilitar equipo"><i class="fa fa-toggle-off fa-fw"></i></a>
@@ -160,7 +158,6 @@
                     </ul>
                   </div>
                 @endif
-             
               </li>
             @endforeach
           </ul>

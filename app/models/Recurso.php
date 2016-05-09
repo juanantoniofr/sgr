@@ -6,21 +6,6 @@ class Recurso extends Eloquent {
 
  	protected $fillable = array('acl', 'admin_id','descripcion','nombre', 'tipo', 'grupo_id','espacio_id','tipoequipo_id','deleted_at','disabled');
   protected $softDelete = true;
-
-	/**
-    * @param void
-    * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
-  */
-  public function visible($capacidad = ''){
-
-    $visible = false;
-    if (empty($capacidad)) $capacidad = Auth::user()->capacidad;
-    //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
-    $permisos = json_decode($this->acl,true); //array con key = 'r', y value igual a '2,3'
-    if (strpos($permisos['r'],$capacidad) !== false) $visible = true; // si la capacidad del usuario forma parte de la cadena $permisos['r'], entonces es visible (puede reservar)
-      
-    return $visible;
-  }    
     
   //devuelve los puestos de un recurso (espacio) (Relación Reflexiva)
   public function puestos(){
@@ -51,8 +36,34 @@ class Recurso extends Eloquent {
     return $this->hasMany('Evento','recurso_id','id');
   }
 
-  public function usuariopuedereservartodoslospuestos($id){
+  /**
+    * //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
+  */
+  public function eventofuturo(){
+      return $this->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')));
+  }
 
+  /**
+    * @param void
+    * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
+  */
+  public function visible($capacidad = ''){
+
+    $visible = false;
+    if (empty($capacidad)) $capacidad = Auth::user()->capacidad;
+    //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
+    $permisos = json_decode($this->acl,true); //array con key = 'r', y value igual a '2,3'
+    if (strpos($permisos['r'],$capacidad) !== false) $visible = true; // si la capacidad del usuario forma parte de la cadena $permisos['r'], entonces es visible (puede reservar)
+      
+    return $visible;
+  }   
+
+  /**
+    * Devuelve true si usuario identificado por $id puede reservar todos lo puestos de un recurso tipo espacio
+    * @param $id int (identificador de usuario)
+    * @return boolean 
+  */
+  public function usuariopuedereservartodoslospuestos($id){
     if (User::findOrFail($id)->isUser() || $this->puestos->count() == 0 )  return false;
     return true;    
   }
@@ -62,7 +73,6 @@ class Recurso extends Eloquent {
     *   @param $id 
     *   @return boolean
   */
-
   public function esAtendidoPor($id = ''){
     $result = false;
         
@@ -99,48 +109,41 @@ class Recurso extends Eloquent {
     }
       
     return $validacion;
-
   }
     
-    public function scopetipoDesc($query)
-    {
-        return $query->orderBy('tipo','DESC');
-    }
+  public function scopetipoDesc($query){
+    return $query->orderBy('tipo','DESC');
+  }
 
-	public function scopegrupoDesc($query)
-    {
-        return $query->orderBy('grupo','DESC');
-    }   
+	public function scopegrupoDesc($query){
+    return $query->orderBy('grupo','DESC');
+  }   
  
-    
-    public function perfiles(){
-        $perfiles = array();
-        $aPerfilesSGR = Config::get('options.perfiles');
-        $aclrecurso = json_decode($this->acl,true);
-        $capacidades = explode(',',$aclrecurso['r']);
-        foreach ($capacidades as $capacidad) {
-          $perfiles[] = $aPerfilesSGR[$capacidad]; 
-        }
-        return $perfiles;
+  public function perfiles(){
+    $perfiles = array();
+    $aPerfilesSGR = Config::get('options.perfiles');
+    $aclrecurso = json_decode($this->acl,true);
+    $capacidades = explode(',',$aclrecurso['r']);
+    foreach ($capacidades as $capacidad) {
+      $perfiles[] = $aPerfilesSGR[$capacidad]; 
     }
+    return $perfiles;
+  }
 
-    public function tipoGestionReservas(){
-
-        $result = 'No está definida....';
-        $modo = '1';
-        $aclrecurso = json_decode($this->acl,true);
-        if (isset($aclrecurso['m'])) $modo = $aclrecurso['m'];
-
-        switch ($modo) {
-            case 0: //Gestión atendida con validación
-                $result = Config::get('options.gestionAtendida');
-                break;
-            case 1: //Gestión atendida sin validación
-                $result = Config::get('options.gestionDesatendida');
-                break;
-        }
-        
-        return $result;
-    }
+  public function tipoGestionReservas(){
+    $result = 'No está definida....';
+    $modo = '1';
+    $aclrecurso = json_decode($this->acl,true);
+    if (isset($aclrecurso['m'])) $modo = $aclrecurso['m'];
+      switch ($modo) {
+        case 0: //Gestión atendida con validación
+          $result = Config::get('options.gestionAtendida');
+          break;
+        case 1: //Gestión atendida sin validación
+          $result = Config::get('options.gestionDesatendida');
+          break;
+       }
+    return $result;
+  }
 
 }

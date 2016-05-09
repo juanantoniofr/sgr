@@ -207,8 +207,8 @@
 
             <div class="modal-body">
         
-                <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el usuario: "<b><span id="infoUsuario"></span>"</b> ?</div>
-                <div class="alert alert-warning"> El usuario se eliminará de forma permanente.</div>
+                <div class="alert alert-danger text-center" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el usuario: "<b><span id="infoUsuario"></span>"</b> ?</div>
+                <div class="alert alert-warning text-center" > El usuario se eliminará de forma permanente.</div>
        
             </div><!-- ./.modal-body -->
 

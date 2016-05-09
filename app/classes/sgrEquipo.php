@@ -37,7 +37,7 @@
 		}
 
 		public function enabled(){
-			$this->disabled =  0;
+			$this->recurso->disabled =  0;
 			return true;
 		}
 

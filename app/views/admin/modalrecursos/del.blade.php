@@ -13,9 +13,9 @@
             <div class="modal-body">
                 <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delrecurso_textError"></div>
                 <!--Div alert --> 
-                <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el recurso: "<b><span id="mdrecurso_nombre"></span>"</b> ?</div>
+                <div class="alert alert-danger text-center" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el recurso: "<b><span id="mdrecurso_nombre"></span>"</b> ?</div>
                 <!--Div warning --> 
-                <div class="alert alert-warning"> El recurso se eliminará de forma permanente y se borrarán todos las reservas pendientes de realización.... </div>
+                <div class="alert alert-warning text-center"> El recurso se eliminará de forma permanente</div>
                 <div class="form-group hidden">
                     {{Form::text('idrecurso','',array('class' => 'form-control'))}}
                 </div>  

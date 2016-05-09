@@ -24,7 +24,7 @@
       <div class="panel-body">
         
           @if (Session::has('message'))
-              <div class="alert alert-success alert-dismissable">
+              <div class="alert alert-success text-center alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                 {{ Session::get('message') }}
               </div>

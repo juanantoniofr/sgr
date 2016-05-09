@@ -25,14 +25,14 @@
 		   
 			<!-- msg for user -->
 			@if($solapamientos)
-			   	<div class="alert alert-danger" role="alert" >
+			   	<div class="alert alert-danger text-center" role="alert" >
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				    	<strong>No se pudo aprobar la solicitud: solapamiento con solicitud ya aprobada.</strong>
 				</div>
 			@endif
 
 			@if(!empty($msg))
-			   	<div class="alert alert-success" role="alert" >
+			   	<div class="alert alert-success text-center" role="alert" >
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				    	{{ $msg }}
 				</div>

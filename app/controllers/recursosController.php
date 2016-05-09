@@ -194,25 +194,27 @@ class recursosController extends BaseController{
     //Input
     $id = Input::get('id','');
     $nombre = Input::get('nombre');
-    $tipo =  Input::get('tipo'); //espacio|puesto|equipo
+    $tipo =  Input::get('tipo'); //espacio|puesto|tipoequipo|equipo
     $grupo_id = Input::get('grupo_id',0);
     $espacio_id = Input::get('espacio_id',0);
+    $tipoequipo_id = Input::get('tipoequipo_id',0);
     $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
     $descripcion = Input::get('descripcion','');
     $id_lugar = Input::get('id_lugar','');
     $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
     //out
-    $result = array('error' => false,
-                    'msg'   => '',
-                    'errors' => array());
+    $result = array('error'   => false,
+                    'msg'     => '',
+                    'errors'  => array());
     
     //Validación de formulario   
-    $rules = array( 'id'          => 'required|exists:recursos',
-                    'nombre'      => 'required|unique:recursos,nombre,'.Input::get('id'),
-                    'tipo'        => 'required|in:'.implode(',',Config::get('options.recursos')),  
-                    'grupo_id'    => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
-                    'espacio_id'  => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
-                    'modo'        => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
+    $rules = array( 'id'              => 'required|exists:recursos',
+                    'nombre'          => 'required|unique:recursos,nombre,'.Input::get('id'),
+                    'tipo'            => 'required|in:'.implode(',',Config::get('options.recursos')),  
+                    'grupo_id'        => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
+                    'espacio_id'      => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
+                    'tipoequipo_id'   => 'required_if:tipo,'.Config::get('options.equipo').'|exists:recursos,id',
+                    'modo'            => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
      $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
                         'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
                         'unique'                  => 'Existe un recurso con el mismo nombre...',
@@ -231,14 +233,15 @@ class recursosController extends BaseController{
       $result['errors'] = $validator->errors()->toArray();
     }
     else{  
-      $data = array('nombre'      => $nombre,
-                    'tipo'        => $tipo,
-                    'modo'        => $modo, 
-                    'grupo_id'    => $grupo_id,
-                    'espacio_id'  => $espacio_id,
-                    'descripcion' => $descripcion,
-                    'id_lugar'    => $id_lugar,
-                    'acl'         => sgrACL::buildJsonAcl($modo,$roles),);
+      $data = array('nombre'        => $nombre,
+                    'tipo'          => $tipo,
+                    'modo'          => $modo, 
+                    'grupo_id'      => $grupo_id,
+                    'espacio_id'    => $espacio_id,
+                    'tipoequipo_id' => $tipoequipo_id,
+                    'descripcion'   => $descripcion,
+                    'id_lugar'      => $id_lugar,
+                    'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
       $recurso = Recurso::find($id);
       $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
       $sgrRecurso->setRecurso($recurso);
@@ -472,12 +475,13 @@ class recursosController extends BaseController{
   } 
 
   /**
-    * //Devuelve todos los espacios 
-    * @param void
+    * //Devuelve todos los recurso del tipo Input::get('tipo') formateados como html options 
+    * @param Input::get('tipo') string
     * @return View::make('admin.html.optionEspacios')
   */
-  public function htmlOptionEspacios(){
-    $espacios = Recurso::where('tipo','=',Config::get('options.espacio'))->get();
+  public function htmlOptionrecursos(){
+    $tipoRecurso = Input::get('tipo','');
+    $espacios = Recurso::where('tipo','=',$tipoRecurso)->get();
     return View::make('admin.html.optionEspacios')->with(compact('espacios'));
   }
 

@@ -37,7 +37,7 @@
             </div>
           </form>
                   
-          <div class=""  id="success_recurselist_msg" style="display:none" role="alert">
+          <div class="text-center"  id="success_recurselist_msg" style="display:none" role="alert">
             <i class="fa fa-check fa-fw text-success"></i><span id="success_recurselist_textmsg"></span> 
           </div>
           
@@ -71,8 +71,9 @@
   {{ $modalAddPuestoExistente or '' }}
 
   <!-- Equipos -->
-  {{ $modalAddEquipoExistente or ''}}
-  {{ $modalAddEquipo          or ''}}
+  {{ $modalAddEquipoExistente or '' }}
+  {{ $modalAddEquipo          or '' }}
+  {{ $modalEditEquipo         or '' }}
 @stop
 
 @section('js')
@@ -84,6 +85,7 @@
   <script type="text/javascript">CKEDITOR.replace( 'fm_addpuesto_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_editpuesto_inputdescripcion' );</script>
+  <script type="text/javascript">CKEDITOR.replace( 'fm_editequipo_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_addequipo_inputdescripcion' );</script>
       
   {{HTML::script('assets/js/admin.js')}}

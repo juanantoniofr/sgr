@@ -52,7 +52,7 @@
    </div><!-- /.row -->
       @if (!empty($msgEmpty))
       
-          <div class='alert alert-danger' rol='alert'>{{ $msgEmpty }}</div>
+          <div class='alert alert-danger text-center' rol='alert'>{{ $msgEmpty }}</div>
       
       @endif
 

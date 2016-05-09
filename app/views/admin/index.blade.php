@@ -24,11 +24,11 @@
                 <h2><i class="fa fa-comment fa-fw"></i> Peticiones de alta </h2>   
             </div><!-- /.panel-heading -->
                 
-            <div class="alert alert-success alert-dismissible" role="alert" id="msgsuccess" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="alert alert-success alert-dismissible text-center" role="alert" id="msgsuccess" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <p id ="textmsgsuccess"></p>
             </div>   
                 
-            <div class="alert alert-danger alert-dismissible" role="alert" id="msgerror" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="alert alert-danger alert-dismissible text-center" role="alert" id="msgerror" style="display:none" ><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <p id ="textmsgerror"></p>
             </div> 
                 
@@ -42,7 +42,7 @@
                         </div><!-- /.list-group -->
                     @endforeach
                 @else
-                        <div class="alert alert-warning" role="alert">No hay peticiones pendientes</a>
+                        <div class="alert alert-warning text-center" role="alert">No hay peticiones pendientes</a>
                 @endif
             </div><!-- /.panel-body -->
         </div><!-- /.panel -->

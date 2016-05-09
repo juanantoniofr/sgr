@@ -68,7 +68,7 @@ Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before'
 Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
-Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOptionEspacios','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
 
 //Temporales
@@ -145,8 +145,8 @@ App::error(function(ModelNotFoundException $e){
 });
 
 Route::get('test',array('as'=>'test',function(){
-  $recurso = Recurso::find('57');
-  foreach ($recurso->equipos as $equipo) {
-    echo $equipo->nombre;
+  $recurso = Recurso::find('42');
+  foreach ($recurso->eventofuturo as $evento) {
+    echo $evento->titulo;
   }
  }));
