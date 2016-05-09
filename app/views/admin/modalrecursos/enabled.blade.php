@@ -16,6 +16,7 @@
                 <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>Habilitar</b> el recurso: "<b><span id="m_enabled_nombre"></span>"</b> ?</div>
                 <div class="alert alert-warning"> Al habilitar el recurso:
                     <ul>
+                        <li> Se habilitaran todos los elementos asociados a este recurso. </li>
                         <li> Se podrán añadir nuevas reservas o solicitudes de uso. </li>
                         <li> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso, inidcando que vuelve a estar habilitado. </li>
                     </ul>

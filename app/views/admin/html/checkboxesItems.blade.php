@@ -1,4 +1,4 @@
-@if ($puestos->count() > 0)
+@if ($items->count() > 0)
   @foreach($items as $item)
     <div class="checkbox">
       <label>

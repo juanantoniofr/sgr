@@ -20,6 +20,41 @@ class GruposController extends BaseController {
     return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente')->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente');
   }
 
+
+  /**
+    * @param Input::get('idgrupo') int indetificador de grupo
+    * @param Input::get('tipogrupo') string tipo de recursos para el grupo 
+    * 
+    * @return View::make string
+  */
+  public function recursosSinGrupo(){
+    //Input
+    $idgrupo    = Input::get('idgrupo','');
+    $tipogrupo  = Input::get('tipogrupo','');
+    //Output 
+    $result = array('errors' => array(),
+                    'html'   => '',    
+                    'error'  => false,);
+
+    //Validate
+    $rules = array( 'idgrupo'   => 'required|exists:grupoRecursos,id',
+                    'tipogrupo' => 'required|in:'.implode(',',Config::get('options.tipoGrupos')),);
+
+    $messages = array('required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'        => Config::get('msg.idnotfound'),
+                      'tipogrupo.in'  => 'El tipo de grupo no está definido...',);
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      $result['html'] = (string) View::make('admin.html.checkboxesItems')->with('items',Recurso::where('grupo_id','=','0')->where('tipo','=',$tipogrupo)->get());
+    }
+    return $result;
+  }
   /**
     * @param Input::get('grupo_id') int indetificador de grupo
     * @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
@@ -36,10 +71,10 @@ class GruposController extends BaseController {
                     'msg'    => '',    
                     'error'  => false,);
     //Validate
-    $rules = array('grupo_id' => 'required|exists:grupoRecursos,id',);
+    $rules = array( 'grupo_id'  => 'required|exists:grupoRecursos,id',);
 
-    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'exists'   => Config::get('msg.idnotfound'),);
+    $messages = array('required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'        => Config::get('msg.idnotfound'),);
     $validator = Validator::make(Input::all(), $rules, $messages);
       
     //Save Input or return error
@@ -218,7 +253,7 @@ class GruposController extends BaseController {
 						        'error'		=> false,);
 		//validate
 		$rules = array( 'nombre' => 'required|unique:grupoRecursos',
-                    'tipo'   => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),);
+                    'tipo'   => 'required|in:'.implode(',',Config::get('options.tipoGrupos')),);
    	$messages = array(  'required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
         	              'unique'        => 'Existe un <b>grupo</b> con el mismo nombre....',
                         'in'            => 'El valor especificado en tipo no está permitido....',);

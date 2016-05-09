@@ -59,7 +59,7 @@
 	public function disabled(){
 		
 		foreach ($this->equipos as $equipo) {
-			$puesto->disabled =  1;
+			$equipo->disabled =  1;
 		}		
 		$this->recurso->disabled = 1;
 		return true;
@@ -72,11 +72,13 @@
 		$this->recurso->save();
 		return true;
 	}
-
+	/**
+		* //elimina la relación equipo-tipoequipo y elimina el recurso (Softdelete)
+	*/
 	public function del(){
-		//Softdelete recurso
-    foreach ($this->equipos as $equipo) {
-			$equipo->delete();
+		foreach ($this->equipos as $equipo) {
+			$equipo->tipoequipo_id = 0;
+			$equipo->save();
 		}
 
 		$this->recurso->delete();		
@@ -91,6 +93,19 @@
 	}
 
 	public function update($data){
+		//si cambia el tipo
+		if ($data['tipo'] != $this->recurso->tipo){
+			foreach ($this->recurso->equipos as $equipo) {
+				$equipo->tipoequipo_id = 0;
+				$equipo->save();
+			}
+		}
+		//update ACL en todos los equipos
+		foreach ($this->recurso->equipos as $equipo) {
+				$equipo->acl = $data['acl'];
+				$equipo->save();
+			}
+		
 		return $this->recurso->update($data);
 	}
 

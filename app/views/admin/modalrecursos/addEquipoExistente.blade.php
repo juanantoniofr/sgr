@@ -1,4 +1,4 @@
-<!-- / Modal añade puesto existente a espacio  -->
+<!-- / Modal añade equipo existenten a tipoequipos  -->
 <div class="modal fade myModal-lg " id="m_addEquipoExistente" tabindex="-16" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addEquipoExistente'))}}          
   <div class="modal-dialog modal-lg">

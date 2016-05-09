@@ -11,7 +11,7 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delgrupo_textError"></div>
+                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delrecurso_textError"></div>
                 <!--Div alert --> 
                 <div class="alert alert-danger" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el recurso: "<b><span id="mdrecurso_nombre"></span>"</b> ?</div>
                 <!--Div warning --> 

@@ -72,6 +72,7 @@
 
   <!-- Equipos -->
   {{ $modalAddEquipoExistente or ''}}
+  {{ $modalAddEquipo          or ''}}
 @stop
 
 @section('js')
@@ -83,6 +84,7 @@
   <script type="text/javascript">CKEDITOR.replace( 'fm_addpuesto_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_editpuesto_inputdescripcion' );</script>
-    
+  <script type="text/javascript">CKEDITOR.replace( 'fm_addequipo_inputdescripcion' );</script>
+      
   {{HTML::script('assets/js/admin.js')}}
 @stop

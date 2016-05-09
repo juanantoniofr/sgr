@@ -125,7 +125,7 @@ $(function(e){
           hideGifEspera();
           $('#m_addequipo').modal('hide');   
           showMsg($respuesta.msg);
-          getListado($('#fm_addequipo input[name="espacio_id"]').val()); 
+          getListado($('#fm_addequipo input[name="tipoequipo_id"]').val()); 
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -213,23 +213,22 @@ $(function(e){
         url:  "getrecurso",
         data: {idrecurso:$(this).data('idrecurso')},
         success: function($recurso){
+          console.log($recurso);
           hideGifEspera();
           $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
           CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
           CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
           $('#fm_editpuesto input[name="id"]').val($recurso.id);
-
-
           $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
           $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
           $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-                        
           setEspacios('#fm_editpuesto_optionsEspacios','#fm_editpuesto select[name="espacio_id"]',$recurso.espacio_id);
 
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-                        
+          
+          $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
           $.each($arrayRoles,function(index,value){
-            $('#fm_editpuesto input#fm_editrecurso_roles'+value).prop( "checked", true );
+            $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
           });
           hideMsg();
           $('#m_editpuesto').modal('show');
@@ -253,18 +252,18 @@ $(function(e){
         data: {idrecurso:$(this).data('idrecurso')},
         success: function($recurso){
           hideGifEspera();
+
           CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
           CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
-                     
           $('#fm_editrecurso input[name="id"]').val($recurso.id);
           $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
           $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
           setGrupos('#fm_editrecurso_optionsGrupos','#fm_editrecurso select[name="grupo_id"]',$recurso.grupo_id);
           $('#fm_editrecurso select[name="tipo"]').val($recurso.tipo);
           $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-                    
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-                    
+          
+          $('#fm_editrecurso input[type="checkbox"]').prop( "checked", false );
           $.each($arrayRoles,function(index,value){
             $('#fm_editrecurso input#fm_editrecurso_roles'+value).prop( "checked", true );
           });
@@ -279,50 +278,56 @@ $(function(e){
     });
   }
 
-    //Delete recurso **************
-    function activelinkeliminarrecurso(){
-        $(".linkEliminaRecurso").on('click',function(e){
-            e.preventDefault();
-            $idrecurso = $(this).data('idrecurso');
-            $nombre = $(this).data('nombre');
-            $('#mdrecurso_nombre').html($nombre);
-            $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
-            hideMsg();
-            $('#m_delrecurso').modal('show');
-        });
-    }
-    //Ajax: Delete recurso
-    $('#fm_delrecurso_save').on('click',function(e){
-        e.preventDefault();
-        showGifEspera();
-        $.ajax({
-            type: "POST",
-            url:  "delrecurso",
-            data: $('form#fm_delrecurso').serialize(),
-            success: function($respuesta){
-                if($respuesta.error === true){  
-                    hideGifEspera(); 
-                    $.each($respuesta.errors,function(index,value){
-                        $('.divmodal_msgError').html('').fadeOut();
-                        $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                        $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                    });
-                   $('#fm_editrecurso_textError').fadeIn('8000');
-                }
-                else {
-                    hideGifEspera();
-                    $('#m_delrecurso').modal('hide');   
-                    showMsg($respuesta.msg);
-                    getListado(); 
-                }
-                
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-            });
+  //Delete recurso **************
+  function activelinkeliminarrecurso(){
+    $(".linkEliminaRecurso").on('click',function(e){
+      e.preventDefault();
+      if($(this).data('numeroelementos') > 0){
+        $('#malert_text').html('No se pueden eliminar un recurso con elementos asignados.');
+        $('#m_alert').modal('show');
+      }
+      else {
+        $idrecurso = $(this).data('idrecurso');
+        $nombre = $(this).data('nombre');
+        $('#mdrecurso_nombre').html($nombre);
+        $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+        hideMsg();
+        $('#m_delrecurso').modal('show');
+      }
     });
+  }
+  
+  //Ajax: Delete recurso
+  $('#fm_delrecurso_save').on('click',function(e){
+    e.preventDefault();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "delrecurso",
+      data: $('form#fm_delrecurso').serialize(),
+        success: function($respuesta){
+          if($respuesta.error === true){  
+            hideGifEspera(); 
+            $.each($respuesta.errors,function(index,value){
+                $('.divmodal_msgError').html('').fadeOut();
+                $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+            });
+            $('#fm_editrecurso_textError').fadeIn('8000');
+          }
+          else {
+            hideGifEspera();
+            $('#m_delrecurso').modal('hide');   
+            showMsg($respuesta.msg);
+            getListado(); 
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });
+  });
     
 
   //Temporal (añade recursos que ya existen a grupos nuevos)
@@ -361,19 +366,26 @@ $(function(e){
       showGifEspera();
       $('#m_addrecursotogrupo_nombre').html($(this).data('nombre'));
       $('form#fm_addrecursotogrupo input[name="grupo_id"]').val($(this).data('idgrupo'));
+      $('form#fm_addrecursotogrupo input[name="tipogrupo"]').val($(this).data('tipogrupo'));
       $.ajax({
         type: "GET",
         url:  "recursosSinGrupo",
-        data: {id:$(this).data('idgrupo')},
-        success: function($html){
-              hideGifEspera();
-              $('#m_addrecursotogrupo span#recursosSinGrupo').html($html);
-              hideMsg();
-              $('#m_addrecursotogrupo').modal('show');
+        data: {idgrupo:$(this).data('idgrupo'),tipogrupo:$(this).data('tipogrupo')},
+        success: function($respuesta){
+          hideGifEspera();
+          if($respuesta.error == true){ 
+            $('.divmodal_msgError').html('').fadeOut();
+            $('#fm_fm_addrecursotogrupo_textError').append($respuesta.msg).fadeIn('8000');
+          }
+          else{
+            $('#m_addrecursotogrupo span#recursosSinGrupo').html($respuesta.html);
+            hideMsg();
+          }
+          $('#m_addrecursotogrupo').modal('show');
         },
         error: function(xhr, ajaxOptions, thrownError){
-              hideGifEspera();
-              alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
         }
       });
     });
@@ -392,7 +404,7 @@ $(function(e){
         if($respuesta.error == true){ 
           hideGifEspera(); 
           $('.divmodal_msgError').html('').fadeOut();
-          $('#fm_addPuestoExistente_textError').append($respuesta.smg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
+          $('#fm_addPuestoExistente_textError').append($respuesta.msg).fadeIn('8000');//añade texto de error a div alert-danger en ventana modal
         }
         else {
           hideGifEspera();
@@ -583,7 +595,7 @@ $(function(e){
       $idgrupo = $(this).data('idgrupo');
       $descripcion = $(this).data('descripcion');
       $nombre = $(this).data('nombre');
-      $tipo = $(this).data('tipo');
+      $tipo = $(this).data('tipogrupo');
       $('form#fm_editgrupo input[name="nombre"]').val($nombre);
       $('form#fm_editgrupo input[name="descripcion"]').val($descripcion);
       $('form#fm_editgrupo input[name="grupo_id"]').val($idgrupo);
@@ -671,26 +683,25 @@ $(function(e){
       url:"disabled",
       data: $('#fm_disabledrecurso').serialize(),
       success: function($respuesta){
-            if($respuesta.error === true){
-              hideGifEspera();
-              $.each($respuesta.errors,function(index,value){
-                                            $('.divmodal_msgError').html('').fadeOut();
-                                            $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                                            $('#fm_disabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                                        });
-              $('#fm_disabledrecurso_textError').fadeIn('8000');
-            }
-            else {
-              hideGifEspera();
-              $('#m_disabledrecurso').modal('hide');   
-              showMsg($respuesta.msg);
-              getListado(); 
-            }
-                
+        if($respuesta.error === true){
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+                                      $('.divmodal_msgError').html('').fadeOut();
+                                      $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+                                      $('#fm_disabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_disabledrecurso_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_disabledrecurso').modal('hide');   
+          showMsg($respuesta.msg);
+          getListado(); 
+        }
       },
       error:function(xhr, ajaxOptions, thrownError){
-            hideGifEspera();
-            alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
       }
     });//<--./ajax-->
   });

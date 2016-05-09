@@ -19,6 +19,7 @@
 
                 <div class="alert alert-warning text-center"> Al deshabilitar el recurso:
                     <ul class="text-left">
+                        <li> Se deshabilitarán todos los elementos asociados a este recurso. </li>
                         <li> No se podrán añadir nuevas reservas o solicitudes de uso. </li>
                         <lI> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso. </lI>
                     </ul>

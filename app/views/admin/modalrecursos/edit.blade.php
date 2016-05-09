@@ -28,12 +28,12 @@
            
           </select>
         </div>
-       
+        
         <div class="form-group" id="fm_editrecurso_inputtipo">  
-          {{Form::label('tipo', 'Tipo de recurso')}}
-          {{Form::select('tipo', array('espacio' => 'Espacio', 'equipo' => 'Equipo'),'espacio',array('class' => 'form-control'))}}
+            {{Form::label('tipo', 'Tipo de recurso')}}
+            {{Form::select('tipo', Config::get('options.tipoRecursos'),'',array('class' => 'form-control'))}}
         </div>
-            
+        
         <div class="form-group" id="fm_editrecurso_inputmodo">  
           {{Form::label('modo', 'Gestión de solicitudes de reserva')}}
           {{Form::select('modo', array('0' => 'Con Validación', '1' => 'Sin Validación'),'1',array('class' => 'form-control'))}}
@@ -59,7 +59,7 @@
             <input type="checkbox" name = "roles[]" value="5" id="fm_editrecurso_roles5"> Validador 
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]" value="6" id="fm_editrecurso_roles4"> Supervisor (EE MAV)
+            <input type="checkbox" name = "roles[]" value="6" id="fm_editrecurso_roles6"> Supervisor (EE MAV)
           </label>
         </div>
 

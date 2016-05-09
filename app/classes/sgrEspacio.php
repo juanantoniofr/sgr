@@ -80,7 +80,8 @@
 	public function del(){
 		//Softdelete recurso
     foreach ($this->puestos as $puesto) {
-			$puesto->delete();
+			$puesto->espacio_id = 0;
+			$puesto->save();
 		}
 
 		$this->recurso->delete();		
@@ -95,6 +96,18 @@
 	}
 
 	public function update($data){
+		//si cambia el tipo
+		if ($data['tipo'] != $this->recurso->tipo){
+			foreach ($this->recurso->puestos as $puesto) {
+				$puesto->espacio_id = 0;
+				$puesto->save();
+			}
+		}
+		//update ACL en todos los equipos
+		foreach ($this->recurso->puestos as $puesto) {
+				$puesto->acl = $data['acl'];
+				$puesto->save();
+			}
 		return $this->recurso->update($data);
 	}
 

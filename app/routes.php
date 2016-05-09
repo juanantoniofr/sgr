@@ -72,7 +72,9 @@ Route::get('admin/htmlOptionEspacios',array('uses' => 'recursosController@htmlOp
 Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
 
 //Temporales
-Route::get('admin/recursosSinGrupo',array('uses'=>'recursosController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::get('admin/recursosSinGrupo',array('uses'=>'GruposController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
+
 Route::get('admin/getpuestosSinEspacio',array('uses'=>'recursosController@getpuestosSinEspacio','before' => array('ajax_check','auth','capacidad:4-6,msg')));
 Route::get('admin/getequiposSinModelo',array('uses'=>'recursosController@getequiposSinModelo','before' => array('ajax_check','auth','capacidad:4-6,msg')));
 Route::post('admin/addpuestoaespacio',array('uses'  => 'recursosController@addpuestoaespacio','before' => array('auth','ajax_check','capacidad:4-6,msg')));
@@ -80,7 +82,6 @@ Route::post('admin/addpuestoaespacio',array('uses'  => 'recursosController@addpu
 Route::post('admin/addequipoamodelo',array('uses'  => 'recursosController@addequipoamodelo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 
 
-Route::post('admin/addrecursotogrupo',array('uses' => 'GruposController@addrecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Añade recurso al grupo
 
 //GruposController routes ************************
 Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
@@ -144,5 +145,8 @@ App::error(function(ModelNotFoundException $e){
 });
 
 Route::get('test',array('as'=>'test',function(){
-  echo implode(',',array_keys(Config::get('options.tipoRecursos')));
+  $recurso = Recurso::find('57');
+  foreach ($recurso->equipos as $equipo) {
+    echo $equipo->nombre;
+  }
  }));

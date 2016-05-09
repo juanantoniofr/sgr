@@ -2,6 +2,54 @@
 class recursosController extends BaseController{
   
   /**
+    * //Deshabilita un recursos para su reserva
+    *
+    * @param Input::get('idrecurso') int
+    * @param Input::get('motivo') string
+    *
+    * @return $result array
+  */
+  public function disabled(){
+ 
+    //input
+    $id = Input::get('idrecurso','');
+    $motivo = Input::get('motivo','');
+
+    //Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,);
+    //Validate
+    $rules = array('idrecurso'  => 'required|exists:recursos,id',);
+
+    $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+                      'exists'    => 'No existe identificador de recurso en BD.',);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+      //disabled
+      $recurso = Recurso::findOrFail($id);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso->disabled();
+      $sgrRecurso->save();
+
+      //Enviar mail a usuarios con reserva futuras
+      $sgrMail = new sgrMail();
+      $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
+
+      $result['msg'] = Config::get('msg.actionSuccess');
+    }
+    
+    return $result;
+  }
+
+  /**
     * // Obtiene los items (equipos o espacios) de un espacio o tipoequipos
     *
     * @param $idrecurso int
@@ -161,7 +209,7 @@ class recursosController extends BaseController{
     //Validación de formulario   
     $rules = array( 'id'          => 'required|exists:recursos',
                     'nombre'      => 'required|unique:recursos,nombre,'.Input::get('id'),
-                    'tipo'        => 'required|in:'.implode(',',Config::get('options.tipoRecursos')),  
+                    'tipo'        => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'grupo_id'    => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
                     'espacio_id'  => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
                     'modo'        => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
@@ -185,14 +233,15 @@ class recursosController extends BaseController{
     else{  
       $data = array('nombre'      => $nombre,
                     'tipo'        => $tipo,
+                    'modo'        => $modo, 
                     'grupo_id'    => $grupo_id,
                     'espacio_id'  => $espacio_id,
                     'descripcion' => $descripcion,
                     'id_lugar'    => $id_lugar,
                     'acl'         => sgrACL::buildJsonAcl($modo,$roles),);
-      //$recurso = Recurso::find($id);
-      $sgrRecurso = RecursoFactory::getRecursoInstance($tipo);
-      $sgrRecurso->setRecurso(Recurso::find($id));
+      $recurso = Recurso::find($id);
+      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
       $sgrRecurso->update($data);
 
       $result['msg'] = Config::get('msg.success');
@@ -297,63 +346,6 @@ class recursosController extends BaseController{
     
     return $result;
   } 
-
-  /**
-    * //Deshabilita un recursos para su reserva
-    *
-    * @param Input::get('idrecurso') int
-    * @param Input::get('motivo') string
-    *
-    * @return $result array
-  */
-  public function disabled(){
- 
-    //input
-    $id = Input::get('idrecurso','');
-    $motivo = Input::get('motivo','');
-
-    //Output 
-    $result = array( 'errors'    => array(),
-                      'msg'   => '',    
-                      'error'   => false,);
-    //Validate
-    $rules = array('idrecurso'  => 'required|exists:recursos,id',);
-
-    $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
-                      'exists'    => 'No existe identificador de recurso en BD.',);
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-    //Save Input or return error
-    if ($validator->fails()){
-        $result['errors'] = $validator->errors()->toArray();
-        $result['error'] = true;
-    }
-    else{
-      //disabled
-      $recurso = Recurso::findOrFail($id);
-      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-      $sgrRecurso->setRecurso($recurso);
-      $sgrRecurso->disabled();
-      $sgrRecurso->save();
-
-      //Enviar mail a usuarios con reserva futuras
-      $sgrMail = new sgrMail();
-      $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
-
-      $result['msg'] = Config::get('msg.actionSuccess');
-    }
-    
-    return $result;
-  }
-
-  /**
-    * @param void
-    *
-    * @return string html checboxes 
-  */
-  public function recursosSinGrupo(){
-    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('grupo_id','=','0')->where('tipo','=',Config::get('options.espacio'))->orwhere('tipo','=',Config::get('options.tipoequipos'))->get());
-  }
 
   /**
     * //checboxes html 

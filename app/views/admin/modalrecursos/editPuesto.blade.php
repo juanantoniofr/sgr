@@ -47,19 +47,19 @@
         <div class="form-group" id="fm_editpuesto_inputrol"> 
           <label>Disponible para el Rol:</label><br />
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]" value="1" checked="true"> Alumno
+            <input type="checkbox" name = "roles[]" value="1" id="fm_editpuesto_roles1" checked="true"> Alumno
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]" value="2" checked="true"> PDI & PAS-Administración
+            <input type="checkbox" name = "roles[]" value="2" id="fm_editpuesto_roles2" checked="true"> PDI & PAS-Administración
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]"  value="3" checked="true"> PAS-Técnico (MAV)
+            <input type="checkbox" name = "roles[]"  value="3" id="fm_editpuesto_roles3" checked="true"> PAS-Técnico (MAV)
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]" value="5" checked="true"> Validador 
+            <input type="checkbox" name = "roles[]" value="5" id="fm_editpuesto_roles5" checked="true"> Validador 
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" name = "roles[]" value="6" checked="true"> Supervisor (EE MAV)
+            <input type="checkbox" name="roles[]" value="6" id="fm_editpuesto_roles6" checked="true"> Supervisor (EE MAV)
           </label>
         </div>
 
