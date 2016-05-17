@@ -22,7 +22,7 @@
                                           
           <form class="navbar-form">
             <div class="form-group ">
-              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Espacio"><i class="fa fa-plus fa-fw"></i> Añadir Recurso</a>
+              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Nuevo Espacio o Medio"><i class="fa fa-plus fa-fw"></i> Nuevo Espacio o Medio</a>
             </div>
             <!--
             <div class="form-group ">
@@ -33,7 +33,7 @@
             </div>
             -->
             <div class="form-group ">
-              <a href="#" class="btn btn-warning" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Añadir Grupo</a>
+              <a href="#" class="btn btn-warning" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Nuevo Grupo</a>
             </div>
           </form>
                   

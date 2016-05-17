@@ -55,13 +55,16 @@ class GruposController extends BaseController {
     }
     return $result;
   }
+  
   /**
+    * // Añade recursos existentes sin grupo asisagnado a un grupo
+    *
     * @param Input::get('grupo_id') int indetificador de grupo
     * @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
     *
     * @return $result array(boleano,string)
   */
-  //temporal Añade recursos existentes a un grupo
+  
   public function addrecursos(){
     //Input
     $id = Input::get('grupo_id','');
@@ -92,7 +95,7 @@ class GruposController extends BaseController {
   }
 
   /**
-    * //devuelve array con los nombres de los grupos con algún recurso visible para reserva para el usuario con identificador igual a $id
+    * //devuelve array con los nombres de los grupos con algún recurso visible para su reserva para el usuario con identificador igual a $id
     * 
     * @param $id int
     *
@@ -216,14 +219,15 @@ class GruposController extends BaseController {
                      		);
    	//Validate
     $rules = array(
-    	  'grupo_id'	=> 'required|exists:grupoRecursos,id', //exists:table,column
+    	  'grupo_id'	=> 'required|exists:grupoRecursos,id',
        	'nombre'    => 'required|unique:grupoRecursos,nombre,'.$id,
-        'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoRecursos')), 
+        'tipo'      => 'required|in:'.implode(',',Config::get('options.tipoGrupos')), 
       );
 
     $messages = array(
        	'required'	=> 'El campo <strong>:attribute</strong> es obligatorio....',
         'exists'		=> 'No existe identificador de grupo...',	
+        'in'        => 'El valor del campo tipo no está definido...',
       );
     $validator = Validator::make(Input::all(), $rules, $messages);
     	

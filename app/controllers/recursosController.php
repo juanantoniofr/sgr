@@ -223,9 +223,19 @@ class recursosController extends BaseController{
                         'grupo_id.required_if'    => 'identificador de grupo requerido....',
                         'espacio_id.required_if'  => 'identificador de espacio requerido....',
                         'grupo_id.exists'         => 'No existe identificador de grupo...',
-                        'espacio_id.exists'       => 'No existe identificador de espacio...',);
+                        'espacio_id.exists'       => 'No existe identificador de espacio...',
+                        'grupo_id.sametypes'      => 'No coinciden los tipos de grupo y recurso...',
+                        );
     
     $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //Controlar condición: $grupo->tipo debe ser igual a $recurso->tipo
+    if (0 != $grupo_id && 0 != $id){
+      $data = array('idgrupo' => $grupo_id,'idrecurso' => $id);
+      $validator->sometimes(array('grupo_id','tipo'),'sametypes',function($data){
+          return GrupoRecurso::find($data['grupo_id'])->tipo == Recurso::find($data['id'])->tipo;
+      });
+    }
 
     if ($validator->fails()){
       //Si errores en el formulario
@@ -298,12 +308,38 @@ class recursosController extends BaseController{
   /**
     * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
     * 
-    * @param void
+    * @param Input::get('idrecurso') int
     *
-    * @return object Recurso
+    * @return $result object Recurso
   */
   public function getrecurso(){
-    return Recurso::findOrFail(Input::get('idrecurso'));
+    //input
+    $id = Input::get('idrecurso','');
+    //Output 
+    $result = array( 'errors'         => array(),
+                     'msg'            => '',    
+                     'error'          => false,
+                     'recurso'        => '',
+                     'listadogrupos'  => '');
+    //Validate
+    $rules = array('idrecurso'      => 'required|exists:recursos,id',);
+    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'exists'    => 'No existe identificador de grupo...',);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+      $recurso = Recurso::findOrFail($id);
+      $result['recurso'] = $recurso->toArray();
+      $grupos = GrupoRecurso::all();
+      $result['listadogrupos'] = (string) View::make('admin.html.optionGrupos')->with(compact('grupos'));
+    }  
+    
+    return $result;
   }
 
   /**

@@ -46,7 +46,7 @@
               <!-- eliminar -->
               <a href="#" title="Eliminar grupo" class = "linkdelgrupo" data-idgrupo="{{$grupo->id}}" data-nombre="{{$grupo->nombre}}" data-numeroelementos="{{$grupo->recursos->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
               <!-- añadir recursos al grupo -->
-              <a href="#" title="Añadir recursos existente al grupo" class="addrecursotogrupo" data-nombre="{{$grupo->nombre}}" data-idgrupo="{{$grupo->id}}" data-tipogrupo="{{$grupo->tipo}}"><i class="fa fa-plus fa-fw"></i></a>
+              <a href="#" title="Añadir {{$grupo->tipo}} existente al grupo" class="addrecursotogrupo" data-nombre="{{$grupo->nombre}}" data-idgrupo="{{$grupo->id}}" data-tipogrupo="{{$grupo->tipo}}"><i class="fa fa-plus fa-fw"></i></a>
               {{$grupo->nombre}}
             </li>
           </ul>

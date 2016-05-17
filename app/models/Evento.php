@@ -183,40 +183,37 @@ class Evento extends Eloquent{
 
  	private $rules = array (
 			'titulo' 			=>	'required',
-			'actividad'			=>	'required',
-			'fInicio' 			=>  'required|date|date_format:d-m-Y',
+			'actividad'		=>	'required',
+			'fInicio' 		=>  'required|date|date_format:d-m-Y',
 			'hInicio'			=>	'required|date_format:H:i',
 			'hFin'				=>	'required|date_format:H:i',
 			'dias'				=> 	'required_with:fInicio,fEvento',
-			
 			);
 
 	private	$messages = array (
-			'required'				=>	' El campo <strong>:attribute</strong> es obligatorio.',
-			'dias.required_with'	=>	' El campo <strong>"Días"</strong> es obligatorio. ',
-			'date'					=>	'<strong>Fecha no válida</strong>. <br />',
-			'date_format'  			=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
+			'required'										=>	' El campo <strong>:attribute</strong> es obligatorio.',
+			'dias.required_with'					=>	' El campo <strong>"Días"</strong> es obligatorio. ',
+			'date'												=>	'<strong>Fecha no válida</strong>. <br />',
+			'date_format'  								=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
 
-			'fInicio.after' 			=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
-			'fInicio.req1' 				=>	'',
-			'fInicio.req5' 				=>	'',
-			'fInicio.req6' 				=>	'',
-			'fInicio.dateiniciocurso' 	=>	'',
+			'fInicio.after' 							=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
+			'fInicio.req1' 								=>	'',
+			'fInicio.req5' 								=>	'',
+			'fInicio.req6' 								=>	'',
+			'fInicio.dateiniciocurso' 		=>	'',
 			
-			'fFin.after'			=>	' La <strong>"fecha de finalización"</strong> debe ser posterior a la <strong>"fecha de inicio"</strong>. <br />',
-			'fFin.datefincurso' 	=>  '',
+			'fFin.after'									=>	' La <strong>"fecha de finalización"</strong> debe ser posterior a la <strong>"fecha de inicio"</strong>. <br />',
+			'fFin.datefincurso' 					=>  '',
 
-			'hFin.after'			=>	' La <strong>"hora de inicio"</strong> tiene que ser anterior a la <strong>"hora de finalización"</strong>. ',
-			'hFin.req2' 			=>	' Se supera el máximo de horas a la semana.. (12h). ',
+			'hFin.after'									=>	' La <strong>"hora de inicio"</strong> tiene que ser anterior a la <strong>"hora de finalización"</strong>. ',
+			'hFin.req2' 									=>	' Se supera el máximo de horas a la semana.. (12h). ',			
+			'dias.req4'										=>	'',			
+			'fEvento.reservaunica'				=> 	' No está permitido reservar dos puestos o equipos el mismo día y a la misma hora. Puede consultar su Agenda para comprobar coincidencias.',
 			
-			'dias.req4'				=>	'',
-			
-			'fEvento.reservaunica'	=> 	' No está permitido reservar dos puestos o equipos el mismo día y a la misma hora. Puede consultar su Agenda para comprobar coincidencias.',
-			
-			'titulo.required' 		=>	' El campo <strong>título</strong> es obligatorio.',
-			'titulo.req3' 			=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
+			'titulo.required' 						=>	' El campo <strong>título</strong> es obligatorio.',
+			'titulo.req3' 								=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
 			'reservarParaUvus.existeuvus' => '',
-			'titulo.deshabilitado'	=> 'Espacio deshabilitado temporalmente..',
+			'titulo.deshabilitado'				=> 'Espacio deshabilitado temporalmente..',
 			);	
 	
     private $errors = array();

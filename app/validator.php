@@ -53,4 +53,10 @@ Validator::extend('deshabilitado',function($attributes,$value,$parameters){
 	return false;
 });
 
+//$grupo->tipo debe ser igual a $recurso->tipo
+Validator::extend('sametypes',function($attributes,$value,$parameters){
+	return false;
+});
+
+
 ?>
