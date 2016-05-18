@@ -229,18 +229,19 @@ class recursosController extends BaseController{
     
     $validator = Validator::make(Input::all(), $rules, $messages);
     
-    //Controlar condición: $grupo->tipo debe ser igual a $recurso->tipo
+    //Controlar condición: debe coincidir el tipo del grupo con el tipo de recurso (grupos de tipo "espacio" deben agrupar recursos de tipo espacio (igual para grupos de tipo tiopequipos y recursos del tipo tipoequipos))
     if (0 != $grupo_id && 0 != $id){
-      $data = array('idgrupo' => $grupo_id,'idrecurso' => $id);
-      $validator->sometimes(array('grupo_id','tipo'),'sametypes',function($data){
-          return GrupoRecurso::find($data['grupo_id'])->tipo == Recurso::find($data['id'])->tipo;
+      $tiposachequear = array('tipogrupo' => GrupoRecurso::find($grupo_id)->tipo,'tiporecurso' => $tipo);
+      $validator->sometimes(array('grupo_id','tipo'),'sametypes',function() use ($tiposachequear){
+          return  $tiposachequear['tipogrupo'] != $tiposachequear['tiporecurso'];
       });
     }
-
+    
     if ($validator->fails()){
       //Si errores en el formulario
       $result['error'] = true;
       $result['errors'] = $validator->errors()->toArray();
+
     }
     else{  
       $data = array('nombre'        => $nombre,
@@ -276,9 +277,9 @@ class recursosController extends BaseController{
                       'msg'   => '',    
                       'error'   => false,);
     //Validate
-    $rules = array('idrecurso'  => 'required|exists:recursos,id',);
-    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
-                        'exists'    => 'No existe identificador de grupo...',);
+    $rules    = array('idrecurso' => 'required|exists:recursos,id',);
+    $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'    => 'No existe identificador de grupo...',);
     $validator = Validator::make(Input::all(), $rules, $messages);
 
     //Save Input or return error

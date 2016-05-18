@@ -215,9 +215,9 @@ $(function(e){
       url:  "updaterecurso",
       data: $('form#fm_editrecurso').serialize(),
       success: function($respuesta){
+        console.log($respuesta);
         if($respuesta.error == true){ 
           hideGifEspera(); 
-          console.log($respuesta);
           $.each($respuesta.errors,function(index,value){
             $('.divmodal_msgError').html('').fadeOut();
             $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error

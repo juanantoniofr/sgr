@@ -39,8 +39,13 @@ class Recurso extends Eloquent {
   /**
     * //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
   */
-  public function eventofuturo(){
-      return $this->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')));
+  public function eventosfuturos(){
+    $recurso = $this;
+    $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+    $sgrRecurso->setRecurso($recurso);
+    $eventosfuturos = $sgrRecurso->eventosfuturos();
+    return $eventosfuturos;
+    //return $this->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')));
   }
 
   /**

@@ -14,6 +14,20 @@
 	}
 	
 	/**
+		*
+   	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
+  */
+	public function eventosfuturos(){
+		if ($this->recurso->equipos->count() > 0){
+				//Tiene puestos
+				foreach($this->recurso->equipos as $equipo)	$id_equipos[] = $equipo->id;
+  		  return Evento::whereIn('recurso_id',$id_equipos)->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+  		}
+			else //No tiene puestos
+				return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();		
+	}
+
+	/**
 		* // Devuelve los equipos visibles (acl tiene permiso de lectura "r") para el usuario
 		* @return array Object recurso (tipo=puesto)
 	*/
@@ -72,7 +86,9 @@
 		$this->recurso->save();
 		return true;
 	}
+	
 	/**
+		*
 		* //elimina la relación equipo-tipoequipo y elimina el recurso (Softdelete)
 	*/
 	public function del(){
@@ -93,20 +109,24 @@
 	}
 
 	public function update($data){
-		//si cambia el tipo
-		if ($data['tipo'] != $this->recurso->tipo){
-			foreach ($this->recurso->equipos as $equipo) {
-				$equipo->tipoequipo_id = 0;
-				$equipo->save();
+		$idrecursocontenedor = $this->recurso->id;
+		//para cada uno de los puestos
+		foreach ($this->recurso->equipos as $item) {
+			//si cambia el tipo
+			if ($data['tipo'] != $this->recurso->tipo){
+				$item->tipo = Config::get('options.puesto');
+				$item->espacio_id = $idrecursocontenedor;
+				$item->tipoequipo_id = 0;
 			}
+			
+			//updateAcl
+			$item->acl = $data['acl'];
+			$item->save();
 		}
-		//update ACL en todos los equipos
-		foreach ($this->recurso->equipos as $equipo) {
-				$equipo->acl = $data['acl'];
-				$equipo->save();
-			}
 		
-		return $this->recurso->update($data);
+		//update recurso		
+		$this->recurso->update($data);
+		return true;
 	}
 
 	public function add($data){

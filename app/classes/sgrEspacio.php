@@ -12,6 +12,22 @@
 	public function recurso(){
 			return $this->recurso;
 	}
+	
+	/**
+   	*
+   	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
+  */
+	public function eventosfuturos(){
+		if ($this->recurso->puestos->count() > 0){
+				//Tiene puestos
+				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
+  		  return Evento::whereIn('recurso_id',$id_puestos)->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+  		}
+			else //No tiene puestos
+				return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+		
+	}
+
 	/**
 		* // Devuelve los puestos visibles (acl tiene permiso de lectura "r") para el usuario
 		* @return array Object recurso (tipo=puesto)
@@ -96,19 +112,24 @@
 	}
 
 	public function update($data){
-		//si cambia el tipo
-		if ($data['tipo'] != $this->recurso->tipo){
-			foreach ($this->recurso->puestos as $puesto) {
-				$puesto->espacio_id = 0;
-				$puesto->save();
+		$idrecursocontenedor = $this->recurso->id;
+		//para cada uno de los puestos
+		foreach ($this->recurso->puestos as $item) {
+			//si cambia el tipo
+			if ($data['tipo'] != $this->recurso->tipo){
+				$item->tipo = Config::get('options.equipo');
+				$item->tipoequipo_id = $idrecursocontenedor;
+				$item->espacio_id = 0;
 			}
+			
+			//updateAcl
+			$item->acl = $data['acl'];
+			$item->save();
 		}
-		//update ACL en todos los equipos
-		foreach ($this->recurso->puestos as $puesto) {
-				$puesto->acl = $data['acl'];
-				$puesto->save();
-			}
-		return $this->recurso->update($data);
+		
+		//update recurso		
+		$this->recurso->update($data);
+		return true;
 	}
 
 	public function add($data){

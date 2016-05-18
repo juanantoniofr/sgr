@@ -18,6 +18,13 @@
 		}
 
 		/**
+    	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
+  	*/
+		public function eventosfuturos(){
+			return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+		}
+
+		/**
 			* // Devuelve true si User con id = $id atiende $this->recurso
 			* @param $id int
 			* @return $atendido boolean
