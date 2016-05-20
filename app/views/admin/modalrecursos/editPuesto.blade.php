@@ -30,7 +30,7 @@
         <div class="form-group" id="fm_editpuesto_inputespacio_id">
           {{Form::label('espacio_id', 'Espacio')}}
           <select name="espacio_id" class="form-control" id="fm_editpuesto_optionsEspacios">
-           
+            <option value="" selected="selected"></option>
           </select>
         </div>
             

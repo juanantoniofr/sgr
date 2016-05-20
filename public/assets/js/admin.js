@@ -135,7 +135,7 @@ $(function(e){
     });//<!-- ajax -->
   });
 
-  //Edit recurso*************
+  //Edit Puesto*************
   //Ajax: Salvar edición de Puesto 
   $('#fm_editpuesto_save').on('click',function(e){
     e.preventDefault();
@@ -170,7 +170,46 @@ $(function(e){
     });//<!-- ajax -->
   });
 
-  //Edit recurso*************
+  function activeLinkeditpuesto(){
+    //Muestra ventana modal editpuesto
+    $(".linkEditPuesto").on('click',function(e){
+      e.preventDefault();
+      showGifEspera();
+      $('#fm_editpuesto select[name="espacio_id"] option:selected').text($(this).data('nombreespacio'));
+      $.ajax({
+        type: "GET",
+        url:  "getrecurso",
+        data: {idrecurso:$(this).data('idrecurso')},
+        success: function($respuesta){
+          $recurso = $respuesta.recurso;
+          hideGifEspera();
+          $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
+          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
+          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
+          $('#fm_editpuesto input[name="id"]').val($recurso.id);
+          $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
+          $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
+          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+          $('#fm_editpuesto select[name="espacio_id"] option:selected').val($recurso.espacio_id);
+
+          $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
+          
+          $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
+          $.each($arrayRoles,function(index,value){
+            $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
+          });
+          hideMsg();
+          $('#m_editpuesto').modal('show');
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });//<!-- ajax -->
+    });
+  }
+  
+  //Edit Equipo *************
   //Ajax: Salvar edición de Equipo 
   $('#fm_editequipo_save').on('click',function(e){
     e.preventDefault();
@@ -204,77 +243,7 @@ $(function(e){
       }
     });//<!-- ajax -->
   });
-
-  //Ajax: Salvar edición recurso
-  $('#fm_editrecurso_save').on('click',function(e){
-    e.preventDefault();
-    updateChkeditorInstances();
-    showGifEspera();
-    $.ajax({
-      type: "POST",
-      url:  "updaterecurso",
-      data: $('form#fm_editrecurso').serialize(),
-      success: function($respuesta){
-        if($respuesta.error == true){ 
-          hideGifEspera(); 
-          $.each($respuesta.errors,function(index,value){
-            $('.divmodal_msgError').html('').fadeOut();
-            $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-            $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-          });
-          $('#fm_editrecurso_textError').fadeIn('8000');
-        }
-        else {
-          hideGifEspera();
-          $('#m_editrecurso').modal('hide');   
-          showMsg($respuesta['msg']);
-          getListado(); 
-        }
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });
-  });
-
-  function activeLinkeditpuesto(){
-    //Muestra ventana modal editpuesto
-    $(".linkEditPuesto").on('click',function(e){
-      e.preventDefault();
-      showGifEspera();
-      $.ajax({
-        type: "GET",
-        url:  "getrecurso",
-        data: {idrecurso:$(this).data('idrecurso')},
-        success: function($recurso){
-          hideGifEspera();
-          $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
-          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
-          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
-          $('#fm_editpuesto input[name="id"]').val($recurso.id);
-          $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
-          $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
-          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-          //setRecursos('#fm_editpuesto_optionsEspacios','#fm_editpuesto select[name="espacio_id"]',$recurso.espacio_id,'espacio');
-
-          $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-          
-          $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
-          $.each($arrayRoles,function(index,value){
-            $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
-          });
-          hideMsg();
-          $('#m_editpuesto').modal('show');
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-        }
-      });//<!-- ajax -->
-    });
-  }
-
+  
   function activeLinkeditequipo(){
     //Muestra ventana modal editequipo
     $(".linkEditEquipo").on('click',function(e){
@@ -311,6 +280,40 @@ $(function(e){
       });//<!-- ajax -->
     });
   }
+
+  //Edit recurso ************
+  //Ajax: Salvar edición recurso
+  $('#fm_editrecurso_save').on('click',function(e){
+    e.preventDefault();
+    updateChkeditorInstances();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "updaterecurso",
+      data: $('form#fm_editrecurso').serialize(),
+      success: function($respuesta){
+        if($respuesta.error == true){ 
+          hideGifEspera(); 
+          $.each($respuesta.errors,function(index,value){
+            $('.divmodal_msgError').html('').fadeOut();
+            $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_editrecurso_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_editrecurso').modal('hide');   
+          showMsg($respuesta['msg']);
+          getListado(); 
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });
+  });  
 
   function activeLinkeditrecurso(){
     //Muestra ventana modal editRecurso
@@ -370,6 +373,7 @@ $(function(e){
           }
       }); 
   }
+  
   //Delete recurso **************
   function activelinkeliminarrecurso(){
     $(".linkEliminaRecurso").on('click',function(e){
@@ -425,7 +429,6 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
         }
       });
-    
   });
   
   //Temporal (añade recursos que ya existen a grupos nuevos)
@@ -489,7 +492,7 @@ $(function(e){
     });
   }
   
-  //Temporal (añade puestos que ya existen a espacios)
+  //Añade puestos que ya existen a espacios
   //Ajax: Añadir Puesto a espacio 
   $('#fm_addPuestoExistente_save').on('click',function(e){
     e.preventDefault();

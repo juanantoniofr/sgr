@@ -120,7 +120,7 @@
 
                         <span class="@if($puesto->disabled) text-warning @else text-success @endif">{{$puesto->nombre}}</span>
                         <!-- editar -->
-                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}"><i class="fa fa-pencil fa-fw"></i></a>
+                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}" data-nombreespacio="{{$puesto->espacio->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Puesto -->
                         <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" data-numeroeventos="{{$puesto->eventosfuturos()->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($puesto->disabled)
