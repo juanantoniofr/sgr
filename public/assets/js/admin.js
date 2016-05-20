@@ -195,7 +195,7 @@ $(function(e){
           hideGifEspera();
           $('#m_editequipo').modal('hide');   
           showMsg($respuesta.msg);
-          getListado($('#fm_editequipo select[name="tipoequipo_id"]').val()); 
+          getListado($('form#fm_editequipo select[name="tipoequipo_id"] option:selected').val()); 
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -215,7 +215,6 @@ $(function(e){
       url:  "updaterecurso",
       data: $('form#fm_editrecurso').serialize(),
       success: function($respuesta){
-        console.log($respuesta);
         if($respuesta.error == true){ 
           hideGifEspera(); 
           $.each($respuesta.errors,function(index,value){
@@ -249,7 +248,6 @@ $(function(e){
         url:  "getrecurso",
         data: {idrecurso:$(this).data('idrecurso')},
         success: function($recurso){
-          //console.log($recurso);
           hideGifEspera();
           $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
           CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
@@ -258,7 +256,7 @@ $(function(e){
           $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
           $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
           $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-          setRecursos('#fm_editpuesto_optionsEspacios','#fm_editpuesto select[name="espacio_id"]',$recurso.espacio_id,'espacio');
+          //setRecursos('#fm_editpuesto_optionsEspacios','#fm_editpuesto select[name="espacio_id"]',$recurso.espacio_id,'espacio');
 
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
           
@@ -282,12 +280,13 @@ $(function(e){
     $(".linkEditEquipo").on('click',function(e){
       e.preventDefault();
       showGifEspera();
+      $('#fm_editequipo select[name="tipoequipo_id"] option:selected').text($(this).data('modeloequipo'));
       $.ajax({
         type: "GET",
         url:  "getrecurso",
         data: {idrecurso:$(this).data('idrecurso')},
-        success: function($recurso){
-          //console.log($recurso);
+        success: function($respuesta){
+          $recurso = $respuesta.recurso;
           hideGifEspera();
           $('#m_editequipo_title_nombreequipo').html($recurso.nombre)
           CKEDITOR.instances['fm_editequipo_inputdescripcion'].setData($recurso.descripcion);
@@ -295,8 +294,8 @@ $(function(e){
           $('#fm_editequipo input[name="id"]').val($recurso.id);
           $('#fm_editequipo input[name="nombre"]').val($recurso.nombre);
           $('#fm_editequipo input[name="id_lugar"]').val($recurso.id_lugar);
-          $('#fm_editequipo select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-          setRecursos('#fm_editequipo_optionsTipoequipo','#fm_editequipo select[name="tipoequipo_id"]',$recurso.tipoequipo_id,'tipoequipos');
+          $('#fm_editequipo select[name="modo"]').val($.parseJSON($recurso.acl).m);
+          $('#fm_editequipo select[name="tipoequipo_id"] option:selected').val($recurso.tipoequipo_id);    
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
           $('#fm_editequipo input[type="checkbox"]').prop( "checked", false );
           $.each($arrayRoles,function(index,value){
@@ -323,7 +322,6 @@ $(function(e){
         url:  "getrecurso",
         data: {idrecurso:$(this).data('idrecurso')},
         success: function($respuesta){
-          console.log($respuesta);
           hideGifEspera();
           $recurso = $respuesta.recurso;
 
@@ -389,6 +387,8 @@ $(function(e){
         $nombre = $(this).data('nombre');
         $('#mdrecurso_nombre').html($nombre);
         $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+        $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+        $('#fm_delrecurso_save').data('idrecursopadre',$(this).data('idrecursopadre')); 
         hideMsg();
         $('#m_delrecurso').modal('show');
       }
@@ -417,7 +417,7 @@ $(function(e){
             hideGifEspera();
             $('#m_delrecurso').modal('hide');   
             showMsg($respuesta.msg);
-            getListado(); 
+            getListado($('#fm_delrecurso_save').data('idrecursopadre')); 
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -425,9 +425,9 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
         }
       });
-  });
     
-
+  });
+  
   //Temporal (añade recursos que ya existen a grupos nuevos)
   //Ajax: Añadir Recurso a Grupo Temporal
   $('#fm_addrecursotogrupo_save').on('click',function(e){
@@ -650,9 +650,9 @@ $(function(e){
     });
   }
 
-    //Edit grupo    
-    //Ajax: Salvar edición de grupo
-    $('#fm_editgrupo_save').on('click',function(e){
+  //Edit grupo    
+  //Ajax: Salvar edición de grupo
+  $('#fm_editgrupo_save').on('click',function(e){
         e.preventDefault();
         updateChkeditorInstances();
         showGifEspera();
@@ -684,7 +684,7 @@ $(function(e){
                     alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
                     }
             });
-    });
+  });
   
   //Muestra ventana modal para editar grupo de recursos
   function activelinkeditgrupo(){
@@ -966,24 +966,6 @@ $(function(e){
     $('#m_addgrupo').modal('show');
   });
 
-  //Obtine el listado de espacios
-  function setRecursos($idSelect,$idInput,$optionSelected,$tipo){
-    $.ajax({
-      type:"GET",
-      url:"htmlOptionrecursos",
-      data:{ tipo : $tipo  },
-      success:function($html){
-        console.log($html);
-        $($idSelect).html($html);
-        if ($idInput != '') $($idInput).val($optionSelected);
-      },
-      error:function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    }); 
-  }
-
   function getListado($idrecurso){
     $.ajax({
       type:"GET",
@@ -991,8 +973,6 @@ $(function(e){
       data:{'orderby':'','order':''},
       success:function($html){
         $('#tableRecursos').html($html);
-        //verPuestos($idrecurso);
-        //verItems($idrecurso);
         $('#items_'+$idrecurso).fadeIn();
         activelinks();
       },

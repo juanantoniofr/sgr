@@ -145,9 +145,9 @@
                       <li>
                         <span class="@if($equipo->disabled) text-warning @else text-success @endif">{{$equipo->nombre}}</span>
                         <!-- editar -->
-                        <a href="#" title="Editar Equipo" class="linkEditEquipo text-info" data-idrecurso="{{$equipo->id}}"><i class="fa fa-pencil fa-fw"></i></a>
+                        <a href="#" title="Editar Equipo" class="linkEditEquipo text-info" data-idrecurso="{{$equipo->id}}" data-modeloequipo="{{$equipo->tipoequipo->nombre}}" ><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Equipo -->
-                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" data-numeroeventos="{{$equipo->eventosfuturos()->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" data-numeroeventos="{{$equipo->eventosfuturos()->count()}}" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($equipo->disabled)
                           <!-- habilitar Equipo -->
                           <a id="link_{{$equipo->id}}" href="" class = "enabled text-success" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Habilitar equipo"><i class="fa fa-toggle-off fa-fw"></i></a>

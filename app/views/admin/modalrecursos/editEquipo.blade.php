@@ -30,7 +30,7 @@
         <div class="form-group" id="fm_editequipo_inputtipoequipo_id">
           {{Form::label('tipoequipo_id', 'Modelo de equipo')}}
           <select name="tipoequipo_id" class="form-control" id="fm_editequipo_optionsTipoequipo">
-           
+           <option value="" selected="selected"></option>
           </select>
         </div>
             
