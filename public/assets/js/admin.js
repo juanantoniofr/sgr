@@ -305,7 +305,8 @@ $(function(e){
           hideGifEspera();
           $('#m_editrecurso').modal('hide');   
           showMsg($respuesta['msg']);
-          getListado(); 
+          getListado($('#fm_editrecurso input[name="id"]').val());
+          
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -333,11 +334,8 @@ $(function(e){
           $('#fm_editrecurso input[name="id"]').val($recurso.id);
           $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
           $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
-          //setGrupos('#fm_editrecurso_optionsGrupos','#fm_editrecurso select[name="grupo_id"]',$recurso.grupo_id);
-          //Select recurso del mismo grupo  
           $('#fm_editrecurso_optionsGrupos').html($respuesta.listadogrupos);
           $('#fm_editrecurso select[name="grupo_id"]').val($recurso.grupo_id);
-
           $('#fm_editrecurso select[name="tipo"]').val($recurso.tipo);
           $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
@@ -421,7 +419,8 @@ $(function(e){
             hideGifEspera();
             $('#m_delrecurso').modal('hide');   
             showMsg($respuesta.msg);
-            getListado($('#fm_delrecurso_save').data('idrecursopadre')); 
+            getListado($('#fm_delrecurso_save').data('idrecursopadre'));
+            $('#fm_delrecurso_save').data('idrecursopadre',"")); 
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -741,6 +740,18 @@ $(function(e){
       }
     });//<--./ajax-->
   });
+  
+  //Enabled recurso
+  function activelinkenabled(){
+    $(".enabled").on('click',function(e){
+      e.preventDefault();
+      $('#m_enabled_nombre').html($(this).data('nombrerecurso'));
+      $('form#fm_enabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
+      $('#fm_enabledrecurso_save').data('idrecursopadre',$(this).data('idrecursopadre'));
+      hideMsg();
+      $('#m_enabledrecurso').modal('show');
+    });
+  }
 
   //Ajax: enabled recurso
   $('#fm_enabledrecurso_save').on('click',function(e){
@@ -754,9 +765,9 @@ $(function(e){
         if($respuesta.error === true){
           hideGifEspera();
           $.each($respuesta.errors,function(index,value){
-                                    $('.divmodal_msgError').html('').fadeOut();
-                                    $('#fm_enabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                                    $('#fm_enabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+              $('.divmodal_msgError').html('').fadeOut();
+              $('#fm_enabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+              $('#fm_enabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
           });
           $('#fm_enabledrecurso_textError').fadeIn('8000');
         }
@@ -764,7 +775,8 @@ $(function(e){
           hideGifEspera();
           $('#m_enabledrecurso').modal('hide');   
           showMsg($respuesta.msg);
-          getListado(); 
+          getListado($('#fm_enabledrecurso_save').data('idrecursopadre')); 
+          $('#fm_enabledrecurso_save').data('idrecursopadre',""));
         }
       },
       error:function(xhr, ajaxOptions, thrownError){
@@ -775,6 +787,17 @@ $(function(e){
   });
 
   //Ajax: Disabled recurso
+  function activelinkdisabled(){
+    $(".disabled").on('click',function(e){
+      e.preventDefault();
+      $('#m_disabled_nombre').html($(this).data('nombrerecurso'));
+      $('form#fm_disabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
+      $('#fm_disabledrecurso_save').data('idrecursopadre',$(this).data('idrecursopadre'));
+      hideMsg();
+      $('#m_disabledrecurso').modal('show');
+    });
+  }
+
   $('#fm_disabledrecurso_save').on('click',function(e){
     e.preventDefault();
     updateChkeditorInstances();
@@ -787,9 +810,9 @@ $(function(e){
         if($respuesta.error === true){
           hideGifEspera();
           $.each($respuesta.errors,function(index,value){
-                                      $('.divmodal_msgError').html('').fadeOut();
-                                      $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                                      $('#fm_disabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+              $('.divmodal_msgError').html('').fadeOut();
+              $('#fm_disabledrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
+              $('#fm_disabledrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
           });
           $('#fm_disabledrecurso_textError').fadeIn('8000');
         }
@@ -797,7 +820,8 @@ $(function(e){
           hideGifEspera();
           $('#m_disabledrecurso').modal('hide');   
           showMsg($respuesta.msg);
-          getListado(); 
+          getListado($('#fm_disabledrecurso_save').data('idrecursopadre'));
+          $('#fm_disabledrecurso_save').data('idrecursopadre',""));
         }
       },
       error:function(xhr, ajaxOptions, thrownError){
@@ -905,26 +929,7 @@ $(function(e){
     $('#items_'+$recursoid).fadeToggle();
   }
 
-  function activelinkdisabled(){
-    $(".disabled").on('click',function(e){
-      e.preventDefault();
-      $('#m_disabled_nombre').html($(this).data('nombrerecurso'));
-      $('form#fm_disabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
-      hideMsg();
-      $('#m_disabledrecurso').modal('show');
-    });
-  }
-   
-  function activelinkenabled(){
-    $(".enabled").on('click',function(e){
-      e.preventDefault();
-      $('#m_enabled_nombre').html($(this).data('nombrerecurso'));
-      $('form#fm_enabledrecurso input[name="idrecurso"]').val($(this).data('idrecurso'));
-      hideMsg();
-      $('#m_enabledrecurso').modal('show');
-    });
-  }
-
+  
   //Muestra ventana modal para establecer relación persona-recurso
   function activelinkaddpersonas(){
     $('.addUserWithRol').on('click',function(e){

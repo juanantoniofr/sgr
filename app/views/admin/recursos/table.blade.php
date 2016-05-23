@@ -122,13 +122,13 @@
                         <!-- editar -->
                         <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}" data-nombreespacio="{{$puesto->espacio->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Puesto -->
-                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" data-numeroeventos="{{$puesto->eventosfuturos()->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" data-numeroeventos="{{$puesto->eventosfuturos()->count()}}" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($puesto->disabled)
                           <!-- habilitar Puesto -->
-                          <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto"><i class="fa fa-toggle-off fa-fw"></i></a>
+                          <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
                         @else    
                           <!-- deshabilitar Puesto-->
-                          <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto"><i class="fa fa-toggle-on fa-fw "></i></a>
+                          <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
                         @endif 
                         
                       </li>
@@ -150,10 +150,10 @@
                         <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" data-numeroeventos="{{$equipo->eventosfuturos()->count()}}" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($equipo->disabled)
                           <!-- habilitar Equipo -->
-                          <a id="link_{{$equipo->id}}" href="" class = "enabled text-success" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Habilitar equipo"><i class="fa fa-toggle-off fa-fw"></i></a>
+                          <a id="link_{{$equipo->id}}" href="" class = "enabled text-success" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Habilitar equipo" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
                         @else    
                           <!-- deshabilitar Equipo-->
-                          <a id="link_{{$equipo->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Deshabilitar equipo"><i class="fa fa-toggle-on fa-fw "></i></a>
+                          <a id="link_{{$equipo->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Deshabilitar equipo" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
                         @endif 
                       </li>
                     @endforeach

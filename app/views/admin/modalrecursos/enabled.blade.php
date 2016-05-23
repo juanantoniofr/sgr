@@ -29,7 +29,7 @@
              <div class="modal-footer">
                 <div class="col-lg-12" style="margin-top:10px">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id ="fm_enabledrecurso_save">
+                    <button type="submit" class="btn btn-primary" data-idrecursopadre="" id ="fm_enabledrecurso_save">
                         <i class="fa fa-toggle-on fa-fw"></i> Habilitar
                     </button>
                 </div>

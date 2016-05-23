@@ -40,7 +40,7 @@
             <div class="modal-footer">
                <div class="col-lg-12" style="margin-top:10px">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-warning" id ="fm_disabledrecurso_save">
+                    <button type="submit" class="btn btn-warning" data-idrecursopadre="" id ="fm_disabledrecurso_save">
                         <i class="fa fa-toggle-off fa-fw"></i> Deshabilitar
                     </button>
                 </div>
