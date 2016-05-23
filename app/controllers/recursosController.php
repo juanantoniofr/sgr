@@ -82,8 +82,9 @@ class recursosController extends BaseController{
       $sgrRecurso->setRecurso($recurso);
       //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
       $items = $sgrRecurso->items();
-      
-      $addOptionReservarTodo = $recurso->usuariopuedereservartodoslospuestos(Auth::user()->id);
+      $addOptionReservarTodo = false;
+      if (count($items) > 0 && !Auth::user()->isUser()) $addOptionReservarTodo = true;
+      //$addOptionReservarTodo = $recurso->usuariopuedereservartodoslospuestos(Auth::user()->id);
       
       //número de puestos or equipos disabled
       $numerodeitemsdisabled = 0;
@@ -95,6 +96,7 @@ class recursosController extends BaseController{
       
       //Añadir opción reservar "todos los puestos"
       $result['listoptions'] = (string) View::make('calendario.allViews.optionsItems')->with(compact('items','addOptionReservarTodo','disabledAll'));
+      //$result['listoptions'] = "<pre>".var_dump($items)."</pre>";
     }
     return $result;
   }

@@ -9,6 +9,10 @@
 		$this->recurso = new Recurso;
 	}
 
+	public function visible(){
+			return $this->recurso->visible() && $this->recurso->equipos()->count() > 0;
+	}
+
 	public function recurso(){
 			return $this->recurso;
 	}
@@ -34,6 +38,7 @@
 	public function items(){
 		$items = $this->recurso->equipos->filter(function($equipo){ return $equipo->visible(); });
   	return $items;
+  	//return  $this->recurso->equipos();
 	}
 	
 	/**
@@ -55,7 +60,7 @@
 	
 	public function getEvents($fechaEvento){
 		if ($this->recurso->equipos->count() > 0){
-			foreach($this->recurso->equipo as $equipo)	$id_equipos[] = $equipo->id;
+			foreach($this->recurso->equipos as $equipo)	$id_equipos[] = $equipo->id;
   	  return Evento::whereIn('recurso_id',$id_equipos)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
   	}
 		else

@@ -1,7 +1,10 @@
-@if ($addOptionReservarTodo)
-  <option value="0" data-disabled="{{$disabledAll}}">Todos los {{$tipoRecursos}}/s</option>
-@endif
 @foreach ($recursos as $recurso)
-  <option value="{{$recurso->id}}" data-numeropuestos="{{$recurso->puestos()->count()}}" data-disabled="{{$recurso->disabled}}" data-atendido = @if ($recurso->esAtendidoPor(Auth::user()->id)) "1" @else "0" @endif> {{$recurso->nombre}} @if ($recurso->disabled) (Deshabilitado) @endif 
+  <option value="{{$recurso->id}}" 
+  				@if ( $recurso->tipo == Config::get('options.espacio') ) data-numeroitems="{{$recurso->puestos()->count()}}"
+  				@elseif ( $recurso->tipo == Config::get('options.tipoequipos') ) data-numeroitems="{{$recurso->equipos()->count()}}"
+  				@endif
+  				data-disabled="{{$recurso->disabled}}" 
+  				data-atendido = @if ($recurso->esAtendidoPor(Auth::user()->id)) "1" @else "0" @endif>
+  					{{$recurso->nombre}} @if ($recurso->disabled) (Deshabilitado) @endif 
   </option>                  
 @endforeach

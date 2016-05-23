@@ -126,13 +126,16 @@ class GruposController extends BaseController {
       
     //Output 
     $htmloptionsrecursos = '';
+    $disabledAll = 0;
     
     if(!empty($id)){
       $grupo = GrupoRecurso::findOrFail($id);
       
-      //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
+      //se filtran para obtener sólo aquellos visibles 
       $recursos = $grupo->recursos->filter(function($recurso){
-          return $recurso->visible(); });
+          $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+          $sgrRecurso->setRecurso($recurso);
+          return $sgrRecurso->visible(); });
       $addOptionReservarTodo = $grupo->usuariopuedereservartodo(Auth::user()->id);
       
       //número de puestos or equipos disabled
@@ -302,7 +305,7 @@ class GruposController extends BaseController {
 	    return View::make('admin.recursos.table',compact('grupos','sortby','order'));
   	}
  
-/**
+  /**
   * //Establece la relación persona-grupoRecursos (supervisor-validador-tecnico)
   *
   * @param Input::get('idgrupo')    int
@@ -311,7 +314,7 @@ class GruposController extends BaseController {
   *
   * @return $result array
   * 
-*/
+  */
   public function addPersona(){
     
     //input
@@ -398,7 +401,7 @@ class GruposController extends BaseController {
     return $result;
   }
 
-   /**
+  /**
     * //elimina la relación grupoRecursos-persona
     *
     * @param Input::get('idgrupo') int
@@ -505,11 +508,9 @@ class GruposController extends BaseController {
     * @param void
     * @return View::make('admin.html.optionGrupos')
   */
-
   public function htmlOptionGrupos(){
 
     return View::make('admin.html.optionGrupos')->with('grupos',grupoRecurso::all());
-
   }
 
 }

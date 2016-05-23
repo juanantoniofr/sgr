@@ -8,6 +8,10 @@
 		public function __construct(){
 			$this->recurso = new Recurso;
 		}
+		
+		public function visible(){
+			return $this->recurso->visible();
+		}
 
 		public function recurso(){
 			return $this->recurso;

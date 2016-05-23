@@ -8,6 +8,10 @@
 	public function __construct(){
 		$this->recurso = new Recurso;
 	}
+	
+	public function visible(){
+			return true;
+	}
 
 	public function recurso(){
 			return $this->recurso;
@@ -25,7 +29,6 @@
   		}
 			else //No tiene puestos
 				return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
-		
 	}
 
 	/**
@@ -44,6 +47,7 @@
 	*/
 	public function atendidoPor($id){
 		$atendido = false;
+		//if ($this->recurso->grupo->tecnicos->contains($id)) $atendido = true;
 		if (User::findOrFail($id)->atiende->count() > 0) $atendido = true;
 		return $atendido;
 	}

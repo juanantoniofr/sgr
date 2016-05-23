@@ -7,9 +7,79 @@ $(function(e){
 
 	onLoad();
 	
-	/*functions 
-		*****************************************************************************
-	*/
+	function whenChangeRecurseSelected(){
+		
+		//When change items selected
+		$('#items').on('change',function(){
+			$('#message').fadeOut("slow");
+			var $str = 'Nueva reserva: ' +  $('select#items option:selected').text();
+			$('#myModalLabel').html($str);
+			setLabelRecurseName();
+			$('input[name$=id_recurso]').val($('select#puesto option:selected').val());
+			printCalendar();
+		});
+
+		//When change recurse selected
+		$('#recurse').on('change',function(){
+			$('#message').fadeOut("slow");
+			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
+			$('#myModalLabel').html($str);
+			setLabelRecurseName();
+			$('input[name$=id_recurso]').val($('select#recurse option:selected').val());
+			if($("select#recurse option:selected").data('numeroitems') > 0){
+				$.ajax({
+					type:"GET",
+					url:"getitems",
+					data:{ idrecurso:$("select#recurse option:selected").val()},
+					success: function($result){
+						$('#selectItems').fadeIn('fast',function(){
+										$('#items').html($result.listoptions);
+										$("select#items option:first").prop("selected", "selected");
+										$('select#items').change();});
+					},
+					error: function(xhr, ajaxOptions, thrownError){
+						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+					}
+				});
+			}
+			else{
+				printCalendar();
+			}
+			//fin del if
+			
+		});
+
+		//When change group
+		$('#selectGroupRecurse').on('change',function(e){
+			showGifEspera();
+			$('#message').fadeOut("slow");
+			$('#selectItems').fadeOut('fast',function(){
+																				$('select#items option:selected').prop('selected', false);
+																				$('select#items option').detach();});
+			$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
+			$.ajax({
+				type:"GET",
+				url:"getRecursos",
+				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
+				success: function(respuesta){
+					
+					$('#selectRecurseInGroup').fadeIn('fast',function(){
+						$('#recurse').html(respuesta);
+						$('select#recurse option:first').prop('selected', 'selected');
+						$('select#recurse').change();
+					});
+					hideGifEspera();
+				},
+				error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+				}
+			});
+		});
+	}
+
+
+
 
 	//When load page....
 	function onLoad(){
@@ -113,86 +183,14 @@ $(function(e){
 	//********************************************************************************
 	//********************************************************************************
 	
-	function whenChangeRecurseSelected(){
-		
-		//When change recurse selected
-		$('#items').on('change',function(){
-			$('#message').fadeOut("slow");
-			var $str = 'Nueva reserva: ' +  $('select#items option:selected').text();
-			$('#myModalLabel').html($str);
-			setLabelRecurseName();
-			$('input[name$=id_recurso]').val($('select#puesto option:selected').val());
-			printCalendar();
-		});
-
-		//When change recurse selected
-		$('#recurse').on('change',function(){
-			$('#message').fadeOut("slow");
-			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
-			$('#myModalLabel').html($str);
-			setLabelRecurseName();
-			$('input[name$=id_recurso]').val($('select#recurse option:selected').val());
-			printCalendar();
-		});
-
-		//When select group recurse
-		$('#selectGroupRecurse').on('change',function(e){
-			showGifEspera();
-			$('#message').fadeOut("slow");
-			$('#selectItems').fadeOut('fast',function(){
-																							$('select#items option:selected').prop('selected', false);
-																							$('select#items option').detach();}
-																							);
-			$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
-
-
-			$.ajax({
-				type:"GET",
-				url:"getRecursos",
-				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
-				success: function(respuesta){
-					
-					$('#selectRecurseInGroup').fadeIn('fast',function(){
-						$('#recurse').html(respuesta);
-						$('select#recurse option:first').prop('selected', 'selected');
-						if($("select#recurse option:first").data('numeropuestos') > 0){
-							$.ajax({
-								type:"GET",
-								url:"getitems",
-								data:{ idrecurso:$("select#recurse option:first").val()},
-								success: function($result){
-										
-										$('#selectItems').fadeIn('fast',function(){
-																												$('#items').html($result.listoptions);
-																												$("select#items option:first").prop("selected", "selected");
-																												$('select#items').change();
-																											});
-								},
-								error: function(xhr, ajaxOptions, thrownError){
-								alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-								}
-							});
-						}
-						else {
-							$('select#recurse').change();
-						}
-					});
-					hideGifEspera();
-				},
-				error: function(xhr, ajaxOptions, thrownError){
-						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-				}
-			});
-		});
-	}
+	
 
 	/*
 		display new data in calendar (call from functions in onLaod....)
 		********************************************************************************
 		********************************************************************************
 	*/
-		function setLabelRecurseName(){
+	function setLabelRecurseName(){
 		
 		$viewActive = $('#btnView .active').data('calendarView');
 		if ($viewActive == 'agenda'){
@@ -254,7 +252,6 @@ $(function(e){
 				url:"ajaxCalendar",
 				data:$data,
 				success: function(respuesta){
-			
 					if ($('select#recurse option:selected').val()) {$('#alert').css('display','none');}
 					$('#loadCalendar').html(respuesta.calendar);
 					init();
@@ -265,7 +262,7 @@ $(function(e){
 					
 					hideGifEspera();
 
-					if ($('select#recurse option:selected').data('disabled')) {
+					/*if ($('select#recurse option:selected').data('disabled')) {
 						
 							$('#btnNuevaReserva').addClass('disabled');
 							//muestra modal disabled recurso
@@ -275,7 +272,7 @@ $(function(e){
 							$('#textMsg').html(respuesta['disabled']['msg']);
 							$('#modalMsg').modal('show');
 				
-						}
+						}*/
 					
 					},
 					error: function(xhr, ajaxOptions, thrownError){
