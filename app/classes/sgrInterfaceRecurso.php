@@ -13,6 +13,7 @@
 		public function atendidoPor($id);
 		public function items();
 		public function visible();
+		public function recursoOcupado($dataEvento);
 	}
 
 ?>

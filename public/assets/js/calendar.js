@@ -1065,8 +1065,8 @@ $(function(e){
 		//reset error msg
 		resetMsgErrors();
 		$('#errorsModalAdd').slideUp();
-		//Cierra ventana de edición
-		//$('#editOptions').hide();
+		//Cierra opciones de edición en ventana modal
+		$('#editOptions').hide();
 		//Título
 		$('#fm_addEvent input#newReservaTitle').val('');
 		//Hora inicial
@@ -1094,7 +1094,7 @@ $(function(e){
 		//Set id recurso
 		console.log($('select#items option:selected').val());
 		$('#fm_addEvent input[name|="id_recurso"]').val($('select#recurse option:selected').val());
-		if (undefined != $('select#items option:selected').val())
+		if (undefined != $('select#items option:selected').val() || $('select#items option:selected').val() == 0)
 			$('#fm_addEvent input[name|="id_recurso"]').val($('select#items option:selected').val());
 		//Texto resumen
 		setResumen();
@@ -1104,81 +1104,79 @@ $(function(e){
 		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
 		resetMsgErrors();
 		showGifEspera();
+		$('#actionType').val('edit');
 		$.ajax({
     	type: "GET",
 			url: "geteventbyId",
 			data: {'id':$idEvento},
-        	success: function($respuesta){
-        		$evento = $respuesta['event'];
-        		$usernameReservadoPara = $respuesta['usernameReservadoPara'];
-        		$usernameReservadoPor = $respuesta['usernameReservadoPor'];
-        		$('#contentModalAdd').html($respuesta);
-        		
-		     		//titulo
-						$('#fm_addEvent input#newReservaTitle').val($evento.titulo);
-						//Actividad
-						$('select[name|="actividad"] option').each(function(){
-																													if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
-																													else $(this).prop('selected',false);
-																											});
-						$('#fm_addEvent input#reservadoPara').val($usernameReservadoPara);
-						$('#fm_addEvent input#reservadoPor').val($usernameReservadoPor);
+      success: function($respuesta){
+      	$evento = $respuesta['event'];
+      	
+      	//text header modal
+				$('#myModalLabel').html('<i class="fa fa-pencil fa-fw"></i> Editar evento: ' + $evento.titulo);
 
-						//Fecha inicio: campo día
-						//hora inicio
-						$('select[name|="hInicio"] option').each(function(){
-																											if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
-																											else $(this).prop('selected',false);
-																									});
-						//hora fin
-						$('select[name|="hFin"] option').each(function(){
-																											if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
-																											else $(this).prop('selected',false);
-																										});
-						//repetir
-						if ($evento.repeticion == '1'){
-							$('select[name|="repetir"]').val('CS');
-							$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-							$('#datepickerFinicio').prop('disabled',true);
-							$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
-							$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
-							$aDias = eval($evento.diasRepeticion);
-							$("input:checkbox").each(function(index,value){
-																					$(this).prop('checked',false);
-																					if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
-																				});
-							$('#inputRepeticion').show();
-						}
-					else{
-						$('select[name|="repetir"]').val('SR');
-						$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-						$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
-						$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
-						$("input:checkbox").each(function(index,value){
-																					$(this).prop('checked',false);
-																					if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
-																				});
-						$('#inputRepeticion').hide();
-					}
-				
-					setResumen();
-					$('button#save').hide();
-					//$('#editOptions').show();
-					hideGifEspera();
-					$('#modalAdd').modal('show');
- 		    },
+      	$usernameReservadoPara = $respuesta['usernameReservadoPara'];
+      	$usernameReservadoPor = $respuesta['usernameReservadoPor'];
+      	//$('#contentModalAdd').html($respuesta);
+      	//titulo
+				$('#fm_addEvent input#newReservaTitle').val($evento.titulo);
+				//Actividad
+				$('select[name|="actividad"] option').each(function(){
+						if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
+						else $(this).prop('selected',false);
+				});
+				$('#fm_addEvent input#reservadoPara').val($usernameReservadoPara);
+				$('#fm_addEvent input#reservadoPor').val($usernameReservadoPor);
+				//Fecha inicio: campo día
+				//hora inicio
+				$('select[name|="hInicio"] option').each(function(){
+						if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
+						else $(this).prop('selected',false);
+				});
+				//hora fin
+				$('select[name|="hFin"] option').each(function(){
+						if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
+						else $(this).prop('selected',false);
+				});
+				//repetir
+				if ($evento.repeticion == '1'){
+					$('select[name|="repetir"]').val('CS');
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
+					$('#datepickerFinicio').prop('disabled',true);
+					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+					$aDias = eval($evento.diasRepeticion);
+					$("input:checkbox").each(function(index,value){
+							$(this).prop('checked',false);
+							if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
+					});
+					$('#inputRepeticion').show();
+				}
+				else{
+					$('select[name|="repetir"]').val('SR');
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
+					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+					$("input:checkbox").each(function(index,value){
+							$(this).prop('checked',false);
+							if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
+					});
+					$('#inputRepeticion').hide();
+				}
+				setResumen();
+				$('button#save').hide();
+				$('#editOptions').show();
+				hideGifEspera();
+				$('#modalAdd').modal('show');
+ 			  },
 				error: function(xhr, ajaxOptions, thrownError){
 					hideGifEspera();
 					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
 				}
-      });
-
-			$('#actionType').val('edit');
-			$('#myModalLabel').html('Editar evento');
+    	});
 		
+			
 			$('button#editOption1').off();
-		
-
 			$('button#editOption1').click(function(){
 			$('#EditOption1').data('idEvento',$idEvento);
 			$('#EditOption1').data('idSerie',$idSerie);
@@ -1232,6 +1230,7 @@ $(function(e){
 					if (undefined === $(this).data('hora')) $hora = '08:30';
 					else  $hora = $(this).data('hora');
 					showGifEspera();
+					console.log($(this).data('fecha'));
 					setInitValueForModalAdd($hora,$(this).data('fecha'));
 					hideGifEspera();
 					$('#modalAdd').modal('show');

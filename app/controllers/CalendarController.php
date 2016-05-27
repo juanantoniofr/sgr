@@ -114,7 +114,6 @@ class CalendarController extends BaseController {
 
 	//Generación de pdf's para imprimir
 	public function imprime(){
-		
 		//!!!***Validar parámetros de entrada***!!!
 		//get Input or default
 		$viewActive = Input::get('view','month');
@@ -174,12 +173,10 @@ class CalendarController extends BaseController {
 		//return $html;
 		$result = myPDF::getPDF($html,$nombreFichero);
 		return Response::make($result)->header('Content-Type', 'application/pdf');
-	
 	}
 
 	//Datos de un evento para un validador
 	public function ajaxDataEvent(){
-
 		$respuesta = array();
 		$diasSemana = array('1'=>'lunes','2'=>'martes','3'=>'miércoles','4'=>'jueves','5'=>'viernes','6'=>'sabado','7'=>'domingo');
 

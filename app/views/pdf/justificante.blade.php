@@ -1,5 +1,4 @@
 <style>
-
 	* {
 		font-family:verdana;
 		font-size: 12px; 
@@ -59,15 +58,21 @@
 <table>
 	<tr>
 		<td class = "first"><p class="label">Equipo o espacio reservado</p></td>
-		<td class = "first"><p>
-		
-		@foreach ($recursos as $recurso)	
-		
-			{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo->nombre}} )</small>
-			<br />
-		@endforeach
-		
-		</p></td>
+		<td class = "first">
+			<p>
+				@foreach ($recursos as $recurso)	
+					{{$recurso->recurso->nombre}} 
+					@if ($recurso->recurso->tipo == Config::get('options.espacio')) 
+						<i>( {{$recurso->recurso->grupo->nombre}} )</i>
+					@elseif ($recurso->recurso->tipo == Config::get('options.puesto'))
+						<i>( {{$recurso->recurso->espacio->nombre}} )</i>
+					@elseif ($recurso->recurso->tipo == Config::get('options.equipo'))
+						<i>( {{$recurso->recurso->tipoequipo->nombre}} )</i>
+					@endif
+				<br />
+				@endforeach
+			</p>
+		</td>
 	</tr>
 	<tr>
 		<td class = "first"><p class="label">Estado de la reserva</p></td>
@@ -126,7 +131,15 @@
 	
 		@foreach($recursos as $recurso)
 	
-			<ul><b>{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo}} )</small></b>
+			<ul>
+			<b>{{$recurso->recurso->nombre}} 
+					@if ($recurso->recurso->tipo == Config::get('options.espacio')) 
+						<i>( {{$recurso->recurso->grupo->nombre}} )</i>
+					@elseif ($recurso->recurso->tipo == Config::get('options.puesto'))
+						<i>( {{$recurso->recurso->espacio->nombre}} )</i>
+					@elseif ($recurso->recurso->tipo == Config::get('options.equipo'))
+						<i>( {{$recurso->recurso->tipoequipo->nombre}} )</i>
+					@endif</b>
 			
 			@foreach($recurso->recurso->events as $event)
 				<li>{{sgrDate::getStrDayWeek($event->fechaEvento);}}, {{date('d-m-Y',strtotime($event->fechaEvento))}} @if ($event->deleted_at != NULL) <span style="color:red;">(Anulada o Eliminada)</span>@endif</li>

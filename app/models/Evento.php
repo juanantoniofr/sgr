@@ -52,7 +52,6 @@ class Evento extends Eloquent{
  		* @return boolean
  	*/
  	public function esEditable($idUser){
- 	
  		$user = User::findOrFail($idUser); //@param identificador de usuario autenticado
  		if ($user->count() == 0) return false;//no hay usuario
  		
@@ -73,7 +72,6 @@ class Evento extends Eloquent{
 		* @return boolean
 	*/
 	public function esAnulable($idUser){
-		
 		//$idUser no existe	
  		if (User::where('id','=',$idUser)->count() == 0) return false;
 		//$idUser no es propietario y no ha reservado para otro
@@ -91,9 +89,9 @@ class Evento extends Eloquent{
  	*/
  	public function numeroRecursos(){
  		$muestraItem = '';
-        $numRecursos = 0;
-        if ($this->recurso->tipo != 'espacio') {
-        	$numRecursos = $this->total();
+    $numRecursos = 0;
+    if ($this->recurso->tipo != 'espacio') {
+     	$numRecursos = $this->total();
         		
 
 			//Bug PODController, quitar el año q viene
@@ -111,8 +109,8 @@ class Evento extends Eloquent{
 
 			}
 			//fin del bug
-        }
-        return $numRecursos;
+    }
+    return $numRecursos;
  	}
  
  	/**
@@ -238,15 +236,15 @@ class Evento extends Eloquent{
 
     //formatear fechas
     if (!empty($data['fEvento'])){
-    	$date = DateTime::createFromFormat('j-n-Y',$data['fEvento']);
+    	$date = DateTime::createFromFormat('d-m-Y',$data['fEvento']);
 			$data['fEvento'] = $date->format('Y-m-d');
     }
     if (!empty($data['fInicio'])){
-    	$date = DateTime::createFromFormat('j-n-Y',$data['fInicio']);
+    	$date = DateTime::createFromFormat('d-m-Y',$data['fInicio']);
 			$data['fInicio'] = $date->format('Y-m-d');
     } 
     if (!empty($data['fFin'])){
-    	$date = DateTime::createFromFormat('j-n-Y',$data['fFin']);
+    	$date = DateTime::createFromFormat('d-m-Y',$data['fFin']);
 			$data['fFin'] = $date->format('Y-m-d');
     }  
     
@@ -352,66 +350,73 @@ class Evento extends Eloquent{
 		}
 
 		//req3: espacio ocupado (no solapamientos)
-    if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
+    /*if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
 			$v->sometimes('titulo','req3',function($data){
-							$sgrEvento = new sgrEvento;
-							if ($data['id_recurso'] == 0){
-								$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
-								foreach($recursos as $recurso){
-									//si modo automatico
-									//$ocupado = false;
-									$id_recurso = $recurso->id;	
-									if(!$recurso->validacion()){
-										//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-										$estado = 'aprobada';
-										//$currentFecha tiene formato d-m-Y
-										$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
+					$sgrEvento = new sgrEvento;
+					if ($data['id_recurso'] == 0){
+						$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
+						foreach($recursos as $recurso){
+							//si modo automatico
+							//$ocupado = false;
+							$id_recurso = $recurso->id;	
+							if(!$recurso->validacion()){
+								//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
+								$estado = 'aprobada';
+								//$currentFecha tiene formato d-m-Y
+								$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
 										
-										foreach ($dias as $dWeek) {
-											if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-											else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+								foreach ($dias as $dWeek) {
+									if ($data['repetir'] == 'SR') $nRepeticiones = 1;
+									else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
-											for($j=0;$j<$nRepeticiones;$j++){
-												$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek,'Y-m-d');
-												$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-												$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-												//si ocupado
-												if($numEvents > 0){
-													return true;
-												}
-											}
-										}
+									for($j=0;$j<$nRepeticiones;$j++){
+										$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
+										$currentfecha = sgrDate::fechaEnesimoDia(strtotime($startDate),$j);
+										$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+										//si ocupado
+										if($numEvents > 0) return true;
 									}
 								}
 							}
-							else{
-								//si modo automatico = si no necesita validacion
-								//$ocupado = false;	
-								if( !Recurso::find($data['id_recurso'])->validacion() ){
-									//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-									$estado = 'aprobada';
-									//$currentFecha tiene formato d-m-Y
-									$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
-									
-									foreach ($dias as $dWeek) {
-										if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-										else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+						}
+					}
+					else{
+						//si modo automatico = si no necesita validacion
+						//$ocupado = false;	
+						if( !Recurso::find($data['id_recurso'])->validacion() ){
+							//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
+							$estado = 'aprobada';
+							//$currentFecha tiene formato d-m-Y
+							$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
+								
+							foreach ($dias as $dWeek) {
+								if ($data['repetir'] == 'SR') $nRepeticiones = 1;
+								else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
-										for($j=0;$j<$nRepeticiones;$j++){
-											$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek,'Y-m-d');
-											$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-											$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-											//si ocupado
-											if($numEvents > 0){
-												return true;
-											}
-										}
-									}
+								for($j=0;$j<$nRepeticiones;$j++){
+									$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
+									$currentfecha = sgrDate::fechaEnesimoDia(strtotime($startDate),$j);
+									$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+									//si ocupado
+									if($numEvents > 0) return true;
 								}
-							}	
+							}
+						}
+					}	
+			});
+		}*/
+    
+    //test req3:
+    if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
+			$v->sometimes('titulo','req3',function($data){
+					$idrecurso = $data['id_recurso'];
+					$recurso = Recurso::findOrFail($idrecurso);
+      		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      		$sgrRecurso->setRecurso($recurso);
+      		return $sgrRecurso->recursoOcupado($data);		
 			});
 		}
-               
+
     //req4: Sábados y domingos no se puede reservar
 		if (isset($data['dias'])){
 			$v->sometimes('dias','req4',function($data){

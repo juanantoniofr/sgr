@@ -76,6 +76,13 @@
 		return true;
 	}
 
+	public function recursoOcupado($dataEvento){
+		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento))->count();
+				if ( $eventos > 0 ) return true; 	
+		}//fin del for
+		return false;
+	}
 	
 	public function getEvents($fechaEvento){
 

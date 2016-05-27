@@ -19,7 +19,7 @@
 	@if($event->esEditable(Auth::user()->id))
 		<a class = "comprobante" href="{{ URL::route('justificante',array('idEventos' => $event->evento_id)) }}" data-id-evento="{{ $event->id }}" data-id-serie="{{ $event->evento_id }}" data-periodica="{{ $event->repeticion }}" title="Comprobante" target="_blank"><span class="fa fa-file-pdf-o fa-fw text-success" aria-hidden="true"></span></a>
 		|
-
+		
 		<a href="#" id="edit_{{$event->id}}" data-id-evento="{{$event->id}}" data-id-serie="{{$event->evento_id}}" data-periodica="{{$event->repeticion}}" title="Editar reserva"><span class="fa fa-pencil fa-fw text-success" aria-hidden="true"></span></a>
 		|
 

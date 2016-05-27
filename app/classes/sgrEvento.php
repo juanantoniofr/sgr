@@ -99,7 +99,6 @@ class sgrEvento {
 	}
 
 	private function saveEvents($data){
-		
 		$dias = $data['dias']; //1->lunes...., 5->viernes
 		$respuesta = array();
 		$evento_id = $this->getIdUnique();
@@ -108,17 +107,15 @@ class sgrEvento {
 			if ($data['repetir'] == 'SR') $nRepeticiones = 1;
 			else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek,'Y-m-d');
-				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
+				$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);//return timestamp
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);//return string Y-m-d
 				$respuesta[] =$this->saveEvent($data,$currentfecha,$evento_id);
 			}
 		}
 		return $evento_id;
-		
 	}
 
 	private function saveEvent($data,$currentfecha,$evento_id){
-
 		/* aquí hay que hacer algo así para reservas de puesto/equipo - espacio - todos los puestos/equipos
 		$recurso = Recurso::findOrFail($id_recurso);
 		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
@@ -139,19 +136,14 @@ class sgrEvento {
 					$evento->estado = $this->setEstado($data['grupo_id'],$id_recurso,$currentfecha,$hInicio,$hFin);
 				
 					$repeticion = 1;
-					//$evento->fechaFin = sgrDate::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
-					//$evento->fechaInicio = sgrDate::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 					$evento->fechaFin = $data['fFin'];
 					$evento->fechaInicio = $data['fInicio'];
 					$evento->diasRepeticion = json_encode($data['dias']);
 				
 					if ($data['repetir'] == 'SR') {
 						$repeticion = 0;
-						//$evento->fechaFin = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-						//$evento->fechaInicio = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 						$evento->fechaFin = $currentfecha;
 						$evento->fechaInicio = $currentfecha;
-						//$evento->diasRepeticion = json_encode(array(date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'))));
 						$evento->diasRepeticion = json_encode(array(date('N',strtotime($currentfecha))));
 					}
 				
@@ -159,10 +151,8 @@ class sgrEvento {
 					$evento->titulo = $data['titulo'];
 					$evento->actividad = $data['actividad'];
 					$evento->recurso_id = $id_recurso;
-					//$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 					$evento->fechaEvento = $currentfecha;
 					$evento->repeticion = $repeticion;
-					//$evento->dia = date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'));
 					$evento->dia = date('N',strtotime($currentfecha));
 					$evento->horaInicio = $data['hInicio'];
 					$evento->horaFin = $data['hFin'];
@@ -195,19 +185,14 @@ class sgrEvento {
 
 			
 			$repeticion = 1;
-			//$evento->fechaFin = sgrDate::parsedatetime($data['fFin'],'d-m-Y','Y-m-d');
-			//$evento->fechaInicio = sgrDate::parsedatetime($data['fInicio'],'d-m-Y','Y-m-d');
 			$evento->fechaFin = $data['fFin'];
 			$evento->fechaInicio = $data['fInicio'];
 			$evento->diasRepeticion = json_encode($data['dias']);
 			
 			if ($data['repetir'] == 'SR') {
 				$repeticion = 0;
-				//$evento->fechaFin = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
-				//$evento->fechaInicio = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 				$evento->fechaFin = $currentfecha;
 				$evento->fechaInicio = $currentfecha;
-				//$evento->diasRepeticion = json_encode(array(date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'))));
 				$evento->diasRepeticion = json_encode(array(date('N',strtotime($currentfecha))));
 			}
 			
@@ -215,9 +200,8 @@ class sgrEvento {
 			$evento->titulo = $data['titulo'];
 			$evento->actividad = $data['actividad'];
 			$evento->recurso_id = $data['id_recurso'];
-			$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+			$evento->fechaEvento = $currentfecha;
 			$evento->repeticion = $repeticion;
-			//$evento->dia = date('N',sgrDate::gettimestamp($currentfecha,'d-m-Y'));
 			$evento->dia = date('N',strtotime($currentfecha));
 			$evento->horaInicio = $data['hInicio'];
 			$evento->horaFin = $data['hFin'];
@@ -242,7 +226,6 @@ class sgrEvento {
 
 	//Edit
 	public function edit(){
-
 		$result = array('error' => false,
 						'msgSuccess' => '',
 						'idsDeleted' => array(),
@@ -317,8 +300,8 @@ class sgrEvento {
 			else { $nRepeticiones = sgrDate::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
 							
 			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaInicio,$dWeek,'Y-m-d');
-				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
+				$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);//return timestamp
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);//return string Y-m-d
 				$result = $this->saveEvent(Input::all(),$currentfecha,$idSerie);
 			}
 						
@@ -380,10 +363,7 @@ class sgrEvento {
 		return $result;
 	}
 
-	
-	
 	//Anular evento: realiza un soft_delete
-
 	public function anularEvento(){
 		
 		$result = array('error' => false,
@@ -409,12 +389,8 @@ class sgrEvento {
 		return $result;
 	}
 
-	
-
 	//private functions
-	
 	private function uniqueId(){
-		
 		$idSerie = $this->getIdUnique();
 		return $idSerie;
 	}
@@ -428,19 +404,18 @@ class sgrEvento {
 	}
 
 	/**
- 	* Determina si un nuevo evento en $idRecurso en $currentfecha, con hora inicio $hi, hora de finalización $hf, solapa con eventos con $condicionEstado existentes en BD
- 	*
- 	* @param $idGrupo int
- 	* @param $idRecurso int
- 	* @param $currentfecha (d-m-Y)
- 	* @param $hi
- 	* @param $hf
- 	* @param $condicionEstado
- 	* @return $numSolapamientos int
- 	*
+ 		* Determina si un nuevo evento en $idRecurso en $currentfecha, con hora inicio $hi, hora de finalización $hf, solapa con eventos con $condicionEstado existentes en BD
+ 		*
+ 		* @param $idGrupo int
+ 		* @param $idRecurso int
+ 		* @param $currentfecha (d-m-Y)
+	 	* @param $hi
+	 	* @param $hf
+	 	* @param $condicionEstado
+	 	* @return $numSolapamientos int
+	 	*
  	*/
 	public function solapa($idGrupo,$idRecurso,$currentfecha,$hi,$hf,$condicionEstado = ''){
-		
 		$numSolapamientos = 0;
 		
 		$hi = date('H:i:s',strtotime($hi));
@@ -479,8 +454,6 @@ class sgrEvento {
 		return $numSolapamientos;
 	}
 	
-
-
 	private function setEstado($idGrupo,$idRecurso,$currentfecha,$hi,$hf){
 		$estado = 'denegada';
 
@@ -524,7 +497,6 @@ class sgrEvento {
 		}
 
 		return $estado;
-
 	}
 }
 ?>

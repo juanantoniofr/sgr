@@ -19,14 +19,13 @@ class sgrDate{
 	}  
 
 	/**
-	* Devuelve el número de de veces que se repite $dWeek entre $fInicio y $fFin
-	*	@param $fInicio string 	(formato dd-mm-yyyy)
-	*	@param $fFin 	string 	(formato dd-mm-yyyy)
-	* 	@param $dWeek	int		(día de la semana: 0->domingo,1->lunes,.... 6->sábado)
-	*	@return $numRepeticiones int  
+		* Devuelve el número de de veces que se repite $dWeek entre $fInicio y $fFin
+		*	@param $fInicio string 	(formato dd-mm-yyyy)
+		*	@param $fFin 	string 	(formato dd-mm-yyyy)
+		*	@param $dWeek	int		(día de la semana: 0->domingo,1->lunes,.... 6->sábado)
+		*	@return $numRepeticiones int  
 	*/
 	public static function numRepeticiones($fInicio,$fFin,$dWeek){
-		
 		$numRepeticiones = 0;
 		$aDaysWeek = array('0' => 'Sunday', '1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
 		$self = new self();
@@ -62,47 +61,43 @@ class sgrDate{
 	}
 	
 	/**
-		*	Devuelve fecha en formato d-m-Y, del primer día de la semana ($dWeek) a partir de la fecha ($f)
-		* 	@param $f string fecha 'd-m-Y'
+		*	Devuelve tiemstamp de $f formato Y-m-d, del primer día de la semana ($dWeek) a partir de la fecha ($f)
+		* 	@param $f string fecha 'Y-m-d'
 		* 	@param $dWeek int 0->domingo,1->lunes,...
-		*	@return string format d-m-Y
+		*		@return string format Y-m-d
 	*/
-	public static function timeStamp_fristDayNextToDate($f,$dWeek,$formatofecha){
+	public static function timeStamp_fristDayNextToDate($f,$dWeek){
 		$aDaysWeek = array('0' => 'Sunday','1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
-		$self = new self();
-		//$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($f,$formatofecha));
 		$startTime = strtotime($aDaysWeek[$dWeek],strtotime($f));
-		return date('j-n-Y',$startTime);
+		return $startTime;
 	}
 
 	/**
 		*	Devuelve la fecha del n-esimo ($numRepeticion) día siguiente a $finicio
-		* @param $fInicio string fecha en formato d-m-Y
+		* @param $tsFecha int timestamp
 		* @param $numRepetición int 
-		* @return $fecha string (d-m-Y)  
+		* @return $fecha string (Y-m-d)  
 		*
 	*/
-	public static function fechaEnesimoDia($fInicio,$n){
+	public static function fechaEnesimoDia($tsFecha,$n){
 		$self = new self();
-		if ($n == 0) return $fInicio;
-		//$currentTime = strtotime('+ '.$n.' Week',$self->gettimestamp($fInicio,'d-m-Y'));
-		$currentTime = strtotime('+ '.$n.' Week',strtotime($fInicio));
-		$fecha = date('d-m-Y',$currentTime);
-		return $fecha;
+		if ($n == 0) return date('Y-m-d',$tsFecha);
+		$currentTime = strtotime('+ '.$n.' Week ',date('Y-m-d',$tsFecha));
+		return date('Y-m-d',$currentTime);
 	}
 
 	/**
-	 * Devuelve $fecha en formato $farmatosalida
- 	 * 
- 	 * @param $fecha datetime 
- 	 * @param $formatoentrada string formato de entrada de $fecha
- 	 * @param $formatosalida string formato de salida para $fecha
- 	 * @return $result datetime formateado según $formatosalida
+	 	* Devuelve $fecha en formato $farmatosalida
+ 	 	* 
+ 	 	* @param $fecha datetime 
+ 	 	* @param $formatoentrada string formato de entrada de $fecha
+ 	 	* @param $formatosalida string formato de salida para $fecha
+ 	 	* @return $result datetime formateado según $formatosalida
 	*/
 	public static function parsedatetime($fecha,$formatoentrada,$formatosalida){
 		$result = '';
-
 		$date = DateTime::createFromFormat($formatoentrada,$fecha);
+		if (false === $date) $date = DateTime::createFromFormat('Y-m-d',date('Y-m-d'));
 		$result = $date->format($formatosalida);
 		return $result;
 	}
