@@ -184,17 +184,18 @@ class Evento extends Eloquent{
  	private $rules = array (
 			'titulo' 			=>	'required',
 			'actividad'		=>	'required',
-			'fInicio' 		=>  'required|date|date_format:d-m-Y',
+			'fInicio' 		=>  'required|date|date_format:Y-m-d',
 			'hInicio'			=>	'required|date_format:H:i',
 			'hFin'				=>	'required|date_format:H:i',
 			'dias'				=> 	'required_with:fInicio,fEvento',
+			'id_recurso'	=>	'required|exists:recursos,id',
 			);
 
 	private	$messages = array (
 			'required'										=>	' El campo <strong>:attribute</strong> es obligatorio.',
 			'dias.required_with'					=>	' El campo <strong>"Días"</strong> es obligatorio. ',
 			'date'												=>	'<strong>Fecha no válida</strong>. <br />',
-			'date_format'  								=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
+			'date_format'  								=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: j-n-Y.',
 
 			'fInicio.after' 							=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
 			'fInicio.req1' 								=>	'',
@@ -216,102 +217,116 @@ class Evento extends Eloquent{
 			'titulo.deshabilitado'				=> 'Espacio deshabilitado temporalmente..',
 			);	
 	
-    private $errors = array();
+  private $errors = array();
 
-		//Requisitos antes de salvar eventos.
-			//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
-    		//req2: alumno supera el máximo de horas a la semana (12)
-    		//req3: espacio ocupado (no solapamientos)
-    		//req4: no se puede reservar en sábados y domingos
-    		//req5: alumnos y pdi: solo pueden reservar a partir de firstmonday
-    		//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
-    		//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
-			//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
-    		//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico para alumnos y pdi
-    		//dateiniciocurso: las reservas no pueden empezar antes del inicio del presente curso académico para alumnos y pdi
-    		//deshabilitado: no permite añadir reservas en espacios deshabilitados 
+	//Requisitos antes de salvar eventos.
+		//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
+  	//req2: alumno supera el máximo de horas a la semana (12)
+  	//req3: espacio ocupado (no solapamientos)
+  	//req4: no se puede reservar en sábados y domingos
+  	//req5: alumnos y pdi: solo pueden reservar a partir de firstmonday
+  	//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
+  	//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
+		//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
+  	//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico para alumnos y pdi
+  	//dateiniciocurso: las reservas no pueden empezar antes del inicio del presente curso académico para alumnos y pdi
+  	//deshabilitado: no permite añadir reservas en espacios deshabilitados 
     
-    public function validate($data)
-    	{
-    	//mensages
-    	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
-    	if (Auth::user()->isUser()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',sgrCalendario::lastFriday()) .'</strong><br />';
-    	}
+  public function validate($data){
+    //$this->errors = $data;
+    //return false;	
 
+    //formatear fechas
+    if (!empty($data['fEvento'])){
+    	$date = DateTime::createFromFormat('j-n-Y',$data['fEvento']);
+			$data['fEvento'] = $date->format('Y-m-d');
+    }
+    if (!empty($data['fInicio'])){
+    	$date = DateTime::createFromFormat('j-n-Y',$data['fInicio']);
+			$data['fInicio'] = $date->format('Y-m-d');
+    } 
+    if (!empty($data['fFin'])){
+    	$date = DateTime::createFromFormat('j-n-Y',$data['fFin']);
+			$data['fFin'] = $date->format('Y-m-d');
+    }  
+    
+
+    //mensages
+    //req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
+    if (Auth::user()->isUser()){
+    	setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+    	$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',sgrCalendario::lastFriday()) .'</strong><br />';
+    }
+
+    if (Auth::user()->isAvanceUser()){
+    	setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+    	$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong><br />';
+    }
+
+    if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()){
+    	setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+    	$tsToday = strtotime('today');
+    	$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
+    }
+
+    if (isset($data['dias']) && in_array('6', $data['dias'])){
+    	$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>sábado</strong><br />";
+    }
+    
+    if (isset($data['dias']) && in_array('0', $data['dias']) )
+    	$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>domingo</strong><br />";
     	
-    	if (Auth::user()->isAvanceUser()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong><br />';
-    	}
+    if ( !empty($data['fFin']) ){
+    	$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
+    }
 
-    	if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$tsToday = strtotime('today');
-    		$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
-    	}
+   	if ( !empty($data['fInicio']) ){
+   		$this->messages['fInicio.dateiniciocurso'] = 'No es posible realizar reservas hasta que se finalice la carga del POD: fecha prevista a partir del día ' . date('d-m-Y',strtotime(Config::get('options.inicio_gestiondesatendida')));
+   	}
 
-    	if (isset($data['dias']) && in_array('6', $data['dias'])){
-    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>sábado</strong><br />";
-    	}
-    	if (isset($data['dias']) && in_array('0', $data['dias']) )
-    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>domingo</strong><br />";
-    	
-    	if ( !empty($data['fFin']) ){
-    		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
-    	}
-
-    	if ( !empty($data['fInicio']) ){
-    		$this->messages['fInicio.dateiniciocurso'] = 'No es posible realizar reservas hasta que se finalice la carga del POD: fecha prevista a partir del día ' . date('d-m-Y',strtotime(Config::get('options.inicio_gestiondesatendida')));
-    	}
-
-    	if (!empty($data['reservarParaUvus'])){
-    		$this->messages['reservarParaUvus.existeuvus'] = 'Usuario "'. $data['reservarParaUvus'] .'" no registrado.';
-    	}
-    	
-    	//fin mensages
+    if (!empty($data['reservarParaUvus'])){
+    	$this->messages['reservarParaUvus.existeuvus'] = 'Usuario "'. $data['reservarParaUvus'] .'" no registrado.';
+    }
+    //fin mensages
        
-    	
-        // make a new validator object
-        $v = Validator::make($data, $this->rules, $this->messages);
+    // make a new validator object
+    $v = Validator::make($data, $this->rules, $this->messages);
    
-   		//requisito: reserva para otro usuario -> debe de existir en la Base de Datos
-        if (!empty($data['reservarParaUvus'])){
-        	$v->sometimes('reservarParaUvus','existeuvus',function($data){
-  				if (User::where('username','=',$data['reservarParaUvus'])->count() == 0) return true;      		
-        	});	
-        }
+   	//requisito: reserva para otro usuario -> debe de existir en la Base de Datos
+    if (!empty($data['reservarParaUvus'])){
+     	$v->sometimes('reservarParaUvus','existeuvus',function($data){
+ 														if (User::where('username','=',$data['reservarParaUvus'])->count() == 0) return true;
+ 													});	
+    }
 
- 	    //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
+ 	  //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
 		if ( !empty($data['fEvento']) && !empty($data['hFin']) && !empty($data['hInicio']) ){
 			$v->sometimes('fEvento','reservaunica',function($data){
-				if (Auth::user()->capacidad == '1'){
-					//setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-		    		//determinar si tiene reserva en otro recurso con misma fechaEvento, horainicio y horafin solapadas.
-		    		$id_recurso = Recurso::find($data['id_recurso'])->id;
-		    		$where = 	" (( horaInicio <= '".$data['hInicio']."' and horaFin >= '".$data['hFin']."' ) "; 
-					$where .= 	" or ( horaFin > '".$data['hFin']."' and horaInicio < '".$data['hFin']."')";
-					$where .=	" or ( horaInicio > '".$data['hInicio']."' and horaInicio < '".$data['hFin']."')";
-					$where .=	" or horaFin < '".$data['hFin']."' and horaFin > '".$data['hInicio']."')";
-					$where .=	" and recurso_id != " . $id_recurso;
-				
+									if (Auth::user()->capacidad == '1'){
+										//setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+						    		//determinar si tiene reserva en otro recurso con misma fechaEvento, horainicio y horafin solapadas.
+						    		$id_recurso = Recurso::find($data['id_recurso'])->id;
+						    		$where = 	" (( horaInicio <= '".$data['hInicio']."' and horaFin >= '".$data['hFin']."' ) "; 
+										$where .= 	" or ( horaFin > '".$data['hFin']."' and horaInicio < '".$data['hFin']."')";
+										$where .=	" or ( horaInicio > '".$data['hInicio']."' and horaInicio < '".$data['hFin']."')";
+										$where .=	" or horaFin < '".$data['hFin']."' and horaFin > '".$data['hInicio']."')";
+										$where .=	" and recurso_id != " . $id_recurso;
+								
+						    		$numEventosOtroRecurso = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])))->whereRaw($where)->count();
+						    	
+						    		if ($numEventosOtroRecurso > 0) return true;
+						    		
+						    	}
+								});
+    }
 
-		    		$numEventosOtroRecurso = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])))->whereRaw($where)->count();
-		    	
-		    		if ($numEventosOtroRecurso > 0) return true;
-		    		
-		    	}
-			});
-        }
 
-
-	   //req1: alumno solo pueden reservar entre firstMonday y lastFriday  
-	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
+	  //req1: alumno solo pueden reservar entre firstMonday y lastFriday  
+	  if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
-				if (Auth::user()->isUser()) {
-					if ( sgrCalendario::fristMonday() > sgrDate::gettimestamp($data['fInicio'],'d-m-Y')  || sgrCalendario::lastFriday()  < sgrDate::gettimestamp($data['fInicio'],'d-m-Y')) return true;
-				}
+					if (Auth::user()->isUser()) {
+						if ( sgrCalendario::fristMonday() > strtotime($data['fInicio'])  || sgrCalendario::lastFriday()  < strtotime($data['fInicio']) ) return true;
+					}
 			});
 		}
 
@@ -320,88 +335,84 @@ class Evento extends Eloquent{
 		if (!empty($data['hFin']) && !empty($data['hInicio']) && empty($data['action'])){
 			
 			$v->sometimes('hFin','req2',function($data){
-				if (Auth::user()->isUser()){
-					$nh = Auth::user()->numHorasReservadas();//Número de horas ya reservadas
-					$nh2 = sgrDate::diffHours($data['hInicio'],$data['hFin']);//números de horas que se quiere reservar
-					$maximo = Config::get('options.max_horas');
-					$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
-			    		if ($credito < $nh2) return true;
-			    	}
-			    });
+										if (Auth::user()->isUser()){
+											$nh = Auth::user()->numHorasReservadas();//Número de horas ya reservadas
+											$nh2 = sgrDate::diffHours($data['hInicio'],$data['hFin']);//números de horas que se quiere reservar
+											$maximo = Config::get('options.max_horas');
+											$credito = $maximo - $nh; //número de horas que aún puede el alumno reservar
+									    		if ($credito < $nh2) return true;
+									  }
+			});
 		}
 		//deshabilitado
 		if (isset($data['id_recurso']) && $data['id_recurso'] != 0){
-
 			$v->sometimes('titulo','deshabilitado',function($data){
 				if ( 1 == Recurso::findOrFail($data['id_recurso'])->disabled ) return true;
 			});
-
 		}
 
 		//req3: espacio ocupado (no solapamientos)
-       	if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
-			
-			$v->sometimes('titulo','req3',function($data) {
-				$sgrEvento = new sgrEvento;
-				if ($data['id_recurso'] == 0){
-					$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
-					foreach($recursos as $recurso){
-						//si modo automatico
-						//$ocupado = false;
-						$id_recurso = $recurso->id;	
-						if(!$recurso->validacion()){
-							//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-							$estado = 'aprobada';
-							//$currentFecha tiene formato d-m-Y
-							$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
-							
-							foreach ($dias as $dWeek) {
-								if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-								else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+    if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
+			$v->sometimes('titulo','req3',function($data){
+							$sgrEvento = new sgrEvento;
+							if ($data['id_recurso'] == 0){
+								$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
+								foreach($recursos as $recurso){
+									//si modo automatico
+									//$ocupado = false;
+									$id_recurso = $recurso->id;	
+									if(!$recurso->validacion()){
+										//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
+										$estado = 'aprobada';
+										//$currentFecha tiene formato d-m-Y
+										$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
+										
+										foreach ($dias as $dWeek) {
+											if ($data['repetir'] == 'SR') $nRepeticiones = 1;
+											else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
-								for($j=0;$j<$nRepeticiones;$j++){
-									$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-									$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-									$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-									//si ocupado
-									if($numEvents > 0){
-										return true;
+											for($j=0;$j<$nRepeticiones;$j++){
+												$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek,'Y-m-d');
+												$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
+												$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+												//si ocupado
+												if($numEvents > 0){
+													return true;
+												}
+											}
+										}
 									}
 								}
 							}
-						}
-					}
-				}
-				else{
-					//si modo automatico = si no necesita validacion
-					//$ocupado = false;	
-					if( !Recurso::find($data['id_recurso'])->validacion() ){
-						//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-						$estado = 'aprobada';
-						//$currentFecha tiene formato d-m-Y
-						$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
-						
-						foreach ($dias as $dWeek) {
-							if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-							else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
+							else{
+								//si modo automatico = si no necesita validacion
+								//$ocupado = false;	
+								if( !Recurso::find($data['id_recurso'])->validacion() ){
+									//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
+									$estado = 'aprobada';
+									//$currentFecha tiene formato d-m-Y
+									$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
+									
+									foreach ($dias as $dWeek) {
+										if ($data['repetir'] == 'SR') $nRepeticiones = 1;
+										else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
 
-							for($j=0;$j<$nRepeticiones;$j++){
-								$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-								$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-								$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-								//si ocupado
-								if($numEvents > 0){
-									return true;
+										for($j=0;$j<$nRepeticiones;$j++){
+											$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek,'Y-m-d');
+											$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
+											$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
+											//si ocupado
+											if($numEvents > 0){
+												return true;
+											}
+										}
+									}
 								}
-							}
-						}
-					}
-				}	
-				
+							}	
 			});
 		}
                
-        //req4: Sábados y domingos no se puede reservar
+    //req4: Sábados y domingos no se puede reservar
 		if (isset($data['dias'])){
 			$v->sometimes('dias','req4',function($data){
 				$dias = $data['dias'];
@@ -415,85 +426,70 @@ class Evento extends Eloquent{
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req5',function($data){
 				if (Auth::user()->isAvanceUser()) {
-					if ( sgrCalendario::fristMonday() > sgrDate::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
+					if ( sgrCalendario::fristMonday() > strtotime($data['fInicio']) ) return true;
 				}
 			}); 
 		}	
 		
 		//Req6: 
-		// --> tecnicos  (capacidad 3, 4 y 5): reservas a partir del día de hoy (para mañana)
+		// --> técnicos  (capacidad 3, 4 y 5): reservas a partir del día de hoy (para mañana)
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req6',function($data){
 				if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()) {
-					if ( strtotime('today') > sgrDate::gettimestamp($data['fInicio'],'d-m-Y') ) return true;
+					if ( strtotime('today') > strtotime($data['fInicio']) ) return true;
 				}
 			}); 
 		}	
+		
 		//after: fInicio & fFin > today	
  		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false ){
-        	
-	        
-		        $intFinicio = sgrDate::gettimestamp($data['fInicio'],'d-m-Y');
-		        $intNow = strtotime('now');
-	        	$intDiaAnterior = strtotime('-1 day',$intFinicio);
-			    //fecha posterior al día actual
-			    $v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){
-			    	return true;
-				    });
-			    //fecha fin mayor o igual que fecha inicio => mayor que el día anterior a fecha inicio
-			    if ($data['repetir'] == 'CS'){ 
-	        		$v->sometimes('fFin','required|date|date_format:d-m-Y|after:'. date('d-m-Y',$intDiaAnterior),function($data){
-			    	    	return true;
-			    	});
-	        	}
+      $intFinicio = strtotime($data['fInicio']);
+		  $intNow = strtotime('now');
+	    $intDiaAnterior = strtotime('-1 day',$intFinicio);
+			//fecha posterior al día actual
+			$v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){return true;});
+			//fecha fin mayor o igual que fecha inicio => mayor que el día anterior a fecha inicio
+			if ($data['repetir'] == 'CS'){ 
+	    	$v->sometimes('fFin','required|date|date_format:j-n-Y|after:'. date('d-m-Y',$intDiaAnterior),function($data){return true;});
 	    }
-        //after:hinicio < hfin
+	  }
+    
+    //after:hinicio < hfin
 		if (!empty($data['hInicio'])){
 			$aHini = explode(':',$data['hInicio']);
 			$timehorainicio = mktime($aHini[0],$aHini[1]);
-			$v->sometimes('hFin','required|date_format:H:i|after:'.date('H:i',$timehorainicio),function($data){
-		    	return true;
-			    });
-        }
+			$v->sometimes('hFin','required|date_format:H:i|after:'.date('H:i',$timehorainicio),function($data){return true;});
+    }
         
-        // requisito: reservas debe finalizar dentro del curso académico actual (Restringido a todos los usuarios menos a los validadores)
-        if (!empty($data['fFin'])  && !empty($data['repetir']) && !Auth::user()->isValidador()){
-
+    // requisito: reservas debe finalizar dentro del curso académico actual (Restringido a todos los usuarios menos a los validadores)
+    if (!empty($data['fFin'])  && !empty($data['repetir']) && !Auth::user()->isValidador()){
 			$v->sometimes('fFin','datefincurso',function($data){
-		    	
-		    	$fechaFinCurso = Config::get('options.fin_cursoAcademico');
-		    	$fechaMaximaEvento = $data['fEvento'];
-		    	if ($data['repetir'] == 'CS') $fechaMaximaEvento = $data['fFin']; //Reptición cada semana
-		    		
-		    	if (strtotime(sgrDate::parsedatetime($fechaMaximaEvento,'d-m-Y','Y-m-d')) > strtotime($fechaFinCurso)) return true;
-			});
-        }
+		 	$fechaFinCurso = Config::get('options.fin_cursoAcademico');
+		 	$fechaMaximaEvento = $data['fEvento'];
+		 	if ($data['repetir'] == 'CS') $fechaMaximaEvento = $data['fFin']; //Reptición cada semana
+		  if (strtotime($fechaMaximaEvento) > strtotime($fechaFinCurso)) return true;});
+    }
 
-        // requisito dateiniciocurso: lasreservas debe de ser posteriores a la fecha de inicio curso actual (Restringido a usuarios alumnos, pdi, supervisores y tecnicos)
-        if (!empty($data['fInicio'])  && !Auth::user()->isValidador() && !Auth::user()->isAdmin() ){
-
+    // requisito dateiniciocurso: lasreservas debe de ser posteriores a la fecha de inicio curso actual (Restringido a usuarios alumnos, pdi, supervisores y tecnicos)
+    if (!empty($data['fInicio'])  && !Auth::user()->isValidador() && !Auth::user()->isAdmin() ){
 			$v->sometimes('fInicio','dateiniciocurso',function($data){
 		    	$hoy = strtotime('today');
-				$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
-				if ($diaInicio > $hoy) return true;
-			});
-        }
-
-		//}
-        // check for failure
-        if ($v->fails())
-        {
-           	$this->errors = $v->messages()->toArray();
-            return false;
-        }
-
-        // validation pass
-        return true;
+					$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
+					if ($diaInicio > $hoy) return true;});
     }
 
-    public function errors()
-    	{
+		// check for failure
+    if ($v->fails()){
+      $this->errors = $v->messages()->toArray();
+      return false;
+    }
+
+    // validation pass
+    return true;
+  }
+
+  public function errors(){
         return $this->errors;
-    }
+  }
  
 }

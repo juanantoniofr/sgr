@@ -3,21 +3,19 @@
 class sgrDate{
 	
 	/**
-	 * calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
- 	 * 
- 	 * @param $h1 string formato H:m
- 	 * @param $h2 string formato H:m
- 	 * @return $diff int número de horas de una reserva: diferencia entre $h1 y $h2
+	 	* calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
+ 	 	* 
+ 	 	* @param $h1 string formato H:m
+ 	 	* @param $h2 string formato H:m
+ 	 	* @return $diff int número de horas de una reserva: diferencia entre $h1 y $h2
 	*/
 	public static function diffHours($h1,$h2){ 
-	    //In: $h1,$h2 -> horas en formato H:m:s
-	    $tsh1 = strtotime($h1); //número de segundos desde 1 enero de 1970
-	    $tsh2 = strtotime($h2); //número de segundos desde 1 enero de 1970
+	  //In: $h1,$h2 -> horas en formato H:m:s
+	  $tsh1 = strtotime($h1); //número de segundos desde 1 enero de 1970
+	  $tsh2 = strtotime($h2); //número de segundos desde 1 enero de 1970
 
-	    $diff = ($tsh2 - $tsh1) / (60 * 60) ; //diferencia en horas
-		
+	  $diff = ($tsh2 - $tsh1) / (60 * 60) ; //diferencia en horas
 		return $diff;
-
 	}  
 
 	/**
@@ -34,7 +32,8 @@ class sgrDate{
 		$self = new self();
 					
 		$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($fInicio,'d-m-Y'));
-		$endTime = $self->gettimestamp($fFin,'d-m-Y');
+		//$endTime = $self->gettimestamp($fFin,'d-m-Y');
+		$endTime = strtotime($fFin);
 		$currentTime = $startTime;
 		
 		if ($startTime <= $endTime){
@@ -56,7 +55,6 @@ class sgrDate{
  	 * @return $timestamp int Timestamp de $fecha
 	*/
 	public static function gettimestamp($fecha,$formato){
-
 		$timestamp = '';
 		$date = DateTime::createFromFormat($formato,$fecha);
 		$timestamp = $date->getTimestamp();
@@ -64,33 +62,31 @@ class sgrDate{
 	}
 	
 	/**
-	*	Devuelve fecha en formato d-m-Y, del primer día de la semana ($dWeek) a partir de la fecha ($f)
-	* 	@param $f string fecha 'd-m-Y'
-	* 	@param $dWeek int 0->domingo,1->lunes,...
-	*	@return string format d-m-Y
+		*	Devuelve fecha en formato d-m-Y, del primer día de la semana ($dWeek) a partir de la fecha ($f)
+		* 	@param $f string fecha 'd-m-Y'
+		* 	@param $dWeek int 0->domingo,1->lunes,...
+		*	@return string format d-m-Y
 	*/
-	
-	public static function timeStamp_fristDayNextToDate($f,$dWeek){
+	public static function timeStamp_fristDayNextToDate($f,$dWeek,$formatofecha){
 		$aDaysWeek = array('0' => 'Sunday','1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
 		$self = new self();
-		$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($f,'d-m-Y'));
+		//$startTime = strtotime($aDaysWeek[$dWeek],$self->gettimestamp($f,$formatofecha));
+		$startTime = strtotime($aDaysWeek[$dWeek],strtotime($f));
 		return date('j-n-Y',$startTime);
 	}
 
-
 	/**
-	*	Devuelve la fecha del n-esimo ($numRepeticion) día siguiente a $finicio
-	* @param $fInicio string fecha en formato d-m-Y
-	* @param $numRepetición int 
-	* @return $fecha string (d-m-Y)  
-	*
+		*	Devuelve la fecha del n-esimo ($numRepeticion) día siguiente a $finicio
+		* @param $fInicio string fecha en formato d-m-Y
+		* @param $numRepetición int 
+		* @return $fecha string (d-m-Y)  
+		*
 	*/
-	
 	public static function fechaEnesimoDia($fInicio,$n){
-				
 		$self = new self();
 		if ($n == 0) return $fInicio;
-		$currentTime = strtotime('+ '.$n.' Week',$self->gettimestamp($fInicio,'d-m-Y'));
+		//$currentTime = strtotime('+ '.$n.' Week',$self->gettimestamp($fInicio,'d-m-Y'));
+		$currentTime = strtotime('+ '.$n.' Week',strtotime($fInicio));
 		$fecha = date('d-m-Y',$currentTime);
 		return $fecha;
 	}
@@ -104,7 +100,6 @@ class sgrDate{
  	 * @return $result datetime formateado según $formatosalida
 	*/
 	public static function parsedatetime($fecha,$formatoentrada,$formatosalida){
-		
 		$result = '';
 
 		$date = DateTime::createFromFormat($formatoentrada,$fecha);
@@ -114,7 +109,6 @@ class sgrDate{
 
 	public static function dateCSVtoSpanish($date){
 		//Esperamos de entrada fecha en formato dd-mesAbr(3)-yyyy, ejemplo 01-ene-2015
-
 		$mifecha = explode('-',$date);
 		$dia = $mifecha[0];
 		$mes = strtolower($mifecha[1]);
@@ -166,7 +160,6 @@ class sgrDate{
 	}
 
 	public static function sgrStrftime($format,$date){
-		
 		//'%A, %d de %B de %Y'
 		//$date = $event->fechaInicio;
 		setlocale(LC_ALL,'es_ES@euro','es_ES.UTF-8','esp');

@@ -2,7 +2,7 @@
 	<tr>
       	<td style="font-weight: bold;" width="9%"><small>{{$horas[$j]}}-{{$horas[$j+1]}}</small></td>
       	@for ( $i=0 ; $i<7 ; $i++ )
-      		<td class="celda" @if ($sgrWeek->dia($i)->festivo()) width="6%" @else width="16%" @endif>
+      		<td @if ($sgrWeek->dia($i)->festivo()) width="4%" @else width="17%" @endif>
       			@if ($sgrWeek->dia($i)->festivo()) 
       				{{(string) View::make('calendario.tdFestivo')->with('idfecha',date('jnY',$sgrWeek->dia($i)->timestamp()))->with('fecha',$sgrWeek->dia($i)->fecha())->with('view','week')->with('festivo','festivo')}}
       			@else

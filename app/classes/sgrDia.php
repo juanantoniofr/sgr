@@ -132,6 +132,7 @@ class sgrDia {
        
         $abreviatura=utf8_encode(ucfirst(date('D',$this->timestamp)));
     } 
+		//return substr($abreviatura,0,1);
 		return $abreviatura;
 	}
 

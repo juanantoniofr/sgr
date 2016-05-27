@@ -2,8 +2,8 @@
 
 class sgrCalendario {
 	
-	private $fecha;						//objeto DateTime (php) 
-	private $sgrRecurso;			//Objeto sgrRecurso
+	private $fecha;						//objeto DateTime (php) || empty
+	private $sgrRecurso;			//Objeto sgrRecurso 
 	private $currentDay;			//timestamp	
 	private $sgrWeeks; 				//array de objetos sgrWeek
 
@@ -13,15 +13,15 @@ class sgrCalendario {
 		*	@param $fecha 			DateTime
 		* @param $sgrRecurso 	sgrRecurso
 	*/
-	function __construct($fecha = '',$sgrRecurso = ''){
+	function __construct($fecha,$sgrRecurso){
 		
 		//sgrRecurso
 		$this->sgrRecurso = $sgrRecurso;
 		
 		//DateTime
-		if (empty($fecha)) $this->fecha = new DateTime();
-		else $this->fecha = $fecha;
-
+		//if (empty($fecha)) $this->fecha = new DateTime();
+		//else $this->fecha = $fecha;
+		$this->fecha = $fecha;
 		//timestamp
 		$this->currentDay 	= $this->fecha->getTimestamp();
 		

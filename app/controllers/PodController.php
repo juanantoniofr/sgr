@@ -99,7 +99,7 @@ class PodController extends BaseController {
 				$evento->fechaInicio = sgrDate::parsedatetime(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'d-m-Y','Y-m-d');
 				
 				//fecha Evento
-				$startDate = sgrDate::timeStamp_fristDayNextToDate(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA']);
+				$startDate = sgrDate::timeStamp_fristDayNextToDate(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA'],'Y-m-d');
 				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 				$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
 
@@ -167,7 +167,7 @@ class PodController extends BaseController {
 		for($j=0;$j < $nRepeticiones; $j++ ){ //foreach 
 			
 			//fecha Evento
-			$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA']);
+			$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA'],'Y-m-d');
 			$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
 			$sgrEvento = new sgrEvento;
 			foreach ($recursos as $recurso) {

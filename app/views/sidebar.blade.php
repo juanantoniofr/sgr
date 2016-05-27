@@ -17,7 +17,7 @@
       </div>
       
       <div  id="selectItems" style="display:none;margin-top:5px;">
-        <select class="form-control" id="items" name="puestos" > 
+        <select class="form-control" id="items" name="items" > 
         </select>
       </div>
 

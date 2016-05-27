@@ -126,8 +126,7 @@ class GruposController extends BaseController {
       
     //Output 
     $htmloptionsrecursos = '';
-    $disabledAll = 0;
-    
+        
     if(!empty($id)){
       $grupo = GrupoRecurso::findOrFail($id);
       
@@ -136,18 +135,7 @@ class GruposController extends BaseController {
           $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
           $sgrRecurso->setRecurso($recurso);
           return $sgrRecurso->visible(); });
-      $addOptionReservarTodo = $grupo->usuariopuedereservartodo(Auth::user()->id);
-      
-      //número de puestos or equipos disabled
-      $numerodeitemsdisabled = 0;
-      $disabledAll = 0;
-      foreach ($recursos as $recurso) {
-        if($recurso->disabled == '1') $numerodeitemsdisabled++;
-      }
-      if($numerodeitemsdisabled == $recursos->count()) $disabledAll = 1;
-      $tipoRecursos = $grupo->tipo;     
-      $htmloptionsrecursos = (string ) View::make('calendario.optionsRecursos')->with(compact('recursos','addOptionReservarTodo','disabledAll','tipoRecursos'));
-      
+      $htmloptionsrecursos = (string ) View::make('calendario.allViews.optionsRecursos')->with(compact('recursos'));
     }
 
     return $htmloptionsrecursos;

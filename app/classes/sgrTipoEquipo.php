@@ -10,7 +10,17 @@
 	}
 
 	public function visible(){
-			return $this->recurso->visible() && $this->recurso->equipos()->count() > 0;
+		$visible = false;
+		$recursoesvisible = false;
+		$tienealmenosunequipovisible = false;
+		if ($this->recurso->visible() && $this->recurso->equipos()->count() > 0){
+			$recursoesvisible = true;
+			foreach ($this->recurso->equipos as $equipo) {
+					if ($equipo->visible()) $tienealmenosunequipovisible = true;
+			}
+		}
+		if ($recursoesvisible && $tienealmenosunequipovisible) $visible = true; 
+		return $visible;
 	}
 
 	public function recurso(){

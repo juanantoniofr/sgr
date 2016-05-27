@@ -65,9 +65,7 @@ class CalendarController extends BaseController {
 			case 'month':
 				return (string) View::make('calendario.month.head');
 				break;
-			
 			case 'week':
-				//$sgrWeek = $sgrCalendario->sgrWeek();
 				return (string) View::make('calendario.week.head')->with('sgrCalendario',$sgrCalendario);
 				break;
 		}
@@ -117,6 +115,7 @@ class CalendarController extends BaseController {
 	//Generación de pdf's para imprimir
 	public function imprime(){
 		
+		//!!!***Validar parámetros de entrada***!!!
 		//get Input or default
 		$viewActive = Input::get('view','month');
 		$day = Input::get('day',date('d'));
@@ -132,31 +131,29 @@ class CalendarController extends BaseController {
 		
 		//Output
 		$table = array( 'tCaption'	=> '',
-						'tHead' 	=> '',
-						'tBody'		=> '');
-
-		$sgrCalendario = new sgrCalendario($month,$year);
+										'tHead' 		=> '',
+										'tBody'			=> '');
+		$fecha = new DateTime($year.'-'.$month.'-1');
+		$recurso = Recurso::findOrFail($id_recurso);
+		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+		$sgrRecurso->setRecurso($recurso);
+		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
 
 
 		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->year());
-		$table['tHead'] = CalendarController::head($viewActive,$day,$month,$year);
+		
 
 		switch ($viewActive) {
 			case 'month':
-				//$diaActual = 1;
-				//$j=1;
-				//$nameMonth = $sgrCalendario->nombreMes();//representación textual del mes (enero,febrero.... etc)
-				//$days = $sgrCalendario->dias();
-				//$diaSemanaPimerDiaMes = date('N',$days[1]->timestamp());
-				//$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('mon',$month)->with('year',$year)->with('diaActual',$diaActual)->with('j',$j)->with('diaSemanaPimerDiaMes',$diaSemanaPimerDiaMes)->with('days',$days)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);
+				$table['tHead'] = CalendarController::head($viewActive,$sgrCalendario);
 				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
 				break;
 			case 'week':
 				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
-				$sgrWeek = new sgrWeek($day,$month,$year);
-
-				$table['tBody'] = View::make('calendario.printBodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);	
-					
+				$sgrWeek = $sgrCalendario->sgrWeek();
+								
+				$table['tHead'] = View::make('calendario.printHeadWeek')->with('sgrCalendario',$sgrCalendario);
+				$table['tBody'] = View::make('calendario.printBodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
 				break;
 			default:
 				# code...

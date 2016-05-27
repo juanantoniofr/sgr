@@ -10,7 +10,25 @@
 	}
 	
 	public function visible(){
-			return true;
+		$visible = false;
+		$recursoesvisible = false;
+		$tienealmenosunpuestovisible = false;
+		
+		//Espacio sin puestos
+		if ($this->recurso->visible() && $this->recurso->puestos()->count() == 0){
+				$visible = true;
+				return $visible;
+		}
+
+		//Espacio con puestos
+		if ($this->recurso->visible() && $this->recurso->puestos()->count() > 0){
+				$recursoesvisible = true;
+				foreach ($this->recurso->puestos as $puesto) {
+						if ($puesto->visible()) $tienealmenosunpuestovisible = true;
+				}
+		}
+		if ($recursoesvisible && $tienealmenosunpuestovisible) $visible = true; 
+		return $visible;
 	}
 
 	public function recurso(){

@@ -49,9 +49,9 @@
           </button>
         </div>
         <div class = "btn-group"  >
-          <a type="button" data-view="{{$viewActive}}" data-day="{{$sgrCalendario->dia()}}" data-month="{{$sgrCalendario->mes()}}" data-year="{{$sgrCalendario->year()}}"  id="btnprint" class="btn btn-primary disabled">
+          <button type="button" data-view="{{$viewActive}}" data-day="{{$sgrCalendario->dia()}}" data-month="{{$sgrCalendario->mes()}}" data-year="{{$sgrCalendario->year()}}"  id="btnprint" class="btn btn-primary disabled">
             <i class="fa fa-print fa-fw" ></i> Imprimir
-          </a>
+          </button>
         </div>
      </div>
 

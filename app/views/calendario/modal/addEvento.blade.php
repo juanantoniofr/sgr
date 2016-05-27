@@ -1,109 +1,105 @@
 <!-- / Modal addEvent // editEvent  -->
 <div class="modal fade myModal-lg" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="formNewEvent" aria-hidden="true">
     
-    <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg">
      
-      <div class="modal-content">
-        
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h3 class="modal-title" id="myModalLabel">Atención de reserva: usuario <b><span id="uvusModal"></span></b></h3>
-        </div><!-- ./modal-header -->
-        
-
-        <div class="modal-body">
-          <form class="form-horizontal" role="form" id = "addEvent" >
-            <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Información básica</h4>
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="modal-title" id="myModalLabel">Atención de reserva: usuario <b><span id="uvusModal"></span></b></h3>
+      </div>
+      
+      <div class="modal-body">
+        <form class="form-horizontal" role="form" id = "fm_addEvent" >
+          <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Información básica</h4>
             
-             <!-- Errores --> 
-            <div id = 'errorsModalAdd' class = "col-md-12 alert alert-danger text-center is_slide" style = "display:none">  
-              <p id="titulo_Error" class="col-md-12" style=""></p>
-              <p id="reservarParaUvus_Error" class="col-md-12" style=""></p>
-              <p id="fInicio_Error" class="col-md-12" style=""></p>
-              <p id="hFin_Error" class="col-md-12" style=""></p>
-              <p id="fEvento_Error" class="col-md-12" style=""></p>
-              <p id="fFin_Error" class="col-md-12" style=""></p>
-              <p id="dias_Error" class="col-md-12" style=""></p>
-            </div>
+          <!-- Errores --> 
+          <div id = 'errorsModalAdd' class = "col-md-12 alert alert-danger text-center is_slide" style = "display:none">  
+            <p id="titulo_Error" class="col-md-12" style=""></p>
+            <p id="reservarParaUvus_Error" class="col-md-12" style=""></p>
+            <p id="fInicio_Error" class="col-md-12" style=""></p>
+            <p id="hFin_Error" class="col-md-12" style=""></p>
+            <p id="fEvento_Error" class="col-md-12" style=""></p>
+            <p id="fFin_Error" class="col-md-12" style=""></p>
+            <p id="dias_Error" class="col-md-12" style=""></p>
+          </div>
 
-            <!-- título -->
-
-            <div class="form-group" id="titulo">
-              <label for="titulo"  class="control-label col-sm-2" >Título: </label>   
-              <div class = "col-sm-10" >  
-                <input type="text" name="titulo" class="form-control" id = "newReservaTitle" placeholder="Introducir título de la reserva" value="" />
-              </div>             
-            </div>
-            
-            
-            <!-- Actividad -->
-            <div class="form-group">
-              <label class="control-label col-sm-2">Actividad:</label>
-              <div class="col-sm-8">
-                <select class="form-control"  name="actividad" id="tipoActividad" >
-                  @if (Auth::user()->capacidad > 1)<option value="Docencia Reglada PAP">Docencia Reglada PAP</option>@endif
-                  @if (Auth::user()->capacidad > 1)<option value="Títulos propios">Títulos propios</option>@endif
-                  @if (Auth::user()->capacidad > 1)<option value="Otra actividad docente/investigadora">Otra actividad docente/investigadora</option>@endif
-                 <option value="Autoaprendizaje">Autoaprendizaje</option>
+          <!-- título -->
+          <div class="form-group" id="titulo">
+            <label for="titulo"  class="control-label col-sm-2" >Título: </label>   
+            <div class = "col-sm-10" >  
+              <input type="text" name="titulo" class="form-control" id = "newReservaTitle" placeholder="Introducir título de la reserva" value="" />
+            </div>             
+          </div>
+          
+          <!-- Actividad -->
+          <div class="form-group">
+            <label class="control-label col-sm-2">Actividad:</label>
+            <div class="col-sm-8">
+              <select class="form-control"  name="actividad" id="tipoActividad" >
+                @if (Auth::user()->capacidad > 1)<option value="Docencia Reglada PAP">Docencia Reglada PAP</option>@endif
+                @if (Auth::user()->capacidad > 1)<option value="Títulos propios">Títulos propios</option>@endif
+                @if (Auth::user()->capacidad > 1)<option value="Otra actividad docente/investigadora">Otra actividad docente/investigadora</option>@endif
+                <option value="Autoaprendizaje">Autoaprendizaje</option>
                   @if (Auth::user()->capacidad > 1)<option value="Otra actividad">Otra actividad</option>@endif
-                </select>
-              </div>
+              </select>
             </div>
+          </div>
 
-           
-            <!-- Fecha  evento -->
-            <div class="form-group" id="fEvento">
-                  <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
-                  <div class="col-md-4" >  
-                    <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
-                  </div>
+          <!-- Fecha  evento -->
+          <div class="form-group" id="fEvento">
+            <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
+            <div class="col-md-4" >  
+              <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
             </div>
+          </div>
             
-            <!-- horario -->
-            <div class="form-group" id="hFin">
-              <label class="control-label col-sm-2">Horario desde:</label>
-              <div class="col-sm-4">
-                  <select class="form-control"  name="hInicio" id="newReservaHinicio" >
-                    <option value="8:30">8:30</option>
-                    <option value="9:30">9:30</option>
-                    <option value="10:30">10:30</option>
-                    <option value="11:30">11:30</option>
-                    <option value="12:30">12:30</option>
-                    <option value="13:30">13:30</option>
-                    <option value="14:30">14:30</option>
-                    <option value="15:30">15:30</option>
-                    <option value="16:30">16:30</option>
-                    <option value="17:30">17:30</option>
-                    <option value="18:30">18:30</option>
-                    <option value="19:30">19:30</option>
-                    <option value="20:30">20:30</option>
-                  </select>
-              </div>
-              <label class="control-label col-sm-2">Hasta:</label>
-              <div class="col-sm-4">
-                  <select class="form-control"  name="hFin" id="newReservaHfin" >
-                    <option value="9:30">9:30</option>
-                    <option value="10:30">10:30</option>
-                    <option value="11:30">11:30</option>
-                    <option value="12:30">12:30</option>
-                    <option value="13:30">13:30</option>
-                    <option value="14:30">14:30</option>
-                    <option value="15:30">15:30</option>
-                    <option value="16:30">16:30</option>
-                    <option value="17:30">17:30</option>
-                    <option value="18:30">18:30</option>
-                    <option value="19:30">19:30</option>
-                    <option value="20:30">20:30</option>
-                    <option value="21:30">21:30</option>
-                  </select>
-              </div>
+          <!-- horario -->
+          <div class="form-group" id="hFin">
+            <label class="control-label col-sm-2">Horario desde:</label>
+            <div class="col-sm-4">
+              <select class="form-control"  name="hInicio" id="newReservaHinicio" >
+                <option value="8:30">8:30</option>
+                <option value="9:30">9:30</option>
+                <option value="10:30">10:30</option>
+                <option value="11:30">11:30</option>
+                <option value="12:30">12:30</option>
+                <option value="13:30">13:30</option>
+                <option value="14:30">14:30</option>
+                <option value="15:30">15:30</option>
+                <option value="16:30">16:30</option>
+                <option value="17:30">17:30</option>
+                <option value="18:30">18:30</option>
+                <option value="19:30">19:30</option>
+                <option value="20:30">20:30</option>
+              </select>
             </div>
+            <label class="control-label col-sm-2">Hasta:</label>
+            <div class="col-sm-4">
+              <select class="form-control"  name="hFin" id="newReservaHfin" >
+                <option value="9:30">9:30</option>
+                <option value="10:30">10:30</option>
+                <option value="11:30">11:30</option>
+                <option value="12:30">12:30</option>
+                <option value="13:30">13:30</option>
+                <option value="14:30">14:30</option>
+                <option value="15:30">15:30</option>
+                <option value="16:30">16:30</option>
+                <option value="17:30">17:30</option>
+                <option value="18:30">18:30</option>
+                <option value="19:30">19:30</option>
+                <option value="20:30">20:30</option>
+                <option value="21:30">21:30</option>
+              </select>
+            </div>
+          </div>
             
-           
+          <!-- Periocidad -->
           <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Periocidad</h4>
 
-            <!-- repetición?? -->
+            
             <div class="form-group">
               <label  class="control-label col-md-2">Repetir.... </label> 
               <div class="col-md-10">  
@@ -157,9 +153,8 @@
                   </div>
                 </div> 
               </div>        
-              
             </div>
-          </div>  <!-- ./ preiodica -->
+          </div>
 
           
           <div style="display:none" id = "reservarPara">
@@ -189,18 +184,16 @@
          
           <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Resumen</h4>
           
-            <div class="alert alert-info text-center" role="alert" id="resumen"><p></p></div>
-            <!-- fin elementos de edición -->
+          <div class="alert alert-info text-center" role="alert" id="resumen"><p></p></div>
+          <!-- fin elementos de edición -->
            
-            <input type="hidden" name="id_recurso" id="idRecurso" value="" />
-            <input type="hidden" name="action"  id="actionType" value="" />
-            <input type="hidden" name="eventoid"  value=""   />
-        
-        
-         
-       </div><!-- /#modal-body -->
+          <input type="hidden" name="id_recurso" id="idRecurso" value="" />
+          <!-- <input type="hidden" name="id_item" id="idItem" value="" /> -->
+          <input type="hidden" name="action"  id="actionType" value="" />
+          <input type="hidden" name="eventoid"  value=""   />
+        </div><!-- /#modal-body -->
        
-       <div class="modal-footer">
+        <div class="modal-footer">
           <div class="col-md-12 " style = "display:none" id = "editOptions">
             <button type="button" class="btn btn-primary  optionedit" id="editOption1" data-id-serie="" data-id-evento="">Modificar evento</button>
           </div>
@@ -208,10 +201,8 @@
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
             <button type="button" class="btn btn-primary" id="save"><i class="fa fa-save fa-fw"></i> Salvar</button>
           </div>
-        </div><!-- ./footer --> 
-
-       </form> 
-       
-      </div><!-- ./modal-content -->
-    </div><!-- ./modal-dialog -->
-  </div><!-- ./modal -->
+        </div>
+      </form> 
+    </div><!-- ./modal-content -->
+  </div><!-- ./modal-dialog -->
+</div><!-- ./modal -->
