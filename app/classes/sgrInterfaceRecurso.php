@@ -8,12 +8,14 @@
 		public function del();
 		public function update($data);
 		public function add($data);
-		public function getEvents($fecha);
+		public function getEvents($fecha,$estados);
 		public function recurso();
 		public function atendidoPor($id);
 		public function items();
 		public function visible();
 		public function recursoOcupado($dataEvento);
+		public function addEvent($dataEvento,$fecha,$idserie);
+		private function setdataevent($evento,$data,$currentfecha,$idserie)
 	}
 
 ?>

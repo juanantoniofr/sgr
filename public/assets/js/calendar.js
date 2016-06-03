@@ -76,9 +76,6 @@ $(function(e){
 		});
 	}
 
-
-
-
 	//When load page....
 	function onLoad(){
 
@@ -164,9 +161,6 @@ $(function(e){
 	//functions: call from function onLoad()
 	//********************************************************************************
 	//********************************************************************************
-	
-	
-
 	/*
 		display new data in calendar (call from functions in onLaod....)
 		********************************************************************************
@@ -557,11 +551,6 @@ $(function(e){
 		$('#errorsModalAdd').slideUp();
 	}
 
-	/*Action: 1. save new event
-		********************************************************************************
-		********************************************************************************
-	*/
-	
 	/*Action: 2. delete event
 		********************************************************************************
 		********************************************************************************
@@ -1244,7 +1233,7 @@ $(function(e){
 	function saveEvent(){
 		$('#message').fadeOut("slow");
 		
-		$data = 'grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' + $('#fm_addEvent').serialize();
+		$data = $('#fm_addEvent').serialize();
 		console.log($data);
 		$.ajax({
     	type: "POST",

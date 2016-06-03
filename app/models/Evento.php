@@ -150,10 +150,10 @@ class Evento extends Eloquent{
 	}
 
  	/**
- 	 * Implementa requisito: ofrecer sumatorio de puestos o equipos reservados
- 	 * 
- 	 * @param void
- 	 * @return $total int número total de puestos o equipos asociados a una misma reserva 
+ 	 	* Implementa requisito: ofrecer sumatorio de puestos o equipos reservados
+ 	 	* 
+ 	 	* @param void
+ 		 * @return $total int número total de puestos o equipos asociados a una misma reserva 
  	*/
  	public function total(){
  		$total = 0;
@@ -179,6 +179,18 @@ class Evento extends Eloquent{
  		return $total;
  	}
 
+ 	//Requisitos antes de salvar eventos.
+		//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
+  	//req2: alumno supera el máximo de horas a la semana (12)
+  	//req3: espacio ocupado (no solapamientos)
+  	//req4: no se puede reservar en sábados y domingos
+  	//req5: alumnos y pdi: solo pueden reservar a partir de firstmonday
+  	//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
+  	//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
+		//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
+  	//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico para alumnos y pdi
+  	//dateiniciocurso: las reservas no pueden empezar antes del inicio del presente curso académico para alumnos y pdi
+  	//deshabilitado: no permite añadir reservas en espacios deshabilitados 
  	private $rules = array (
 			'titulo' 			=>	'required',
 			'actividad'		=>	'required',
@@ -217,20 +229,7 @@ class Evento extends Eloquent{
 	
   private $errors = array();
 
-	//Requisitos antes de salvar eventos.
-		//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
-  	//req2: alumno supera el máximo de horas a la semana (12)
-  	//req3: espacio ocupado (no solapamientos)
-  	//req4: no se puede reservar en sábados y domingos
-  	//req5: alumnos y pdi: solo pueden reservar a partir de firstmonday
-  	//rqe6: alumnos no pueden reservar dos recursos a la misma hora mismo día
-  	//reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
-		//existeuvus: al añadir un evento para uvus: debe existir en la base de datos.
-  	//datefincurso: las reservas no pueden finalizar después de la fecha de fin del presente curso académico para alumnos y pdi
-  	//dateiniciocurso: las reservas no pueden empezar antes del inicio del presente curso académico para alumnos y pdi
-  	//deshabilitado: no permite añadir reservas en espacios deshabilitados 
-    
-  public function validate($data){
+	public function validate($data){
     //$this->errors = $data;
     //return false;	
 
@@ -349,63 +348,6 @@ class Evento extends Eloquent{
 			});
 		}
 
-		//req3: espacio ocupado (no solapamientos)
-    /*if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
-			$v->sometimes('titulo','req3',function($data){
-					$sgrEvento = new sgrEvento;
-					if ($data['id_recurso'] == 0){
-						$recursos = Recurso::where('grupo_id','=',$data['grupo_id'])->get();
-						foreach($recursos as $recurso){
-							//si modo automatico
-							//$ocupado = false;
-							$id_recurso = $recurso->id;	
-							if(!$recurso->validacion()){
-								//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-								$estado = 'aprobada';
-								//$currentFecha tiene formato d-m-Y
-								$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
-										
-								foreach ($dias as $dWeek) {
-									if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-									else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
-
-									for($j=0;$j<$nRepeticiones;$j++){
-										$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-										$currentfecha = sgrDate::fechaEnesimoDia(strtotime($startDate),$j);
-										$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-										//si ocupado
-										if($numEvents > 0) return true;
-									}
-								}
-							}
-						}
-					}
-					else{
-						//si modo automatico = si no necesita validacion
-						//$ocupado = false;	
-						if( !Recurso::find($data['id_recurso'])->validacion() ){
-							//Ocupado??; -> Solo busco solapamientos con solicitudes ya aprobadas
-							$estado = 'aprobada';
-							//$currentFecha tiene formato d-m-Y
-							$dias = $data['dias']; //0->domingo, 1->lunes...., 5->viernes, 6->sádabo
-								
-							foreach ($dias as $dWeek) {
-								if ($data['repetir'] == 'SR') $nRepeticiones = 1;
-								else $nRepeticiones = sgrDate::numRepeticiones($data['fInicio'],$data['fFin'],$dWeek);
-
-								for($j=0;$j<$nRepeticiones;$j++){
-									$startDate = sgrDate::timeStamp_fristDayNextToDate($data['fInicio'],$dWeek);
-									$currentfecha = sgrDate::fechaEnesimoDia(strtotime($startDate),$j);
-									$numEvents = $sgrEvento->solapa($data['grupo_id'],$data['id_recurso'],$currentfecha,$data['hInicio'],$data['hFin'],$estado);
-									//si ocupado
-									if($numEvents > 0) return true;
-								}
-							}
-						}
-					}	
-			});
-		}*/
-    
     //test req3:
     if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
 			$v->sometimes('titulo','req3',function($data){

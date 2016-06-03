@@ -14,8 +14,15 @@
 		
 		public function recursoOcupado($dataEvento){
 			for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
-				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento))->count();
-				if ( $eventos > 0 ) return true; 	
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento));
+				if ( $eventos->count() > 0 ){
+					foreach ($eventos as $evento) {
+						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+							return true;
+						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+							return true; 	 	
+					}//fin foreach
+				}//fin if  	
 			}//fin del for
 			
 			return false;
@@ -51,7 +58,13 @@
 		public function setRecurso($recurso){
 			$this->recurso = $recurso;
 		}
-
+		
+		/**
+			* //Devuelve los eventos para el día $fechaEvento
+			*	@param $fechaEvento string formato Y-m-d
+			*	@return Collection Object Evento
+			*
+		*/
 		public function getEvents($fechaEvento){
 			return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
 		}

@@ -56,14 +56,15 @@ class sgrCalendario {
 		}
 
 	/**
-		*	
+		*	//devuelve la semana sgrWeek que contine la fecha con timestamp $timestamp or la semana que contine el timestamp $this->fecha->getTimestamp() or false en otro caso;
+		* @param 	$tiemstamp int  
 		*	@return $sgrWeek array object srgDia 
 	*/
-	public function sgrWeek(){
-
+	public function sgrWeek($timestamp = ''){
+		if (empty($timestamp)) $timestamp = $this->fecha->getTimestamp();
 		foreach ($this->sgrWeeks as $sgrWeek) {
 			foreach ($sgrWeek->sgrDays() as $sgrDia) {
-				if ($this->fecha->getTimestamp() == $sgrDia->timestamp()) return $sgrWeek;
+				if ($timestamp == $sgrDia->timestamp()) return $sgrWeek;
 			}
 		}
 		

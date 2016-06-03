@@ -121,7 +121,8 @@ class CalendarController extends BaseController {
 		$month = Input::get('month',date('m'));
 		$year = Input::get('year',date('Y'));
 		$id_recurso = Input::get('idRecurso','');
-		$id_grupo = Input::get('groupID','');
+		//$id_grupo = Input::get('groupID','');
+		$id_item = Input::get('item',0);//Todos los items (equipos o puestos)
 		$titulo = Input::get('titulo',false);
 		$nombre = Input::get('nombre',false);
 		$colectivo = Input::get('colectivo',false);
@@ -132,12 +133,12 @@ class CalendarController extends BaseController {
 		$table = array( 'tCaption'	=> '',
 										'tHead' 		=> '',
 										'tBody'			=> '');
+
 		$fecha = new DateTime($year.'-'.$month.'-1');
 		$recurso = Recurso::findOrFail($id_recurso);
 		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
 		$sgrRecurso->setRecurso($recurso);
 		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-
 
 		$table['tCaption'] = CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$sgrCalendario->year());
 		
@@ -145,14 +146,15 @@ class CalendarController extends BaseController {
 		switch ($viewActive) {
 			case 'month':
 				$table['tHead'] = CalendarController::head($viewActive,$sgrCalendario);
-				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
+				$table['tBody'] = View::make('calendario.printBodyMonth')->with('sgrCalendario',$sgrCalendario)->with('id_recurso',$id_recurso)->with('id_grupo','')->with('datatoprint',$datatoprint);		
 				break;
 			case 'week':
 				$horas = array('8:30','9:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30','20:30','21:30');
-				$sgrWeek = $sgrCalendario->sgrWeek();
+				$sgrWeek = $sgrCalendario->sgrWeek(strtotime($year.'-'.$month.'-'.$day));
 								
-				$table['tHead'] = View::make('calendario.printHeadWeek')->with('sgrCalendario',$sgrCalendario);
-				$table['tBody'] = View::make('calendario.printBodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo',$id_grupo)->with('datatoprint',$datatoprint);		
+				$table['tHead'] = View::make('calendario.print.weekhead')->with('sgrWeek',$sgrWeek);
+				//$table['tBody'] = View::make('calendario.printBodyWeek')->with('horas',$horas)->with('sgrWeek',$sgrWeek)->with('id_recurso',$id_recurso)->with('id_grupo','')->with('datatoprint',$datatoprint);		
+				$table['tBody'] = (string) View::make('calendario.print.weekbody')->with('sgrCalendario',$sgrCalendario);
 				break;
 			default:
 				# code...

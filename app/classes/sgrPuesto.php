@@ -9,23 +9,113 @@
 			$this->recurso = new Recurso;
 		}
 		
-		public function recursoOcupado($dataEvento){
+	public function recursoOcupado($dataEvento){
 			
+			$estado = array('aprobada');
 			for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
-				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento))->count();
-				if ( $eventos > 0 ) return true; 	
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado));
+				if ( $eventos->count() > 0 ){
+					foreach ($eventos as $evento) {
+						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+							return true;
+						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+							return true; 	 	
+					}//fin foreach
+				}//fin if  	
 			}//fin del for
 			
 			return false;
+	}
+	/**
+		* //Añade un evento para la fecha $fecha con identificador de serie $idserie
+		* @param $dataEvento array 
+		* @param $fecha string Y-m-d
+		* @param $idserie string
+	*/
+	public function addEvent($dataEvento,$currentfecha,$idserie){
+		
+		$evento = new Evento();
+		$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
+		if ($evento->save()) return $evento->id;
+		return false;
+		
+	}//fin function addEvent
+				
+		
+	private function setdataevent($evento,$data,$currentfecha,$idserie){
+		
+		$evento->recurso_id = $this->recurso->id;
+		//Procesar información de formulario
+		$hInicio = date('H:i:s',strtotime($data['hInicio']));
+		$hFin = date('H:i:s',strtotime($data['hFin']));
+		
+		//Estado inicial del evento (reserva)
+		$estado = 'denegada';
+		//si no se requiere validación 
+		if( !$this->recurso->validacion() ){
+			if ( !$this->recursoOcupado($data) ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
 		}
+		//si se requiere validación (se pueden solapar las peticiones)
+		else {
+			$estado = 'pendiente'; //Si validación pendiente por defecto
+			if ( !$this->recursoOcupado($data) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
+			 $estado = 'aprobada';
+		}
+	
+		//fin estado inicial
+		$repeticion = 1;
+		$evento->fechaFin = $data['fFin'];
+		$evento->fechaInicio = $data['fInicio'];
+		$evento->diasRepeticion = json_encode($data['dias']);
+				
+		if ($data['repetir'] == 'SR') {
+			$repeticion = 0;
+			$evento->fechaFin = $currentfecha;
+			$evento->fechaInicio = $currentfecha;
+			$evento->diasRepeticion = json_encode(array(date('N',strtotime($currentfecha))));
+		}
+				
+		$evento->evento_id = $idserie;
+		$evento->titulo = $data['titulo'];
+		$evento->actividad = $data['actividad'];
+		
+		$evento->fechaEvento = $currentfecha;
+		$evento->repeticion = $repeticion;
+		$evento->dia = date('N',strtotime($currentfecha));
+		$evento->horaInicio = $data['hInicio'];
+		$evento->horaFin = $data['hFin'];
+		$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
+					
+		//Propietaria de la reserva
+		$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
+					
+		//U otro usuario
+		$uvus = Input::get('reservarParaUvus','');
+		if (!empty($uvus)) {
+			$user = User::where('username','=',$uvus)->first();
+			if ($user->count() > 0) $evento->user_id = $user->id;
+		}
+		
+		return $evento;
+	}
+	
+	/**
+			* //Devuelve los eventos en $fechaEvento
+			* @param $fechaEvento string formato Y-m-d
+			*	@return Collection Objets type Evento 
+			*
+	*/
+	public function getEvents($fechaEvento,$estado = ''){
+			return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
+	}
 
-		public function visible(){
-			return $this->recurso->visible();
-		}
+	public function visible(){
+		return $this->recurso->visible();
+	}
 
-		public function recurso(){
-			return $this->recurso;
-		}
+	public function recurso(){
+		return $this->recurso;
+	}
 		
 		public function items(){
     	//return $this->recurso->equipos->filter(function($equipo){return $equipo->visible();})
@@ -54,15 +144,6 @@
 			$this->recurso = $recurso;
 		}
 
-		/**
-			* //Devuelve los eventos en $fechaEvento
-			* @param $fechaEvento string formato Y-m-d
-			*	@return Collection Objets type Evento 
-			*
-		*/
-		public function getEvents($fechaEvento){
-			return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
-		}
 
 		public function enabled(){
 			$this->recurso->disabled =  0;

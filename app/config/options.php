@@ -48,6 +48,7 @@ return array (
 														'3'	=>	'finalizada',
 														'4'	=>	'anulada',
 														'5'	=>	'liberada',),
+	'estadosEvento' => array(	'denegada','aprobada','pendiente','finalizada','anulada','liberada',),
 	'reservaAprobada'		=> 'aprobada',
 	'reservaPendiente'	=> 'pendiente',
 	//tiempo cortesia para liberar una reserva (20 minutos) en segundos
