@@ -15,7 +15,6 @@
 		public function visible();
 		public function recursoOcupado($dataEvento);
 		public function addEvent($dataEvento,$fecha,$idserie);
-		private function setdataevent($evento,$data,$currentfecha,$idserie)
 	}
 
 ?>

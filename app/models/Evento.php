@@ -205,8 +205,10 @@ class Evento extends Eloquent{
 			'required'										=>	' El campo <strong>:attribute</strong> es obligatorio.',
 			'dias.required_with'					=>	' El campo <strong>"Días"</strong> es obligatorio. ',
 			'date'												=>	'<strong>Fecha no válida</strong>. <br />',
-			'date_format'  								=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: j-n-Y.',
-
+			'fInicio.date_format'  				=>	'Fecha inicial: <strong>formato no válido</strong>. Formato admitido: j-n-Y.',
+			'date_format'									=>  ':attribute',
+			'hInicio.date_format'  				=>	'Hora de inicio: <strong>formato no válido</strong>. Formato admitido: H:m.',
+			'hFin.date_format'  					=>	'Hora de finalización: <strong>formato no válido</strong>. Formato admitido: H:m.',
 			'fInicio.after' 							=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
 			'fInicio.req1' 								=>	'',
 			'fInicio.req5' 								=>	'',
@@ -397,7 +399,7 @@ class Evento extends Eloquent{
 			$v->sometimes('fInicio','after:'. date('d-m-Y',$intDiaAnterior),function($data){return true;});
 			//fecha fin mayor o igual que fecha inicio => mayor que el día anterior a fecha inicio
 			if ($data['repetir'] == 'CS'){ 
-	    	$v->sometimes('fFin','required|date|date_format:j-n-Y|after:'. date('d-m-Y',$intDiaAnterior),function($data){return true;});
+	    	$v->sometimes('fFin','required|date|date_format:Y-m-d|after:'. date('d-m-Y',$intDiaAnterior),function($data){return true;});
 	    }
 	  }
     

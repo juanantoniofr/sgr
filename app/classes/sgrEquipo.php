@@ -59,43 +59,45 @@
 			$this->recurso = $recurso;
 		}
 		
-		/**
-			* //Devuelve los eventos para el día $fechaEvento
-			*	@param $fechaEvento string formato Y-m-d
-			*	@return Collection Object Evento
-			*
-		*/
-		public function getEvents($fechaEvento){
-			return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
-		}
+	/**
+		* //Devuelve los eventos en $fechaEvento
+		* @param $fechaEvento string formato Y-m-d
+		*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
+		*	@return Collection Objets type Evento 
+		*
+	*/
+	public function getEvents($fechaEvento,$estado = ''){
+			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independiente de su estado
+			return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
+	}
 
-		public function enabled(){
-			$this->recurso->disabled =  0;
-			return true;
-		}
+	public function enabled(){
+		$this->recurso->disabled =  0;
+		return true;
+	}
 
-		public function disabled(){
-			$this->recurso->disabled =  1;
-			return true;
-		}
+	public function disabled(){
+		$this->recurso->disabled =  1;
+		return true;
+	}
 
-		public function save(){
-			return $this->recurso->save();
-		}
+	public function save(){
+		return $this->recurso->save();
+	}
 
-		public function del(){
-			//Softdelete recurso
-     	return $this->recurso->delete();
-		}
+	public function del(){
+		//Softdelete recurso
+   	return $this->recurso->delete();
+	}
 
-		public function delEvents(){
-			//Softdelete eventos
-			return $this->recurso->events()->delete();
-		}
+	public function delEvents(){
+		//Softdelete eventos
+		return $this->recurso->events()->delete();
+	}
 
-		public function update($data){
-			return $this->recurso->update($data);
-		}
+	public function update($data){
+		return $this->recurso->update($data);
+	}
 
 		public function add($data){
 			foreach ($data as $key => $value) {

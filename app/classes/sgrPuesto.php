@@ -8,12 +8,17 @@
 		public function __construct(){
 			$this->recurso = new Recurso;
 		}
-		
+	
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
+		* @param $dataEvento array
+		*
+		* @return boolean
+	*/	
 	public function recursoOcupado($dataEvento){
-			
 			$estado = array('aprobada');
 			for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
-				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado));
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
 				if ( $eventos->count() > 0 ){
 					foreach ($eventos as $evento) {
 						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
@@ -26,24 +31,46 @@
 			
 			return false;
 	}
+
 	/**
-		* //Añade un evento para la fecha $fecha con identificador de serie $idserie
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
+		* @param $dataEvento array
+		*	@param $fecha string (Y-m-d)
+		*
+		* @return boolean
+	*/
+	private function solapaEvento($dataEvento,$fecha){
+		$estado = array();
+		$estado[] = 'aprobada';
+		$eventos = $this->getEvents($fecha,$estado);
+		if ( $eventos->count() > 0 ){
+			foreach ($eventos as $evento) {
+				if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+					return true;
+				if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+					return true; 	 	
+			}//fin foreach
+		}//fin if 
+		return false;
+	}
+
+	/**
+		* //Añade un evento para la fecha $fecha con identificador de serie $idserie (si el puesto no está deshabilitado)
 		* @param $dataEvento array 
 		* @param $fecha string Y-m-d
 		* @param $idserie string
 	*/
 	public function addEvent($dataEvento,$currentfecha,$idserie){
-		
-		$evento = new Evento();
-		$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
-		if ($evento->save()) return $evento->id;
+		if(0 === $this->recurso->disabled){
+			$evento = new Evento();
+			$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
+			if ($evento->save()) return $evento->id;
+			}
 		return false;
-		
 	}//fin function addEvent
 				
 		
 	private function setdataevent($evento,$data,$currentfecha,$idserie){
-		
 		$evento->recurso_id = $this->recurso->id;
 		//Procesar información de formulario
 		$hInicio = date('H:i:s',strtotime($data['hInicio']));
@@ -52,17 +79,19 @@
 		//Estado inicial del evento (reserva)
 		$estado = 'denegada';
 		//si no se requiere validación 
-		if( !$this->recurso->validacion() ){
-			if ( !$this->recursoOcupado($data) ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
+		if( $this->recurso->validacion() === false){
+			if ( $this->solapaEvento($data,$currentfecha) === false ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
+			//else $estado = 'pendiente';
 		}
 		//si se requiere validación (se pueden solapar las peticiones)
 		else {
 			$estado = 'pendiente'; //Si validación pendiente por defecto
-			if ( !$this->recursoOcupado($data) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
+			if ( !$this->solapaEvento($data,$currentfecha) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
 			 $estado = 'aprobada';
 		}
-	
+		$evento->estado = $estado;
 		//fin estado inicial
+		
 		$repeticion = 1;
 		$evento->fechaFin = $data['fFin'];
 		$evento->fechaInicio = $data['fInicio'];
@@ -100,12 +129,14 @@
 	}
 	
 	/**
-			* //Devuelve los eventos en $fechaEvento
-			* @param $fechaEvento string formato Y-m-d
-			*	@return Collection Objets type Evento 
-			*
+		* //Devuelve los eventos en $fechaEvento
+		* @param $fechaEvento string formato Y-m-d
+		*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
+		*	@return Collection Objets type Evento 
+		*
 	*/
 	public function getEvents($fechaEvento,$estado = ''){
+			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independiente de su estado
 			return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 	}
 

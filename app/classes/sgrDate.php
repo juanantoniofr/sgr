@@ -80,9 +80,8 @@ class sgrDate{
 		*
 	*/
 	public static function fechaEnesimoDia($tsFecha,$n){
-		$self = new self();
 		if ($n == 0) return date('Y-m-d',$tsFecha);
-		$currentTime = strtotime('+ '.$n.' Week ',date('Y-m-d',$tsFecha));
+		$currentTime = strtotime('+'.$n.' week',$tsFecha);
 		return date('Y-m-d',$currentTime);
 	}
 

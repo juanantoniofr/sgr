@@ -95,7 +95,7 @@ class recursosController extends BaseController{
       if($numerodeitemsdisabled == $items->count()) $disabledAll = 1;
       
       //Añadir opción reservar "todos los puestos"
-      $result['listoptions'] = (string) View::make('calendario.allViews.optionsItems')->with(compact('items','addOptionReservarTodo','disabledAll'));
+      $result['listoptions'] = (string) View::make('calendario.allViews.optionsItems')->with(compact('items','addOptionReservarTodo','disabledAll','numerodeitemsdisabled'));
       //$result['listoptions'] = "<pre>".var_dump($items)."</pre>";
     }
     return $result;

@@ -83,11 +83,16 @@
 		return $atendido;
 	}
 
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
+		* @param $dataEvento array
+		*
+		* @return boolean
+	*/
 	public function recursoOcupado($dataEvento){
-		
-		$estado = array('aprobada');
+		$estado = array();
+		$estado[] = 'aprobada';
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
-				
 				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
 				if ( $eventos->count() > 0 ){
 					foreach ($eventos as $evento) {
@@ -100,32 +105,54 @@
 		}//fin del for
 		return false;
 	}
+
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
+		* @param $dataEvento array
+		*	@param $fecha string (Y-m-d)
+		*
+		* @return boolean
+	*/
+	private function solapaEvento($dataEvento,$fecha){
+		$estado = array();
+		$estado[] = 'aprobada';
+		$eventos = $this->getEvents($fecha,$estado);
+		if ( $eventos->count() > 0 ){
+			foreach ($eventos as $evento) {
+				if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+					return true;
+				if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+					return true; 	 	
+			}//fin foreach
+		}//fin if 
+		return false;
+	}
 	
 	/**
-		* //Añade un evento para la fecha $fecha con identificador de serie $idserie
+		* //Añade un evento para la fecha $currentfecha con identificador de serie $idserie:
+		* 	--> Si tiene puestos y son reservables individualmente: se reserva todos los puestos.
+		*		--> en caso contrario: se reserva el espacio
 		* @param $dataEvento array 
 		* @param $fecha string Y-m-d
 		* @param $idserie string
 	*/
 	public function addEvent($dataEvento,$currentfecha,$idserie){
-		
 		if ($this->recurso->puestos->count() > 0){
-				foreach($this->sgrPuestos as $puesto){
-					$result = $puesto->addEvent($dataEvento,$currentfecha,$idserie);
-				}
-				return $result;
+			foreach($this->sgrPuestos as $sgrPuesto){
+				$result = $sgrPuesto->addEvent($dataEvento,$currentfecha,$idserie);
+			}
+			return $result;
   	}
 		else {
-					$evento = new Evento();
-					$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
-					if ($evento->save()) return $evento->id;
-					return false;
+			$evento = new Evento();
+			$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
+			if ($evento->save()) return $evento->id;
+			return false;
 		}
 	}//fin function addEvent
 				
 		
 	private function setdataevent($evento,$data,$currentfecha,$idserie){
-		
 		$evento->recurso_id = $this->recurso->id;
 		//Procesar información de formulario
 		$hInicio = date('H:i:s',strtotime($data['hInicio']));
@@ -134,16 +161,18 @@
 		//Estado inicial del evento (reserva)
 		$estado = 'denegada';
 		//si no se requiere validación 
-		if( !$this->recurso->validacion() ){
-			if ( !$this->recursoOcupado($data) ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
+		if( $this->recurso->validacion() === false){
+			if ( $this->solapaEvento($data,$currentfecha) === false ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
+			//else $estado = 'pendiente';
 		}
 		//si se requiere validación (se pueden solapar las peticiones)
 		else {
 			$estado = 'pendiente'; //Si validación pendiente por defecto
-			if ( !$this->recursoOcupado($data) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
+			if ( !$this->solapaEvento($data,$currentfecha) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
 			 $estado = 'aprobada';
 		}
-	
+		$evento->estado = $estado;
+
 		//fin estado inicial
 		$repeticion = 1;
 		$evento->fechaFin = $data['fFin'];
@@ -196,14 +225,18 @@
 				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
   		  return Evento::whereIn('recurso_id',$id_puestos)->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
   		}
-			else
-				return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
+			else{
+				//$estado = 'aprobada';
+				//$estado = Config::get('options.estadoEventos');
+				//return $this->recurso->events->whereIn('estadodc',$estado)->where('fechaEvento','=',$fechaEvento)->get();
+				$use = array('fechaEvento' => $fechaEvento,'estado' => $estado);
+				return $this->recurso->events->filter(function($evento) use ($use){
+					return in_array($evento->estado,$use['estado']) && $evento->fechaEvento == $use['fechaEvento'];
+				});
+			}
 	}
 
-
-
 	public function enabled(){
-		
 		foreach ($this->puestos as $puesto) {
 			$puesto->disabled =  0;
 		}		
@@ -212,7 +245,6 @@
 	}
 
 	public function disabled(){
-		
 		foreach ($this->puestos as $puesto) {
 			$puesto->disabled =  1;
 		}		
@@ -220,9 +252,7 @@
 		return true;
 	}
 
-
 	public function save(){
-
 		foreach ($this->puestos as $puesto) {
 			$puesto->save();
 		}		

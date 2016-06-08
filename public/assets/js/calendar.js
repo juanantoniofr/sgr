@@ -32,9 +32,9 @@ $(function(e){
 					data:{ idrecurso:$("select#recurse option:selected").val()},
 					success: function($result){
 						$('#selectItems').fadeIn('fast',function(){
-										$('#items').html($result.listoptions);
-										$("select#items option:first").prop("selected", "selected");
-										$('select#items').change();});
+								$('#items').html($result.listoptions);
+								$("select#items option:first").prop("selected", "selected");
+								$('select#items').change();});
 					},
 					error: function(xhr, ajaxOptions, thrownError){
 						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
@@ -1081,10 +1081,13 @@ $(function(e){
 		//Día de la semana
 		setCheckBoxActive($fecha);
 		//Set id recurso
-		console.log($('select#items option:selected').val());
+		console.log('item=' + $('select#items option:selected').val());
+		console.log('recurso=' + $('select#recurse option:selected').val());
 		$('#fm_addEvent input[name|="id_recurso"]').val($('select#recurse option:selected').val());
-		if (undefined != $('select#items option:selected').val() || $('select#items option:selected').val() == 0)
+		if (undefined != $('select#items option:selected').val() && $('select#items option:selected').val() != 0)
 			$('#fm_addEvent input[name|="id_recurso"]').val($('select#items option:selected').val());
+		//activa botón save
+		$("button#save").removeClass('disabled');
 		//Texto resumen
 		setResumen();
 	}
@@ -1203,10 +1206,10 @@ $(function(e){
 		$('.formlaunch').click(function(e){
 			e.stopPropagation();
 			e.preventDefault();
-			if($('select#recurse option:selected').data('disabled')){
-				$('#modalMsg').modal('show');
-			}	
-			else{
+			//if($('select#recurse option:selected').data('disabled')){
+			//	$('#modalMsg').modal('show');
+			//}	
+			//else{
 				if ($('select#recurse option:selected').val() === undefined) {
 					$('#alert').fadeOut('slow');
 					$('#alert').fadeIn('slow');
@@ -1219,12 +1222,11 @@ $(function(e){
 					if (undefined === $(this).data('hora')) $hora = '08:30';
 					else  $hora = $(this).data('hora');
 					showGifEspera();
-					console.log($(this).data('fecha'));
 					setInitValueForModalAdd($hora,$(this).data('fecha'));
 					hideGifEspera();
 					$('#modalAdd').modal('show');
 				}
-			}
+			//}
 
 		});
 	}
@@ -1232,9 +1234,8 @@ $(function(e){
 	//Save new event to DB
 	function saveEvent(){
 		$('#message').fadeOut("slow");
-		
+		$("button#save").addClass('disabled');
 		$data = $('#fm_addEvent').serialize();
-		console.log($data);
 		$.ajax({
     	type: "POST",
 			url: "saveajaxevent",
@@ -1242,12 +1243,13 @@ $(function(e){
         success: function(respuesta){
         	if (respuesta['error'] == false){
  		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+			   		$("button#save").removeClass('disabled');
 			   		printCalendar();
 						$("#modalAdd").modal('hide');
 						$('#actionType').val('');
  		      }
  		      else {
- 		      	console.log(respuesta);
+ 		      	$("button#save").removeClass('disabled');
  		      	$('.has-error').removeClass('has-error');
  		      	$('.is_slide').each(function(){$(this).slideUp();});
  		      	resetMsgErrors();

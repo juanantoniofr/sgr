@@ -79,7 +79,6 @@
 	
 	
 	public function recursoOcupado($dataEvento){
-		
 		$estado = array('aprobada');
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
 				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento,$estado));
@@ -94,13 +93,13 @@
 		}//fin del for
 		return false;
 	}
+	
 	/**
 		* //Añade un evento para la fecha $fecha con identificador de serie $idserie
 		* @param $dataEvento array 
 		* @param $fecha string Y-m-d
 		* @param $idserie string
 	*/
-
 	public function addEvent($dataEvento,$currentfecha,$idserie){
 		
 		if ($this->recurso->equipos->count() > 0){
@@ -137,7 +136,7 @@
 			if ( !$this->recursoOcupado($data) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
 			 $estado = 'aprobada';
 		}
-	
+		$evento->estado = $estado;
 		//fin estado inicial
 		$repeticion = 1;
 		$evento->fechaFin = $data['fFin'];
@@ -180,13 +179,14 @@
 		*	@return Collection Object Evento
 		*
 	*/
-	public function getEvents($fechaEvento){
+	public function getEvents($fechaEvento,$estado = ''){
+		if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independiente de su estado
 		if ($this->recurso->equipos->count() > 0){
 			foreach($this->recurso->equipos as $equipo)	$id_equipos[] = $equipo->id;
-  	  return Evento::whereIn('recurso_id',$id_equipos)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
+  	  return Evento::whereIn('recurso_id',$id_equipos)->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
   	}
 		else
-		return $this->recurso->events()->where('fechaEvento','=',$fechaEvento)->get();
+		return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 	}
 
 	public function enabled(){
