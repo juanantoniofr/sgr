@@ -1,5 +1,5 @@
 @if ($addOptionReservarTodo)
-  <option value="0" data-disabled="{{$disabledAll}}">Todos los puestos/equipos ,{{$items->count() - $numerodeitemsdisabled}}/{{$items->count()}}</option>
+  <option id="allitems" data-numeroitems = "{{$items->count()}}" data-numeroitemsdisabled = "{{$numerodeitemsdisabled}}" value="0" data-disabled="{{$disabledAll}}">Todos los puestos/equipos ,{{$items->count() - $numerodeitemsdisabled}}/{{$items->count()}}</option>
 @endif
 @foreach ($items as $item)
 	@if ($item->tipo == Config::get('options.puesto'))

@@ -835,8 +835,17 @@ $(function(e){
 			$str += ' ' + $di.toLocaleString("es-ES",options_i) + ', ';
 		}
 		
+		console.log($('select#recurse option:selected').data('numeroitems'));
+		$textdisponibles = '';
+		if ($('select#recurse option:selected').data('numeroitems') > 0 && $('select#items option:selected').val() == 0){
+			$items = $('#allitems').data('numeroitems');
+			$disabled = $('#allitems').data('numeroitemsdisabled');
+			$textdisponibles = '<span><b>(Disponibles ' + ($items - $disabled) + ' de ' + $items + ')</b></span>';
+		} 
 		
-		$('#resumen').html('<p>'+$str+ $di.toLocaleString("es-ES", options) + $dias +' de '+$horaInicio+' a '+ $horaFin +  $strf +'</p>');
+		
+		
+		$('#resumen').html('<p>'+$str+ $di.toLocaleString("es-ES", options) + $dias +' de '+$horaInicio+' a '+ $horaFin +  $strf +' '+ $textdisponibles +' </p>');
 		//$('#resumen').slideUp('slow');
 	}
 	
@@ -1054,9 +1063,12 @@ $(function(e){
 			$('#reservarPara').fadeOut();
 			$('#fm_addEvent input[name="reservarParaUvus"]').val('');	
 		}
+		//msg itemsdisponibles
+		
 		//reset error msg
 		resetMsgErrors();
 		$('#errorsModalAdd').slideUp();
+		$('#divfEvento').slideDown('slow');
 		//Cierra opciones de edición en ventana modal
 		$('#editOptions').hide();
 		//Título

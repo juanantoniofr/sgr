@@ -12,6 +12,7 @@
       
       <div class="modal-body">
         <form class="form-horizontal" role="form" id = "fm_addEvent" >
+          
           <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Datos de la reserva </h4>
             
           <!-- Errores --> 
@@ -87,35 +88,36 @@
             </div>
           </div>
           <!-- periocidad -->
-          <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
-            <div class="form-group">
-              <label  class="control-label col-md-2">Repetir.... </label> 
-              <div class="col-md-10">  
-                  <select class="form-control" name="repetir" id="newReservaRepetir" >
-                    <option value="SR">Sin repetición</option>
-                    <option value="CS">Cada Semana</option>
-                  </select>
-              </div>
+          <div class="form-group">
+            <label  class="control-label col-md-2">Repetir.... </label> 
+            <div class="col-md-10">  
+              <select class="form-control" name="repetir" id="newReservaRepetir" >
+                <option value="SR">Sin repetición</option>
+                @if (Auth::user()->puedePeriodica()) 
+                  <option value="CS">Cada Semana</option>
+                @endif
+              </select>
             </div>
-          </div>  
+          </div>
+          
 
           <!-- reserva puntual -->
           <div id="divfEvento">
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva puntual </h4>
             <!-- Fecha  evento -->
             <div class="form-group" id="fEvento">
-            <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
-            <div class="col-md-4" >  
-              <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
-            </div>
+              <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
+              <div class="col-md-4" >  
+                <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
+              </div>
             </div>
           </div>
           <!-- reserva periódica -->
           <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
             <div id="inputRepeticion">
-            <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva periódica</h4> 
+              <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva periódica</h4> 
           
-            <!-- fecha inicio, fecha finalización y días -->            
+              <!-- fecha inicio, fecha finalización y días -->            
             
               <!-- fecha inicio -->
               <div class="form-group" id="fInicio">
