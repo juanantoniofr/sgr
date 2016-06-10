@@ -12,7 +12,7 @@
       
       <div class="modal-body">
         <form class="form-horizontal" role="form" id = "fm_addEvent" >
-          <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Información básica</h4>
+          <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Datos de la reserva </h4>
             
           <!-- Errores --> 
           <div id = 'errorsModalAdd' class = "col-md-12 alert alert-danger text-center is_slide" style = "display:none">  
@@ -46,19 +46,11 @@
               </select>
             </div>
           </div>
-
-          <!-- Fecha  evento -->
-          <div class="form-group" id="fEvento">
-            <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
-            <div class="col-md-4" >  
-              <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
-            </div>
-          </div>
-            
+          
           <!-- horario -->
           <div class="form-group" id="hFin">
-            <label class="control-label col-sm-2">Horario desde:</label>
-            <div class="col-sm-4">
+            <label class="control-label col-sm-2">Horario de inicio:</label>
+            <div class="col-sm-2">
               <select class="form-control"  name="hInicio" id="newReservaHinicio" >
                 <option value="8:30">8:30</option>
                 <option value="9:30">9:30</option>
@@ -75,8 +67,8 @@
                 <option value="20:30">20:30</option>
               </select>
             </div>
-            <label class="control-label col-sm-2">Hasta:</label>
-            <div class="col-sm-4">
+            <label class="control-label col-sm-3">Hora de finalización:</label>
+            <div class="col-sm-2">
               <select class="form-control"  name="hFin" id="newReservaHfin" >
                 <option value="9:30">9:30</option>
                 <option value="10:30">10:30</option>
@@ -94,12 +86,8 @@
               </select>
             </div>
           </div>
-            
-          <!-- Periocidad -->
+          <!-- periocidad -->
           <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
-            <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Periocidad</h4>
-
-            
             <div class="form-group">
               <label  class="control-label col-md-2">Repetir.... </label> 
               <div class="col-md-10">  
@@ -109,9 +97,26 @@
                   </select>
               </div>
             </div>
+          </div>  
 
-            <!-- fecha inicio, fecha finalización y días -->            
+          <!-- reserva puntual -->
+          <div id="divfEvento">
+            <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva puntual </h4>
+            <!-- Fecha  evento -->
+            <div class="form-group" id="fEvento">
+            <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
+            <div class="col-md-4" >  
+              <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
+            </div>
+            </div>
+          </div>
+          <!-- reserva periódica -->
+          <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
             <div id="inputRepeticion">
+            <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva periódica</h4> 
+          
+            <!-- fecha inicio, fecha finalización y días -->            
+            
               <!-- fecha inicio -->
               <div class="form-group" id="fInicio">
                   <label for="fInicio"  class="control-label col-md-2" >Empieza el: </label> 
@@ -155,7 +160,6 @@
               </div>        
             </div>
           </div>
-
           
           <div style="display:none" id = "reservarPara">
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva diaria</h4>

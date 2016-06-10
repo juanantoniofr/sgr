@@ -72,15 +72,19 @@ class sgrEvento {
 										'ids' => array(),
 										'idsSolapamientos' => array(),
 										'msgErrors' => array(),
-										'msgSuccess' => '');
+										'msgSuccess' => '',
+										'data'	=> array(),);
 		$testDataForm = new Evento();
 				
 		if(!$testDataForm->validate(Input::all())){
 			$result['error'] = true;
 			$result['msgErrors'] = $testDataForm->errors();
+			$result['data']	= $testDataForm->getdata();
 		}
 		else {
+			$result['data'] = Input::all();
 			$result['idEvents'] = $this->saveEvents(Input::all());
+
 			//Msg confirmación al usuario (add reserva)
 			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
 			if ($event->estado == 'aprobada'){
@@ -118,7 +122,6 @@ class sgrEvento {
 	}
 
 	private function saveEvent($data,$currentfecha,$evento_id){
-		
 		$idrecurso = $data['id_recurso'];//$direcurso puede indentificar a un puesto/un equipo/un tipoequipo/espacio (con o sin puestos)
 		$recurso = Recurso::findOrFail($idrecurso);
 		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
@@ -126,7 +129,7 @@ class sgrEvento {
 
 		return $sgrRecurso->addEvent($data,$currentfecha,$evento_id);//addEvent devuelve el identificador del evento añadido
 
-		return $result;
+		//return $result;
 	}
 
 	//Edit

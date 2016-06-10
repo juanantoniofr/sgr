@@ -230,11 +230,12 @@ class Evento extends Eloquent{
 			);	
 	
   private $errors = array();
+  private $data =array();
 
 	public function validate($data){
-    //$this->errors = $data;
+    
+		//$this->data = $data;
     //return false;	
-
     //formatear fechas
     if (!empty($data['fEvento'])){
     	$date = DateTime::createFromFormat('d-m-Y',$data['fEvento']);
@@ -432,13 +433,18 @@ class Evento extends Eloquent{
       $this->errors = $v->messages()->toArray();
       return false;
     }
-
+    $this->data = $data;
+    //return false;	
     // validation pass
     return true;
   }
 
   public function errors(){
         return $this->errors;
+  }
+
+  public function getdata(){
+  		return $this->data;
   }
  
 }

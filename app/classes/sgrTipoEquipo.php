@@ -76,10 +76,14 @@
 		return $atendido;
 	}
 
-	
-	
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
+		* @param $dataEvento array
+		*
+		* @return boolean
+	*/
 	public function recursoOcupado($dataEvento){
-		$estado = array('aprobada');
+		$estado = array('aprobada');//Sólo comprueba eventos aprobados.
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
 				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento,$estado));
 				if ( $eventos->count() > 0 ){
@@ -95,7 +99,31 @@
 	}
 	
 	/**
-		* //Añade un evento para la fecha $fecha con identificador de serie $idserie
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
+		* @param $dataEvento array
+		*	@param $fecha string (Y-m-d)
+		*
+		* @return boolean
+	*/
+	private function solapaEvento($dataEvento,$fecha){
+		$estado = array();
+		$estado[] = 'aprobada';
+		$eventos = $this->getEvents($fecha,$estado);
+		if ( $eventos->count() > 0 ){
+			foreach ($eventos as $evento) {
+				if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+					return true;
+				if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+					return true; 	 	
+			}//fin foreach
+		}//fin if 
+		return false;
+	}
+
+	/**
+		* //Añade un evento para la fecha $currentfecha con identificador de serie $idserie:
+		* 	--> Si tiene equipos, estos son reservables individualmente: se reserva todos los puestos.
+		*		--> en caso contrario: no se hace nada
 		* @param $dataEvento array 
 		* @param $fecha string Y-m-d
 		* @param $idserie string
@@ -108,16 +136,16 @@
 				}
 				return $result;
   	}
-		else {
+		/*else {
 					$evento = new Evento();
 					$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
-					if ($evento->save()) return $evento->id;
-					return false;
-		}
+					if ($evento->save()) return $evento->id;*/
+		return true;
+		//}
 	}//fin function addEvent
 				
 		
-	private function setdataevent($evento,$data,$currentfecha,$idserie){
+	/*private function setdataevent($evento,$data,$currentfecha,$idserie){
 		
 		$evento->recurso_id = $this->recurso->id;
 		//Procesar información de formulario
@@ -172,7 +200,8 @@
 		}
 		
 		return $evento;
-	}
+	}*/
+
 	/**
 		* //Devuelve los eventos para el día $fechaEvento
 		*	@param $fechaEvento string formato Y-m-d

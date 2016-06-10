@@ -435,11 +435,14 @@ $(function(e){
 		$( "#newReservaRepetir" ).on('change',function(){
 			if ($('#newReservaRepetir').val() == 'CS') {
 				$('#inputRepeticion').slideDown('slow');
-				$('#datepickerFinicio').prop('disabled', true);
+				$('#divfEvento').slideUp('slow');
+				
+				//$('#datepickerFinicio').prop('readonly', readonly);
 			}
 			else {
 				$('#inputRepeticion').slideUp('slow');
-				$('#datepickerFinicio').prop('disabled', false);
+				$('#divfEvento').slideDown('slow');
+				//$('#datepickerFinicio').prop('readonly', false);
 			}
 			setResumen();
 		});
@@ -1236,11 +1239,13 @@ $(function(e){
 		$('#message').fadeOut("slow");
 		$("button#save").addClass('disabled');
 		$data = $('#fm_addEvent').serialize();
+		console.log($data);
 		$.ajax({
     	type: "POST",
 			url: "saveajaxevent",
 			data: $data,
         success: function(respuesta){
+        	console.log(respuesta);
         	if (respuesta['error'] == false){
  		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
 			   		$("button#save").removeClass('disabled');

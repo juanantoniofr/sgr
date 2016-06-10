@@ -76,12 +76,15 @@
 		$hInicio = date('H:i:s',strtotime($data['hInicio']));
 		$hFin = date('H:i:s',strtotime($data['hFin']));
 		
+		$date = DateTime::createFromFormat('d-m-Y',$data['fInicio']);
+		$evento->fechaInicio = $date->format('Y-m-d');
+		$date = DateTime::createFromFormat('d-m-Y',$data['fFin']);
+		$evento->fechaFin = $date->format('Y-m-d');
 		//Estado inicial del evento (reserva)
 		$estado = 'denegada';
 		//si no se requiere validación 
 		if( $this->recurso->validacion() === false){
 			if ( $this->solapaEvento($data,$currentfecha) === false ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
-			//else $estado = 'pendiente';
 		}
 		//si se requiere validación (se pueden solapar las peticiones)
 		else {
@@ -93,8 +96,7 @@
 		//fin estado inicial
 		
 		$repeticion = 1;
-		$evento->fechaFin = $data['fFin'];
-		$evento->fechaInicio = $data['fInicio'];
+		
 		$evento->diasRepeticion = json_encode($data['dias']);
 				
 		if ($data['repetir'] == 'SR') {
@@ -103,13 +105,14 @@
 			$evento->fechaInicio = $currentfecha;
 			$evento->diasRepeticion = json_encode(array(date('N',strtotime($currentfecha))));
 		}
-				
+		$evento->repeticion = $repeticion;
+
 		$evento->evento_id = $idserie;
 		$evento->titulo = $data['titulo'];
 		$evento->actividad = $data['actividad'];
 		
 		$evento->fechaEvento = $currentfecha;
-		$evento->repeticion = $repeticion;
+		
 		$evento->dia = date('N',strtotime($currentfecha));
 		$evento->horaInicio = $data['hInicio'];
 		$evento->horaFin = $data['hFin'];

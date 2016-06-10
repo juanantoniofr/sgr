@@ -47,20 +47,6 @@ class sgrDate{
 	}
 
 	/**
-	 * Devuelve timestamp de $fecha con $formato
- 	 * 
- 	 * @param $fecha string fecha
- 	 * @param $formato string indica el formato de $fecha (por ejemplo d-m-Y) 
- 	 * @return $timestamp int Timestamp de $fecha
-	*/
-	public static function gettimestamp($fecha,$formato){
-		$timestamp = '';
-		$date = DateTime::createFromFormat($formato,$fecha);
-		$timestamp = $date->getTimestamp();
-		return $timestamp;
-	}
-	
-	/**
 		*	Devuelve tiemstamp de $f formato Y-m-d, del primer día de la semana ($dWeek) a partir de la fecha ($f)
 		* 	@param $f string fecha 'Y-m-d'
 		* 	@param $dWeek int 0->domingo,1->lunes,...
@@ -81,9 +67,25 @@ class sgrDate{
 	*/
 	public static function fechaEnesimoDia($tsFecha,$n){
 		if ($n == 0) return date('Y-m-d',$tsFecha);
-		$currentTime = strtotime('+'.$n.' week',$tsFecha);
+		$currentTime = strtotime('+ '.$n.' week',$tsFecha);
 		return date('Y-m-d',$currentTime);
 	}
+
+	/**
+	 * Devuelve timestamp de $fecha con $formato
+ 	 * 
+ 	 * @param $fecha string fecha
+ 	 * @param $formato string indica el formato de $fecha (por ejemplo d-m-Y) 
+ 	 * @return $timestamp int Timestamp de $fecha
+	*/
+	public static function gettimestamp($fecha,$formato){
+		$timestamp = '';
+		$date = DateTime::createFromFormat($formato,$fecha);
+		$timestamp = $date->getTimestamp();
+		return $timestamp;
+	}
+	
+	
 
 	/**
 	 	* Devuelve $fecha en formato $farmatosalida
