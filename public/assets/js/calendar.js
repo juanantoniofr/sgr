@@ -408,15 +408,15 @@ $(function(e){
 	function whenChangeInputInModalWindow(){
 
 		$( "#datepickerFevento" ).on('change',function(){
-			setCheckBoxActive($(this).val());
+			//setCheckBoxActive($(this).val());
 			$('#datepickerFinicio').val($(this).val());
 			setResumen();
 		});
 
 		$( "#datepickerFinicio" ).on('change',function(){
-			setCheckBoxActive($(this).val());
+			//setCheckBoxActive($(this).val());
 			$('#datepickerFevento').val($(this).val());
-			$('#datepickerFfin').val(nextMonth(dateToformatES($(this).val())));
+			//$('#datepickerFfin').val(nextMonth(dateToformatES($(this).val())));
 			setResumen();
 		});
 		
@@ -436,13 +436,19 @@ $(function(e){
 			if ($('#newReservaRepetir').val() == 'CS') {
 				$('#inputRepeticion').slideDown('slow');
 				$('#divfEvento').slideUp('slow');
-				
-				//$('#datepickerFinicio').prop('readonly', readonly);
+				//$fecha = $('#datepickerFinicio').val();
+				//$('#datepickerFinicio').prop('disabled',false);
+				//$('#datepickerFevento').val($fecha);
+				//$('#datepickerFfin').val(nextMonth(dateToformatES($fecha)));
 			}
 			else {
 				$('#inputRepeticion').slideUp('slow');
 				$('#divfEvento').slideDown('slow');
-				//$('#datepickerFinicio').prop('readonly', false);
+				//$fecha = $('#datepickerFinicio').val();
+				//$('#datepickerFinicio').prop('disabled',false);
+				//$('#datepickerFevento').val($fecha);
+				//$('#datepickerFfin').val(nextDay(dateToformatES($fecha)));
+				//console.log('fecha fin: ' + $('#datepickerFfin').val());
 			}
 			setResumen();
 		});
@@ -599,6 +605,7 @@ $(function(e){
 	//edit events (DB & calendar view)
 	function editEvents($option,$idEvento,$idSerie){
 		$('#message').fadeOut("slow");
+		console.log('grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' +'option='+$option+'&'+'idEvento='+$idEvento+'&'+'idSerie='+$idSerie+'&'+$('#fm_addEvent').serialize());
 		$.ajax({
 		    type: "POST",
 				url: "editajaxevent",
@@ -1148,28 +1155,26 @@ $(function(e){
 				//repetir
 				if ($evento.repeticion == '1'){
 					$('select[name|="repetir"]').val('CS');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFinicio').prop('disabled',true);
-					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
 					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
 					$aDias = eval($evento.diasRepeticion);
 					$("input:checkbox").each(function(index,value){
 							$(this).prop('checked',false);
 							if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
 					});
-					$('#inputRepeticion').show();
 				}
 				else{
 					$('select[name|="repetir"]').val('SR');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFevento').val(dateToformatES($evento.fechaInicio));
-					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+					$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
+					$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
+					$('#datepickerFfin').val(dateToformatES($evento.fechaInicio));
 					$("input:checkbox").each(function(index,value){
 							$(this).prop('checked',false);
 							if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
 					});
-					$('#inputRepeticion').hide();
 				}
+				$('select[name|="repetir"]').change();
 				setResumen();
 				$('button#save').hide();
 				$('#editOptions').show();

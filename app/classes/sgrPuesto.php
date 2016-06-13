@@ -15,15 +15,15 @@
 		*
 		* @return boolean
 	*/	
-	public function recursoOcupado($dataEvento){
+	public function recursoOcupado($dataEvento,$excluyeId = ''){
 			$estado = array('aprobada');
 			for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
 				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
 				if ( $eventos->count() > 0 ){
 					foreach ($eventos as $evento) {
-						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
 							return true;
-						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
 							return true; 	 	
 					}//fin foreach
 				}//fin if  	

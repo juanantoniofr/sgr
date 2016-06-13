@@ -108,7 +108,7 @@
             <div class="form-group" id="fEvento">
               <label for="fEvento"  class="control-label col-md-2" >Fecha: </label> 
               <div class="col-md-4" >  
-                <input type="text"  name="fEvento" class="form-control" id="datepickerFinicio" />
+                <input type="text"  name="fEvento" class="form-control" id="datepickerFevento" />
               </div>
             </div>
           </div>
@@ -123,7 +123,7 @@
               <div class="form-group" id="fInicio">
                   <label for="fInicio"  class="control-label col-md-2" >Empieza el: </label> 
                   <div class="col-md-4">  
-                    <input type="text" name="fInicio"  class="form-control"   id="datepickerFevento"  />
+                    <input type="text" name="fInicio"  class="form-control"   id="datepickerFinicio"  />
                   </div>
               </div>    
               <!-- fecha finalización -->

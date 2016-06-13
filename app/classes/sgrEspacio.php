@@ -86,19 +86,20 @@
 	/**
 		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
 		* @param $dataEvento array
+		*	@param $excluyeId int excluir de la comprobación el evento con id igual $excluyeId 
 		*
 		* @return boolean
 	*/
-	public function recursoOcupado($dataEvento){
+	public function recursoOcupado($dataEvento,$excluyeId = ''){
 		$estado = array();
 		$estado[] = 'aprobada';
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
 				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
 				if ( $eventos->count() > 0 ){
 					foreach ($eventos as $evento) {
-						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
 							return true;
-						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
 							return true; 	 	
 					}//fin foreach
 				}//fin if 
@@ -214,11 +215,11 @@
 	}
 
 	/**
-			* //Devuelve los eventos para el día $fechaEvento
-			*	@param $fechaEvento string formato Y-m-d
-			* @param $estado array estados de la reserva
-			*	@return Collection Object Evento
-			*
+		* //Devuelve los eventos para el día $fechaEvento
+		*	@param $fechaEvento string formato Y-m-d
+		* @param $estado array estados de la reserva
+		*	@return Collection Object Evento
+		*
 	*/
 	public function getEvents($fechaEvento,$estado = ''){
 
@@ -229,9 +230,6 @@
   		  return Evento::whereIn('recurso_id',$id_puestos)->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
   		}
 			else{
-				//$estado = 'aprobada';
-				//$estado = Config::get('options.estadoEventos');
-				//return $this->recurso->events->whereIn('estadodc',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 				$use = array('fechaEvento' => $fechaEvento,'estado' => $estado);
 				return $this->recurso->events->filter(function($evento) use ($use){
 					return in_array($evento->estado,$use['estado']) && $evento->fechaEvento == $use['fechaEvento'];

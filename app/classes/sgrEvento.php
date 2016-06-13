@@ -135,9 +135,9 @@ class sgrEvento {
 	//Edit
 	public function edit(){
 		$result = array('error' => false,
-						'msgSuccess' => '',
-						'idsDeleted' => array(),
-						'msgErrors' => array());
+										'msgSuccess' => '',
+										'idsDeleted' => array(),
+										'msgErrors' => array());
 		//Controlar errores en el formulario
 		$testDataForm = new Evento();
 		if(!$testDataForm->validate(Input::all())){
@@ -154,10 +154,7 @@ class sgrEvento {
 				$result['msgErrors'] = $error;	
 			}
 			else {
-				
 				$idSerie = Input::get('idSerie');
-
-				
 				$fechaInicio = Input::get('fInicio');
 				$fechaFin = Input::get('fFin');
 				//Borrar todos los eventos a modificar

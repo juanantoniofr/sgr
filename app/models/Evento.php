@@ -351,14 +351,16 @@ class Evento extends Eloquent{
 			});
 		}
 
-    //test req3:
+    //req3:
     if (isset($data['fInicio']) && strtotime($data['fInicio']) != false && isset($data['dias']) ){
 			$v->sometimes('titulo','req3',function($data){
 					$idrecurso = $data['id_recurso'];
 					$recurso = Recurso::findOrFail($idrecurso);
       		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
       		$sgrRecurso->setRecurso($recurso);
-      		return $sgrRecurso->recursoOcupado($data);		
+      		$excluyeId = '';
+      		if (isset($data['idSerie'])) $excluyeId = $data['idSerie'];
+      		return $sgrRecurso->recursoOcupado($data,$excluyeId);		
 			});
 		}
 

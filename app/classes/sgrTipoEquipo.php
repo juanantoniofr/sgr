@@ -85,7 +85,7 @@
 	public function recursoOcupado($dataEvento){
 		$estado = array('aprobada');//Sólo comprueba eventos aprobados.
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
-				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento,$estado));
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
 				if ( $eventos->count() > 0 ){
 					foreach ($eventos as $evento) {
 						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
