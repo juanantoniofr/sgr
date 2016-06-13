@@ -568,11 +568,13 @@ $(function(e){
 	//Delete events to BD (by ajax)
 	function deleteEvents($option,$idEvento,$idSerie){
 		//Delete event by ajax
-		
+		$id_recurso = $('select#recurse option:selected').val();
+		if (undefined != $('select#items option:selected').val() && $('select#items option:selected').val() != 0)
+			$id_recurso = $('select#items option:selected').val();
 		$.ajax({
-    		type: "POST",
+    	type: "POST",
 			url: "delajaxevent",
-			data: {'id_recurso':$('select#recurse option:selected').val(),'grupo_id':$('select#selectGroupRecurse option:selected').val(),'option':$option,'idEvento':$idEvento,'idSerie':$idSerie},
+			data: {'id_recurso':$id_recurso,'idSerie':$idSerie},
         	success: function(respuesta){
 			       
 			        $(respuesta).each(function(index,value){

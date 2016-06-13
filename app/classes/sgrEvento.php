@@ -128,8 +128,6 @@ class sgrEvento {
 		$sgrRecurso->setRecurso($recurso);
 
 		return $sgrRecurso->addEvent($data,$currentfecha,$evento_id);//addEvent devuelve el identificador del evento añadido
-
-		//return $result;
 	}
 
 	//Edit
@@ -247,13 +245,21 @@ class sgrEvento {
 	//del
 	public function delete(){
 
-		$result = '';
+
+		$idrecurso = $data['id_recurso'];//$direcurso puede indentificar a un puesto/un equipo/un tipoequipo/espacio (con o sin puestos)
+		$recurso = Recurso::findOrFail($idrecurso);
+		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+		$sgrRecurso->setRecurso($recurso);
+		
+		$idSerie = $data['id_serie'];//identificador de la serie de eventos de una reserva
+		return $sgrRecurso->deleteEvent($idSerie);//,$currentfecha,$evento_id);//addEvent devuelve el identificador del evento añadido
+		/*$result = '';
 
 		$result = $this->delEvents();
-		return $result;
+		return $result;*/
 	} 
 	
-	private function delEvents(){
+	/*private function delEvents(){
 		$result = '';
 		$eventToDel = Evento::find(Input::get('idEvento'))->first();
 		$event = Evento::find(Input::get('idEvento'));
@@ -266,7 +272,7 @@ class sgrEvento {
 		
 		
 		return $result;
-	}
+	}*/
 
 	//Anular evento: realiza un soft_delete
 	public function anularEvento(){

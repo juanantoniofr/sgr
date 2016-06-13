@@ -151,7 +151,10 @@
 			return false;
 		}
 	}//fin function addEvent
-				
+	
+	public function deleteEvent($idSerie){
+		return Evento::where('evento_id','=',Input::get('idSerie'))->delete();
+	}			
 		
 	private function setdataevent($evento,$data,$currentfecha,$idserie){
 		$evento->recurso_id = $this->recurso->id;

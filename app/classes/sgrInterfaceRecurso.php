@@ -28,6 +28,7 @@
 		*/
 		public function recursoOcupado($dataEvento,$excluyeId);
 		public function addEvent($dataEvento,$fecha,$idserie);
+		public function deleteEvent($idSerie);
 	}
 
 ?>

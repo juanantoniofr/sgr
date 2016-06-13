@@ -20,6 +20,7 @@ class EventoController extends BaseController {
 	}
 
 	public function del(){
+		
 		$sgrEvento = new sgrEvento;
 
 		$result = $sgrEvento->delete();
