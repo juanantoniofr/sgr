@@ -1,16 +1,21 @@
 <?php
 
-	class sgrEquipo implements sgrInterfaceRecurso{
+	class sgrEquipo extends sgrItem implements sgrInterfaceRecurso{
 		
-		private $recurso;
+		//private $recurso;
 
-		public function __construct(){
+		/*public function __construct(){
 			$this->recurso = new Recurso;
-		}
+		}*/
 
-		public function visible(){
+		/*public function enabled(){
+		$this->recurso->disabled =  0;
+		return true;
+		}*/
+
+		/*public function visible(){
 			return $this->recurso->visible();
-		}
+		}*/
 	
 		/**
 			* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
@@ -147,11 +152,11 @@
 			* @param $id int
 			* @return $atendido boolean
 		*/
-		public function atendidoPor($id){
+		/*public function atendidoPor($id){
 			$atendido = false;
 			if (User::findOrFail($id)->atiende->count() > 0) $atendido = true;
 			return $atendido;
-		}
+		}*/
 		
 		public function setRecurso($recurso){
 			$this->recurso = $recurso;
@@ -169,31 +174,28 @@
 			return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 	}
 
-	public function enabled(){
-		$this->recurso->disabled =  0;
-		return true;
-	}
+	
 
-	public function disabled(){
+	/*public function disabled(){
 		$this->recurso->disabled =  1;
 		return true;
-	}
+	}*/
 
-	public function save(){
+	/*public function save(){
 		return $this->recurso->save();
 	}
 
 	public function del(){
 		//Softdelete recurso
    	return $this->recurso->delete();
-	}
+	}*/
 
 	public function delEvents(){
 		//Softdelete eventos
 		return $this->recurso->events()->delete();
 	}
 
-	public function update($data){
+	/*public function update($data){
 		return $this->recurso->update($data);
 	}
 
@@ -203,7 +205,7 @@
 			}
 			return true;
 		}
-
+	*/
 
 	}	
 

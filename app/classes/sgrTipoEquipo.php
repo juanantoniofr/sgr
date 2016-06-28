@@ -23,7 +23,7 @@
 		return true;
 	}
 
-	public function visible(){
+	/*public function visible(){
 		$visible = false;
 		$recursoesvisible = false;
 		$tienealmenosunequipovisible = false;
@@ -35,7 +35,7 @@
 		}
 		if ($recursoesvisible && $tienealmenosunequipovisible) $visible = true; 
 		return $visible;
-	}
+	}*/
 
 	public function recurso(){
 			return $this->recurso;
@@ -218,22 +218,22 @@
 		return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 	}
 
-	public function enabled(){
+	/*public function enabled(){
 		foreach ($this->equipos as $equipo) {
 			$equipo->disabled =  0;
 		}		
 		$this->recurso->disabled = 0;
 		return true;
-	}
+	}*/
 
-	public function disabled(){
+	/*public function disabled(){
 		
 		foreach ($this->equipos as $equipo) {
 			$equipo->disabled =  1;
 		}		
 		$this->recurso->disabled = 1;
 		return true;
-	}
+	}*/
 
 	public function save(){
 		foreach ($this->equipos as $equipo) {

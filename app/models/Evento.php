@@ -7,7 +7,7 @@ class Evento extends Eloquent{
 	//use SoftDeletingTrait;
 	protected $table = 'eventos';
 	//protected $dates = ['deleted_at'];
- 	protected $fillable = array('horaInicio','titulo', 'recurso_id','fechaEvento','fechaInicio','repeticion', 'dia','diasRepeticion','fechaFin','user_id','created_at','user_id');
+ 	protected $fillable = array('horaInicio','recurso_id','fechaEvento','fechaInicio','repeticion', 'dia','diasRepeticion','fechaFin','user_id','created_at','user_id');
  	protected $softDelete = true;
 
  	//Devuelve el objeto User propietario del evento

@@ -1,14 +1,19 @@
 <?php
 
-	class sgrPuesto implements sgrInterfaceRecurso{
+	class sgrPuesto extends sgrItem implements sgrInterfaceRecurso{
 		
-		
-		private $recurso;
+		//private $recurso;
 
-		public function __construct(){
+		/*public function __construct(){
 			$this->recurso = new Recurso;
-		}
+		}*/
 	
+		/*public function enabled(){
+			$this->recurso->disabled =  0;
+			return true;
+		}*/
+
+
 	/**
 		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
 		* @param $dataEvento array
@@ -143,9 +148,9 @@
 			return $this->recurso->events()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 	}
 
-	public function visible(){
+	/*public function visible(){
 		return $this->recurso->visible();
-	}
+	}*/
 
 	public function recurso(){
 		return $this->recurso;
@@ -168,7 +173,7 @@
 			* @param $id int
 			* @return $atendido boolean
 		*/
-		public function atendidoPor($id){
+		/*public function atendidoPor($id){
 			$atendido = false;
 			$atendido = $this->recurso->espacio->esAtendidoPor($id);
 			return $atendido;
@@ -176,18 +181,15 @@
 
 		public function setRecurso($recurso){
 			$this->recurso = $recurso;
-		}
+		}*/
 
 
-		public function enabled(){
-			$this->recurso->disabled =  0;
-			return true;
-		}
-
+		
+		/*
 		public function disabled(){
 			$this->recurso->disabled =  1;
 			return true;
-		}
+		}*/
 
 		public function save(){
 			return $this->recurso->save();

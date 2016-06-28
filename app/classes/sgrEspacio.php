@@ -1,14 +1,30 @@
 <?php
 
-	class sgrEspacio implements sgrInterfaceRecurso{
+	class sgrEspacio extends sgrRecurso implements sgrInterfaceRecurso{
 
-	private $recurso;
+	//private $recurso;
 	private $puestos;
 	private $sgrPuestos; //array de elementos de tipo $sgrPuesto o vacio
-
-	public function __construct(){
+	private $sgrItems; ////array de elementos de tipo $sgrPuesto o vacio
+	/*public function __construct(){
 		$this->recurso = new Recurso;
-	}
+	}*/
+	
+	/*public function enabled(){
+		foreach ($this->sgrItems as $item) {
+			$item->enabled();
+		}		
+		$this->recurso->disabled = 0;
+		return true;
+	}*/
+
+	/*public function enabled(){
+		foreach ($this->puestos as $puesto) {
+			$puesto->disabled =  0;
+		}		
+		$this->recurso->disabled = 0;
+		return true;
+	}*/
 
 	public function setRecurso($recurso){
 		$this->recurso = $recurso;
@@ -22,7 +38,7 @@
 		return true;
 	}
 	
-	public function visible(){
+	/*public function visible(){
 		$visible = false;
 		$recursoesvisible = false;
 		$tienealmenosunpuestovisible = false;
@@ -42,7 +58,7 @@
 		}
 		if ($recursoesvisible && $tienealmenosunpuestovisible) $visible = true; 
 		return $visible;
-	}
+	}*/
 
 	public function recurso(){
 			return $this->recurso;
@@ -76,12 +92,12 @@
 		* @param $id int
 		* @return $atendido boolean
 	*/
-	public function atendidoPor($id){
+	/*public function atendidoPor($id){
 		$atendido = false;
 		//if ($this->recurso->grupo->tecnicos->contains($id)) $atendido = true;
 		if (User::findOrFail($id)->atiende->count() > 0) $atendido = true;
 		return $atendido;
-	}
+	}*/
 
 	/**
 		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
@@ -240,21 +256,15 @@
 			}
 	}
 
-	public function enabled(){
-		foreach ($this->puestos as $puesto) {
-			$puesto->disabled =  0;
-		}		
-		$this->recurso->disabled = 0;
-		return true;
-	}
+	
 
-	public function disabled(){
+	/*public function disabled(){
 		foreach ($this->puestos as $puesto) {
 			$puesto->disabled =  1;
 		}		
 		$this->recurso->disabled = 1;
 		return true;
-	}
+	}*/
 
 	public function save(){
 		foreach ($this->puestos as $puesto) {
