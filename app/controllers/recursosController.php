@@ -154,7 +154,7 @@ class recursosController extends BaseController{
     $rules = array( 'nombre'        => 'required|unique:recursos',
                     'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
-                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo').'|exists:recursos,id,',
+                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo').'|exists:recursos,id',
                     'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
 
     $messages = array('required'                    => 'El campo <strong>:attribute</strong> es obligatorio....',
