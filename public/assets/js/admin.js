@@ -38,7 +38,7 @@ $(function(e){
     e.preventDefault();
     updateChkeditorInstances();
     showGifEspera();
-    $('form#fm_addrecurso input[name="contenedor_id"]').val('0');
+    //$('form#fm_addrecurso input[name="contenedor_id"]').val('0');
     $data = $('form#fm_addrecurso').serialize();
     console.log($data);
     $.ajax({

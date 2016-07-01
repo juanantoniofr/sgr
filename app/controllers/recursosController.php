@@ -144,7 +144,7 @@ class recursosController extends BaseController{
     $nombre = Input::get('nombre');
     $tipo =  Input::get('tipo'); //espacio|tipoequipos
     $grupo_id = Input::get('grupo_id',0);
-    $contenedor_id = Input::get('contenedor_id',0); //!=0 si add puesto
+    $contenedor_id = Input::get('contenedor_id','0'); //!=0 si add puesto
     $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
     $descripcion = Input::get('descripcion','');
     $id_lugar = Input::get('id_lugar','');
@@ -154,7 +154,7 @@ class recursosController extends BaseController{
     $rules = array( 'nombre'        => 'required|unique:recursos',
                     'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
-                    'contenedor_id'    => 'required_if:tipo,puesto|exists:recursos,id',
+                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo').'|exists:recursos,id,',
                     'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
 
     $messages = array('required'                    => 'El campo <strong>:attribute</strong> es obligatorio....',
