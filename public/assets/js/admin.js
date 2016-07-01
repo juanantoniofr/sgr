@@ -15,7 +15,7 @@ $(function(e){
     $(".linkAddPuesto").on('click',function(e){
       e.preventDefault();
       $('#m_addpuesto_title_nombrerecurso').html($(this).data('nombrerecurso'));
-      $('form#fm_addpuesto input[name="espacio_id"]').val($(this).data('idrecurso'));
+      $('form#fm_addpuesto input[name="contenedor_id"]').val($(this).data('idrecurso'));
       $('form#fm_addpuesto input[name="nombre"]').val('');
       hideMsg();
       $('#m_addpuesto').modal('show');
@@ -26,7 +26,7 @@ $(function(e){
     $(".linkAddEquipo").on('click',function(e){
       e.preventDefault();
       $('#m_addequipo_title_nombrerecurso').html($(this).data('nombrerecurso'));
-      $('form#fm_addequipo input[name="tipoequipo_id"]').val($(this).data('idrecurso'));
+      $('form#fm_addequipo input[name="contenedor_id"]').val($(this).data('idrecurso'));
       $('form#fm_addequipo input[name="nombre"]').val('');
       hideMsg();
       $('#m_addequipo').modal('show');
@@ -38,7 +38,9 @@ $(function(e){
     e.preventDefault();
     updateChkeditorInstances();
     showGifEspera();
+    $('form#fm_addrecurso input[name="contenedor_id"]').val('0');
     $data = $('form#fm_addrecurso').serialize();
+    console.log($data);
     $.ajax({
       type: "POST",
       url: "addrecurso",
@@ -420,7 +422,7 @@ $(function(e){
             $('#m_delrecurso').modal('hide');   
             showMsg($respuesta.msg);
             getListado($('#fm_delrecurso_save').data('idrecursopadre'));
-            $('#fm_delrecurso_save').data('idrecursopadre',"")); 
+            $('#fm_delrecurso_save').data('idrecursopadre',""); 
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -776,7 +778,7 @@ $(function(e){
           $('#m_enabledrecurso').modal('hide');   
           showMsg($respuesta.msg);
           getListado($('#fm_enabledrecurso_save').data('idrecursopadre')); 
-          $('#fm_enabledrecurso_save').data('idrecursopadre',""));
+          $('#fm_enabledrecurso_save').data('idrecursopadre',"");
         }
       },
       error:function(xhr, ajaxOptions, thrownError){
@@ -821,7 +823,7 @@ $(function(e){
           $('#m_disabledrecurso').modal('hide');   
           showMsg($respuesta.msg);
           getListado($('#fm_disabledrecurso_save').data('idrecursopadre'));
-          $('#fm_disabledrecurso_save').data('idrecursopadre',""));
+          $('#fm_disabledrecurso_save').data('idrecursopadre',"");
         }
       },
       error:function(xhr, ajaxOptions, thrownError){

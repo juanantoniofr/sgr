@@ -57,7 +57,7 @@
         </div>
 
         <div class="form-group hidden">
-            {{Form::text('espacio_id','',array('class' => 'form-control'))}}
+            {{Form::text('contenedor_id','',array('class' => 'form-control'))}}
         </div> 
         <div class="form-group hidden">
             {{Form::text('id','',array('class' => 'form-control'))}}

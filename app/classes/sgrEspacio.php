@@ -1,32 +1,14 @@
 <?php
 
-	class sgrEspacio extends sgrRecurso implements sgrInterfaceRecurso{
+	class sgrEspacio extends sgrRecurso{
 
 	//private $recurso;
 	private $puestos;
 	private $sgrPuestos; //array de elementos de tipo $sgrPuesto o vacio
 	private $sgrItems; ////array de elementos de tipo $sgrPuesto o vacio
-	/*public function __construct(){
-		$this->recurso = new Recurso;
-	}*/
 	
-	/*public function enabled(){
-		foreach ($this->sgrItems as $item) {
-			$item->enabled();
-		}		
-		$this->recurso->disabled = 0;
-		return true;
-	}*/
 
-	/*public function enabled(){
-		foreach ($this->puestos as $puesto) {
-			$puesto->disabled =  0;
-		}		
-		$this->recurso->disabled = 0;
-		return true;
-	}*/
-
-	public function setRecurso($recurso){
+	/*public function setRecurso($recurso){
 		$this->recurso = $recurso;
 		$this->puestos = $this->recurso->puestos;
 		$this->sgrPuestos = array();
@@ -36,38 +18,20 @@
 			$this->sgrPuestos[] = $sgrPuesto;
 		}
 		return true;
-	}
-	
-	/*public function visible(){
-		$visible = false;
-		$recursoesvisible = false;
-		$tienealmenosunpuestovisible = false;
-		
-		//Espacio sin puestos
-		if ($this->recurso->visible() && $this->recurso->puestos()->count() == 0){
-				$visible = true;
-				return $visible;
-		}
-
-		//Espacio con puestos
-		if ($this->recurso->visible() && $this->recurso->puestos()->count() > 0){
-				$recursoesvisible = true;
-				foreach ($this->recurso->puestos as $puesto) {
-						if ($puesto->visible()) $tienealmenosunpuestovisible = true;
-				}
-		}
-		if ($recursoesvisible && $tienealmenosunpuestovisible) $visible = true; 
-		return $visible;
 	}*/
-
+	
+	/*
 	public function recurso(){
 			return $this->recurso;
 	}
-	
+	*/
+
+
 	/**
    	*
    	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
   */
+	
 	public function eventosfuturos(){
 		if ($this->recurso->puestos->count() > 0){
 				//Tiene puestos
@@ -78,26 +42,7 @@
 				return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
 	}
 
-	/**
-		* // Devuelve los puestos visibles (acl tiene permiso de lectura "r") para el usuario
-		* @return array Object recurso (tipo=puesto)
-	*/
-	public function items(){
-		$items = $this->recurso->puestos->filter(function($puesto){ return $puesto->visible(); });
-  	return $items;
-	}
 	
-	/**
-		* // Devuelve true si User con id = $id atiende $this->recurso
-		* @param $id int
-		* @return $atendido boolean
-	*/
-	/*public function atendidoPor($id){
-		$atendido = false;
-		//if ($this->recurso->grupo->tecnicos->contains($id)) $atendido = true;
-		if (User::findOrFail($id)->atiende->count() > 0) $atendido = true;
-		return $atendido;
-	}*/
 
 	/**
 		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
@@ -106,7 +51,7 @@
 		*
 		* @return boolean
 	*/
-	public function recursoOcupado($dataEvento,$excluyeId = ''){
+	/*public function recursoOcupado($dataEvento,$excluyeId = ''){
 		$estado = array();
 		$estado[] = 'aprobada';
 		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
@@ -122,7 +67,8 @@
 		}//fin del for
 		return false;
 	}
-
+	*/
+	
 	/**
 		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
 		* @param $dataEvento array
@@ -130,6 +76,7 @@
 		*
 		* @return boolean
 	*/
+	/*
 	private function solapaEvento($dataEvento,$fecha){
 		$estado = array();
 		$estado[] = 'aprobada';
@@ -144,7 +91,8 @@
 		}//fin if 
 		return false;
 	}
-	
+	*/
+
 	/**
 		* //Añade un evento para la fecha $currentfecha con identificador de serie $idserie:
 		* 	--> Si tiene puestos y son reservables individualmente: se reserva todos los puestos.
@@ -153,7 +101,7 @@
 		* @param $fecha string Y-m-d
 		* @param $idserie string
 	*/
-	public function addEvent($dataEvento,$currentfecha,$idserie){
+	/*public function addEvent($dataEvento,$currentfecha,$idserie){
 		if ($this->recurso->puestos->count() > 0){
 			foreach($this->sgrPuestos as $sgrPuesto){
 				$result = $sgrPuesto->addEvent($dataEvento,$currentfecha,$idserie);
@@ -167,11 +115,15 @@
 			return false;
 		}
 	}//fin function addEvent
-	
+	*/
+
+	/*
 	public function deleteEvent($idSerie){
 		return Evento::where('evento_id','=',Input::get('idSerie'))->delete();
 	}			
-		
+	*/
+
+	/*	
 	private function setdataevent($evento,$data,$currentfecha,$idserie){
 		$evento->recurso_id = $this->recurso->id;
 		//Procesar información de formulario
@@ -232,6 +184,8 @@
 		
 		return $evento;
 	}
+	*/
+
 
 	/**
 		* //Devuelve los eventos para el día $fechaEvento
@@ -240,7 +194,7 @@
 		*	@return Collection Object Evento
 		*
 	*/
-	public function getEvents($fechaEvento,$estado = ''){
+	/*public function getEvents($fechaEvento,$estado = ''){
 
 			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independiente de su estado
 
@@ -255,17 +209,11 @@
 				});
 			}
 	}
-
+	*/
 	
 
-	/*public function disabled(){
-		foreach ($this->puestos as $puesto) {
-			$puesto->disabled =  1;
-		}		
-		$this->recurso->disabled = 1;
-		return true;
-	}*/
-
+	
+	/*
 	public function save(){
 		foreach ($this->puestos as $puesto) {
 			$puesto->save();
@@ -273,7 +221,9 @@
 		$this->recurso->save();
 		return true;
 	}
+	*/
 
+	/*
 	public function del(){
 		//Softdelete recurso
     foreach ($this->puestos as $puesto) {
@@ -283,7 +233,9 @@
 
 		$this->recurso->delete();		
 	}
-
+	*/
+	
+	/*
 	public function delEvents(){
 		//Softdelete eventos
 		foreach ($this->puestos as $puesto) {
@@ -291,7 +243,9 @@
 		}
 		$this->recurso->events()->delete();
 	}
+	*/
 
+	/*
 	public function update($data){
 		$idrecursocontenedor = $this->recurso->id;
 		//para cada uno de los puestos
@@ -312,14 +266,16 @@
 		$this->recurso->update($data);
 		return true;
 	}
+	*/
 
+	/*
 	public function add($data){
 		foreach ($data as $key => $value) {
 			$this->recurso->$key = $value;
 		}
 		return true;
 	}	
-
+	*/
 
 
 	}	

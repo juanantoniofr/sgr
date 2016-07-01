@@ -56,7 +56,7 @@
             </label>
           </div>
 
-          <div class="form-group hidden">{{Form::text('tipoequipo_id','',array('class' => 'form-control'))}}</div> 
+          <div class="form-group hidden">{{Form::text('contenedor_id','',array('class' => 'form-control'))}}</div> 
           
           <div class="form-group hidden">{{Form::text('id','',array('class' => 'form-control'))}}</div> 
         </div><!-- ./modal-body --> 

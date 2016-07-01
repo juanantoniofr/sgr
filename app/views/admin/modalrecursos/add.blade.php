@@ -45,7 +45,7 @@
         </div>
             
         <div class="form-group" id="fm_addrecurso_inputrol"> 
-          <label>Disponible para el Rol:</label><br />
+          <label>Disponible para reserva para los usuarios con Rol:</label><br />
           <label class="checkbox-inline">
             <input type="checkbox" name = "roles[]" value="1" checked="true"> Alumno
           </label>
@@ -62,6 +62,9 @@
             <input type="checkbox" name = "roles[]" value="6" checked="true"> Supervisor (EE MAV)
           </label>
         </div>
+
+        <div class="form-group hidden">{{Form::text('contenedor_id','0',array('class' => 'form-control'))}}</div> 
+
       </div><!-- ./modal-body --> 
       
       <div class="modal-footer">

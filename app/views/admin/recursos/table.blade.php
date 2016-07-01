@@ -1,3 +1,4 @@
+<!-- eof --> 
 <table class="table table-hover table-striped">
   <thead>
     <tr>
@@ -7,7 +8,7 @@
         @if ($sortby == 'nombre' && $order == 'asc') 
           {{
           link_to_action(
-                          'GruposController@listar',
+                          'recursosController@listar',
                           'Grupo',
                           array(
                                 'sortby' => 'nombre',
@@ -18,7 +19,7 @@
         @else
           {{
           link_to_action(
-                          'GruposController@listar',
+                          'recursosController@listar',
                           'Grupo',
                           array(
                                 'sortby' => 'nombre',
@@ -59,22 +60,9 @@
               <li > 
                 @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) ) 
                   <!-- editar -->
-                  <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}"
-                    @if( $recurso->tipo == Config::get('options.espacio') ) 
-                      data-numeroelementos = "{{ $recurso->puestos->count()}}"
-                    @elseif( $recurso->tipo == Config::get('options.tipoequipos') ) 
-                      data-numeroelementos = "{{ $recurso->equipos->count()}}"
-                    @endif    
-                  ><i class="fa fa-pencil fa-fw"></i>
-                  </a>
+                  <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-pencil fa-fw"></i></a>
                   <!-- eliminar -->
-                  <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" data-numeroeventos="{{$recurso->eventosfuturos()->count()}}"
-                    @if( $recurso->tipo == Config::get('options.espacio') ) 
-                      data-numeroelementos = "{{ $recurso->puestos->count()}}"
-                    @elseif( $recurso->tipo == Config::get('options.tipoequipos') ) 
-                      data-numeroelementos = "{{ $recurso->equipos->count()}}"
-                    @endif
-                  ><i class="fa fa-trash-o fa-fw"></i></a>
+                  <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" data-numeroeventos="{{$recurso->eventosfuturos()->count()}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
                   <!-- enabled/disabled -->
                   @if($recurso->disabled)
                     <!-- habilitar -->
@@ -91,7 +79,7 @@
                     <!-- Nuevo Puesto -->
                     <a href="#" title="Nuevo Puesto" class = "linkAddPuesto text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Puestos -->
-                    @if($recurso->puestos->count() > 0)
+                    @if($recurso->items->count() > 0)
                       <a href="#" title="Ver Puestos" class = "linkVerItems text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                     @endif    
                   @endif
@@ -103,7 +91,7 @@
                     <!-- Nuevo Equipo -->
                     <a href="#" title="Nuevo Equipo" class = "linkAddEquipo text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-plus-square fa-fw"></i></a>
                     <!-- Ver Equipos -->
-                    @if($recurso->equipos->count() > 0)
+                    @if($recurso->items->count() > 0)
                       <a href="#" title="Ver Equipos" class = "linkVerItems text-info" data-idrecurso="{{$recurso->id}}" data-nombrerecurso="{{$recurso->nombre}}" ><i class="fa fa-eye fa-fw"></i></a>
                     @endif    
                   @endif
@@ -115,20 +103,20 @@
                   <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                   
                     <ul class="list-unstyled">
-                    @foreach ($recurso->puestos as $puesto)
+                    @foreach ($recurso->items as $item)
                       <li>
 
-                        <span class="@if($puesto->disabled) text-warning @else text-success @endif">{{$puesto->nombre}}</span>
+                        <span class="@if($item->disabled) text-warning @else text-success @endif">{{$item->nombre}}</span>
                         <!-- editar -->
-                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$puesto->id}}" data-nombreespacio="{{$puesto->espacio->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
+                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$item->id}}" data-nombreespacio="{{$item->contenedor->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Puesto -->
-                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$puesto->id}}" data-nombre="{{$puesto->nombre}}" data-numeroeventos="{{$puesto->eventosfuturos()->count()}}" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
-                        @if($puesto->disabled)
+                        <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$item->id}}" data-nombre="{{$item->nombre}}" data-numeroeventos="{{$item->eventosfuturos()->count()}}" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                        @if($item->disabled)
                           <!-- habilitar Puesto -->
-                          <a id="link_{{$puesto->id}}" href="" class = "enabled text-success" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Habilitar puesto" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
+                          <a id="link_{{$item->id}}" href="" class = "enabled text-success" data-idrecurso="{{$item->id}}" data-nombrerecurso="{{$item->nombre}}" title = "Habilitar puesto" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
                         @else    
                           <!-- deshabilitar Puesto-->
-                          <a id="link_{{$puesto->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$puesto->id}}" data-nombrerecurso="{{$puesto->nombre}}" title = "Deshabilitar puesto" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
+                          <a id="link_{{$item->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$item->id}}" data-nombrerecurso="{{$item->nombre}}" title = "Deshabilitar puesto" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
                         @endif 
                         
                       </li>
@@ -141,19 +129,19 @@
                   <!-- equipos -->
                   <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                     <ul class="list-unstyled">
-                    @foreach ($recurso->equipos as $equipo)
+                    @foreach ($recurso->items as $item)
                       <li>
-                        <span class="@if($equipo->disabled) text-warning @else text-success @endif">{{$equipo->nombre}}</span>
+                        <span class="@if($item->disabled) text-warning @else text-success @endif">{{$item->nombre}}</span>
                         <!-- editar -->
-                        <a href="#" title="Editar Equipo" class="linkEditEquipo text-info" data-idrecurso="{{$equipo->id}}" data-modeloequipo="{{$equipo->tipoequipo->nombre}}" ><i class="fa fa-pencil fa-fw"></i></a>
+                        <a href="#" title="Editar Equipo" class="linkEditEquipo text-info" data-idrecurso="{{$item->id}}" data-modeloequipo="{{$item->contenedor->nombre}}" ><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Equipo -->
-                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$equipo->id}}" data-nombre="{{$equipo->nombre}}" data-numeroeventos="{{$equipo->eventosfuturos()->count()}}" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
-                        @if($equipo->disabled)
+                        <a href="#" title="Eliminar Equipo" class = "linkEliminaRecurso text-info" data-idrecurso="{{$item->id}}" data-nombre="{{$item->nombre}}" data-numeroeventos="{{$item->eventosfuturos()->count()}}" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                        @if($item->disabled)
                           <!-- habilitar Equipo -->
-                          <a id="link_{{$equipo->id}}" href="" class = "enabled text-success" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Habilitar equipo" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
+                          <a id="link_{{$item->id}}" href="" class = "enabled text-success" data-idrecurso="{{$item->id}}" data-nombrerecurso="{{$item->nombre}}" title = "Habilitar equipo" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
                         @else    
                           <!-- deshabilitar Equipo-->
-                          <a id="link_{{$equipo->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$equipo->id}}" data-nombrerecurso="{{$equipo->nombre}}" title = "Deshabilitar equipo" data-idrecursopadre="{{$recurso->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
+                          <a id="link_{{$item->id}}" href="" class = "disabled text-warning" data-idrecurso="{{$item->id}}" data-nombrerecurso="{{$item->nombre}}" title = "Deshabilitar equipo" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
                         @endif 
                       </li>
                     @endforeach

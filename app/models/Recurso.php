@@ -64,25 +64,22 @@ class Recurso extends Eloquent {
       * @param void
       * @return $visible boolean 
     */
-    public function esVisible($capacidad = ''){
+   /* public function esVisible($capacidad = ''){
       if (empty($capacidad))  return false;
       //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
       $permisos = json_decode($this->recurso->acl,true); 
       if (strpos($permisos['r'],$capacidad) !== false) return true; 
       return false;
-    }  
+    }*/  
 
 
   /**
     * //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
   */
   public function eventosfuturos(){
-    $recurso = $this;
-    $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-    $sgrRecurso->setRecurso($recurso);
-    $eventosfuturos = $sgrRecurso->eventosfuturos();
-    return $eventosfuturos;
-    //return $this->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')));
+    $sgrRecurso = Factoria::getRecursoInstance($this);
+    return $sgrRecurso->eventosfuturos();
+     
   }
 
   /**
