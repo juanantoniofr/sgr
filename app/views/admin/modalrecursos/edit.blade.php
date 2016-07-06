@@ -63,9 +63,8 @@
           </label>
         </div>
 
-        <div class="form-group hidden">
-            {{Form::text('id','',array('class' => 'form-control'))}}
-          </div>
+        <div class="form-group hidden">{{Form::text('id','',array('class' => 'form-control'))}}</div> 
+        <div class="form-group hidden">{{Form::text('contenedor_id','0',array('class' => 'form-control'))}}</div> 
       </div><!-- ./modal-body -->      
       
       <div class="modal-footer">

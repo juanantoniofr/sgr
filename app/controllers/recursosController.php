@@ -2,12 +2,13 @@
 class recursosController extends BaseController{
   
 
-  /** EOF
+  /** 
     * @param Input::get('sortby') string
     * @param Input::get('order')  string
     *
     * @return View::make('admin.recursos.list')  
   */
+  /******* EOF *******/
   public function listar(){
     //Input      
     $sortby = Input::get('sortby','nombre');
@@ -18,6 +19,219 @@ class recursosController extends BaseController{
 
 
     return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente')->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente')->nest('modalEditEquipo','admin.modalrecursos.editEquipo');
+  }
+
+  /**
+    * //Añade un nuevo recurso a la base de datos de cualquier tipo (puesto,equipo,espacio y tipoequipos)
+    * // llamadas desde: admin\modalrecursos\add.blade.php
+    * @param Input::get('nombre')         string
+    * @param Input::get('descripcion')    string
+    * @param Input::get('tipo')           string
+    * @param Input::get('id_lugar')       string
+    * @param Input::get('grupo_id')       int
+    * @param Input::get('contenedor_id')  int  
+    * @param Input::get('modo')           int (0|1)
+    * @param Input::get('roles')          array
+    *
+    * @return $result                     array(boolean,string,array)    
+  */ 
+  /******* EOF *******/
+  public function add(){
+    
+    //out
+    $result = array('error' => false,
+                    'msg'   => '',
+                    'errors' => array());
+    //Input
+    $nombre = Input::get('nombre');
+    $tipo =  Input::get('tipo'); //espacio|tipoequipos
+    $grupo_id = Input::get('grupo_id',0);
+    $contenedor_id = Input::get('contenedor_id','0');
+    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
+    $descripcion = Input::get('descripcion','');
+    $id_lugar = Input::get('id_lugar','');
+    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    
+    //Validación de formulario   
+    $rules = array( 'nombre'        => 'required|unique:recursos',
+                    'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
+                    'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
+                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo'),
+                    'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
+
+    $messages = array('required'                    => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'unique'                      => 'Existe un recurso con el mismo nombre...',
+                      'tipo.in'                     => 'El tipo de recurso no está definido ..',
+                      'modo.in'                     => 'Modo de Gestión de solicitudes de reserva no definido....',
+                      'grupo_id.required_if'        => 'identificador de grupo requerido....',
+                      'contenedor_id.required_if'   => 'identificador de elemento contendor requerido....',
+                      'grupo_id.exists'             => 'No existe identificador de grupo...',
+                      'exist_contenedor'            => 'No existe identificador de elemento padre..',);
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    if ($contenedor_id != 0){
+      $validator->sometimes('exist_contenedor','',function($input){
+        return Recurso::findOrFail($input['contenedor_id'])->count() > 0;
+      });
+    }
+
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+    }
+    else{  
+      //Si no hay errores en el formulario
+      $data = array(  'nombre'        => $nombre,
+                      'tipo'          => $tipo,
+                      'grupo_id'      => $grupo_id,
+                      'contenedor_id' => $contenedor_id,
+                      'descripcion'   => $descripcion,
+                      'id_lugar'      => $id_lugar,
+                      'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
+      //$recurso = new Recurso;
+      $sgrRecurso = Factoria::getRecursoInstance(new Recurso);
+      $sgrRecurso->setdatos($data);
+      $sgrRecurso->save();
+      
+      $result['msg'] = Config::get('msg.success');
+    }
+
+    return $result;
+  }
+
+  /**
+    * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
+    * 
+    * @param Input::get('idrecurso') int
+    *
+    * @return $result object Recurso
+  */
+  public function getrecurso(){
+    //input
+    $id = Input::get('idrecurso','');
+    //Output 
+    $result = array( 'errors'         => array(),
+                     'msg'            => '',    
+                     'error'          => false,
+                     'recurso'        => '',
+                     'listadogrupos'  => '');
+    //Validate
+    $rules = array('idrecurso'      => 'required|exists:recursos,id',);
+    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'exists'    => 'No existe identificador de grupo...',);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+
+    //Save Input or return error
+    if ($validator->fails()){
+        $result['errors'] = $validator->errors()->toArray();
+        $result['error'] = true;
+    }
+    else{
+      $recurso = Recurso::findOrFail($id);
+      $result['recurso'] = $recurso->toArray();
+      $grupos = GrupoRecurso::all();
+      $result['listadogrupos'] = (string) View::make('admin.html.optionGrupos')->with(compact('grupos'));
+    }  
+    
+    return $result;
+  }
+  
+  /**
+    * @param Input::get('nombre')      string
+    * @param Input::get('descripcion') string
+    * @param Input::get('tipo')        string
+    * @param Input::get('id_lugar')    string
+    * @param Input::get('grupo_id')    int 
+    * @param Input::get('modo')        int (0|1)
+    * @param Input::get('roles')       array
+    *
+    * @return $result                  array    
+  */ 
+  public function edit(){
+    //Input
+    $id = Input::get('id','');
+    $nombre = Input::get('nombre');
+    $tipo =  Input::get('tipo'); //espacio|puesto|tipoequipo|equipo
+    $grupo_id = Input::get('grupo_id',0);
+   //$espacio_id = Input::get('espacio_id',0);
+   //$tipoequipo_id = Input::get('tipoequipo_id',0);
+    $contenedor_id = Input::get('contenedor_id','0');
+    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
+    $descripcion = Input::get('descripcion','');
+    $id_lugar = Input::get('id_lugar','');
+    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    //out
+    $result = array('error'   => false,
+                    'msg'     => '',
+                    'errors'  => array());
+    
+    //Validación de formulario   
+    $rules = array( 'id'              => 'required|exists:recursos',
+                    'nombre'          => 'required|unique:recursos,nombre,'.Input::get('id'),
+                    'tipo'            => 'required|in:'.implode(',',Config::get('options.recursos')),  
+                    'grupo_id'        => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
+                    'contenedor_id'   => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo'),
+                    //'espacio_id'      => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
+                    //'tipoequipo_id'   => 'required_if:tipo,'.Config::get('options.equipo').'|exists:recursos,id',
+                    'modo'            => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
+     $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
+                        'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
+                        'unique'                  => 'Existe un recurso con el mismo nombre...',
+                        'tipo.in'                 => 'El tipo de recurso no está definido...',
+                        'modo.in'                 => 'Modo de Gestión de solicitudes de reserva no definido....',
+                        'grupo_id.required_if'    => 'identificador de grupo requerido....',
+                        'espacio_id.required_if'  => 'identificador de espacio requerido....',
+                        'grupo_id.exists'         => 'No existe identificador de grupo...',
+                        //'espacio_id.exists'       => 'No existe identificador de espacio...',
+                        'grupo_id.sametypes'      => 'No coinciden los tipos de grupo y recurso...',
+                        'exist_contenedor'        => 'No existe identificador de elemento padre..',
+                        );
+    
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    if ($contenedor_id != 0){
+      $validator->sometimes('exist_contenedor','',function($input){
+        return Recurso::findOrFail($input['contenedor_id'])->count() > 0;
+      });
+    }
+
+    //Controlar condición: debe coincidir el tipo del grupo con el tipo de recurso (grupos de tipo "espacio" deben agrupar recursos de tipo espacio (igual para grupos de tipo tiopequipos y recursos del tipo tipoequipos))
+    if (0 != $grupo_id && 0 != $contenedor_id){
+      $tiposachequear = array('tipogrupo' => GrupoRecurso::find($grupo_id)->tipo,'tiporecurso' => $tipo);
+      $validator->sometimes(array('grupo_id','tipo'),'sametypes',function() use ($tiposachequear){
+          return  $tiposachequear['tipogrupo'] != $tiposachequear['tiporecurso'];
+      });
+    }
+    
+    if ($validator->fails()){
+      //Si errores en el formulario
+      $result['error'] = true;
+      $result['errors'] = $validator->errors()->toArray();
+
+    }
+    else{  
+      $data = array('nombre'        => $nombre,
+                    'tipo'          => $tipo,
+                    'modo'          => $modo, 
+                    'grupo_id'      => $grupo_id,
+                    'espacio_id'    => $espacio_id,
+                    'tipoequipo_id' => $tipoequipo_id,
+                    'descripcion'   => $descripcion,
+                    'id_lugar'      => $id_lugar,
+                    'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
+      $recurso = Recurso::findOrFail($id);
+      $sgrRecurso = Factoria::getRecursoInstance($recurso);
+      $sgrRecurso->setdatos($data);
+      $sgrRecurso->save();
+      /*$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
+      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso->update($data);*/
+
+      $result['msg'] = Config::get('msg.success');
+    }
+    return $result;
   }
 
   /**
@@ -121,163 +335,6 @@ class recursosController extends BaseController{
   }
 
   /**
-    * //Añade un nuevo recurso a la base de datos de cualquier tipo (puesto,equipo,espacio y tipoequipos)
-    * // llamadas desde: admin\modalrecursos\add.blade.php
-    * @param Input::get('nombre')      string
-    * @param Input::get('descripcion') string
-    * @param Input::get('tipo')        string
-    * @param Input::get('id_lugar')    string
-    * @param Input::get('grupo_id')    int
-    * @param Input::get('espacio_id')  int  
-    * @param Input::get('modo')        int (0|1)
-    * @param Input::get('roles')       array
-    *
-    * @return $result                  array    
-  */ 
-  public function add(){
-    
-    //out
-    $result = array('error' => false,
-                    'msg'   => '',
-                    'errors' => array());
-    //Input
-    $nombre = Input::get('nombre');
-    $tipo =  Input::get('tipo'); //espacio|tipoequipos
-    $grupo_id = Input::get('grupo_id',0);
-    $contenedor_id = Input::get('contenedor_id','0'); //!=0 si add puesto
-    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
-    $descripcion = Input::get('descripcion','');
-    $id_lugar = Input::get('id_lugar','');
-    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
-    
-    //Validación de formulario   
-    $rules = array( 'nombre'        => 'required|unique:recursos',
-                    'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
-                    'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
-                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo').'|exists:recursos,id',
-                    'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
-
-    $messages = array('required'                    => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'unique'                      => 'Existe un recurso con el mismo nombre...',
-                      'tipo.in'                     => 'El tipo de recurso no está definido ..',
-                      'modo.in'                     => 'Modo de Gestión de solicitudes de reserva no definido....',
-                      'grupo_id.required_if'        => 'identificador de grupo requerido....',
-                      'contenedor_id.required_if'   => 'identificador de elemento contendor requerido....',
-                      'grupo_id.exists'             => 'No existe identificador de grupo...',
-                      'contenedor_id.exists'        => 'No existe identificador de elemento padre.sssss..' . $tipo,);
-    
-    $validator = Validator::make(Input::all(), $rules, $messages);
-
-    if ($validator->fails()){
-      //Si errores en el formulario
-      $result['error'] = true;
-      $result['errors'] = $validator->errors()->toArray();
-    }
-    else{  
-      //Si no hay errores en el formulario
-      $data = array(  'nombre'        => $nombre,
-                      'tipo'          => $tipo,
-                      'grupo_id'      => $grupo_id,
-                      'contenedor_id' => $contenedor_id,
-                      'descripcion'   => $descripcion,
-                      'id_lugar'      => $id_lugar,
-                      'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
-      //$recurso = new Recurso;
-      $sgrRecurso = Factoria::getRecursoInstance(new Recurso);
-      $sgrRecurso->add($data);
-      $sgrRecurso->save();
-      
-      $result['msg'] = Config::get('msg.success');
-    }
-
-    return $result;
-  }
-  
-  /**
-    * @param Input::get('nombre')      string
-    * @param Input::get('descripcion') string
-    * @param Input::get('tipo')        string
-    * @param Input::get('id_lugar')    string
-    * @param Input::get('grupo_id')    int 
-    * @param Input::get('modo')        int (0|1)
-    * @param Input::get('roles')       array
-    *
-    * @return $result                  array    
-  */ 
-  public function edit(){
-    //Input
-    $id = Input::get('id','');
-    $nombre = Input::get('nombre');
-    $tipo =  Input::get('tipo'); //espacio|puesto|tipoequipo|equipo
-    $grupo_id = Input::get('grupo_id',0);
-    $espacio_id = Input::get('espacio_id',0);
-    $tipoequipo_id = Input::get('tipoequipo_id',0);
-    $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
-    $descripcion = Input::get('descripcion','');
-    $id_lugar = Input::get('id_lugar','');
-    $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
-    //out
-    $result = array('error'   => false,
-                    'msg'     => '',
-                    'errors'  => array());
-    
-    //Validación de formulario   
-    $rules = array( 'id'              => 'required|exists:recursos',
-                    'nombre'          => 'required|unique:recursos,nombre,'.Input::get('id'),
-                    'tipo'            => 'required|in:'.implode(',',Config::get('options.recursos')),  
-                    'grupo_id'        => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
-                    'espacio_id'      => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
-                    'tipoequipo_id'   => 'required_if:tipo,'.Config::get('options.equipo').'|exists:recursos,id',
-                    'modo'            => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
-     $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
-                        'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
-                        'unique'                  => 'Existe un recurso con el mismo nombre...',
-                        'tipo.in'                 => 'El tipo de recurso no está definido...',
-                        'modo.in'                 => 'Modo de Gestión de solicitudes de reserva no definido....',
-                        'grupo_id.required_if'    => 'identificador de grupo requerido....',
-                        'espacio_id.required_if'  => 'identificador de espacio requerido....',
-                        'grupo_id.exists'         => 'No existe identificador de grupo...',
-                        'espacio_id.exists'       => 'No existe identificador de espacio...',
-                        'grupo_id.sametypes'      => 'No coinciden los tipos de grupo y recurso...',
-                        );
-    
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-    //Controlar condición: debe coincidir el tipo del grupo con el tipo de recurso (grupos de tipo "espacio" deben agrupar recursos de tipo espacio (igual para grupos de tipo tiopequipos y recursos del tipo tipoequipos))
-    if (0 != $grupo_id && 0 != $id){
-      $tiposachequear = array('tipogrupo' => GrupoRecurso::find($grupo_id)->tipo,'tiporecurso' => $tipo);
-      $validator->sometimes(array('grupo_id','tipo'),'sametypes',function() use ($tiposachequear){
-          return  $tiposachequear['tipogrupo'] != $tiposachequear['tiporecurso'];
-      });
-    }
-    
-    if ($validator->fails()){
-      //Si errores en el formulario
-      $result['error'] = true;
-      $result['errors'] = $validator->errors()->toArray();
-
-    }
-    else{  
-      $data = array('nombre'        => $nombre,
-                    'tipo'          => $tipo,
-                    'modo'          => $modo, 
-                    'grupo_id'      => $grupo_id,
-                    'espacio_id'    => $espacio_id,
-                    'tipoequipo_id' => $tipoequipo_id,
-                    'descripcion'   => $descripcion,
-                    'id_lugar'      => $id_lugar,
-                    'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
-      $recurso = Recurso::find($id);
-      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-      $sgrRecurso->setRecurso($recurso);
-      $sgrRecurso->update($data);
-
-      $result['msg'] = Config::get('msg.success');
-    }
-    return $result;
-  }
-
-  /**
     * @param Input::get('idrecurso') int
     *
     * @return $result array(boolean|string) 
@@ -320,42 +377,7 @@ class recursosController extends BaseController{
     return $result;
   }
   
-  /**
-    * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
-    * 
-    * @param Input::get('idrecurso') int
-    *
-    * @return $result object Recurso
-  */
-  public function getrecurso(){
-    //input
-    $id = Input::get('idrecurso','');
-    //Output 
-    $result = array( 'errors'         => array(),
-                     'msg'            => '',    
-                     'error'          => false,
-                     'recurso'        => '',
-                     'listadogrupos'  => '');
-    //Validate
-    $rules = array('idrecurso'      => 'required|exists:recursos,id',);
-    $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
-                        'exists'    => 'No existe identificador de grupo...',);
-    $validator = Validator::make(Input::all(), $rules, $messages);
-
-    //Save Input or return error
-    if ($validator->fails()){
-        $result['errors'] = $validator->errors()->toArray();
-        $result['error'] = true;
-    }
-    else{
-      $recurso = Recurso::findOrFail($id);
-      $result['recurso'] = $recurso->toArray();
-      $grupos = GrupoRecurso::all();
-      $result['listadogrupos'] = (string) View::make('admin.html.optionGrupos')->with(compact('grupos'));
-    }  
-    
-    return $result;
-  }
+  
 
   /**
     * //habilita un recursos para su reserva
@@ -417,78 +439,6 @@ class recursosController extends BaseController{
   */
   public function getequiposSinModelo(){
     return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('tipoequipo_id','=','0')->where('tipo','=',Config::get('options.equipo'))->get());
-  }
-
-  /**
-    * @param Input::get('espacio_id') int indetificador de grupo
-    * @param Input::get('idpuestos') array indentificadores de recursos añadir al grupo
-    *
-    * @return $result array(array,boleano,string)
-  */
-  //temporal
-  public function addpuestoaespacio(){
-    //Input
-    $id = Input::get('espacio_id','');
-    $idpuestos = Input::get('iditems',array());
-    //Output 
-    $result = array('errors' => array(),
-                    'msg'    => '',    
-                    'error'  => false,);
-    //Validate
-    $rules = array('espacio_id' => 'required|exists:recursos,id',);
-
-    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'exists'   => Config::get('msg.idnotfound'),);
-    $validator = Validator::make(Input::all(), $rules, $messages);
-      
-    //Save Input or return error
-    if ($validator->fails()){
-      $result['errors'] = $validator->errors()->toArray();
-      $result['error'] = true;
-    }
-    else{
-      foreach ($idpuestos as $idpuesto) {
-        Recurso::find($idpuesto)->update(array('espacio_id'=>$id));
-      }
-      $result['msg'] = Config::get('msg.success');
-    }
-    return $result;
-  }
-
-  /**
-    * @param Input::get('espacio_id') int indetificador de grupo
-    * @param Input::get('idpuestos') array indentificadores de recursos añadir al grupo
-    *
-    * @return $result array(array,boleano,string)
-  */
-  //temporal
-  public function addequipoamodelo(){
-    //Input
-    $id = Input::get('tipoequipo_id','');
-    $idequipos = Input::get('iditems',array());
-    //Output 
-    $result = array('errors' => array(),
-                    'msg'    => '',    
-                    'error'  => false,);
-    //Validate
-    $rules = array('tipoequipo_id' => 'required|exists:recursos,id',);
-
-    $messages = array('required' => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'exists'   => Config::get('msg.idnotfound'),);
-    $validator = Validator::make(Input::all(), $rules, $messages);
-      
-    //Save Input or return error
-    if ($validator->fails()){
-      $result['errors'] = $validator->errors()->toArray();
-      $result['error'] = true;
-    }
-    else{
-      foreach ($idequipos as $idequipo) {
-        Recurso::find($idequipo)->update(array('tipoequipo_id'=>$id));
-      }
-      $result['msg'] = Config::get('msg.success');
-    }
-    return $result;
   }
 
   /**

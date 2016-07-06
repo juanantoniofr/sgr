@@ -133,18 +133,24 @@
 		}
 
 
-		//
+		
 		/**
-			* añade un nuevo recurso 
+			* da valor a los atributos del objeto tipo Recurso ($this->recurso)
 			* @param $data array definición de los datos de un recurso
 		*/
-		public function add($data){
+		public function setdatos($data){
 			foreach ($data as $key => $value) {
 				$this->recurso->$key = $value;
 			}
-			return $this->recurso->save();
 		}	
-	
+		
+		/**
+			* 
+			* Salva a BD el objeto Recurso ($this->recurso)
+		*/
+		public function save(){
+			return $this->recurso->save();
+		}
 				
 	}
 ?>
