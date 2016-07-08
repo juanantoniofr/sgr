@@ -108,6 +108,7 @@ class recursosController extends BaseController{
     *
     * @return $result object Recurso
   */
+  /******* EOF *******/
   public function getrecurso(){
     //input
     $id = Input::get('idrecurso','');
@@ -198,7 +199,7 @@ class recursosController extends BaseController{
     }
 
     //Controlar condición: debe coincidir el tipo del grupo con el tipo de recurso (grupos de tipo "espacio" deben agrupar recursos de tipo espacio (igual para grupos de tipo tiopequipos y recursos del tipo tipoequipos))
-    if (0 != $grupo_id && 0 != $contenedor_id){
+    if (0 != $grupo_id && 0 == $contenedor_id){
       $tiposachequear = array('tipogrupo' => GrupoRecurso::find($grupo_id)->tipo,'tiporecurso' => $tipo);
       $validator->sometimes(array('grupo_id','tipo'),'sametypes',function() use ($tiposachequear){
           return  $tiposachequear['tipogrupo'] != $tiposachequear['tiporecurso'];
@@ -214,13 +215,15 @@ class recursosController extends BaseController{
     else{  
       $data = array('nombre'        => $nombre,
                     'tipo'          => $tipo,
-                    'modo'          => $modo, 
+                    //'modo'          => $modo, 
                     'grupo_id'      => $grupo_id,
-                    'espacio_id'    => $espacio_id,
-                    'tipoequipo_id' => $tipoequipo_id,
+                    //'espacio_id'    => $espacio_id,
+                    //'tipoequipo_id' => $tipoequipo_id,
+                    'contenedor_id' => $contenedor_id,
                     'descripcion'   => $descripcion,
                     'id_lugar'      => $id_lugar,
-                    'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
+                    'acl'           => sgrACL::buildJsonAcl($modo,$roles),
+                    );
       $recurso = Recurso::findOrFail($id);
       $sgrRecurso = Factoria::getRecursoInstance($recurso);
       $sgrRecurso->setdatos($data);

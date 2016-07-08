@@ -35,7 +35,7 @@
       * @return $visible boolean 
     */
 		public function esVisible($capacidad = ''){
-			 if (empty($capacidad))  return false;
+			if (empty($capacidad))  return false;
       //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
       $permisos = json_decode($this->recurso->acl,true); 
       if (strpos($permisos['r'],$capacidad) !== false) return true; 
@@ -84,8 +84,6 @@
 			return $this->recurso->eventos()->whereIn('estado',$conEstado)->where('fechaEvento','>=',date('Y-m-d'))->get();
 		}
 
-
-
 		/**
 			* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
 			* @param $dataEvento array
@@ -131,8 +129,6 @@
 			}//fin if 
 			return false;
 		}
-
-
 		
 		/**
 			* da valor a los atributos del objeto tipo Recurso ($this->recurso)

@@ -23,7 +23,7 @@ return array (
 							 							'request' => 5,
 							 						),
 
-	'fin_cursoAcademico' => '2016-07-15',
+	'fin_cursoAcademico' => '2016-09-15',
 	
 	'inicio_gestiondesatendida' => '2015-05-1',
 	
@@ -50,6 +50,7 @@ return array (
 														'5'	=>	'liberada',),
 	'estadosEvento' => array(	'denegada','aprobada','pendiente','finalizada','anulada','liberada',),
 	'reservaAprobada'		=> 'aprobada',
+	'eventoAprobado'		=> 'aprobada',
 	'reservaPendiente'	=> 'pendiente',
 	//tiempo cortesia para liberar una reserva (20 minutos) en segundos
 	'tiempocortesia'	=> '1200',

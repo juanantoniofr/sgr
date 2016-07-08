@@ -139,7 +139,6 @@ $(function(e){
         }
       });//<!-- ajax -->
     });
-
   // <!-- añadir nuevo -->
   
 
@@ -157,11 +156,9 @@ $(function(e){
           success: function($respuesta){
             hideGifEspera();
             $recurso = $respuesta.recurso;
-
             CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
             CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
             $('#fm_editrecurso input[name="id"]').val($recurso.id);
-            $('#fm_editrecurso input[name="contenedor_id"]').val($recurso.contenedor_id);
             $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
             $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
             $('#fm_editrecurso_optionsGrupos').html($respuesta.listadogrupos);
@@ -218,9 +215,45 @@ $(function(e){
       });
     });  
 
-     
-
     //Edit Puesto*************
+    function activeLinkeditpuesto(){
+    //Muestra ventana modal editpuesto
+    $(".linkEditPuesto").on('click',function(e){
+      e.preventDefault();
+      showGifEspera();
+      $('#fm_editpuesto select[name="contenedor_id"] option:selected').text($(this).data('nombrecontenedor'));
+      $.ajax({
+        type: "GET",
+        url:  "getrecurso",
+        data: {idrecurso:$(this).data('idrecurso')},
+        success: function($respuesta){
+          $recurso = $respuesta.recurso;
+          hideGifEspera();
+          $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
+          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
+          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
+          $('#fm_editpuesto input[name="id"]').val($recurso.id);
+          $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
+          $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
+          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+          $('#fm_editpuesto select[name="contenedor_id"] option:selected').val($recurso.contenedor_id);
+
+          $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
+          
+          $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
+          $.each($arrayRoles,function(index,value){
+            $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
+          });
+          hideMsg();
+          $('#m_editpuesto').modal('show');
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });//<!-- ajax -->
+    });
+  }
     //Ajax: Salvar edición de Puesto 
     $('#fm_editpuesto_save').on('click',function(e){
       e.preventDefault();
@@ -255,44 +288,7 @@ $(function(e){
       });//<!-- ajax -->
     });
 
-  function activeLinkeditpuesto(){
-    //Muestra ventana modal editpuesto
-    $(".linkEditPuesto").on('click',function(e){
-      e.preventDefault();
-      showGifEspera();
-      $('#fm_editpuesto select[name="espacio_id"] option:selected').text($(this).data('nombreespacio'));
-      $.ajax({
-        type: "GET",
-        url:  "getrecurso",
-        data: {idrecurso:$(this).data('idrecurso')},
-        success: function($respuesta){
-          $recurso = $respuesta.recurso;
-          hideGifEspera();
-          $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
-          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
-          CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
-          $('#fm_editpuesto input[name="id"]').val($recurso.id);
-          $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
-          $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
-          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-          $('#fm_editpuesto select[name="espacio_id"] option:selected').val($recurso.espacio_id);
-
-          $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-          
-          $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
-          $.each($arrayRoles,function(index,value){
-            $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
-          });
-          hideMsg();
-          $('#m_editpuesto').modal('show');
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-        }
-      });//<!-- ajax -->
-    });
-  }
+  
   
   //Edit Equipo *************
   //Ajax: Salvar edición de Equipo 

@@ -60,7 +60,7 @@
               <li > 
                 @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) ) 
                   <!-- editar -->
-                  <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-contenedorid="{{$recurso->contenedor_id}}" data-id="{{$recurso->id}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-pencil fa-fw"></i></a>
+                  <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}" data-id="{{$recurso->id}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-pencil fa-fw"></i></a>
                   <!-- eliminar -->
                   <a href="#" title="Eliminar recurso" class = "linkEliminaRecurso text-info" data-idrecurso="{{$recurso->id}}" data-nombre="{{$recurso->nombre}}" data-numeroeventos="{{$recurso->eventosfuturos()->count()}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-trash-o fa-fw"></i></a>
                   <!-- enabled/disabled -->
@@ -98,7 +98,7 @@
                 @endif
                 <span class="@if($recurso->disabled) text-warning @else text-success @endif">{{$recurso->nombre}}</span>
                 
-                @if( $recurso->tipo == Config::get('options.espacio') )
+                @if( $recurso->tipo == Config::get('options.espacio') && $recurso->items->count() > 0 )
                   <!-- puestos -->
                   <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                   
@@ -108,7 +108,7 @@
 
                         <span class="@if($item->disabled) text-warning @else text-success @endif">{{$item->nombre}}</span>
                         <!-- editar -->
-                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$item->id}}" data-nombreespacio="{{$item->contenedor->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
+                        <a href="#" title="Editar Puesto" class="linkEditPuesto text-info" data-idrecurso="{{$item->id}}" data-nombrecontenedor="{{$item->contenedor->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
                         <!-- eliminar Puesto -->
                         <a href="#" title="Eliminar Puesto" class = "linkEliminaRecurso text-info" data-idrecurso="{{$item->id}}" data-nombre="{{$item->nombre}}" data-numeroeventos="{{$item->eventosfuturos()->count()}}" data-idrecursopadre="{{$item->contenedor->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
                         @if($item->disabled)
@@ -125,7 +125,7 @@
                   </div>
                 @endif
                 
-                @if( $recurso->tipo == Config::get('options.tipoequipos') )  
+                @if( $recurso->tipo == Config::get('options.tipoequipos') && $recurso->items->count() > 0)  
                   <!-- equipos -->
                   <div id="items_{{$recurso->id}}" style="display:none;border:1px dotted #ccc;margin:10px;padding:10px">
                     <ul class="list-unstyled">

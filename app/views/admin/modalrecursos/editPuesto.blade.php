@@ -27,9 +27,9 @@
           {{Form::select('tipo', array('puesto' => 'Puesto'),'puesto',array('class' => 'form-control'))}}
         </div>
 
-        <div class="form-group" id="fm_editpuesto_inputespacio_id">
-          {{Form::label('espacio_id', 'Espacio')}}
-          <select name="espacio_id" class="form-control" id="fm_editpuesto_optionsEspacios">
+        <div class="form-group" id="fm_editpuesto_inputcontenedor_id">
+          {{Form::label('contenedor_id', 'Espacio')}}
+          <select name="contenedor_id" class="form-control" id="fm_editpuesto_optionsEspacios">
             <option value="" selected="selected"></option>
           </select>
         </div>
@@ -63,12 +63,8 @@
           </label>
         </div>
 
-        <div class="form-group hidden">
-            {{Form::text('id','',array('class' => 'form-control'))}}
-        </div> 
-        <div class="form-group hidden">
-            {{Form::text('tipo','puesto',array('class' => 'form-control'))}}
-        </div> 
+        <div class="form-group hidden">{{Form::text('id','',array('class' => 'form-control'))}}</div> 
+        <div class="form-group hidden">{{Form::text('tipo','puesto',array('class' => 'form-control'))}}</div> 
       </div><!-- ./modal-body --> 
       
       <div class="modal-footer">
