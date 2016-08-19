@@ -34,7 +34,7 @@
 
         <div class="form-group" id="fm_addpuesto_inputdescripcion">  
           {{Form::label('descripcion', 'Descripcion')}}
-          {{Form::text('descripcion',Input::old('descripcion'),array('class' => 'form-control','id' => 'fm_addrecurso_inputdescripcion'))}}
+          {{Form::text('descripcion',Input::old('descripcion'),array('class' => 'form-control','id' => 'fm_addpuesto_inputdescripcion'))}}
         </div>
             
         <div class="form-group" id="fm_addpuesto_inputrol"> 

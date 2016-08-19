@@ -15,11 +15,10 @@ $(function(e){
     //Ajax: Salvar nuevo recurso 
     $('#fm_addrecurso_save').on('click',function(e){
       e.preventDefault();
-      updateChkeditorInstances();
       showGifEspera();
-      //$('form#fm_addrecurso input[name="contenedor_id"]').val('0');
-      $data = $('form#fm_addrecurso').serialize();
-      console.log($data);
+      CKEDITOR.instances['fm_addrecurso_inputdescripcion'].updateElement();
+      $data = $('form#fm_addrecurso').serialize() + '&descripcion=' + $('#fm_addrecurso_inputdescripcion').html();
+     
       $.ajax({
         type: "POST",
         url: "addrecurso",
@@ -63,9 +62,10 @@ $(function(e){
     //Ajax: Salvar nuevo Puesto 
     $('#fm_addpuesto_save').on('click',function(e){
       e.preventDefault();
-      updateChkeditorInstances();
       showGifEspera();
-      $data = $('form#fm_addpuesto').serialize();
+      CKEDITOR.instances['fm_addpuesto_inputdescripcion'].updateElement();
+      $data = $('form#fm_addpuesto').serialize() + '&descripcion=' + $('#fm_editpuesto_inputdescripcion').html();
+      
       $.ajax({
         type: "POST",
         url: "addrecurso",
@@ -84,7 +84,7 @@ $(function(e){
             hideGifEspera();
             $('#m_addpuesto').modal('hide');   
             showMsg($respuesta.msg);
-            getListado($('#fm_addpuesto input[name="espacio_id"]').val()); 
+            getListado($('#fm_addpuesto input[name="contenedor_id"]').val()); 
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -109,9 +109,9 @@ $(function(e){
     //Ajax: Salvar nuevo equipo
     $('#fm_addequipo_save').on('click',function(e){
       e.preventDefault();
-      updateChkeditorInstances();
       showGifEspera();
-      $data = $('form#fm_addequipo').serialize();
+      CKEDITOR.instances['fm_addequipo_inputdescripcion'].updateElement();
+      $data = $('form#fm_addequipo').serialize() + '&descripcion=' + $('#fm_addequipo_inputdescripcion').html();
       $.ajax({
         type: "POST",
         url: "addrecurso",
@@ -184,12 +184,13 @@ $(function(e){
     //Ajax: Salvar edición recurso
     $('#fm_editrecurso_save').on('click',function(e){
       e.preventDefault();
-      updateChkeditorInstances();
+      CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
+      $data = $('form#fm_editrecurso').serialize() + '&descripcion=' + $('#fm_editrecurso_inputdescripcion').html();
       showGifEspera();
       $.ajax({
         type: "POST",
         url:  "updaterecurso",
-        data: $('form#fm_editrecurso').serialize(),
+        data: $data,
         success: function($respuesta){
           if($respuesta.error == true){ 
             hideGifEspera(); 
@@ -216,12 +217,12 @@ $(function(e){
     });  
 
     //Edit Puesto*************
-    function activeLinkeditpuesto(){
+  function activeLinkeditpuesto(){
     //Muestra ventana modal editpuesto
     $(".linkEditPuesto").on('click',function(e){
       e.preventDefault();
       showGifEspera();
-      $('#fm_editpuesto select[name="contenedor_id"] option:selected').text($(this).data('nombrecontenedor'));
+      //$('#fm_editpuesto select[name="contenedor_id"] option:selected').text($(this).data('nombrecontenedor'));
       $.ajax({
         type: "GET",
         url:  "getrecurso",
@@ -235,7 +236,8 @@ $(function(e){
           $('#fm_editpuesto input[name="id"]').val($recurso.id);
           $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
           $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
-          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+          $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m); 
+          $('#fm_editpuesto select[name="contenedor_id"]').html($respuesta.listadocontenedores);   
           $('#fm_editpuesto select[name="contenedor_id"] option:selected').val($recurso.contenedor_id);
 
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
@@ -255,11 +257,12 @@ $(function(e){
     });
   }
     //Ajax: Salvar edición de Puesto 
-    $('#fm_editpuesto_save').on('click',function(e){
+  $('#fm_editpuesto_save').on('click',function(e){
       e.preventDefault();
-      updateChkeditorInstances();
       showGifEspera();
-      $data = $('form#fm_editpuesto').serialize();
+      CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
+      $data = $('form#fm_editpuesto').serialize() + '&descripcion=' + $('#fm_editpuesto_inputdescripcion').html();
+      hideGifEspera();
       $.ajax({
         type: "POST",
         url: "updaterecurso",
@@ -278,7 +281,7 @@ $(function(e){
             hideGifEspera();
             $('#m_editpuesto').modal('hide');   
             showMsg($respuesta.msg);
-            getListado($('#fm_editpuesto select[name="espacio_id"]').val()); 
+            getListado($('#fm_editpuesto select[name="contenedor_id"]').val()); 
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -286,17 +289,16 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
         }
       });//<!-- ajax -->
-    });
+  });
 
-  
-  
   //Edit Equipo *************
   //Ajax: Salvar edición de Equipo 
   $('#fm_editequipo_save').on('click',function(e){
     e.preventDefault();
-    updateChkeditorInstances();
     showGifEspera();
-    $data = $('form#fm_editequipo').serialize();
+    CKEDITOR.instances['fm_editequipo_inputdescripcion'].updateElement();
+    $data = $('form#fm_editequipo').serialize() + '&descripcion=' + $('#fm_editequipo_inputdescripcion').html();
+    console.log($data);
     $.ajax({
       type: "POST",
       url: "updaterecurso",
@@ -315,7 +317,7 @@ $(function(e){
           hideGifEspera();
           $('#m_editequipo').modal('hide');   
           showMsg($respuesta.msg);
-          getListado($('form#fm_editequipo select[name="tipoequipo_id"] option:selected').val()); 
+          getListado($('form#fm_editequipo select[name="contenedor_id"] option:selected').val()); 
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -330,7 +332,7 @@ $(function(e){
     $(".linkEditEquipo").on('click',function(e){
       e.preventDefault();
       showGifEspera();
-      $('#fm_editequipo select[name="tipoequipo_id"] option:selected').text($(this).data('modeloequipo'));
+      //$('#fm_editequipo select[name="contenedor_id"] option:selected').text($(this).data('modeloequipo'));
       $.ajax({
         type: "GET",
         url:  "getrecurso",
@@ -345,7 +347,8 @@ $(function(e){
           $('#fm_editequipo input[name="nombre"]').val($recurso.nombre);
           $('#fm_editequipo input[name="id_lugar"]').val($recurso.id_lugar);
           $('#fm_editequipo select[name="modo"]').val($.parseJSON($recurso.acl).m);
-          $('#fm_editequipo select[name="tipoequipo_id"] option:selected').val($recurso.tipoequipo_id);    
+          $('#fm_editequipo select[name="contenedor_id"]').html($respuesta.listadocontenedores);
+          $('#fm_editequipo select[name="contenedor_id"] option:selected').val($recurso.contenedor_id);    
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
           $('#fm_editequipo input[type="checkbox"]').prop( "checked", false );
           $.each($arrayRoles,function(index,value){
@@ -361,8 +364,6 @@ $(function(e){
       });//<!-- ajax -->
     });
   }
-
-  
 
   //Obtine el listado de grupos 
   function setGrupos($idSelect,$idInput,$optionSelected){
@@ -664,37 +665,36 @@ $(function(e){
   //Edit grupo    
   //Ajax: Salvar edición de grupo
   $('#fm_editgrupo_save').on('click',function(e){
-        e.preventDefault();
-        updateChkeditorInstances();
-        showGifEspera();
-        $.ajax({
-            type: "POST",
-            url:  "editgrupo",
-            data: $('form#fm_editgrupo').serialize(),
-            success: function($respuesta){
-                if($respuesta.error === true){  
-                    hideGifEspera();
-                    $.each($respuesta.errors,function(index,value){
-                        $('.divmodal_msgError').html('').fadeOut();
-                        $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
-                        $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-                    });
-                    $('#fm_editgrupo_textError').fadeIn('8000');
-                    //updateChkeditorInstances();
-                }
-                else {
-                    hideGifEspera();
-                    $('#m_editgrupo').modal('hide');   
-                    showMsg($respuesta.msg);
-                    getListado(); 
-                }
-                
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                    hideGifEspera();
-                    alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-            });
+    e.preventDefault();
+    CKEDITOR.instances['fm_editgrupo_inputdescripcion'].updateElement();
+      $data = $('form#fm_editgrupo').serialize() + '&descripcion=' + $('#fm_editgrupo_inputdescripcion').html();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "editgrupo",
+      data: $data,
+      success: function($respuesta){
+        if($respuesta.error === true){  
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+              $('.divmodal_msgError').html('').fadeOut();
+              $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
+              $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
+          });
+          $('#fm_editgrupo_textError').fadeIn('8000');
+        }
+        else {
+          hideGifEspera();
+          $('#m_editgrupo').modal('hide');   
+          showMsg($respuesta.msg);
+          getListado(); 
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });
   });
   
   //Muestra ventana modal para editar grupo de recursos
@@ -719,13 +719,13 @@ $(function(e){
   //Ajax: add grupo
   $('#fm_addgrupo_save').on('click',function(e){
     e.preventDefault();
-    updateChkeditorInstances();
     showGifEspera();
-  
+    CKEDITOR.instances['fm_addgrupo_inputdescripcion'].updateElement();
+      $data = $('form#fm_addgrupo').serialize() + '&descripcion=' + $('#fm_addgrupo_inputdescripcion').html();
     $.ajax({
       type:"POST",
       url:"addgrupo",
-      data: $('#fm_addgrupo').serialize(),
+      data: $data,
       success: function($respuesta){
         if($respuesta.error === true){
           hideGifEspera();
@@ -809,12 +809,13 @@ $(function(e){
 
   $('#fm_disabledrecurso_save').on('click',function(e){
     e.preventDefault();
-    updateChkeditorInstances();
+    CKEDITOR.instances['fm_disabledrecurso_inputdescripcion'].updateElement();
+      $data = $('form#fm_disabledrecurso').serialize() + '&descripcion=' + $('#fm_disabledrecurso_inputdescripcion').html();
     showGifEspera();
     $.ajax({
       type:"POST",
       url:"disabled",
-      data: $('#fm_disabledrecurso').serialize(),
+      data: $data,
       success: function($respuesta){
         if($respuesta.error === true){
           hideGifEspera();
@@ -990,7 +991,7 @@ $(function(e){
       data:{'orderby':'','order':''},
       success:function($html){
         $('#tableRecursos').html($html);
-        $('#items_'+$idrecurso).fadeIn();
+        $('#items_'+$idrecurso).fadeToggle();
         activelinks();
       },
       error:function(xhr, ajaxOptions, thrownError){
@@ -1013,11 +1014,6 @@ $(function(e){
       $('.form-group').removeClass('has-error');//Elimina errores en campos de formulario de cualquier ventana modal
   }
     
-  function updateChkeditorInstances(){
-    for ( instance in CKEDITOR.instances )
-      CKEDITOR.instances[instance].updateElement();
-  }    
-
   function showGifEspera(){
     $('#espera').css('display','inline').css('z-index','10000');
   }
@@ -1025,4 +1021,5 @@ $(function(e){
   function hideGifEspera(){
     $('#espera').css('display','none').css('z-index','-10000');
   }
+
 });

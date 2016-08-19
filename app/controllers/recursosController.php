@@ -113,11 +113,12 @@ class recursosController extends BaseController{
     //input
     $id = Input::get('idrecurso','');
     //Output 
-    $result = array( 'errors'         => array(),
-                     'msg'            => '',    
-                     'error'          => false,
-                     'recurso'        => '',
-                     'listadogrupos'  => '');
+    $result = array( 'errors'               => array(),
+                     'msg'                  => '',    
+                     'error'                => false,
+                     'recurso'              => '',
+                     'listadogrupos'        => '',
+                     'listadocontenedores'  => '');
     //Validate
     $rules = array('idrecurso'      => 'required|exists:recursos,id',);
     $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
@@ -134,6 +135,8 @@ class recursosController extends BaseController{
       $result['recurso'] = $recurso->toArray();
       $grupos = GrupoRecurso::all();
       $result['listadogrupos'] = (string) View::make('admin.html.optionGrupos')->with(compact('grupos'));
+      $recursosContenedores = Recurso::where('tipo','=',$recurso->contenedor->tipo)->get();
+      $result['listadocontenedores'] = (string) View::make('admin.html.optionscontenedores')->with(compact('recursosContenedores'));
     }  
     
     return $result;
@@ -156,8 +159,6 @@ class recursosController extends BaseController{
     $nombre = Input::get('nombre');
     $tipo =  Input::get('tipo'); //espacio|puesto|tipoequipo|equipo
     $grupo_id = Input::get('grupo_id',0);
-   //$espacio_id = Input::get('espacio_id',0);
-   //$tipoequipo_id = Input::get('tipoequipo_id',0);
     $contenedor_id = Input::get('contenedor_id','0');
     $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
     $descripcion = Input::get('descripcion','');
@@ -174,8 +175,6 @@ class recursosController extends BaseController{
                     'tipo'            => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'grupo_id'        => 'required_if:tipo,'.Config::get('options.espacio').'|exists:grupoRecursos,id',
                     'contenedor_id'   => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo'),
-                    //'espacio_id'      => 'required_if:tipo,'.Config::get('options.puesto').'|exists:recursos,id',
-                    //'tipoequipo_id'   => 'required_if:tipo,'.Config::get('options.equipo').'|exists:recursos,id',
                     'modo'            => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
      $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
                         'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
@@ -185,7 +184,6 @@ class recursosController extends BaseController{
                         'grupo_id.required_if'    => 'identificador de grupo requerido....',
                         'espacio_id.required_if'  => 'identificador de espacio requerido....',
                         'grupo_id.exists'         => 'No existe identificador de grupo...',
-                        //'espacio_id.exists'       => 'No existe identificador de espacio...',
                         'grupo_id.sametypes'      => 'No coinciden los tipos de grupo y recurso...',
                         'exist_contenedor'        => 'No existe identificador de elemento padre..',
                         );
@@ -198,6 +196,7 @@ class recursosController extends BaseController{
       });
     }
 
+    //En vez de chequear sería mejor cambiar?????
     //Controlar condición: debe coincidir el tipo del grupo con el tipo de recurso (grupos de tipo "espacio" deben agrupar recursos de tipo espacio (igual para grupos de tipo tiopequipos y recursos del tipo tipoequipos))
     if (0 != $grupo_id && 0 == $contenedor_id){
       $tiposachequear = array('tipogrupo' => GrupoRecurso::find($grupo_id)->tipo,'tiporecurso' => $tipo);
@@ -215,10 +214,7 @@ class recursosController extends BaseController{
     else{  
       $data = array('nombre'        => $nombre,
                     'tipo'          => $tipo,
-                    //'modo'          => $modo, 
                     'grupo_id'      => $grupo_id,
-                    //'espacio_id'    => $espacio_id,
-                    //'tipoequipo_id' => $tipoequipo_id,
                     'contenedor_id' => $contenedor_id,
                     'descripcion'   => $descripcion,
                     'id_lugar'      => $id_lugar,
@@ -228,6 +224,7 @@ class recursosController extends BaseController{
       $sgrRecurso = Factoria::getRecursoInstance($recurso);
       $sgrRecurso->setdatos($data);
       $sgrRecurso->save();
+      //$sgrRecurso->updatetipoitems($data['tipo']);
       /*$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
       $sgrRecurso->setRecurso($recurso);
       $sgrRecurso->update($data);*/

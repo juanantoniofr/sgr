@@ -4,6 +4,9 @@
 
 		private $recurso;	//array obj recurso (espacio / tipoequipo)
 		private $items = array(); //array obj recurso (puesto / equipo)
+		//private $tipocontenedor = Config::get('options.tipocontenedor');
+		//private $tipoitem = Config::get('options.tipoitem');
+		//private $itemsparacontenedor = Config::get('options.itemsdelcontenedor');
 
 		public function __construct($recurso){
 			$this->recurso = $recurso;
@@ -135,8 +138,18 @@
 			foreach ($data as $key => $value) {
 				$this->recurso->$key = $value;
 			}
+			$this->updatetipoitems();
 		}	
 		
+		public function updatetipoitems(){
+			foreach ($this->items as $item) {
+				$datos = array('tipo' => Config::get('options.itemsdelcontenedor')[$this->recurso->tipo]);
+				$item->setdatos($datos);
+				$item->save();	
+			}
+			return true;
+		}
+
 		/**
 			* 
 			* Salva a BD el objeto Recurso ($this->recurso)

@@ -74,6 +74,9 @@ return array (
 	'viewsCalendar'				=> 	array('month','week','year','day'),
 	'intervalo'				  	=> array('8:30' => 0,'9:00' => 1,'9:30' => 2,'10:00' => '3','10:30' => 4,'11:00' => 5,'11:30' => 6,'12:00' => 7,'12:30' => 8,'13:00' => 9,'13:30' => 10,'14:00' => 11,'14:30' => 12,'15:00' => 13,'15:30'	=> 14,'16:00' => 15,'16:30' => 16,'17:00' => 17,'17:30' => 18,'18:00' => 19,'18:30' => 20,'19:00' => 21,'19:30' => 22,'20:00' => 23,'20:30' => 24,'21:00' => 25,'21:30'=> 26),
 	'pxintervalo'					=> '82',
+	'tipocontenedor'			=> array ('espacio','tipoequipos'),
+	'tipoitem'					  => array ('puesto','equipo'),
+	'itemsdelcontenedor'	=> array('espacio' => 'puesto','tipoequipos' => 'equipo'),
 
 	);
 ?>
