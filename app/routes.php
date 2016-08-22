@@ -61,15 +61,24 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 //EE de equipo (capacidad = 6) y administradores de la aplicación (capacidad = 4)
 
 // recursosController routes ***********************
+//Add new
+Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+//
+
+//edit
+Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//__Update propiedades recurso
+
+
+
 Route::post('admin/disabled',array('uses'=>'recursosController@disabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/enabled',array('uses'=>'recursosController@enabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
 Route::post('admin/delrecurso',array('uses' => 'recursosController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::post('admin/addrecurso',array('uses' => 'recursosController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::get('admin/getrecurso',array('uses'=>'recursosController@getrecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Update propiedades recurso
+
 Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
 Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
 Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
+
 
 //Temporales
 Route::get('admin/recursosSinGrupo',array('uses'=>'GruposController@recursosSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));
@@ -84,7 +93,7 @@ Route::post('admin/addequipoamodelo',array('uses'  => 'recursosController@addequ
 
 
 //GruposController routes ************************
-Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'GruposController@listar','before' => array('auth','capacidad:4-6,msg')));
+Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
 Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Edita propiedades grupo (nombre y descripción)
@@ -145,8 +154,23 @@ App::error(function(ModelNotFoundException $e){
 });
 
 Route::get('test',array('as'=>'test',function(){
-  $recurso = Recurso::find('42');
-  foreach ($recurso->eventofuturo as $evento) {
-    echo $evento->titulo;
-  }
+ 
+    //$id = 8;
+    //$htmloptionsrecursos = 'no hay ni uno';
+    //$grupo = GrupoRecurso::findOrFail($id);
+    $recurso = Recurso::find(43);
+    echo "<pre>";
+      var_dump($recurso->validadores);
+    echo "</pre>";  
+    Auth::logout();
+    //se filtran para obtener sólo aquellos visibles 
+    //$recursos = $grupo->recursos->filter(function($recurso){
+    //    $sgrRecurso = Factoria::getRecursoInstance($recurso);
+        //return $sgrRecurso->esVisible(Auth::user()->capacidad);
+    //  });
+    //$recursos =  $recursos = $grupo->recursos;
+    //$htmloptionsrecursos = (string ) View::make('calendario.allViews.optionsRecursos')->with(compact('recursos'));
+    //echo $htmloptionsrecursos;
+    
  }));
+

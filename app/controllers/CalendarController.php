@@ -2,13 +2,13 @@
 
 class CalendarController extends BaseController {
 	
-	//Carga la vista por defecto: Mensual
-	public function index(){
+	//Carga la vista por defecto: Mensual 
+	public function index(){//***
 		$viewActive = Config::get('options.defaultview'); //vista por defecto
 		$fecha = new DateTime();
-		$sgrRecurso = RecursoFactory::getRecursoInstance(Config::get('options.defaulttiporecurso'));
+		$sgrRecurso = Factoria::getRecursoInstance();
 		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->id);
+		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->capacidad);
 		$dropdown = Auth::user()->dropdownMenu();
 		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown)->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
 	}

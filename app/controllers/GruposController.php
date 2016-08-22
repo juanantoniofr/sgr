@@ -2,9 +2,6 @@
 
 class GruposController extends BaseController {
 
-  
-
-
   /**
     * @param Input::get('idgrupo') int indetificador de grupo
     * @param Input::get('tipogrupo') string tipo de recursos para el grupo 
@@ -81,16 +78,17 @@ class GruposController extends BaseController {
   /**
     * //devuelve array con los nombres de los grupos con algún recurso visible para su reserva para el usuario con identificador igual a $id
     * 
-    * @param $id int
+    * @param $capacidad int
     *
     * @return $grupos Object GrupoRecursos
     * 
   */
-  static public function gruposVisibles(){
+  static public function gruposVisibles($capacidad){
   
-    $grupos = GrupoRecurso::all()->filter(function($grupo){
-      $recursos = $grupo->recursos->filter(function($recurso){
-            return $recurso->visible();
+    $grupos = GrupoRecurso::all()->filter(function($grupo) use ($capacidad){
+      $recursos = $grupo->recursos->filter(function($recurso) use ($capacidad){
+            $sgrRecurso = Factoria::getRecursoInstance($recurso);
+            return $sgrRecurso->esVisible($capacidad);
         }); 
       if ($recursos->count() > 0 ) return true;
     });
@@ -113,12 +111,11 @@ class GruposController extends BaseController {
         
     if(!empty($id)){
       $grupo = GrupoRecurso::findOrFail($id);
-      
       //se filtran para obtener sólo aquellos visibles 
       $recursos = $grupo->recursos->filter(function($recurso){
-          $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-          $sgrRecurso->setRecurso($recurso);
-          return $sgrRecurso->visible(); });
+          $sgrRecurso = Factoria::getRecursoInstance($recurso);
+          return $sgrRecurso->esVisible(Auth::user()->capacidad);
+          });
       $htmloptionsrecursos = (string ) View::make('calendario.allViews.optionsRecursos')->with(compact('recursos'));
     }
 
@@ -278,14 +275,14 @@ class GruposController extends BaseController {
   	}
  
   /**
-  * //Establece la relación persona-grupoRecursos (supervisor-validador-tecnico)
-  *
-  * @param Input::get('idgrupo')    int
-  * @param Input::get('username')   string
-  * @param Input::get('rol')        string
-  *
-  * @return $result array
-  * 
+    * //Establece la relación persona-grupoRecursos (supervisor-validador-tecnico)
+    *
+    * @param Input::get('idgrupo')    int
+    * @param Input::get('username')   string
+    * @param Input::get('rol')        string
+    *
+    * @return $result array
+    * 
   */
   public function addPersona(){
     

@@ -51,10 +51,18 @@ $(function(e){
 		$('#selectGroupRecurse').on('change',function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
-			$('#selectItems').fadeOut('fast',function(){
-																				$('select#items option:selected').prop('selected', false);
-																				$('select#items option').detach();});
-			$('#selectRecurseInGroup').fadeOut('fast',function(){$('select#recurse option').detach();});
+			$('#selectItems').fadeOut('fast',
+																function(){
+																	$('select#items option:selected').prop('selected', false);
+																	$('select#items option').detach();
+																}
+												);
+			$('#selectRecurseInGroup').fadeOut(	'fast',
+																					function(){
+																						$('select#recurse option').detach();
+																					}
+																	);
+			//alert($('select#selectGroupRecurse option:selected').val());
 			$.ajax({
 				type:"GET",
 				url:"getRecursos",

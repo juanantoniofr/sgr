@@ -26,7 +26,7 @@ class sgrDia {
 		$this->timestamp = $tsfecha;
 
 		$this->sgrRecurso = $sgrRecurso;
-		$this->eventos = $sgrRecurso->getEvents(date('Y-m-d',$tsfecha));
+		if (!empty($sgrRecurso)) $this->eventos = $sgrRecurso->eventos(date('Y-m-d',$tsfecha));
 
 		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			

@@ -8,95 +8,57 @@ class Recurso extends Eloquent {
   protected $softDelete = true;
   
   //devuelve los usuarios que atienden el recurso
-  public function esAtendidoPor(){
-    return $this->belongsToMany('User', 'recurso_atendidoPor', 'recurso_id', 'user_id');
-    //return $this->hasMany('recurso_tecnico','recurso_id','id');
+  public function gestores(){
+ 
+    return $this->belongsToMany('User', 'recurso_gestores', 'recurso_id', 'user_id');
   }
 
+  public function supervisores(){
  
-  //identifica el tipo de equipo al que pertenece un equipo
-  /*public function tipoequipo(){
-    return $this->hasOne('Recurso','id','tipoequipo_id');   
-  }*/
+    return $this->belongsToMany('User', 'recurso_supervisores', 'recurso_id', 'user_id');
+  }
 
-  //identifica el espacio al que pertenece un puesto
-  /*public function espacio(){
-    return $this->hasOne('Recurso','id','espacio_id');   
-  }*/
+  public function validadores(){
+ 
+    return $this->belongsToMany('User', 'recurso_validadores', 'recurso_id', 'user_id');
+  }
 
   //identifica el espacio al que pertenece un puesto
   public function contenedor(){
+    
     return $this->hasOne('Recurso','id','contenedor_id');   
   }
 
-  //devuelve los puestos de un recurso (espacio) (Relación Reflexiva)
- /* public function puestos(){
-    return $this->hasMany('Recurso','espacio_id','id');
-  } */
-  
-  //devuelve los equipos de un recurso (tipoequipo) (Relación Reflexiva)
-  /*public function equipos(){
-    return $this->hasMany('Recurso','tipoequipo_id','id');
-  }*/
-
   public function items(){
+ 
     return $this->hasMany('Recurso','contenedor_id','id');
   }
 
-  
-
   //identifica el grupo al que pertence un recurso
   public function grupo(){
+    
     return $this->hasOne('GrupoRecurso','id','grupo_id');   
   }
 
   public function eventos(){
+  
     return $this->hasMany('Evento','recurso_id','id');
   }
 
   public function eventosItems(){
+  
     return $this->hasManyThrough('Evento','Recurso','contenedor_id','recurso_id');
   }
   
-
-    /**
-      * Devuelve true si $capacidad tiene permiso para ver (listar) recurso
-      * @param void
-      * @return $visible boolean 
-    */
-   /* public function esVisible($capacidad = ''){
-      if (empty($capacidad))  return false;
-      //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
-      $permisos = json_decode($this->recurso->acl,true); 
-      if (strpos($permisos['r'],$capacidad) !== false) return true; 
-      return false;
-    }*/  
-
-
   /**
     * //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
   */
   public function eventosfuturos(){
-    $sgrRecurso = Factoria::getRecursoInstance($this);
+  
+   $sgrRecurso = Factoria::getRecursoInstance($this);
     return $sgrRecurso->eventosfuturos();
-     
   }
-
-  /**
-    * @param void
-    * @return $visible boolean true si el Auth::user puede ver (para reservar) el recurso $this   
-  */
- /* public function visible($capacidad = ''){
-
-    $visible = false;
-    if (empty($capacidad)) $capacidad = Auth::user()->capacidad;
-    //$acl es un string con el formato {"r":"2,3"}, Esto quiere decir que los usuarios con capacidades 2 y 3 pueden "reservar" ese recurso
-    $permisos = json_decode($this->acl,true); //array con key = 'r', y value igual a '2,3'
-    if (strpos($permisos['r'],$capacidad) !== false) $visible = true; // si la capacidad del usuario forma parte de la cadena $permisos['r'], entonces es visible (puede reservar)
-      
-    return $visible;
-  }*/   
-
+ 
   /**
     * Devuelve true si usuario identificado por $id puede reservar todos lo puestos de un recurso tipo espacio
     * @param $id int (identificador de usuario)
@@ -107,23 +69,7 @@ class Recurso extends Eloquent {
     return true;    
   }
 
-  /**
-    *   Devuelve true si el identificador de usuario es uno de los técnicos que atienden el recurso
-    *   @param $id 
-    *   @return boolean
-  */
- /* public function esAtendidoPor($id = ''){
-    $result = false;
-        
-    if ($this->grupo->tecnicos->contains($id)) $result = true;
-    return $result;
-  }*/
-
-  /**
-    * Implementa requisito: la gestión de las solicitudes de reservas pueden ser con validación o sin validación.
-    * @param void
-    * @return $validacion boolean true si la gestión de las solicitudes de reserva es atendida (necesita validación)
-  */
+  
   public function validacion(){
     //Por defecto el modo de reservar es automatico (sin validación)
     $validacion = false;
@@ -151,10 +97,12 @@ class Recurso extends Eloquent {
   }
     
   public function scopetipoDesc($query){
+   
     return $query->orderBy('tipo','DESC');
   }
 
 	public function scopegrupoDesc($query){
+  
     return $query->orderBy('grupo','DESC');
   }   
  

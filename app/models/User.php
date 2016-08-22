@@ -9,21 +9,23 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	protected $softDelete = false;
 	//protected $hidden = array('password');
 
-	//devuelve los grupos de recursos que supervisa (gestiona recurso -> añade/elimina/edita/deshabilita)
+	//devuelve los recursos que supervisa (puede añadir/eliminar/editar/deshabilitar recursos)
 	public function supervisa(){
-    	return $this->belongsToMany('GrupoRecurso','grupoRecursos_supervisor','user_id','grupoRecursos_id');
-    }
+   	
+   	return $this->belongsToMany('Recurso', 'recurso_supervisores', 'user_id', 'recurso_id');
+  }
 
-    //devuelve los grupos de recurso que atiende (gestiona reservas)
-	public function atiende(){
-        return $this->belongsToMany('GrupoRecurso','grupoRecursos_tecnico','user_id','grupoRecursos_id');
-    }
+  //devuelve los recursos que gestiona sus reservas: anula, libera, finaliza reservas
+	public function gestiona(){
+    
+  	return $this->belongsToMany('Recurso', 'recurso_gestores', 'user_id', 'recurso_id');
+  }
 
-    //devuelve los grupos de recurso que valida (aprueba//deniega reservas)
-	public function valida()
-    {
-        return $this->belongsToMany('GrupoRecurso','grupoRecursos_validador','user_id','grupoRecursos_id');
-    }
+  //devuelve los recursos que valida (aprueba//deniega reservas)
+	public function valida(){
+  	
+  	return $this->belongsToMany('Recurso', 'recurso_validadores', 'user_id', 'recurso_id');
+  }
 	
     //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
 	public function atenciones(){

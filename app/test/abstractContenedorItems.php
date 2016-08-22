@@ -4,9 +4,7 @@
 
 		private $recurso;	//array obj recurso (espacio / tipoequipo)
 		private $items = array(); //array obj recurso (puesto / equipo)
-		//private $tipocontenedor = Config::get('options.tipocontenedor');
-		//private $tipoitem = Config::get('options.tipoitem');
-		//private $itemsparacontenedor = Config::get('options.itemsdelcontenedor');
+		
 
 		public function __construct($recurso){
 			$this->recurso = $recurso;
@@ -15,8 +13,7 @@
 			}
 			return $this;
 		}
-	
-		
+			
 		/**
 			*
 			* habilita recurso y todos sus items (puestos/equipos) para su reserva

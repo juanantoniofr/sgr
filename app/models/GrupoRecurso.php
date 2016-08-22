@@ -13,19 +13,20 @@ class GrupoRecurso extends Eloquent{
  	}
 
  	//Devuelve los usuarios supervisores de un grupo de recursos
-    public function supervisores(){
-        return $this->belongsToMany('User','grupoRecursos_supervisor','grupoRecursos_id');
+    /*public function supervisores(){
+        return $this->belongsToMany('User','recurso_supervisores','recurso_id');
     }
 
     //Devuelve los usuarios técnicos que atienden un grupo de recursos
     public function tecnicos(){
-        return $this->belongsToMany('User','grupoRecursos_tecnico','grupoRecursos_id');
+        return $this->belongsToMany('User','recurso_tecnico','recurso_id');
     }
 
     //Devuelve los usuarios validadores de un grupo de recursos
     public function validadores(){
-        return $this->belongsToMany('User','grupoRecursos_validador','grupoRecursos_id');
+        return $this->belongsToMany('User','recurso_validadores','recursos_id');
     }
+    */
 	
     public function usuariopuedereservartodo($id){
 
