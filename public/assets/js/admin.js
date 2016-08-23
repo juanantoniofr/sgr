@@ -1,22 +1,35 @@
 $(function(e){
 
-   $('.toggle').hover(function (event) {
+   $('.toggleOpcionesGrupo').hover(function (event) {
         event.preventDefault();
+        $(this).css('text-decoration','none');
+        var target = $(this).attr('href');
+
+        $(target).fadeIn('fast');
+    });
+   $('.toggleOpcionesRecurso').hover(function (event) {
+        event.preventDefault();
+        $('.opcionesGrupo').fadeOut('fast');
         $(this).css('text-decoration','none');
         var target = $(this).attr('href');
         $(target).fadeIn('fast');
     });
-   $('.listitem').hover(function (event) {
+   $('.listitemgrupo').hover(function (event) {
         event.preventDefault();
         $('.opcionesGrupo').fadeOut('fast');
+    });
+   $('.listitemrecurso').hover(function (event) {
+        event.preventDefault();
+        $('.opcionesRecurso').fadeOut('fast');
     });
     
     $('.listadorecursos').click(function (event) {
         event.preventDefault();
         $(this).css('text-decoration','none');
         var target = $(this).data('divrecursosid');
+        $('#i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
         console.log(target);
-        $(target).fadeIn('fast');
+        $(target).fadeToggle('fast');
     });
   
 
