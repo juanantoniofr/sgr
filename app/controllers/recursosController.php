@@ -7,20 +7,7 @@ class recursosController extends BaseController{
     *
     * @return View::make('admin.recursos.list')  
   */
-  /******* EOF *******/
-  public function listado(){
-    //Input      
-    $sortby = Input::get('sortby','nombre');
-    $order = Input::get('order','asc');
-           
-    //Todos los grupos
-    $grupos = GrupoRecurso::all();
-
-    return View::make('admin.recursos.recursos',compact('grupos','sortby','order'));
-    //return View::make('admin.recursos.list')->nest('table','admin.recursos.table',compact('grupos','sortby','order'))->nest('dropdown',Auth::user()->dropdownMenu())->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente')->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente')->nest('modalEditEquipo','admin.modalrecursos.editEquipo');
-  }
-
-
+ 
   /** 
     * @param Input::get('sortby') string
     * @param Input::get('order')  string

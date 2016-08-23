@@ -1,5 +1,25 @@
 $(function(e){
 
+   $('.toggle').hover(function (event) {
+        event.preventDefault();
+        $(this).css('text-decoration','none');
+        var target = $(this).attr('href');
+        $(target).fadeIn('fast');
+    });
+   $('.listitem').hover(function (event) {
+        event.preventDefault();
+        $('.opcionesGrupo').fadeOut('fast');
+    });
+    
+    $('.listadorecursos').click(function (event) {
+        event.preventDefault();
+        $(this).css('text-decoration','none');
+        var target = $(this).data('divrecursosid');
+        console.log(target);
+        $(target).fadeIn('fast');
+    });
+  
+
   //Añadir nuevo
     //Recursos (Espacio // TipoEquipos)
     //Muestra ventana modal Addrecurso
