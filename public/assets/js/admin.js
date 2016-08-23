@@ -27,7 +27,7 @@ $(function(e){
         event.preventDefault();
         $(this).css('text-decoration','none');
         var target = $(this).data('divrecursosid');
-        $('#i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+        $('.i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
         console.log(target);
         $(target).fadeToggle('fast');
     });

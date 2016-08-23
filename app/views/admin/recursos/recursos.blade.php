@@ -3,7 +3,7 @@
   
     
       <li  class="list-group-item col-md-12 listitemgrupo" >
-        <a href= "#spanopcionesgrupo_{{$grupo->id}}" class="text-success toggleOpcionesGrupo listadorecursos" data-divrecursosid="#divrecursos_{{$grupo->id}}" data-grupoid="{{$grupo->id}}"><i id="i_{{$grupo->id}}" class="fa fa-angle-double-down fa-fw"></i>{{$grupo->nombre}}</a>
+        <a href= "#spanopcionesgrupo_{{$grupo->id}}" class="text-success toggleOpcionesGrupo listadorecursos" data-divrecursosid="#divrecursos_{{$grupo->id}}" data-grupoid="{{$grupo->id}}"><i  class=" i_{{$grupo->id}} fa fa-angle-double-down fa-fw"></i>{{$grupo->nombre}}</a>
 
         <span style="display:none" id="spanopcionesgrupo_{{$grupo->id}}" class="opcionesGrupo">
                   <a href="#" title="Editar grupo" class="linkEditGrupo" data-idgrupo="{{$grupo->id}}" data-descripcion="{{$grupo->descripcion}}" data-tipogrupo="{{$grupo->tipo}}" data-nombre="{{$grupo->nombre}}"><i class="fa fa-pencil fa-fw"></i></a><!-- editar grupo-->
@@ -11,7 +11,7 @@
                   <a href="#" title="Añadir {{$grupo->tipo}} existente al grupo" class="addrecursotogrupo" data-nombre="{{$grupo->nombre}}" data-idgrupo="{{$grupo->id}}" data-tipogrupo="{{$grupo->tipo}}"><i class="fa fa-plus fa-fw"></i></a><!-- añadir recursos al grupo -->
         </span>
         
-        <a href="#" class="badge listadorecursos" data-divrecursosid="#divrecursos_{{$grupo->id}}"><i class="fa fa-angle-double-down fa-fw"></i>{{$grupo->recursos->count()}}</a>
+        <a href="#" class="badge listadorecursos" data-divrecursosid="#divrecursos_{{$grupo->id}}" data-grupoid="{{$grupo->id}}"><i class="i_{{$grupo->id}} fa fa-angle-double-down fa-fw"></i>{{$grupo->recursos->count()}}</a>
      
     
 
