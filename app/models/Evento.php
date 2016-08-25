@@ -263,7 +263,7 @@ class Evento extends Eloquent{
     	$this->messages['fInicio.req5'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',sgrCalendario::fristMonday()) . '</strong><br />';
     }
 
-    if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()){
+    if (Auth::user()->isTecnico()){
     	setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
     	$tsToday = strtotime('today');
     	$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
@@ -387,7 +387,7 @@ class Evento extends Eloquent{
 		// --> técnicos  (capacidad 3, 4 y 5): reservas a partir del día de hoy (para mañana)
 		if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req6',function($data){
-				if (Auth::user()->isTecnico() || Auth::user()->isSupervisor() || Auth::user()->isValidador()) {
+				if (Auth::user()->isTecnico()) {
 					if ( strtotime('today') > strtotime($data['fInicio']) ) return true;
 				}
 			}); 
@@ -422,7 +422,7 @@ class Evento extends Eloquent{
 		  if (strtotime($fechaMaximaEvento) > strtotime($fechaFinCurso)) return true;});
     }
 
-    // requisito dateiniciocurso: lasreservas debe de ser posteriores a la fecha de inicio curso actual (Restringido a usuarios alumnos, pdi, supervisores y tecnicos)
+    // requisito dateiniciocurso: lasreservas debe de ser posteriores a la fecha de inicio curso actual (Restringido a usuarios alumnos, pdi, administradores y tecnicos)
     if (!empty($data['fInicio'])  && !Auth::user()->isValidador() && !Auth::user()->isAdmin() ){
 			$v->sometimes('fInicio','dateiniciocurso',function($data){
 		    	$hoy = strtotime('today');

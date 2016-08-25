@@ -155,14 +155,22 @@ App::error(function(ModelNotFoundException $e){
 
 Route::get('test',array('as'=>'test',function(){
  
-    //$id = 8;
-    //$htmloptionsrecursos = 'no hay ni uno';
-    //$grupo = GrupoRecurso::findOrFail($id);
-    $recurso = Recurso::find(43);
+    //$idGrupo = 2;
+    $idUser = 58;
+    //$idRecurso = 43;
+    
+    //$grupo = GrupoRecurso::findOrFail($idGrupo);
+    //$recurso = Recurso::find($idRecurso);
+    $user = User::find($idUser);
+    //echo $grupo->nombre;
+    echo $user->nombre;
+    //echo $recurso->nombre;
     echo "<pre>";
-      var_dump($recurso->validadores);
+      //var_dump($grupo->administradores);
+      var_dump($user->gruposAdministrados);
     echo "</pre>";  
-    Auth::logout();
+    
+   //Auth::logout();
     //se filtran para obtener sólo aquellos visibles 
     //$recursos = $grupo->recursos->filter(function($recurso){
     //    $sgrRecurso = Factoria::getRecursoInstance($recurso);

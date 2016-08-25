@@ -13,9 +13,9 @@ class Recurso extends Eloquent {
     return $this->belongsToMany('User', 'recurso_gestores', 'recurso_id', 'user_id');
   }
 
-  public function supervisores(){
+  public function administradores(){
  
-    return $this->belongsToMany('User', 'recurso_supervisores', 'recurso_id', 'user_id');
+    return $this->belongsToMany('User', 'recurso_administradores', 'recurso_id', 'user_id');
   }
 
   public function validadores(){

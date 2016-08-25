@@ -9,20 +9,25 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	protected $softDelete = false;
 	//protected $hidden = array('password');
 
-	//devuelve los recursos que supervisa (puede añadir/eliminar/editar/deshabilitar recursos)
-	public function supervisa(){
+	//devuelve los recursos que administra (puede añadir/eliminar/editar/deshabilitar recursos)
+	public function recursosAdministrados(){
    	
-   	return $this->belongsToMany('Recurso', 'recurso_supervisores', 'user_id', 'recurso_id');
+   	return $this->belongsToMany('Recurso', 'recurso_administradores', 'user_id', 'recurso_id');
+  }
+
+  public function gruposAdministrados(){
+   	
+   	return $this->belongsToMany('GrupoRecurso', 'grupo_administradores', 'user_id', 'grupo_id');
   }
 
   //devuelve los recursos que gestiona sus reservas: anula, libera, finaliza reservas
-	public function gestiona(){
+	public function recursosGestionados(){
     
   	return $this->belongsToMany('Recurso', 'recurso_gestores', 'user_id', 'recurso_id');
   }
 
   //devuelve los recursos que valida (aprueba//deniega reservas)
-	public function valida(){
+	public function recursosValidables(){
   	
   	return $this->belongsToMany('Recurso', 'recurso_validadores', 'user_id', 'recurso_id');
   }
@@ -74,7 +79,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				break;
 			case '4': //administradores SGR
 			case '5': //Validadores
-			case '6': //Supervisores (EE MAV)
+			case '6': //administradores (EE MAV)
 				$intfristdayAviable = strtotime('today'); //Hoy a las 00:00
 				if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
 				break;
@@ -192,7 +197,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 			case '5': 
 				return 'Validador';
 			case '6': 
-				return 'Supervisor (E.E Unidad)';	
+				return 'Administrador (E.E Unidad)';	
 			default:
 				return 'No definido..';
 			}
@@ -202,7 +207,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	public function home(){
 		
 		switch ($this->capacidad) {
-			case '6': //Supervisor
+			case '6': //administrador
 				return route('recursos');
 			case '5': //validador
 				return route('validadorHome.html');
@@ -229,7 +234,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				return 'admin.dropdown';
 			case '3': //pas - técnico 
 				return 'emptydropdown';
-			case '6': //pas - supervisor
+			case '6': //pas - administrador
 				return 'supervisor.dropdown';
 			case '2': //pdi
 				return 'emptydropdown';
@@ -297,13 +302,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	}
 
 	//Supervisor
-	public static function isSupervisor(){
+	/*public static function isSupervisor(){
 		$isSupervisor = false;
 
 		if (Auth::user()->capacidad == 6) $isSupervisor = true;
 
 		return $isSupervisor;
-	}
+	}*/
 
 
 }
