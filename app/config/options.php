@@ -27,14 +27,13 @@ return array (
 	
 	'inicio_gestiondesatendida' => '2015-05-1',
 	
-	//definición de perfiles (roles//capacidades)
-	'perfiles' => array(	'1' =>	'Usuarios (Alumnos)',
-												'2'	=>	'Usuarios Avanzados (PDI & PAS de Administración)',
-												'3'	=>	'Tecnicos (PAS Técnico MAV)',
-												'4'	=>	'Administradores de SGR',
-												'5'	=>	'Validadores (Dirección-Decanato)',
-												'6'	=>	'Supervisores (Responsable Unidad)',
-							),
+	
+	//Capacidades - Rol o perfil de usuario
+	'capacidadUsuario'				 	=> '1', //Usuarios (Alumnos)
+	'capacidadUsuarioAvanzado' 	=> '2', //Usuarios Avanzados (PDI & PAS de Administración)
+	'capacidadTécnico' 					=> '3', //Técnicos (PAS)
+	'capacidadAdminSgr' 				=> '4', //Administradores de SGR
+	'capacidadPorDefecto'				=> '1',
 	
 	'gestionAtendida' 	=> 'Atendida (requiere validación)',
 	'gestionDesatendida' => 'Desatendida (sin validación)', 

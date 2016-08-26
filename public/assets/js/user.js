@@ -1,5 +1,78 @@
 $(function(e){
 
+  $("#addUser").on('click',function(e){
+    e.preventDefault();
+    $("#addUserDatePicker" ).datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            showAnim: 'slideDown',
+            dateFormat: 'd-m-yy',
+            showButtonPanel: true,
+            firstDay: 1,
+            monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
+            dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
+    });
+    $('#modalAddUser').modal('show');
+  }); //:)
+   
+  //Lanza ajax function para salvar nuevo usuario
+  $('#btnSalvarUser').on('click',function(e){ // :/
+    e.preventDefault();
+    showGifEspera();
+    $data = $('form#nuevoUsuario').serialize();
+    $.ajax({
+      type: "POST",
+      url: "salvarNuevoUsuario",
+      data: $data,
+      success: function($respuesta){
+        if ($respuesta['error'] == false){
+          $('#modalAddUser').modal('hide');
+          hideGifEspera();
+          getUsuarios();
+          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+          
+          //location.reload();
+        }
+        //Hay errores de validación del formulario
+        else {
+          //reset
+          $('.has-error').removeClass('has-error');//borrar errores anteriores
+          $('.spanerror').each(function(){$(this).slideUp();});
+          //new errors
+          $.each( $respuesta['errors'],
+                  function(key,value){
+                    $('#fg'+key).addClass('has-error');
+                    $('#'+key+'_error > span#text_error').html(value);
+                    $('#'+key+'_error').fadeIn("slow");
+                    $('#'+key+'_error').fadeIn("slow");
+                    $('#aviso').slideDown("slow");
+                    }
+                );     
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });
+  }); 
+
+  function getUsuarios(){
+    
+    $.ajax({
+      type: "GET",
+      url: "ajaxGetUsuarios",
+      data: $('form#filtrarUsuarios').serialize(),
+      success: function($respuesta){
+          $('div#tableusuarios').fadeOut().html($respuesta).fadeIn('slow');
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });
+  }
+
   //show modal edit user
   $(".editUser").on('click',function(e){
     e.preventDefault();
@@ -94,48 +167,7 @@ $(function(e){
         $('#modalEliminaUsuario').modal('show');
     });
 
-   $("#addUser").on('click',function(e){
-		e.preventDefault();
-		$('#modalAddUser').modal('show');
-   });
-   
-   //Lanza ajax function para salvar nuevo usuario
-    $('#btnSalvarUser').on('click',function(e){
-        e.preventDefault();
-        $data = $('form#nuevoUsuario').serialize();
-        $.ajax({
-            type: "POST",
-            url: "salvarNuevoUsuario",
-            data: $data,
-            success: function($respuesta){
-                if ($respuesta['error'] == false){
-                    $('#modalAddUser').modal('hide');
-                    //location.reload();
-                }
-                //Hay errores de validación del formulario
-                else {
-                   //console.log($respuesta['errors']);
-                   //reset
-                   $('.has-error').removeClass('has-error');//borrar errores anteriores
-                   $('.spanerror').each(function(){$(this).slideUp();});
-                   //new errors
-                   $.each($respuesta['errors'],function(key,value){
-                        $('#fg'+key).addClass('has-error');
-                        $('#'+key+'_error > span#text_error').html(value);
-                        $('#'+key+'_error').fadeIn("slow");
-                        $('#'+key+'_error').fadeIn("slow");
-
-                        $('#aviso').slideDown("slow");
-                        
-                    });     
-                }
-                },
-                error: function(xhr, ajaxOptions, thrownError){
-                        hideGifEspera();
-                        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-                    }
-                });
-    }); 
+  
 
 
   function parseDate(strFecha,$delimiter,$locale) {

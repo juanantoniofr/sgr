@@ -14,6 +14,14 @@ $(function(e){
         var target = $(this).attr('href');
         $(target).fadeIn('fast');
     });
+   $('.toggleOpcionesItem').hover(function (event) {
+        event.preventDefault();
+        $('.opcionesRecurso').fadeOut('fast');
+        $(this).css('text-decoration','none');
+        var target = $(this).attr('href');
+        $(target).fadeIn('fast');
+    });
+   
    $('.listitemgrupo').hover(function (event) {
         event.preventDefault();
         $('.opcionesGrupo').fadeOut('fast');
@@ -22,16 +30,29 @@ $(function(e){
         event.preventDefault();
         $('.opcionesRecurso').fadeOut('fast');
     });
+   $('.listitem').hover(function (event) {
+        event.preventDefault();
+        $('.opcionesItem').fadeOut('fast');
+    });
     
-    $('.listadorecursos').click(function (event) {
+    $('.listarRecursos').click(function (event) {
         event.preventDefault();
         $(this).css('text-decoration','none');
         var target = $(this).data('divrecursosid');
         $('.i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
-        console.log(target);
+        
         $(target).fadeToggle('fast');
     });
   
+    $('.listarItems').click(function (event) {
+        event.preventDefault();
+        $(this).css('text-decoration','none');
+        
+        var target = $(this).data('ulitemsid');
+        $('.i_'+$(this).data('recursoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+        
+        $(target).fadeToggle('fast');
+    });
 
   //Añadir nuevo
     //Recursos (Espacio // TipoEquipos)
@@ -955,22 +976,13 @@ $(function(e){
     activelinkaddequipo();
     activeLinkeditpuesto();
     activeLinkeditequipo();
-    activelinkveritems();
+    //activelinkveritems();
     activeLinkaddPuestoExistente();
 
     activeLinkaddEquipoExistente();
   }
 
-  function activelinkveritems(){
-    $('.linkVerItems').on('click', function(e){
-      e.preventDefault();
-      verItems($(this).data('idrecurso'));
-    });
-  }
-
-  function verItems($recursoid){
-    $('#items_'+$recursoid).fadeToggle();
-  }
+  
 
   
   //Muestra ventana modal para establecer relación persona-recurso

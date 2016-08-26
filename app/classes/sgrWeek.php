@@ -5,9 +5,9 @@ class sgrWeek {
 	private $sgrDias;
 	
 	/**
-	*	@param $day
-	*	@param $numMes
-	*	@param $year
+		*	@param $day
+		*	@param $numMes
+		*	@param $year
 	*/
 	function __construct($sgrRecurso,$day = '',$month = '',$year = ''){
 

@@ -194,10 +194,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				return 'PAS (técnico MAV)';
 			case '4':
 				return 'Administrador (SGR)';
-			case '5': 
-				return 'Validador';
-			case '6': 
-				return 'Administrador (E.E Unidad)';	
+			//case '5': 
+			//	return 'Validador';
+			//case '6': 
+			//	return 'Administrador (E.E Unidad)';	
 			default:
 				return 'No definido..';
 			}
@@ -225,7 +225,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	}
 	
-	public function dropdownMenu(){
+	/*public function dropdownMenu(){
 		
 		switch ($this->capacidad) {
 			case '5': //validador
@@ -243,7 +243,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 			default:
 				return 'emptydropdown';
 			}
-	}
+	}*/
 
 	/**
 	 * Implementa requisito: Alumnos no pueden hacer reservas periodicas
@@ -292,23 +292,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 		return $isAdmin;
 	}
-	//Validador
-	public static function isValidador(){
-		$isValidador = false;
-
-		if (Auth::user()->capacidad == 5) $isValidador = true;
-
-		return $isValidador;
-	}
-
-	//Supervisor
-	/*public static function isSupervisor(){
-		$isSupervisor = false;
-
-		if (Auth::user()->capacidad == 6) $isSupervisor = true;
-
-		return $isSupervisor;
-	}*/
+	
+	
 
 
 }

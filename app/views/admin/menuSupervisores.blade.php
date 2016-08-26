@@ -1,12 +1,12 @@
 <div class="col-lg-12">
-        <h3 class=""><i class="fa fa-users fa-fw"></i> Gestión de Supervisores</h3>
+        <h3 class=""><i class="fa fa-users fa-fw"></i> Gestión de Administradores</h3>
         
         <form class="navbar-form navbar-left">    
             <div class="form-group ">
-                <a href="" class="active btn btn-danger" title="Añadir nuevo supervisor" id="addsupervisor"><i class="fa fa-plus fa-fw"></i> Nuevo supervisor</a></li>
+                <a href="" class="active btn btn-danger" title="Añadir nuevo administrador" id="addadministrador"><i class="fa fa-plus fa-fw"></i> Nuevo administrador</a></li>
             </div>
             <div class="form-group">
-                <a href="{{route('supervisores',['idRecurso' => $idRecurso])}}" class="btn btn-primary" title="Listar supervisores"><i class="fa fa-list fa-fw"></i> Listar supervisores de {{$recurso}}</a>
+                <a href="{{route('administradores',['idRecurso' => $idRecurso])}}" class="btn btn-primary" title="Listar administradores"><i class="fa fa-list fa-fw"></i> Listar administradores de {{$recurso}}</a>
             </div>                      
                 
         </form>

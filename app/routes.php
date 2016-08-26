@@ -32,13 +32,17 @@ Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'))
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
 
 //routes gestión de usuarios
-Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listUsers','before' => array('auth','capacidad:4,msg')));
+Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); //:)
 Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg')));
 Route::get('admin/editarUsuario.html',array('as' => 'updateUser.html','uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
 Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg')));
 //Route::post('admin/user/new',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','capacidad:4,msg')));
-Route::post('admin/salvarNuevoUsuario',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','ajax_check','capacidad:4,msg')));
+
+Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); //:)
+Route::post('admin/salvarNuevoUsuario',array('as' => 'post_addUser','uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg')));
+
+
 Route::get('admin/eliminaUser.html',array('as' => 'eliminaUser.html','uses' => 'UsersController@delete','before' => array('auth','capacidad:4,msg')));
 Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
 
@@ -93,7 +97,7 @@ Route::post('admin/addequipoamodelo',array('uses'  => 'recursosController@addequ
 
 
 //GruposController routes ************************
-Route::get('admin/recursos.html',array('as' => 'getListadoGrupos','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
+Route::get('admin/recursos.html',array('as' => 'recursos.html','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg')));
 Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
 Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Nuevo grupo
 Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//Edita propiedades grupo (nombre y descripción)
@@ -156,18 +160,18 @@ App::error(function(ModelNotFoundException $e){
 Route::get('test',array('as'=>'test',function(){
  
     //$idGrupo = 2;
-    $idUser = 58;
+    $idUser = 61;
     //$idRecurso = 43;
     
     //$grupo = GrupoRecurso::findOrFail($idGrupo);
     //$recurso = Recurso::find($idRecurso);
-    $user = User::find($idUser);
+    $user = new sgrUser(User::find($idUser));
     //echo $grupo->nombre;
-    echo $user->nombre;
+    //echo $user->nombre;
     //echo $recurso->nombre;
     echo "<pre>";
       //var_dump($grupo->administradores);
-      var_dump($user->gruposAdministrados);
+      var_dump($user->isValidadorSgr());
     echo "</pre>";  
     
    //Auth::logout();

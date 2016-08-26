@@ -1,9 +1,9 @@
-<!-- supervisores -->
-<h3>Supervisores</h3>
-	@foreach($grupo->supervisores as $supervisor)
-	  <div class="checkbox" id="fm_removePersona_inputsupervisores_id">
+<!-- Administradores -->
+<h3>Administradores</h3>
+	@foreach($grupo->administradores as $administrador)
+	  <div class="checkbox" id="fm_removePersona_inputadministradores_id">
 	 	  <label>
-	 		  <input type="checkbox" name="supervisores_id[]" value="{{$supervisor->id}}"> {{$supervisor->nombre}} {{$supervisor->apellidos}} ({{$supervisor->username}})
+	 		  <input type="checkbox" name="administradores_id[]" value="{{$administrador->id}}"> {{$administrador->nombre}} {{$administrador->apellidos}} ({{$administrador->username}})
 	   	</label>
 	 	</div>
 	@endforeach

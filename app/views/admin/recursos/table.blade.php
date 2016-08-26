@@ -58,7 +58,7 @@
           <ul class="list-unstyled">
             @foreach($grupo->recursos as $recurso)
               <li > 
-                @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) ) 
+                @if ( Auth::user()->isAdmin() || $grupo->administradores->contains(Auth::user()->id) ) 
                   <!-- editar -->
                   <a href="#" title="Editar recurso" class="linkEditRecurso text-info" data-idrecurso="{{$recurso->id}}" data-id="{{$recurso->id}}" data-numeroelementos = "{{ $recurso->items->count()}}"><i class="fa fa-pencil fa-fw"></i></a>
                   <!-- eliminar -->
@@ -153,20 +153,20 @@
           </ul>
         </td>
         <!-- Personas -->
-        @if ( Auth::user()->isAdmin() || $grupo->supervisores->contains(Auth::user()->id) )
+        @if ( Auth::user()->isAdmin() || $grupo->administradores->contains(Auth::user()->id) )
         <td>
           <div id="personas_{{$grupo->id}}" style="">
-            <a class="addUserWithRol text-danger"  href="" data-idgrupo="{{$grupo->id}}" data-nombregrupo="{{$grupo->nombre}}"  title="Añade usuarios con relación de supervisor, tecnico y/o validador" ><i class="fa fa-user-plus fa-fw"></i></a>
-            <a class="removeUserWithRol text-danger"  href="" data-idgrupo="{{$grupo->id}}" data-nombregrupo="{{$grupo->nombre}}" title="Elimina usuarios con relación de supervisor, tecnico y/o validador" ><i class="fa fa-user-times fa-fw"></i></a>
+            <a class="addUserWithRol text-danger"  href="" data-idgrupo="{{$grupo->id}}" data-nombregrupo="{{$grupo->nombre}}"  title="Añade usuarios con relación de administrador, tecnico y/o validador" ><i class="fa fa-user-plus fa-fw"></i></a>
+            <a class="removeUserWithRol text-danger"  href="" data-idgrupo="{{$grupo->id}}" data-nombregrupo="{{$grupo->nombre}}" title="Elimina usuarios con relación de administrador, tecnico y/o validador" ><i class="fa fa-user-times fa-fw"></i></a>
                   
             <table class="table table-hover table-striped" >
               <tbody>
                 <tr>
-                  <td><b>Supervisores</b></td>
+                  <td><b>administradores</b></td>
                   <td>
-                    <div id="supervisores_{{$grupo->id}}">
-                      @foreach($grupo->supervisores as $supervisor)
-                        {{$supervisor->nombre}} {{$supervisor->apellidos}} ({{$supervisor->username}}).<br /> 
+                    <div id="administradores_{{$grupo->id}}">
+                      @foreach($grupo->administradores as $administrador)
+                        {{$administrador->nombre}} {{$administrador->apellidos}} ({{$administrador->username}}).<br /> 
                       @endforeach
                     </div>
                   </td>
