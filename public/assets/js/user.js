@@ -1,6 +1,12 @@
 $(function(e){
 
-  $("#addUser").on('click',function(e){
+  function clearMsgErrorsModal(){ // :)
+    $('.modal_MsgError').fadeOut();
+    $('.modal_divinput').removeClass('has-error');
+    $('.modal_spantexterror').html('');
+  }
+
+  $("#addUser").on('click',function(e){ // :)
     e.preventDefault();
     $("#addUserDatePicker" ).datepicker({
             showOtherMonths: true,
@@ -12,42 +18,39 @@ $(function(e){
             monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
             dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
     });
+    clearMsgErrorsModal();
     $('#modalAddUser').modal('show');
   }); //:)
    
   //Lanza ajax function para salvar nuevo usuario
-  $('#btnSalvarUser').on('click',function(e){ // :/
+  $('#btnSalvarUser').on('click',function(e){ // :)
     e.preventDefault();
     showGifEspera();
     $data = $('form#nuevoUsuario').serialize();
+   
+    clearMsgErrorsModal();
     $.ajax({
       type: "POST",
       url: "salvarNuevoUsuario",
       data: $data,
       success: function($respuesta){
-        if ($respuesta['error'] == false){
+        if ($respuesta.error === false){
           $('#modalAddUser').modal('hide');
           hideGifEspera();
           getUsuarios();
           $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
-          
-          //location.reload();
         }
         //Hay errores de validación del formulario
         else {
-          //reset
-          $('.has-error').removeClass('has-error');//borrar errores anteriores
-          $('.spanerror').each(function(){$(this).slideUp();});
-          //new errors
-          $.each( $respuesta['errors'],
-                  function(key,value){
-                    $('#fg'+key).addClass('has-error');
-                    $('#'+key+'_error > span#text_error').html(value);
-                    $('#'+key+'_error').fadeIn("slow");
-                    $('#'+key+'_error').fadeIn("slow");
-                    $('#aviso').slideDown("slow");
-                    }
-                );     
+          hideGifEspera();
+          console.log($respuesta.errors);
+          $.each($respuesta.errors,function(index,value){
+              $('#m_addusuario_input'+index).addClass('has-error');//resalta el campo de formulario con error
+              console.log(value);
+              $('#m_addusuario_textError_'+index).html(' &nbsp; ' + value);//añade texto de error a span alert-danger en ventana modal
+              
+            });
+            $('#m_addusuario_msgError').fadeIn('8000');
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -57,12 +60,12 @@ $(function(e){
     });
   }); 
 
-  function getUsuarios(){
-    
+  function getUsuarios(){ // :)
+console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina').data('numpagina'));
     $.ajax({
       type: "GET",
       url: "ajaxGetUsuarios",
-      data: $('form#filtrarUsuarios').serialize(),
+      data: $('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina').data('numpagina'),
       success: function($respuesta){
           $('div#tableusuarios').fadeOut().html($respuesta).fadeIn('slow');
       },
@@ -159,13 +162,20 @@ $(function(e){
   }); 
   
 
-  $(".eliminarUsuario").on('click',function(e){
-        e.preventDefault();
-        $('#infoUsuario').html($(this).data('infousuario'));
-        $('a#btnEliminar').data('id',$(this).data('id'));
-        $('a#btnEliminar').attr('href', 'eliminaUser.html' + '?'+'id='+$(this).data('id'));
-        $('#modalEliminaUsuario').modal('show');
-    });
+  $(".eliminarUsuario").on('click',function(e){// :/
+    e.preventDefault();
+    $('#infoUsuario').html($(this).data('infousuario'));
+    $('#modal_deleteUser_tienereservas').fadeOut('fast');
+    if ($(this).data('numreservas') > 0) {
+      $('#modal_deleteUser_numreservas').html(' ' + $(this).data('numreservas') + ' ');
+      $('#modal_deleteUser_tienereservas').fadeIn('fast');
+    }
+    $('a#btnEliminar').data('id',$(this).data('id')); //? 
+    $('a#btnEliminar').attr('href', 'eliminaUser.html' + '?'+'id='+$(this).data('id')); //?
+    $('#modalEliminaUsuario').modal('show');
+  });
+  //falta función ajax para eliminar usuario :/
+
 
   
 

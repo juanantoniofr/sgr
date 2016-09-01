@@ -12,46 +12,40 @@
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="alert alert-danger text-center" role="alert" style="display:none" id="aviso">Revise el formulario para corregir errores.... </div>
+        <div class="alert alert-danger text-center modal_MsgError" role="alert" id="m_addusuario_msgError" style="display:none;margin:10px 0">Formulario con errores</div>
           
-        <div class="form-group" id="fg_username">  
-          {{Form::label('username', 'UVUS (Usuario Virtual Universidad de Sevilla)')}}
-          <span id="username_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>
+        <div class="form-group modal_divinput" id="m_addusuario_inputusername">  
+          {{Form::label('username', 'UVUS (Usuario Virtual Universidad de Sevilla)')}}<span id="m_addusuario_textError_username" class="text-danger modal_spantexterror"></span>
           {{Form::text('username',Input::old('username'),array('class' => 'form-control'))}}
         </div>
                
-        <div class="form-group" id="fg_capacidad">      
-          {{Form::label('capacidad', 'Rol')}}
-          <span id="capacidad_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>
+        <div class="form-group modal_divinput" id="m_addusuario_inputcapacidad">      
+          {{Form::label('capacidad', 'Rol')}}<span id="m_addusuario_textError_capacidad" class="text-danger modal_spantexterror"></span>
           {{Form::select('capacidad', Config::get('string.capacidades') , Config::get('options.capacidadPorDefecto') ,array('class' => 'form-control'));}}
         </div>
 
-        <div class="form-group" id="fg_colectivo">  
-          {{Form::label('colectivo', 'Colectivo')}}
+        <div class="form-group modal_divinput" id="m_addusuario_inputcolectivo">  
+          {{Form::label('colectivo', 'Colectivo')}}<span id="m_addusuario_textError_colectivo" class="text-danger modal_spantexterror"></span>
           {{Form::select('colectivo', array('Alumno' => 'alumno','PAS' => 'PAS','PDI' => 'PDI'),'Alumno',array('class' => 'form-control'))}}
         </div>
       
-        <div class="form-group" id="fg_caducidad">   
-          {{Form::label('caducidad', 'Caducidad de la cuenta para sistema de reservas')}}
-          <span id="caducidad_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>     
+        <div class="form-group modal_divinput" id="m_addusuario_inputcaducidad">   
+          {{Form::label('caducidad', 'Caducidad de la cuenta para sistema de reservas')}}<span id="m_addusuario_textError_caducidad" class="text-danger modal_spantexterror"></span>
           {{Form::text('caducidad',date('d-m-Y',strtotime('+1 year')),array('class' => 'form-control','id' => 'addUserDatePicker'))}}                
         </div>
 
-        <div class="form-group" id="fg_nombre">  
-          {{Form::label('nombre', 'Nombre')}}
-          <span id="nombre_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>     
+        <div class="form-group modal_divinput" id="m_addusuario_inputnombre">  
+          {{Form::label('nombre', 'Nombre')}}<span id="m_addusuario_textError_nombre" class="text-danger modal_spantexterror"></span>
           {{Form::text('nombre',Input::old('nombre'),array('class' => 'form-control'))}}
         </div>
                 
-        <div class="form-group" id="fg_apellidos">  
-          {{Form::label('apellidos', 'Apellidos')}}
-            <span id="apellidos_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>     
+        <div class="form-group modal_divinput" id="m_addusuario_inputapellidos">  
+          {{Form::label('apellidos', 'Apellidos')}}<span id="m_addusuario_textError_apellidos" class="text-danger modal_spantexterror"></span>
           {{Form::text('apellidos',Input::old('apellidos'),array('class' => 'form-control'))}}
         </div>
                 
-        <div class="form-group" id="fg_email">  
-          {{Form::label('email', 'eMail')}}
-          <span id="email_error" style="display:none" class="text-danger spanerror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id='text_error'></span></span>     
+        <div class="form-group modal_divinput" id="m_addusuario_inputemail">  
+          {{Form::label('email', 'eMail')}}<span id="m_addusuario_textError_email" class="text-danger modal_spantexterror"></span>
           {{Form::text('email',Input::old('email'),array('class' => 'form-control'))}}
         </div>        
                         

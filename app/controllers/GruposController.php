@@ -149,8 +149,8 @@ class GruposController extends BaseController {
     }
     else{
       $grupo = GrupoRecurso::findOrFail($id);
-      $supervisores = $grupo->supervisores();
-      foreach ($supervisores as $supervisor) {
+      $administradores = $grupo->administradores();
+      foreach ($administradores as $supervisor) {
         $supervisor->detach($supervisor->id);
       }
       $validadores = $grupo->validadores();
@@ -338,13 +338,13 @@ class GruposController extends BaseController {
         
         //Supervisor
         case '2':
-          $supervisores = $grupo->supervisores;
-          if ($supervisores->contains($idUser)){
+          $administradores = $grupo->administradores;
+          if ($administradores->contains($idUser)){
             $result['error'] = true;
             $result['errors']['supervisor'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>supervisor</b></i> de este recurso.';
             return $result;
           }
-          $grupo->supervisores()->attach($idUser);
+          $grupo->administradores()->attach($idUser);
           break;
       
         //Validador
@@ -374,7 +374,7 @@ class GruposController extends BaseController {
     * //elimina la relación grupoRecursos-persona
     *
     * @param Input::get('idgrupo') int
-    * @param Input::get('supervisores_id) array
+    * @param Input::get('administrador_id) array
     * @param Input::get('validadores_id') array
     * @param Input::get('tecnicos_id') array
     *
@@ -385,7 +385,7 @@ class GruposController extends BaseController {
     
     //input
     $idgrupo                  = Input::get('idgrupo','');
-    $detachSupervisores       = Input::get('supervisores_id',array());
+    $detachAdministradores    = Input::get('administradores_id',array());
     $detachValidadores        = Input::get('validadores_id',array());
     $detachTecnicos           = Input::get('tecnicos_id',array());
     
@@ -415,8 +415,8 @@ class GruposController extends BaseController {
     }
     else {
       $grupo = grupoRecurso::findOrFail($idgrupo);
-      foreach ($detachSupervisores as $idSupervisor) {
-        $grupo->supervisores()->detach($idSupervisor);
+      foreach ($detachAdministradores as $idSupervisor) {
+        $grupo->administradores()->detach($idSupervisor);
       }
       foreach ($detachValidadores as $idValidador) {
         $grupo->validadores()->detach($idValidador);

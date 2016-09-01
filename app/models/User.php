@@ -38,7 +38,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
     }
 
 	//devuelve los eventos del usuario
-	public function userEvents(){
+	public function eventos(){
 		return $this->hasMany('Evento','user_id');
 		}
 
@@ -178,13 +178,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	
 
-	public function caducado(){
+	/*public function caducado(){
 		return strtotime($this->caducidad) < strtotime('today');
-	}
+	}*/
+	/*
 
 	public function getRol(){
-		
-		
+			
 		switch ($this->capacidad) {
 			case '1':
 				return 'Usuario (Alumno)';
@@ -202,7 +202,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 				return 'No definido..';
 			}
 	}
-
+	*/
 	
 	public function home(){
 		

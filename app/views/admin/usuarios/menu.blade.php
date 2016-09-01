@@ -27,7 +27,7 @@
       
       <div class="form-group ">
           <select class="form-control " name = "colectivo" id="selectColectivo">
-            <option value="" @if(empty($colectivo)) selected="selected" @endif >Colectivo</option>
+            <option value="" @if(empty($colectivo)) selected="selected" @endif >Cualquier colectivo</option>
               @foreach($colectivos as $nombreColectivo)
                 <option value="{{$nombreColectivo}}" 
                   @if ($colectivo == $nombreColectivo) selected="selected" @endif>
@@ -39,7 +39,7 @@
 
       <div class="form-group ">
           <select class="form-control" name = "perfil" id="selectPerfil">
-            <option value="" @if(empty($perfil)) selected="selected" @endif >Rol</option>
+            <option value="" @if(empty($perfil)) selected="selected" @endif >Cualquier Rol</option>
             @foreach($perfiles as $key => $nombrePerfil)
               <option value="{{$key}}" 
                 @if ($perfil == $key) selected="selected" @endif>

@@ -1,0 +1,1 @@
+<div><span id="numpagina" data-numpagina="{{$page}}"></span>{{$usuarios->appends(Input::except('page'))->links();}} </div>

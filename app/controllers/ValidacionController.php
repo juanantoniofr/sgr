@@ -6,11 +6,11 @@ class ValidacionController extends BaseController {
 	public function index(){
 		
 		$sortby = Input::get('sortby','estado');
-	    $order = Input::get('order','desc');
-	    $id_recurso = Input::get('id_recurso','0');
-	    $id_user = Input::get('id_user','0');
-	   	$evento_id = Input::get('evento_id','');
-	   	$verpendientes = Input::get('verpendientes',false);
+	  $order = Input::get('order','desc');
+	  $id_recurso = Input::get('id_recurso','0');
+	  $id_user = Input::get('id_user','0');
+	  $evento_id = Input::get('evento_id','');
+	  $verpendientes = Input::get('verpendientes',false);
 		$veraprobadas = Input::get('veraprobadas',false);
 		$verdenegadas = Input::get('verdenegadas',false);
 		$msgforuser = Input::get('msgforuser','');
@@ -55,8 +55,8 @@ class ValidacionController extends BaseController {
 		$eventsByUser = Evento::whereIn('recurso_id',$espaciosConValidacion)->groupby('user_id')->get();
 		
 		$recursos = Auth::user()->valida;
-		
-		return View::make('validador.validaciones')->with('msg',$msgforuser)->with(compact('events','verpendientes','veraprobadas','verdenegadas'))->with('sortby',$sortby)->with('order',$order)->with('idrecurso',$id_recurso)->with('iduser',$id_user)->with('solapamientos',$solapamientos)->nest('dropdown',Auth::user()->dropdownMenu())->nest('menuValidador','validador.menuValidador',compact('recursos','id_recurso','id_user','eventsByUser','verpendientes','veraprobadas','verdenegadas'));
+		$sgrUser = new sgrUser(Auth::user());
+		return View::make('validador.validaciones')->with('msg',$msgforuser)->with(compact('events','verpendientes','veraprobadas','verdenegadas'))->with('sortby',$sortby)->with('order',$order)->with('idrecurso',$id_recurso)->with('iduser',$id_user)->with('solapamientos',$solapamientos)->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('menuValidador','validador.menuValidador',compact('recursos','id_recurso','id_user','eventsByUser','verpendientes','veraprobadas','verdenegadas'));
 	}
 
 	public function valida(){
