@@ -2,10 +2,11 @@
 
 return array (
 
-	'success' 			=> 'Datos salvados con éxito....',
-	'idnotfound'		=> 'Identificador no encontrado....',
-	'idempty'				=> 'Identificador vacío....',
-	'actionSuccess'	=> 'Operación realizada con éxito....',	
+	'success' 				=> 'Datos salvados con éxito....',
+	'idnotfound'			=> 'Identificador no encontrado....',
+	'idempty'					=> 'Identificador vacío....',
+	'actionSuccess'		=> 'Operación realizada con éxito....',	
+	'delusersuccess'	=> 'Usuario eliminado con éxito....',
 
 
 	//AuthController

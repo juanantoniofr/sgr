@@ -34,6 +34,7 @@ return array (
 	'capacidadTécnico' 					=> '3', //Técnicos (PAS)
 	'capacidadAdminSgr' 				=> '4', //Administradores de SGR
 	'capacidadPorDefecto'				=> '1',
+	'colectivoPorDefecto'				=> 'Alumno',
 	
 	'gestionAtendida' 	=> 'Atendida (requiere validación)',
 	'gestionDesatendida' => 'Desatendida (sin validación)', 

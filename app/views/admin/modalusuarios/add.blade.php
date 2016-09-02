@@ -26,7 +26,7 @@
 
         <div class="form-group modal_divinput" id="m_addusuario_inputcolectivo">  
           {{Form::label('colectivo', 'Colectivo')}}<span id="m_addusuario_textError_colectivo" class="text-danger modal_spantexterror"></span>
-          {{Form::select('colectivo', array('Alumno' => 'alumno','PAS' => 'PAS','PDI' => 'PDI'),'Alumno',array('class' => 'form-control'))}}
+          {{Form::select('colectivo', Config::get('string.colectivos'),Config::get('options.colectivoPorDefecto'),array('class' => 'form-control'))}}
         </div>
       
         <div class="form-group modal_divinput" id="m_addusuario_inputcaducidad">   

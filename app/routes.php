@@ -32,19 +32,25 @@ Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'))
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
 
 //routes gestión de usuarios
+//Listar
 Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); //:)
-Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg')));
+Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); //:)
+//add
+Route::post('admin/ajaxAddUsuario',array('as' => 'post_addUser','uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg'))); // :)
+//delete /??
+Route::post('admin/ajaxEliminausuario',array('uses' => 'UsersController@delete','before' => array('auth','ajax_check','capacidad:4,msg'))); //??
+
+Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check'))); //??
+
+Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???
 Route::get('admin/editarUsuario.html',array('as' => 'updateUser.html','uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
-Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg')));
-//Route::post('admin/user/new',array('as' => 'post_addUser','uses' => 'UsersController@create','before' => array('auth','capacidad:4,msg')));
-
-Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); //:)
-Route::post('admin/salvarNuevoUsuario',array('as' => 'post_addUser','uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg')));
+Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg'))); //?
 
 
-Route::get('admin/eliminaUser.html',array('as' => 'eliminaUser.html','uses' => 'UsersController@delete','before' => array('auth','capacidad:4,msg')));
-Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
+
+
+
 
 //routes POD
 Route::get('admin/pod.html',array('as' => 'pod.html','uses' => 'PodController@index','before' => array('auth','capacidad:4,msg')));
@@ -158,31 +164,13 @@ App::error(function(ModelNotFoundException $e){
 });
 
 Route::get('test',array('as'=>'test',function(){
- 
-    //$idGrupo = 2;
-    $idUser = 61;
-    //$idRecurso = 43;
-    
-    //$grupo = GrupoRecurso::findOrFail($idGrupo);
-    //$recurso = Recurso::find($idRecurso);
-    $user = new sgrUser(User::find($idUser));
-    //echo $grupo->nombre;
-    //echo $user->nombre;
-    //echo $recurso->nombre;
-    echo "<pre>";
-      //var_dump($grupo->administradores);
-      var_dump($user->isValidadorSgr());
-    echo "</pre>";  
-    
-   //Auth::logout();
-    //se filtran para obtener sólo aquellos visibles 
-    //$recursos = $grupo->recursos->filter(function($recurso){
-    //    $sgrRecurso = Factoria::getRecursoInstance($recurso);
-        //return $sgrRecurso->esVisible(Auth::user()->capacidad);
-    //  });
-    //$recursos =  $recursos = $grupo->recursos;
-    //$htmloptionsrecursos = (string ) View::make('calendario.allViews.optionsRecursos')->with(compact('recursos'));
-    //echo $htmloptionsrecursos;
-    
- }));
+  $id = 93;
+  $user = User::find($id);
+  $sgrUser = new sgrUser($user);
+  
+  //test 1: elimina 1 reserva de 2
+  $sgrUser->deleteeventos();
+  //var_dump($eventos);
+  
+}));
 

@@ -9,10 +9,15 @@ return array (
 	'itemsespacio' 			=> 'Puestos',
 	'itemstipoequipos'	=> 'Equipos',
 	'capacidades'				=> array(
-													'1' =>	'Usuarios (Alumnos)',
-													'2'	=>	'Usuarios Avanzados (PDI & PAS de Administración)',
-													'3'	=>	'Técnicos (PAS)',
-													'4'	=>	'Administradores de SGR',
+													'1' =>	'Usuario (Alumnos)',
+													'2'	=>	'Usuario Avanzado (PDI & PAS de Administración)',
+													'3'	=>	'Técnico (PAS)',
+													'4'	=>	'Administrador SGR',
+													),
+	'colectivos'				=> array(
+													'Alumno' => 'Alumno',
+													'PAS' => 'PAS',
+													'PDI' => 'PDI',
 													),
 										
 	);

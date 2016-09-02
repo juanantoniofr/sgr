@@ -24,7 +24,7 @@
             </div><!-- ./.modal-body -->
 
             <div class="modal-footer">
-                <div class="col-lg-12" style="margin-top:10px">
+                <div class="col-md-12" style="margin-top:10px">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" data-idrecursopadre="" id ="fm_delrecurso_save">
                         <i class="fa fa-trash-o fa-fw"></i> Eliminar

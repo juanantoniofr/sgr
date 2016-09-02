@@ -1,5 +1,12 @@
 $(function(e){
 
+  activalinks();
+
+  function activalinks() { // :)
+    activaLinkEliminaUsusario();
+    activaLinkEditaUsuario();
+  }
+
   function clearMsgErrorsModal(){ // :)
     $('.modal_MsgError').fadeOut();
     $('.modal_divinput').removeClass('has-error');
@@ -22,7 +29,7 @@ $(function(e){
     $('#modalAddUser').modal('show');
   }); //:)
    
-  //Lanza ajax function para salvar nuevo usuario
+  //Add usuario
   $('#btnSalvarUser').on('click',function(e){ // :)
     e.preventDefault();
     showGifEspera();
@@ -31,7 +38,7 @@ $(function(e){
     clearMsgErrorsModal();
     $.ajax({
       type: "POST",
-      url: "salvarNuevoUsuario",
+      url: "ajaxAddUsuario",
       data: $data,
       success: function($respuesta){
         if ($respuesta.error === false){
@@ -43,14 +50,12 @@ $(function(e){
         //Hay errores de validación del formulario
         else {
           hideGifEspera();
-          console.log($respuesta.errors);
           $.each($respuesta.errors,function(index,value){
-              $('#m_addusuario_input'+index).addClass('has-error');//resalta el campo de formulario con error
-              console.log(value);
-              $('#m_addusuario_textError_'+index).html(' &nbsp; ' + value);//añade texto de error a span alert-danger en ventana modal
+            $('#m_addusuario_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            $('#m_addusuario_textError_'+index).html(' &nbsp; ' + value);//añade texto de error a span alert-danger en ventana modal
               
-            });
-            $('#m_addusuario_msgError').fadeIn('8000');
+          });
+          $('#m_addusuario_msgError').fadeIn('8000');
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -61,13 +66,13 @@ $(function(e){
   }); 
 
   function getUsuarios(){ // :)
-console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina').data('numpagina'));
     $.ajax({
       type: "GET",
       url: "ajaxGetUsuarios",
       data: $('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina').data('numpagina'),
       success: function($respuesta){
           $('div#tableusuarios').fadeOut().html($respuesta).fadeIn('slow');
+          activalinks();
       },
       error: function(xhr, ajaxOptions, thrownError){
         hideGifEspera();
@@ -76,32 +81,78 @@ console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina')
     });
   }
 
-  //show modal edit user
-  $(".editUser").on('click',function(e){
+  function activaLinkEliminaUsusario(){// :)
+    $(".eliminarUsuario").on('click',function(e){
+      e.preventDefault();
+      $('#infoUsuario').html($(this).data('infousuario'));
+      $('#modal_deleteUser_tienereservas').fadeOut('fast');
+      if ($(this).data('numreservas') > 0) {
+        $('#modal_deleteUser_numreservas').html(' ' + $(this).data('numreservas') + ' ');
+        $('#modal_deleteUser_tienereservas').fadeIn('fast');
+      }
+      $('form#fm_eliminausuario input[name="id"]').val($(this).data('id')); 
+      $('#modalEliminaUsuario').modal('show');
+    });
+  }
+ 
+  $('#fm_eliminausuario_save').on('click',function(e){ // :)
     e.preventDefault();
+    showGifEspera();
+    $data = $('form#fm_eliminausuario').serialize();
+    clearMsgErrorsModal();
     $.ajax({
-      type:"GET",
-      url:"user.html",
-      data: { id : $(this).data('id')},
-      success: function($user){
-          $('form#formEditUser #username').html($user.username);
-          $('form#formEditUser #select_rol').val($user.capacidad);
-          $('form#formEditUser #select_colectivo').val($user.colectivo);
-          $('form#formEditUser #select_estado').val($user.estado);
-          $aDate = parseDate($user.caducidad,'-','en-EN');
-          $('#datepickerUserEdit').val($aDate[0]+'-'+$aDate[1]+'-'+$aDate[2]);
-          $('form#formEditUser input[name="nombre"]').val($user.nombre);
-          $('form#formEditUser input[name="apellidos"]').val($user.apellidos);
-          $('form#formEditUser input[name="email"]').val($user.email);
-          $('form#formEditUser input[name="id"]').val($user.id);
-          $('form#formEditUser textarea[name="observaciones"]').val($user.observaciones);
-          $('#modalEditUser').modal('show');
-        },
+      type: "POST",
+      url: "ajaxEliminausuario",
+      data: $data,
+      success: function($respuesta){
+        if ($respuesta.error === false){
+          $('#modalEliminaUsuario').modal('hide');
+          hideGifEspera();
+          getUsuarios();
+          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+        }
+        //Hay errores de validación del formulario
+        else {
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+              $('#m_eliminausuario_textError_'+index).html(' &nbsp; ' + value);
+          });
+          $('#m_eliminausuario_msgError').fadeIn('8000');
+        }
+      },
       error: function(xhr, ajaxOptions, thrownError){
-         alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
       }
     });
   });
+
+  function activaLinkEditaUsuario(){
+    $(".editUser").on('click',function(e){
+      e.preventDefault();
+      $('form#formEditUser input[name="username"]').val($(this).data('username'));
+      $('form#formEditUser input[name="nombre"]').val($(this).data('nombre'));
+      $('form#formEditUser input[name="apellidos"]').val($(this).data('apellidos'));
+      $('form#formEditUser input[name="email"]').val($(this).data('email'));
+      $('form#formEditUser input[name="id"]').val($(this).data('id'));
+      $('form#formEditUser textarea[name="observaciones"]').val($(this).data('observaciones'));
+      
+      $('form#formEditUser select[name="capacidad"]').val( $(this).data('capacidad') );
+      alert($(this).data('colectivo'));
+      $('form#formEditUser select[name="colectivo"]').val( $(this).data('colectivo') );
+      $('form#formEditUser select[name="estado"]').val($(this).data('estado'));
+      
+
+      //$aDate = parseDate($user.caducidad,'-','en-EN');
+      //$('#datepickerUserEdit').val($aDate[0]+'-'+$aDate[1]+'-'+$aDate[2]);
+      
+      $('#modalEditUser').modal('show');
+      
+    });  
+  }
+  
+
+  
 
   //Ajax edit user
   $('#modaleditUser').on('click',function(e){
@@ -113,7 +164,6 @@ console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina')
       url: "editarUsuario.html",
       data: $('form#formEditUser').serialize(),
       success: function($respuesta){
-        //console.log($respuesta);
         if ($respuesta['exito'] == true){
             $('#modalEditUser').modal('hide');
             hideGifEspera();
@@ -138,8 +188,6 @@ console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina')
             }
 
             $('tr#'+$respuesta["user"].id+' td').fadeOut('8000').fadeIn('16000');
-            //console.log($('tr#'+$respuesta["user"].id+'  > td#colectivo'));
-            //console.log($('tr#'+$respuesta["user"].id+' td'));
           }
         //Hay errores de validación del formulario
         else {
@@ -162,20 +210,7 @@ console.log($('form#filtrarUsuarios').serialize()+'&pagina='+$('span#numpagina')
   }); 
   
 
-  $(".eliminarUsuario").on('click',function(e){// :/
-    e.preventDefault();
-    $('#infoUsuario').html($(this).data('infousuario'));
-    $('#modal_deleteUser_tienereservas').fadeOut('fast');
-    if ($(this).data('numreservas') > 0) {
-      $('#modal_deleteUser_numreservas').html(' ' + $(this).data('numreservas') + ' ');
-      $('#modal_deleteUser_tienereservas').fadeIn('fast');
-    }
-    $('a#btnEliminar').data('id',$(this).data('id')); //? 
-    $('a#btnEliminar').attr('href', 'eliminaUser.html' + '?'+'id='+$(this).data('id')); //?
-    $('#modalEliminaUsuario').modal('show');
-  });
-  //falta función ajax para eliminar usuario :/
-
+ 
 
   
 

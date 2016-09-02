@@ -24,17 +24,15 @@
             {{Form::select('estado', array('1' => 'Activa', '0' => 'Desactiva'),'1',array('class' => 'form-control','id' => 'select_estado'));}}
           </div>
 
-          <div class="form-group" id="editmodal_capacidad">     
-            {{Form::label('capacidad', 'Rol')}}
-            <span id="editmodal_capacidad_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>
-            {{Form::select('capacidad', array('1' => 'Usuario (Alumnos)', '2' => 'Usuario Avanzado (PDI/PAS Administración)','3' => 'Técnico (PAS-MAV)','4' => 'Administrador (SGR)', '5' => 'Validador (Dirección/Decanato)','6' => 'Supervisor (E.E Unidad)'),'Usuario (Alumnos)',array('class' => 'form-control','id' => 'select_rol'));}}
+          <div class="form-group modal_divinput" id="m_editusuario_inputcapacidad">      
+            {{Form::label('capacidad', 'Rol')}}<span id="m_editusuario_textError_capacidad" class="text-danger modal_spantexterror"></span>
+            {{Form::select('capacidad', Config::get('string.capacidades') , '' ,array('class' => 'form-control'));}}
           </div>
 
-          <div class="form-group" id="editmodal_colectivo">  
-            {{Form::label('colectivo', 'Colectivo')}}
-            <span id="editmodal_colectivo_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>
-            {{Form::select('colectivo', array('Alumno' => 'alumno','PAS' => 'PAS','PDI' => 'PDI'),'Alumno',array('class' => 'form-control','id' => 'select_colectivo'))}}
-          </div>
+          <div class="form-group modal_divinput" id="m_editusuario_inputcolectivo">  
+            {{Form::label('colectivo', 'Colectivo')}}<span id="m_editusuario_textError_colectivo" class="text-danger modal_spantexterror"></span>
+            {{Form::select('colectivo', Config::get('string.colectivos'),'',array('class' => 'form-control'))}}
+        </div>
           
           <div class="form-group" id="editmodal_caducidad">   
             {{Form::label('caducidad', 'Caducidad para SGR')}}

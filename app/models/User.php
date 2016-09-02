@@ -27,7 +27,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
   }
 
   //devuelve los recursos que valida (aprueba//deniega reservas)
-	public function recursosValidables(){
+	public function recursosValidados(){
   	
   	return $this->belongsToMany('Recurso', 'recurso_validadores', 'user_id', 'recurso_id');
   }
@@ -177,33 +177,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	}
 
 	
-
-	/*public function caducado(){
-		return strtotime($this->caducidad) < strtotime('today');
-	}*/
-	/*
-
-	public function getRol(){
-			
-		switch ($this->capacidad) {
-			case '1':
-				return 'Usuario (Alumno)';
-			case '2':
-				return 'PDI // PAS Administración';
-			case '3':
-				return 'PAS (técnico MAV)';
-			case '4':
-				return 'Administrador (SGR)';
-			//case '5': 
-			//	return 'Validador';
-			//case '6': 
-			//	return 'Administrador (E.E Unidad)';	
-			default:
-				return 'No definido..';
-			}
-	}
-	*/
-	
 	public function home(){
 		
 		switch ($this->capacidad) {
@@ -225,26 +198,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	}
 	
-	/*public function dropdownMenu(){
-		
-		switch ($this->capacidad) {
-			case '5': //validador
-				return 'validador.dropdown';
-			case '4': //root
-				return 'admin.dropdown';
-			case '3': //pas - técnico 
-				return 'emptydropdown';
-			case '6': //pas - administrador
-				return 'supervisor.dropdown';
-			case '2': //pdi
-				return 'emptydropdown';
-			case '1': //alumno
-				return 'emptydropdown';
-			default:
-				return 'emptydropdown';
-			}
-	}*/
-
+	
 	/**
 	 * Implementa requisito: Alumnos no pueden hacer reservas periodicas
 	 * @param void

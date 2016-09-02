@@ -26,7 +26,7 @@ class UsersController extends BaseController {
     }
     $sgrUser = new sgrUser(Auth::user());
       
-    return View::make('admin.usuarios.listado')->nest('tableUsuarios','admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas'))->nest('links','admin.usuarios.links',compact('usuarios','page'))->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('menuUsuarios','admin.usuarios.menu',compact('veractivas','colectivo','colectivos','perfil','perfiles'))->nest('modalAddUser','admin.modalusuarios.add')->nest('modalEditUser','admin.userModalEdit')->nest('modalDeleteUser','admin.modalusuarios.delete');
+    return View::make('admin.usuarios.listado')->nest('tableUsuarios','admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas'))->nest('links','admin.usuarios.links',compact('usuarios','page'))->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('menuUsuarios','admin.usuarios.menu',compact('veractivas','colectivo','colectivos','perfil','perfiles'))->nest('modalAddUser','admin.modalusuarios.add')->nest('modalEditUser','admin.modalusuarios.edit')->nest('modalDeleteUser','admin.modalusuarios.delete');
   }
 
   public function ajaxGetUsuarios(){ // :)
@@ -120,7 +120,7 @@ class UsersController extends BaseController {
     }
   }
 
-  public function delete(){ // :/
+  public function delete(){ // :)
     //Input
     $id = Input::get('id','');
     //Output  
@@ -134,8 +134,8 @@ class UsersController extends BaseController {
     );
 
     $messages = array(
-          'required'  => Config::get('msgErrors.idempty'),
-          'exists'    => Config::get('msgErrors.idnotfound'),
+          'required'  => Config::get('msg.idempty'),
+          'exists'    => Config::get('msg.idnotfound'),
           );
 
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -147,9 +147,10 @@ class UsersController extends BaseController {
     else{
       $user = User::find($id);
       $sgrUser = new sgrUser($user);
-      $sgrUser->detach(); //implementar
-      $sgrUser->delete(); //implementar
-      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+      $sgrUser->detach(); 
+      $sgrUser->deleteeventos();
+      $sgrUser->delete();
+      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.delusersuccess')));
       return $respuesta;
     }
   }
@@ -296,7 +297,7 @@ class UsersController extends BaseController {
     return $result;
   }
 
-  public function ajaxDelete(){
+  public function ajaxDelete(){ //???
     $result = array('success' => false);
     
     $username = Input::get('username','');
