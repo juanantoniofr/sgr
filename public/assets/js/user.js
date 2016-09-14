@@ -29,7 +29,7 @@ $(function(e){
     $('#modalAddUser').modal('show');
   }); //:)
    
-  //Add usuario
+  //Add user
   $('#btnSalvarUser').on('click',function(e){ // :)
     e.preventDefault();
     showGifEspera();
@@ -94,7 +94,7 @@ $(function(e){
       $('#modalEliminaUsuario').modal('show');
     });
   }
- 
+  //Delete user
   $('#fm_eliminausuario_save').on('click',function(e){ // :)
     e.preventDefault();
     showGifEspera();
@@ -127,80 +127,66 @@ $(function(e){
     });
   });
 
-  function activaLinkEditaUsuario(){
+  function activaLinkEditaUsuario(){ // :)
     $(".editUser").on('click',function(e){
       e.preventDefault();
-      $('form#formEditUser input[name="username"]').val($(this).data('username'));
+      $('#fm_editUser_username').html($(this).data('username'));
       $('form#formEditUser input[name="nombre"]').val($(this).data('nombre'));
       $('form#formEditUser input[name="apellidos"]').val($(this).data('apellidos'));
       $('form#formEditUser input[name="email"]').val($(this).data('email'));
-      $('form#formEditUser input[name="id"]').val($(this).data('id'));
+     
       $('form#formEditUser textarea[name="observaciones"]').val($(this).data('observaciones'));
       
       $('form#formEditUser select[name="capacidad"]').val( $(this).data('capacidad') );
-      alert($(this).data('colectivo'));
       $('form#formEditUser select[name="colectivo"]').val( $(this).data('colectivo') );
       $('form#formEditUser select[name="estado"]').val($(this).data('estado'));
+     
+      $("#datepickerUserEdit" ).datepicker({
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        showAnim: 'slideDown',
+        dateFormat: 'd-m-yy',
+        showButtonPanel: true,
+        firstDay: 1,
+        monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
+        dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
+      });
+      $('#datepickerUserEdit').val( $(this).data('caducidad') ); 
       
-
-      //$aDate = parseDate($user.caducidad,'-','en-EN');
-      //$('#datepickerUserEdit').val($aDate[0]+'-'+$aDate[1]+'-'+$aDate[2]);
-      
+      $('form#formEditUser input[name="id"]').val($(this).data('id')); 
+      clearMsgErrorsModal();
       $('#modalEditUser').modal('show');
-      
     });  
   }
   
-
-  
-
   //Ajax edit user
-  $('#modaleditUser').on('click',function(e){
+  $('#btnEditUser').on('click',function(e){ // :)
 
     e.preventDefault();
     showGifEspera();
     $.ajax({
       type: "GET",
-      url: "editarUsuario.html",
+      url: "ajaxEditUsuario",
       data: $('form#formEditUser').serialize(),
       success: function($respuesta){
-        if ($respuesta['exito'] == true){
-            $('#modalEditUser').modal('hide');
-            hideGifEspera();
-            $('#msg').removeClass('alert-warning alert-danger alert-info').addClass('alert-success').html($respuesta['msg']).fadeOut('4000').fadeIn('4000');
-            
-            $('td#'+$respuesta["user"].id+'_colectivo').html($respuesta['user'].colectivo);
-            $('td#'+$respuesta["user"].id+'_rol').html($respuesta['capacidad']);
-            $('td#'+$respuesta["user"].id+'_apellidosnombre').html($respuesta['user'].apellidos + ', ' + $respuesta['user'].nombre);
-            $('td#'+$respuesta["user"].id+'_observaciones').html($respuesta['user'].observaciones);
-            $('small#'+$respuesta["user"].id+'_updated_at').html($respuesta['user'].updated_at);
-
-            //estado
-            $('td#'+$respuesta["user"].id+'_estado i').fadeOut();
-            if($respuesta['user'].estado == '1' && !$respuesta['caducada']) {
-              $('i#'+$respuesta["user"].id+'_activa').fadeIn();
-            }
-            if($respuesta['user'].estado == '0') {
-              $('i#'+$respuesta["user"].id+'_desactiva').fadeIn();
-            }
-            if($respuesta['caducada']) {
-              $('i#'+$respuesta["user"].id+'_caducada').fadeIn();
-            }
-
-            $('tr#'+$respuesta["user"].id+' td').fadeOut('8000').fadeIn('16000');
-          }
+        if ($respuesta.error === false){ //no hay errores
+          $('#modalEditUser').modal('hide');
+          hideGifEspera();
+          getUsuarios();
+          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+        }
         //Hay errores de validación del formulario
         else {
-            //reset
-            $('.form-group').removeClass('has-error');//borrar errores anteriores
-            $('.dataerror').each(function(){$(this).fadeOut();});
-            //Show errors
-            $errors = $respuesta.errors;
-            $.each($errors,function(key,value){
-              $('#editmodal_'+key).addClass('has-error');
-              $('#editmodal_'+key+'_error').html(value).fadeIn('4000');
-              });
-          }//fin else
+          hideGifEspera();
+          $.each($respuesta.errors,function(index,value){
+            $('#m_editusuario_input'+index).addClass('has-error');//resalta el campo de formulario con error
+            alert(index + value);
+            $('#m_editusuario_textError_'+index).html(' &nbsp; ' + value);//añade texto de error a span alert-danger en ventana modal
+
+              
+          });
+          $('#m_editusuario_msgError').fadeIn('8000');
+        }
       },
       error: function(xhr, ajaxOptions, thrownError){
         hideGifEspera();
@@ -214,7 +200,7 @@ $(function(e){
 
   
 
-
+  /*
   function parseDate(strFecha,$delimiter,$locale) {
     
     $delimiter  = typeof $delimiter !== 'undefined' ? $delimiter : '-';
@@ -238,7 +224,7 @@ $(function(e){
 
     return aDate;
   }
-
+*/
   $('form#formEditUser .datepicker').datepicker({
         showOtherMonths: true,
         selectOtherMonths: true,

@@ -2,6 +2,10 @@
 
 class UsersController extends BaseController {
   
+  private $offset = '10';
+  private $order = 'asc';
+  private $sortby = 'username';
+
   public function listar(){ //:)
     //Input  
     $veractivas = Input::get('veractivas',1);
@@ -9,12 +13,12 @@ class UsersController extends BaseController {
     $perfil     = Input::get('perfil','');
     $perfiles   = Config::get('string.capacidades');
       
-    $sortby     = Input::get('sortby','updated_at');
-    $order      = Input::get('order','desc');
-     
+    $sortby     = Input::get('sortby',$this->sortby);
+    $order      = Input::get('order',$this->order);
+    $offset     = Input::get('offset',$this->offset); 
     $search     = Input::get('search','');
       
-    $offset     = Input::get('offset','10');
+    
     $colectivos = Config::get('options.colectivos');
     $page       = Input::get('page','1'); 
     //Output
@@ -36,13 +40,11 @@ class UsersController extends BaseController {
     $perfil     = Input::get('perfil','');
     //$perfiles   = Config::get('string.capacidades');
       
-    $sortby     = Input::get('sortby','updated_at');
-    $order      = Input::get('order','desc');
+    $sortby     = Input::get('sortby',$this->sortby);
+    $order      = Input::get('order',$this->order);
+    $offset     = Input::get('offset',$this->offset);
       
     $search     = Input::get('search','');
-      
-    $offset     = Input::get('offset','10');
-    
     $pagina     = Input::get('pagina','1');
     //Output
     $usuarios = User::where('username','like',"%$search%")->where('estado','=',$veractivas)->where('colectivo','like',"%".$colectivo)->where('capacidad','like',"%".$perfil)->orderby($sortby,$order)->take($offset)->skip($offset * ($pagina-1))->get();
@@ -53,8 +55,8 @@ class UsersController extends BaseController {
     return View::make('admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas','pagina'));
   }
 
-  public function add() // :)
-    {
+  public function add(){ // :)
+    
     //Output  
     $respuesta = array( 'error'   => false,
                         'errors'  => array(),
@@ -66,33 +68,23 @@ class UsersController extends BaseController {
         'apellidos'             => 'required',
         'colectivo'             => 'required',
         'username'              => 'required|unique:users',
-        'caducidad'             => 'required',//|date|date_format:d-m-Y|after:'. date('d-m-Y'),
-        'capacidad'             => 'required|in:1,2,3,4,5',
+        'caducidad'             => 'required|date|date_format:d-m-Y',
+        'capacidad'             => 'required|in:1,2,3,4',
         'email'                 => 'required|email',
-        'caducidad'             => 'required'
+        
       );
 
     $messages = array(
           'required'      => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'date_es'       => 'El campo <strong>:attribute</strong> debe ser una fecha válida',
+          'date'          => 'El campo <strong>:attribute</strong> debe ser una fecha válida, ',
           'date_format'   => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
-          'after'         => 'El campo <strong>:attribute</strong> debe ser una fecha posterior al día actual',
           'in'            => 'El campo <strong>:attribute</strong> es erroneo.',
           'email'         => 'El campo <strong>:attribute</strong> debe ser una dirección de email válida',
           'unique'        => 'El UVUS ya existe.'
         );
 
     $validator = Validator::make(Input::all(), $rules, $messages);
-    //validación fecha formato d-m-Y
-    $fecha = Input::get('caducidad'); 
-    if (!empty($fecha)){
-      $data = Input::all();
-      $validator->sometimes('caducidad','date_es',function($data){
-        $date_es = date_parse_from_format("d-m-Y", $data['caducidad']);
-        if ($date_es['warning_count'] > 0 || $date_es['error_count'] > 0) return true;        
-      });
-    }
-       
+           
     if ($validator->fails())
       {
         $respuesta['error'] = true;
@@ -120,6 +112,71 @@ class UsersController extends BaseController {
     }
   }
 
+  public function edit(){ //:)
+
+    //Output  
+    $respuesta = array( 'error'   => false,
+                        'errors'  => array(),
+                        'msg'     => '',  
+                        );
+        
+    $rules = array(
+      'id'        => 'required|exists:users',
+      'nombre'    => 'required',
+      'apellidos' => 'required',
+      'estado'    => 'required',
+      'colectivo' => 'required',
+      'caducidad' => 'required|date|date_format:d-m-Y',
+      'capacidad' => 'required|in:1,2,3,4',
+      'email'     => 'required|email',
+      );
+
+    $messages = array(
+      'required'      => 'El campo <strong>:attribute</strong> es obligatorio.',
+      'date'          => 'El campo <strong>:attribute</strong> debe ser una fecha válida, ',
+      'date_format'   => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
+      'after'         => 'El campo <strong>:attribute</strong> debe ser una fecha posterior al día actual',
+      'in'            => 'El campo <strong>:attribute</strong> es erroneo',
+      'email'         => 'El campo <strong>:attribute</strong> debe ser una dirección de email válida',
+      'exists'        => 'Identificador de usuario no valido...',
+           );
+  
+ 
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    if ($validator->fails()) {
+      $respuesta['error'] = true;
+      $respuesta['errors'] = $validator->errors()->toArray();
+      return $respuesta;
+    }
+    else{  
+      // salvamos los datos.....
+      $user = User::find(Input::get('id'));
+      
+      // La fecha se debe guardar en formato USA Y-m-d  
+      $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
+      $user->caducidad = $fecha->format('Y-m-d');
+      $user->capacidad = Input::get('capacidad');
+      $user->colectivo = Input::get('colectivo');
+      $user->estado = Input::get('estado','0');
+      $user->email = Input::get('email');
+      $user->nombre = Input::get('nombre');
+      $user->apellidos = Input::get('apellidos');
+      $user->observaciones = Input::get('observaciones');
+
+      $user->save();
+
+      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+      return $respuesta;
+      
+    }
+    $result['user'] = $user->toArray();
+    $result['msg'] = Config::get('msg.success');
+    $result['capacidad'] = $user->getRol();
+    $result['caducada'] = $user->caducado();
+    return $result;
+  }
+  
   public function delete(){ // :)
     //Input
     $id = Input::get('id','');
@@ -155,83 +212,6 @@ class UsersController extends BaseController {
     }
   }
   
-  /**
-    * //Request by Ajax
-    * 
-  */
-  public function edit(){
-
-    $result = array ('exito' => false, 'errors' => array(), 'user' => array(),'msg' => '','rol' => '','caducada' => '');
-    
-    
-    
-    $rules = array(
-        'id'        => 'required',
-        'nombre'    => 'required',
-        'apellidos' => 'required',
-        'estado'    => 'required',
-        'colectivo' => 'required',
-        'caducidad' => 'required|date|date_format:d-m-Y',
-        'capacidad' => 'required|in:1,2,3,4,5',
-        'email'     => 'required|email',
-        );
-
-    $messages = array(
-            'required'   => 'El campo <strong>:attribute</strong> es obligatorio.',
-            'date_es'    => 'El campo <strong>:attribute</strong> debe ser una fecha válida.',
-            'in'         => 'El campo <strong>:attribute</strong> es erroneo.',
-            'email'      => 'El campo <strong>:attribute</strong> debe ser una dirección de email válida',
-           );
-  
- 
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-
-    $fecha = Input::get('caducidad'); 
-    if (!empty($fecha)){
-      $data = Input::all();
-      $validator->sometimes('caducidad','date_es',function($data){
-        $date_es = date_parse_from_format("j-m-Y", $data['caducidad']);
-        if ($date_es['warning_count'] > 0 || $date_es['error_count'] > 0) return true;        
-      });
-    }
-   
-   
-    if ($validator->fails())
-    {
-        $result['errors'] = $validator->errors()->toArray(); 
-        //return $result;
-    }
-    else{  
-      // salvamos los datos.....
-      $user = User::findOrFail(Input::get('id'));
-      
-      // La fecha se debe guardar en formato USA Y-m-d  
-      $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
-      $user->caducidad = $fecha->format('Y-m-d');
-      $user->capacidad = Input::get('capacidad');
-      $user->colectivo = Input::get('colectivo');
-      $user->estado = Input::get('estado','0');
-      $user->email = Input::get('email');
-      $user->nombre = Input::get('nombre');
-      $user->apellidos = Input::get('apellidos');
-      $user->observaciones = Input::get('observaciones');
-
-      $user->save();
-
-      //cierra notificación de alta en caso de que exista....
-      $this->cierraNotificacion($user->username);
-      $result['exito'] = true;
-      
-    }
-    $result['user'] = $user->toArray();
-    $result['msg'] = Config::get('msg.success');
-    $result['capacidad'] = $user->getRol();
-    $result['caducada'] = $user->caducado();
-    return $result;
-  }
-
- 
   
   /**
     * @param $id int

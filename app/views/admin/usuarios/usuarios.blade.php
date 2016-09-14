@@ -131,7 +131,7 @@
 	        	<!-- delete user -->
 	        	<a href="" class="eliminarUsuario" data-infousuario="{{$user->nombre()}} {{$user->apellidos()}} - {{$user->username()}} -" data-id="{{$user->id()}}" data-numreservas="{{$user->eventos()->count()}}"><i class="fa fa-trash fa-fw" title='borrar'></i></a>
 	          <!-- edit user -->
-	          <a href="" data-id="{{$user->id()}}" data-username="{{$user->username()}}" data-nombre="{{$user->nombre()}}" data-apellidos="{{$user->apellidos()}}" data-email="{{$user->email()}}" data-id="{{$user->observaciones()}}" data-capacidad="{{$user->capacidad()}}" data-colectivo="{{$user->colectivo()}}" class="editUser"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
+	          <a href="" data-id="{{$user->id()}}" data-username="{{$user->username()}}" data-nombre="{{$user->nombre()}}" data-apellidos="{{$user->apellidos()}}" data-email="{{$user->email()}}" data-estado="{{$user->estado()}}" data-observaciones="{{$user->observaciones()}}" data-capacidad="{{$user->capacidad()}}" data-colectivo="{{$user->colectivo()}}" data-caducidad="{{ date('d-m-Y',strtotime($user->caducidad())) }}" class="editUser"><i class="fa fa-pencil fa-fw" title='editar'></i></a>
 	          <span id ="username">{{$user->username()}}</span>
 	        </td>
 	        <td id ="{{$user->id()}}_colectivo">{{$user->colectivo()}}</td>

@@ -32,18 +32,17 @@ Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'))
 Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
 
 //routes gestión de usuarios
-//Listar
-Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); //:)
-Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); //:)
-//add
-Route::post('admin/ajaxAddUsuario',array('as' => 'post_addUser','uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg'))); // :)
+Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); // Listar :)
+Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); // Listar :)
+Route::post('admin/ajaxAddUsuario',array('uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg'))); // Add user :)
+Route::get('admin/ajaxEditUsuario',array('uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg'))); // Edit user ://
+
 //delete /??
 Route::post('admin/ajaxEliminausuario',array('uses' => 'UsersController@delete','before' => array('auth','ajax_check','capacidad:4,msg'))); //??
 
 Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check'))); //??
 
 Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???
-Route::get('admin/editarUsuario.html',array('as' => 'updateUser.html','uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg')));
 
 Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg'))); //?
 

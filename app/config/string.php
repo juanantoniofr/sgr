@@ -19,6 +19,10 @@ return array (
 													'PAS' => 'PAS',
 													'PDI' => 'PDI',
 													),
+	'estados'						=> array (
+													'0' => 'No Activa',
+													'1'	=> 'Activa',
+													),
 										
 	);
 

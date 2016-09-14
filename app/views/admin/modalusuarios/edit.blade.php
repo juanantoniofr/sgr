@@ -9,19 +9,16 @@
         </div><!-- ./modal-header -->
 
         <div class="modal-body">
-          <div class="alert alert-danger text-center" role="alert" style="display:none" id="dangerEdit">Revise el formulario para corregir errores.... </div>
+          <div class="alert alert-danger text-center modal_MsgError" role="alert" style="display:none;margin:10px 0" id="m_editusuario_msgError">Formulario con errores</div>
 
           <div class="form-group" id="fg_username"> 
-            <span class="text-danger dataError" style="display:none">
-              <i class="fa fa-exclamation-circle" aria-hidden="true"></i> <span id="error_username"></span>
-            </span>
-            <p class="form-control-static"><b>Usuario Virtual:</b> <b><span class="text-success" id="username"></span></b></p>
+            <p class="form-control-static"><b>UVUS:</b> <span id="fm_editUser_username"></span></p>
           </div>
 
-          <div class="form-group" id="editmodal_estado">     
+          <div class="form-group modal_divinput" id="m_editusuario_inputestado">     
             {{Form::label('estado', 'Estado de la cuenta:')}}
-            <span id="editmodal_estado_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>
-            {{Form::select('estado', array('1' => 'Activa', '0' => 'Desactiva'),'1',array('class' => 'form-control','id' => 'select_estado'));}}
+            <span id="m_editusuario_textError_estado" class="text-danger modal_spantexterror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>
+            {{Form::select('estado', Config::get('string.estados'),'',array('class' => 'form-control'));}}
           </div>
 
           <div class="form-group modal_divinput" id="m_editusuario_inputcapacidad">      
@@ -32,43 +29,42 @@
           <div class="form-group modal_divinput" id="m_editusuario_inputcolectivo">  
             {{Form::label('colectivo', 'Colectivo')}}<span id="m_editusuario_textError_colectivo" class="text-danger modal_spantexterror"></span>
             {{Form::select('colectivo', Config::get('string.colectivos'),'',array('class' => 'form-control'))}}
-        </div>
+          </div>
           
-          <div class="form-group" id="editmodal_caducidad">   
+          <div class="form-group modal_divinput" id="m_editusuario_inputcaducidad">   
             {{Form::label('caducidad', 'Caducidad para SGR')}}
-            <span id="editmodal_caducidad_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
-            {{Form::text('caducidad',date('d-m-Y',strtotime('+1 year')),array('class' => 'form-control datepicker','id' => 'datepickerUserEdit'))}}                
+            <span id="m_editusuario_textError_caducidad" class="text-danger modal_spantexterror"></span>     
+            {{Form::text('caducidad','',array('class' => 'form-control datepicker','id' => 'datepickerUserEdit'))}}                
           </div>
 
-          <div class="form-group" id="editmodal_nombre">  
+          <div class="form-group modal_divinput" id="m_editusuario_inputnombre">  
             {{Form::label('nombre', 'Nombre')}}
-            <span id="editmodal_nombre_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
+            <span id="m_editusuario_textError_nombre" class="text-danger modal_spantexterror"></span>     
             {{Form::text('nombre',Input::old('nombre'),array('class' => 'form-control'))}}
           </div>
                   
-          <div class="form-group" id="editmodal_apellidos">  
+          <div class="form-group modal_divinput" id="m_editusuario_inputapellidos">  
             {{Form::label('apellidos', 'Apellidos')}}
-              <span id="editmodal_apellidos_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
+              <span id="m_editusuario_textError_apellidos" class="text-danger modal_spantexterror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
             {{Form::text('apellidos',Input::old('apellidos'),array('class' => 'form-control'))}}
           </div>
                   
-          <div class="form-group" id="editmodal_email">  
+          <div class="form-group modal_divinput" id="m_editusuario_inputemail">  
             {{Form::label('email', 'eMail')}}
-            <span id="editmodal_email_error" style="display:none" class="text-danger dataError"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
+            <span id="m_editusuario_textError_email" class="text-danger modal_spantexterror"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> </span>     
             {{Form::text('email',Input::old('email'),array('class' => 'form-control'))}}
           </div>
 
-          <div class="form-group" id="editmodal_observaciones">
-              <label for="observaciones">Observaciones</label> 
-              <textarea class="form-control" name="observaciones" rows="5"  value=""></textarea>
-              
-            </div>
+          <div class="form-group modal_divinput" id="m_editusuario_inputobservaciones">
+            <label for="observaciones">Observaciones</label> 
+            <textarea class="form-control" name="observaciones" rows="5"  value=""></textarea>
+          </div>
         </div><!-- ./modal-body -->
 
-        <input type="hidden" name="id" value="" />
         <div class="modal-footer">
+          <input type="hidden" name="id" value="" />
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" id ="modaleditUser"><i class="fa fa-save fa-fw"></i> Salvar</button>
+          <button type="submit" class="btn btn-primary" id ="btnEditUser"><i class="fa fa-save fa-fw"></i> Salvar</button>
         </div><!-- ./modal-footer -->
       </form>
     </div><!-- ./modal-content -->

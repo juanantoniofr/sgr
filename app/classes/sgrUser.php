@@ -128,6 +128,10 @@ class sgrUser {
 		return $this->user->capacidad;
 	}
 
+	public function caducidad(){ // :)
+		return $this->user->caducidad;
+	}
+
 	public function caducado(){
 		return strtotime($this->user->caducidad) < strtotime('today');
 	}

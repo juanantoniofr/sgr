@@ -1,8 +1,8 @@
 <!-- :) -->
 <div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog" aria-labelledby="modalAddUserLabel">
 
-  {{Form::open(array('method' => 'POST','route' => 'post_addUser','role' => 'form','id'=>'nuevoUsuario'))}}
-
+  <form id="nuevoUsuario">
+  
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
@@ -58,5 +58,5 @@
 
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
-      {{Form::close()}}
+  </form> 
 </div><!-- /.modal -->
