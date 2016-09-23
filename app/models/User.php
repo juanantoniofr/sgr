@@ -177,26 +177,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	}
 
 	
-	public function home(){
-		
-		switch ($this->capacidad) {
-			case '6': //administrador
-				return route('recursos');
-			case '5': //validador
-				return route('validadorHome.html');
-			case '4': //root
-				return route('adminHome.html');
-			case '3': //pas - técnico MAV
-				return route('calendarios.html');
-			case '2': //pdi - pas Administración
-				return route('calendarios.html');
-			case '1': //alumno
-				return route('calendarios.html');
-			default:
-				return 'No definido..';
-			}
-
-	}
+	
 	
 	
 	/**

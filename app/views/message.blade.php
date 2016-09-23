@@ -15,11 +15,12 @@
       
     <div class="panel-body" >
 
-        <p class="text-{{$alertLevel or ''}} text-center">{{ $msg or ''}}</p>
+      <p class="text-{{$alertLevel or ''}} text-center">{{ $msg or ''}}</p>
         
-        <p class="text-center">
-          <a class="btn btn-primary" href="{{route('loginsso')}}">Ir a Inicio</a>
-          <a class="btn btn-warning" href="{{route('logout')}}">Cerrar sesión</a>
+      <p class="text-center">
+       
+          <a class="btn btn-warning" href="{{route('logout')}}">Cerrar sesión <abr title="Single Sign On">SSO</abr></a>
+          {{ $btnredirect or '' }}
         </p>
     
     </div><!-- /.panel-body -->

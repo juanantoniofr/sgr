@@ -23,7 +23,7 @@ return array (
 							 							'request' => 5,
 							 						),
 
-	'fin_cursoAcademico' => '2016-09-15',
+	'fin_cursoAcademico' => '2017-7-1',
 	
 	'inicio_gestiondesatendida' => '2015-05-1',
 	

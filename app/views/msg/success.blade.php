@@ -1,1 +1,1 @@
-<div class = "alert alert-success text-center" role="alert">{{$msg}}</div>
+<div class = "alert alert-success text-center" role="alert">{{$msg or ''}}</div>

@@ -45,21 +45,28 @@
     </div><!-- /.navbar-header -->
     
     <div class="collapse navbar-collapse" id="navbar-collapse">
-        <ul class="nav navbar-nav navbar-right" >
+      <ul class="nav navbar-nav navbar-right" >
 
-          {{$dropdown or ''}}
-          <li><a href="{{asset('assets/R_mav.pdf')}}" target="_blank" title="Reglamento Servicio Medios Audiovisuales"><i class="fa fa-book fa-fw"></i> Normativa</a></li>
+        {{$dropdown or ''}}
+        <li>
+          <a href="{{asset('assets/R_mav.pdf')}}" target="_blank" title="Reglamento Servicio Medios Audiovisuales"><i class="fa fa-book fa-fw"></i> Normativa</a>
+        </li>
 
-          <li><a href="{{route('ayuda')}}" title="Ayuda"><i class="fa fa-support fa-fw"></i> Ayuda</a></li>
+        <li>
+          <a href="{{route('ayuda')}}" title="Ayuda"><i class="fa fa-support fa-fw"></i> Ayuda</a>
+        </li>
 
-          @if (Cas::isAuthenticated() && Auth::check())
-          <li><a href="{{route('contactar')}}" title="Contacto"><i class="fa fa-envelope fa-fw"></i> Contacto</a></li>
-          <li><a href="{{URL::route('logout')}}" title="Salir"><i class="fa fa-sign-out fa-fw"></i> Logout ({{Auth::user()->nombre}} {{Auth::user()->apellidos}})</a></li>
-
-          @endif
-        </ul>
+        @if (Cas::isAuthenticated() && Auth::check())
+          <li>
+            <a href="{{route('contactar')}}" title="Contacto"><i class="fa fa-envelope fa-fw"></i> Contacto</a>
+          </li>
+          <li>
+            <a href="{{URL::route('logout')}}" title="Salir"><i class="fa fa-sign-out fa-fw"></i> Logout ({{Auth::user()->nombre}} {{Auth::user()->apellidos}} )</a>
+          </li>
+        @endif
+      </ul>
     </div> 
-    </div>
+  </div>
   </nav>
 
  

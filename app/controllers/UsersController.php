@@ -55,7 +55,7 @@ class UsersController extends BaseController {
     return View::make('admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas','pagina'));
   }
 
-  public function add(){ // :)
+  public function ajaxAdd(){ // :)
     
     //Output  
     $respuesta = array( 'error'   => false,
@@ -112,7 +112,7 @@ class UsersController extends BaseController {
     }
   }
 
-  public function edit(){ //:)
+  public function ajaxEdit(){ //:)
 
     //Output  
     $respuesta = array( 'error'   => false,
@@ -170,14 +170,9 @@ class UsersController extends BaseController {
       return $respuesta;
       
     }
-    $result['user'] = $user->toArray();
-    $result['msg'] = Config::get('msg.success');
-    $result['capacidad'] = $user->getRol();
-    $result['caducada'] = $user->caducado();
-    return $result;
   }
   
-  public function delete(){ // :)
+  public function ajaxDelete(){ // :)
     //Input
     $id = Input::get('id','');
     //Output  
@@ -212,26 +207,91 @@ class UsersController extends BaseController {
     }
   }
   
+  //Página de inicio para administradores sgr (Notificaciones de registro de usuarios)
+  public function home(){ // :)
+    
+    $sgrUser = new sgrUser(Auth::user());
+    $notificaciones = Notificacion::where('estado','=','abierta')->orderby('id','desc')->get();
+    return View::make('admin.index')->with(compact('notificaciones'))->nest('dropdown','admin.dropdown',compact('sgrUser'))->nest('modalvalidaRegistroUser','admin.modalusuarios.validaRegistroUser');
+  }
   
+  
+  public function ajaxUpdateUser(){ // :)
+    
+    //Output  
+    $respuesta = array( 'error'   => false,
+                        'errors'  => array(),
+                        'msg'     => '',  
+                        );
+
+    $rules = array(
+        'idnotificacion'  => 'required|exists:notificaciones,id',//$id requerido y debe existir en la tabla notificaciones 
+        'username'        => 'required|exists:users',//requerido y debe existir en la tabla users
+        'caducidad'       => 'required|date|date_format:d-m-Y',      
+    );
+
+    $messages = array(
+          'required'          => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'idnotificacion.exists'     => Config::get('msg.idnotfound'),
+          'username.exists'   => Config::get('msg.usernamenotfound'),
+          'date'              => 'El campo <strong>:attribute</strong> debe ser una fecha válida',
+          'date_format'       => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
+          );
+
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    if ($validator->fails()){
+        $respuesta['error'] = true;
+        $respuesta['errors'] = $validator->errors()->toArray();
+        return $respuesta;
+    }
+    else{
+
+      //Input
+      $idnotificacion = Input::get('idnotificacion');
+      $username = Input::get('username');
+      $colectivo = Input::get('colectivo',Config::get('options.colectivoPorDefecto'));
+      $capacidad = Input::get('capacidad',Config::get('options.capacidadPorDefecto'));
+      $caducidad = Input::get('caducidad');//Por defecto hoy
+      $observaciones = Input::get('observaciones','');
+      $activar = Input::get('activar',false);
+
+      $user = User::where('username','=',$username)->first();
+      $user->estado = $activar; //Activación cuenta
+      $user->colectivo = $colectivo;
+      $user->capacidad = $capacidad;
+      $user->observaciones = $observaciones;
+      
+      // La fecha se debe guardar en formato USA Y-m-d  
+      $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
+      $user->caducidad = $fecha->format('Y-m-d');
+      
+      $user->save();
+
+      
+      $this->cierraNotificacion($idnotificacion);
+      //mail to User by Activate
+      $sgrMail = new sgrMail();
+      $sgrMail->notificaActualizacionCuenta($user->id);            
+      
+      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+      return $respuesta;
+
+    }
+  }
+  
+
   /**
     * @param $id int
     * @return $user Object User
   */
-  public function user(){
+  public function user(){ // ?????
     $id = Input::get('id','');
     $user = User::findOrFail($id);
 
     return $user;
   }
   
-  //Home rol admin
-  public function home(){
-    $veractivados = Input::get('veractivados',0);
-    $verdesactivados = Input::get('verdesactivados',0);
-    
-    $notificaciones = Notificacion::where('estado','=','abierta')->orderby('id','desc')->get();
-    return View::make('admin.index')->with(compact('notificaciones'))->nest('dropdown','admin.dropdown');
-  }
+  
 
  
 
@@ -239,45 +299,9 @@ class UsersController extends BaseController {
     return View::make('admin.userNew')->with("user",Auth::user())->nest('dropdown',Auth::user()->dropdownMenu());
   }
  
-  public function activeUserbyajax(){
+  
 
-    $result = array('success' => false);
-    
-    $username = Input::get('username','');
-    $colectivo = Input::get('colectivo','');
-    $caducidad = Input::get('caducidad','');
-    $observaciones = Input::get('observaciones','');
-
-    $rol = Input::get('rol','1');
-    //$id = Input::get('id','');
-
-    $user = User::where('username','=',$username)->first();
-
-    if (!empty($user)) {
-      
-      $user->estado = true;
-      $user->colectivo = $colectivo;
-      $user->capacidad = $rol;
-      $user->observaciones = $observaciones;
-      if (empty($caducidad)) $caduca = date('Y-m-d');
-      else $caduca = sgrDate::parsedatetime($caducidad,'d-m-Y','Y-m-d');
-      $user->caducidad = $caduca;
-      $user->save();
-
-      
-      $this->cierraNotificacion($username);
-      //mail to User by Activate
-      $sgrMail = new sgrMail();
-      $sgrMail->notificaActivacionUVUS($user->id);            
-      
-      $result['success'] = true;
-
-    }
-
-    return $result;
-  }
-
-  public function ajaxDelete(){ //???
+  public function ajaxDelete_2(){ //???
     $result = array('success' => false);
     
     $username = Input::get('username','');
@@ -296,43 +320,10 @@ class UsersController extends BaseController {
     return $result;
   }
 
-  public function desactiveUserbyajax(){
-    $result = array('success' => false);
-    
-    $username = Input::get('username','');
-    $colectivo = Input::get('colectivo','');
-    $caducidad = Input::get('caducidad','');
-    $observaciones = Input::get('observaciones','');
-    $rol = Input::get('rol','1');
-    
+  
 
-    $user = User::where('username','=',$username)->first();
-
-    if (!empty($user)) {
-      
-      $user->estado = false;
-      $user->colectivo = $colectivo;
-      $user->capacidad = $rol;
-      $user->observaciones = $observaciones;
-      
-      if (empty($caducidad)) $caduca = date('Y-m-d');
-      else $caduca = sgrDate::parsedatetime($caducidad,'d-m-Y','Y-m-d');
-      $user->caducidad = $caduca;
-      $user->save();
-
-      
-      $this->cierraNotificacion($username);
-      
-      
-      $result['success'] = true;
-
-    }
-
-    return $result;
-  }
-
-  private function cierraNotificacion($username){
-      Notificacion::where('source','=',$username)->update(array('estado' => 'cerrada'));
+  private function cierraNotificacion($id){
+      Notificacion::where('id','=',$id)->update(array('estado' => 'cerrada'));
       return true;
   }
 

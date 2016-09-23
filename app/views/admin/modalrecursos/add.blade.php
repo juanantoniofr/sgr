@@ -10,7 +10,7 @@
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addrecurso_textError" </div>
+        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addrecurso_textError"> </div>
 
         <div class="form-group" id="fm_addrecurso_inputid_lugar">  
           {{Form::label('id_lugar', 'Identificador de Lugar')}}

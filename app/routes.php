@@ -25,22 +25,33 @@ Route::get('ayuda.html',array('as'=>'ayuda','uses'=>'HomeController@ayuda'));
 Route::get('contactar.html',array('as'=>'contactar','uses'=>'HomeController@contacto','before'=>'auth'));
 Route::post('contactar.html',array('as'=>'enviaformulariocontacto','uses'=>'HomeController@sendmailcontact','before'=>'auth'));
 
-Route::get('/',array('as' => 'loginsso','uses' => 'AuthController@doLogin'));
-Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'));
+//routes login/logout :)
+  Route::get('/',array('as' => 'loginsso','uses' => 'AuthController@doLogin'));
+  Route::get('logout',array('as' => 'logout','uses' => 'AuthController@doLogout'));
+//fin login/logout
+//************************
 
-//Admin (rol = 4)
-Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg')));
+//routes gestión registro de usuarios :)
+  Route::get('admin/home.html',array('as' => 'adminHome.html','uses' => 'UsersController@home','before' => array('auth','capacidad:4,msg'))); // :)
+  Route::post('admin/ajaxUpdateUser',array('uses' => 'UsersController@ajaxUpdateUser','before' => array('auth','ajax_check'))); // :/
+  Route::post('admin/ajaxBorraUser',array('uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check'))); // :/
+//fin registro de usuarios
+//************************
 
-//routes gestión de usuarios
-Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); // Listar :)
-Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); // Listar :)
-Route::post('admin/ajaxAddUsuario',array('uses' => 'UsersController@add','before' => array('auth','ajax_check','capacidad:4,msg'))); // Add user :)
-Route::get('admin/ajaxEditUsuario',array('uses' => 'UsersController@edit','before' => array('auth','auth_ajax','capacidad:4,msg'))); // Edit user ://
 
-//delete /??
-Route::post('admin/ajaxEliminausuario',array('uses' => 'UsersController@delete','before' => array('auth','ajax_check','capacidad:4,msg'))); //??
+//routes gestión de usuarios :)
+  Route::get('admin/users.html',array('as' => 'users','uses' => 'UsersController@listar','before' => array('auth','capacidad:4,msg'))); // Listar :)
+  Route::get('admin/ajaxGetUsuarios',array('uses' => 'UsersController@ajaxGetUsuarios','before' => array('auth','ajax_check','capacidad:4,msg'))); // Listar :)
+  Route::post('admin/ajaxAddUsuario',array('uses' => 'UsersController@ajaxAdd','before' => array('auth','ajax_check','capacidad:4,msg'))); // Add user :)
+  Route::get('admin/ajaxEditUsuario',array('uses' => 'UsersController@ajaxEdit','before' => array('auth','auth_ajax','capacidad:4,msg'))); // Edit user :)
+  Route::post('admin/ajaxEliminausuario',array('uses' => 'UsersController@ajaxDelete','before' => array('auth','ajax_check','capacidad:4,msg'))); // Del user :)
+//fin gestión de usaurios
+//************************
 
-Route::get('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check'))); //??
+
+
+
+
 
 Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???
 
@@ -138,8 +149,7 @@ Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => 
 //Atención de eventos
 Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
 Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
-Route::post('admin/ajaxActiveUser',array('uses' => 'UsersController@activeUserbyajax','before' => array('auth','ajax_check')));
-Route::post('admin/ajaxDesactiveUser',array('uses' => 'UsersController@desactiveUserbyajax','before' => array('auth','ajax_check')));
+
 Route::post('admin/ajaxBorraUser',array('as' => 'ajaxBorraUser','uses' => 'UsersController@ajaxDelete','before' => array('auth','capacidad:4,msg','ajax_check')));
 Route::get('print',array('uses' => 'CalendarController@imprime'));
 
@@ -163,13 +173,10 @@ App::error(function(ModelNotFoundException $e){
 });
 
 Route::get('test',array('as'=>'test',function(){
-  $id = 93;
-  $user = User::find($id);
-  $sgrUser = new sgrUser($user);
   
-  //test 1: elimina 1 reserva de 2
-  $sgrUser->deleteeventos();
-  //var_dump($eventos);
-  
+  Mail::send('emails.testmail',array(),function($m){
+      $m->to('juanafr@us.es')->subject('Development SGR. (test with Mail::send)');
+    });
+  echo 'correo enviado...';
 }));
 

@@ -1,4 +1,4 @@
-<ul class="list-group">      
+<ul class="list-group">   
 @foreach($grupos as $grupo)
   
     

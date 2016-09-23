@@ -26,6 +26,7 @@ class sgrUser {
 		$this->user->recursosValidados()->detach();
 		return true;
 	}
+	
 	/**
 		* // Devuelve los eventos de $this->user a partir de un timestamp dado o a partir del momento actual (strtotime('now'))
 		* @param $timestamp int
@@ -77,7 +78,7 @@ class sgrUser {
 			}
 	}
 
-	public function delete(){
+	public function delete(){ //:)
 		return $this->user->delete();
 	}
 
@@ -134,6 +135,27 @@ class sgrUser {
 
 	public function caducado(){
 		return strtotime($this->user->caducidad) < strtotime('today');
+	}
+
+	public function home(){
+		//Usuarios (Alumnos) 																$this->capacidad 	=> '1', 
+		//Usuarios Avanzados (PDI & PAS de Administración) 	$this->capacidad 	=> '2', 
+		//Técnicos (PAS) 																		$this->capacidad 	=> '3', 
+		//Administradores sgrUser														$this->capacidad	=> '4',
+		
+		switch ($this->user->capacidad) {
+			
+			case '1': //Usuarios (Alumnos)
+			case '2': //Usuarios Avanzados (PDI & PAS de Administración)
+			case '3': //Técnicos (PAS)
+				return route('calendarios.html');
+			case '4': //Administradores SGR
+				return route('adminHome.html');	
+			
+			default:
+				return '';	
+			}
+
 	}
 
 	public function test($timestamp = ''){

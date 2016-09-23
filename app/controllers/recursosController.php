@@ -20,6 +20,7 @@ class recursosController extends BaseController{
     return View::make('admin.recursos.list')->nest('table','admin.recursos.recursos',compact('grupos','sortby','order'))->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente')->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente')->nest('modalEditEquipo','admin.modalrecursos.editEquipo');
   }
 
+  
   /**
     * //Añade un nuevo recurso a la base de datos de cualquier tipo (puesto,equipo,espacio y tipoequipos)
     * // llamadas desde: admin\modalrecursos\add.blade.php
@@ -133,12 +134,17 @@ class recursosController extends BaseController{
     else{
       $recurso = Recurso::findOrFail($id);
       $result['recurso'] = $recurso->toArray();
+      $sgrRecurso = Factoria::getRecursoInstance($recurso);
+      
+      
+      //Listado de grupos
       $grupos = GrupoRecurso::all();
       $result['listadogrupos'] = (string) View::make('admin.html.optionGrupos')->with(compact('grupos'));
-      $recursosContenedores = Recurso::where('tipo','=',$recurso->contenedor->tipo)->get();
+
+      $recursosContenedores = $sgrRecurso->getContenedores();
       $result['listadocontenedores'] = (string) View::make('admin.html.optionscontenedores')->with(compact('recursosContenedores'));
-    }  
-    
+
+     } 
     return $result;
   }
   

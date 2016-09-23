@@ -1,19 +1,21 @@
 <?php
 class sgrMail {
 	
-	private $mailAdminSGR = 'juanantonio.fr@gmail.com';
-	private $subject =	array(	'addEvento'		=> 'Nueva solicitud de reserva',
-								'editEvento'	=> 'Modificación de solicitud de reserva',
-								'delEvento'		=> 'Eliminación de evento',
-								'aprobar'		=> 'Solicitud aprobada',
-								'denegar'		=> 'Solicitud denegada',
-								'registro'		=> 'Nueva solicitud de registro pendiente',
-								'contacto'		=> 'Notificación formulario de contacto',
-								'activacion'	=> 'Usuario UVUS activado en SGR (Sistema de Gestión de Reservas fcom)',
-								'deshabilita'	=> 'Espacio o medio deshabilitado',
-								'habilita'		=> 'Espacio o medio habilitado',
-								'deleterecurso'	=> 'Espacio o medio eliminado'
+	private $mailAdminSGR = 'juanafr@us.es';
+	private $subject =	array(
+								'addEvento'				=> 'SGR fcom: Nueva solicitud de reserva',
+								'editEvento'			=> 'SGR fcom: Modificación de solicitud de reserva',
+								'delEvento'				=> 'SGR fcom: Eliminación de evento',
+								'aprobar'					=> 'SGR fcom: Solicitud aprobada',
+								'denegar'					=> 'SGR fcom: Solicitud denegada',
+								'registro'				=> 'SGR fcom: Nueva solicitud de registro pendiente',
+								'contacto'				=> 'SGR fcom: Notificación formulario de contacto',
+								'actualizacionCuenta'		=> 'SGR fcom: Actualización estado cuenta de usaurio',
+								'deshabilita'			=> 'SGR fcom: Espacio o medio deshabilitado',
+								'habilita'				=> 'SGR fcom: Espacio o medio habilitado',
+								'deleterecurso'		=> 'SGR fcom: Espacio o medio eliminado',
 							);
+	
 	public function notificaDeleteRecurso($id,$motivo = ''){
 		if (empty($id)) return true;
 		//Subject 
@@ -33,6 +35,7 @@ class sgrMail {
 			}//fin if		
 		}//fin foreach			
 	}//fin notificaDeleteRecurso
+	
 	public function notificaDeshabilitaRecurso($id,$motivo = ''){
 		if (empty($id)) return true;
 		//Subject 
@@ -73,9 +76,9 @@ class sgrMail {
 		}//fin foreach			
 	}//fin notificahabilitaRecurso	
 	
-	public function notificaActivacionUVUS($idUser){
+	public function notificaActualizacionCuenta($idUser){
 		//Subject 
-		$s = date('d-m-Y H:i') .': '.$this->subject['activacion'];
+		$s = date('d-m-Y H:i') .': '.$this->subject['actualizacionCuenta'];
 		//Notifica solicitante
 		$user = User::find($idUser);
 		$data = array('user' => serialize($user));
@@ -153,6 +156,8 @@ class sgrMail {
 				});	
 		}
 	}//fin notificaEdicionEvento
+	
+
 	/***
 		@param in $user=array('nombre','apellidos','uvus','relacionUSES','colectivo','ubicacion')
 		//todos los valores devueltos por sso
@@ -161,8 +166,10 @@ class sgrMail {
 		$s = date('d-m-Y H:i') .': '.$this->subject['registro'];
 		$data = array('user' => serialize($user));
 		$mailAdminSGR = $this->mailAdminSGR;
+		//Mail::queue
 		Mail::queue(array('html' => 'emails.registroNuevoUsuario'),$data,function($m) use($mailAdminSGR,$s){
-							$m->to($mailAdminSGR)->subject($s);});
+			$m->to($mailAdminSGR)->subject('Development SGR. (test with Mail::queue)' . $s);
+		});
 	}
 	
 	public function notificaContacto($data){

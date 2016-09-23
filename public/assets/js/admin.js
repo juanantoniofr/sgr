@@ -1,59 +1,60 @@
 $(function(e){
 
-   $('.toggleOpcionesGrupo').hover(function (event) {
-        event.preventDefault();
-        $(this).css('text-decoration','none');
-        var target = $(this).attr('href');
+  function toggles(){
+    $('.toggleOpcionesGrupo').hover(function (event) {
+          event.preventDefault();
+          $(this).css('text-decoration','none');
+          var target = $(this).attr('href');
 
-        $(target).fadeIn('fast');
+          $(target).fadeIn('fast');
     });
-   $('.toggleOpcionesRecurso').hover(function (event) {
-        event.preventDefault();
-        $('.opcionesGrupo').fadeOut('fast');
-        $(this).css('text-decoration','none');
-        var target = $(this).attr('href');
-        $(target).fadeIn('fast');
+    $('.toggleOpcionesRecurso').hover(function (event) {
+          event.preventDefault();
+          $('.opcionesGrupo').fadeOut('fast');
+          $(this).css('text-decoration','none');
+          var target = $(this).attr('href');
+          $(target).fadeIn('fast');
     });
-   $('.toggleOpcionesItem').hover(function (event) {
-        event.preventDefault();
-        $('.opcionesRecurso').fadeOut('fast');
-        $(this).css('text-decoration','none');
-        var target = $(this).attr('href');
-        $(target).fadeIn('fast');
+    $('.toggleOpcionesItem').hover(function (event) {
+          event.preventDefault();
+          $('.opcionesRecurso').fadeOut('fast');
+          $(this).css('text-decoration','none');
+          var target = $(this).attr('href');
+          $(target).fadeIn('fast');
     });
-   
-   $('.listitemgrupo').hover(function (event) {
-        event.preventDefault();
-        $('.opcionesGrupo').fadeOut('fast');
+     
+    $('.listitemgrupo').hover(function (event) {
+          event.preventDefault();
+          $('.opcionesGrupo').fadeOut('fast');
     });
-   $('.listitemrecurso').hover(function (event) {
-        event.preventDefault();
-        $('.opcionesRecurso').fadeOut('fast');
+    $('.listitemrecurso').hover(function (event) {
+          event.preventDefault();
+          $('.opcionesRecurso').fadeOut('fast');
     });
-   $('.listitem').hover(function (event) {
-        event.preventDefault();
-        $('.opcionesItem').fadeOut('fast');
+    $('.listitem').hover(function (event) {
+          event.preventDefault();
+          $('.opcionesItem').fadeOut('fast');
+    });
+      
+    $('.listarRecursos').click(function (event) {
+          event.preventDefault();
+          $(this).css('text-decoration','none');
+          var target = $(this).data('divrecursosid');
+          $('.i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+          
+          $(target).fadeToggle('fast');
     });
     
-    $('.listarRecursos').click(function (event) {
-        event.preventDefault();
-        $(this).css('text-decoration','none');
-        var target = $(this).data('divrecursosid');
-        $('.i_'+$(this).data('grupoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
-        
-        $(target).fadeToggle('fast');
-    });
-  
     $('.listarItems').click(function (event) {
-        event.preventDefault();
-        $(this).css('text-decoration','none');
-        
-        var target = $(this).data('ulitemsid');
-        $('.i_'+$(this).data('recursoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
-        
-        $(target).fadeToggle('fast');
+          event.preventDefault();
+          $(this).css('text-decoration','none');
+          
+          var target = $(this).data('ulitemsid');
+          $('.i_'+$(this).data('recursoid')).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+          
+          $(target).fadeToggle('fast');
     });
-
+  }
   //Añadir nuevo
     //Recursos (Espacio // TipoEquipos)
     //Muestra ventana modal Addrecurso
@@ -202,6 +203,7 @@ $(function(e){
       //Muestra ventana modal editRecurso
       $(".linkEditRecurso").on('click',function(e){
         e.preventDefault();
+        
         showGifEspera();
         $.ajax({
           type: "GET",
@@ -209,6 +211,7 @@ $(function(e){
           data: {idrecurso:$(this).data('idrecurso')},
           success: function($respuesta){
             hideGifEspera();
+            console.log($respuesta);
             $recurso = $respuesta.recurso;
             CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
             CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
@@ -221,6 +224,7 @@ $(function(e){
             $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
             $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
             
+
             $('#fm_editrecurso input[type="checkbox"]').prop( "checked", false );
             $.each($arrayRoles,function(index,value){
               $('#fm_editrecurso input#fm_editrecurso_roles'+value).prop( "checked", true );
@@ -283,6 +287,7 @@ $(function(e){
         data: {idrecurso:$(this).data('idrecurso')},
         success: function($respuesta){
           $recurso = $respuesta.recurso;
+          console.log($recurso);
           hideGifEspera();
           $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
           CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
@@ -292,7 +297,7 @@ $(function(e){
           $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
           $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m); 
           $('#fm_editpuesto select[name="contenedor_id"]').html($respuesta.listadocontenedores);   
-          $('#fm_editpuesto select[name="contenedor_id"] option:selected').val($recurso.contenedor_id);
+  $('#fm_editpuesto select[name="contenedor_id"] option[value="'+ $recurso.contenedor_id +'"]').prop('selected', true);
 
           $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
           
@@ -335,6 +340,7 @@ $(function(e){
             hideGifEspera();
             $('#m_editpuesto').modal('hide');   
             showMsg($respuesta.msg);
+
             getListado($('#fm_editpuesto select[name="contenedor_id"]').val()); 
           }
         },
@@ -978,6 +984,7 @@ $(function(e){
     activeLinkeditequipo();
     //activelinkveritems();
     activeLinkaddPuestoExistente();
+    toggles();
 
     activeLinkaddEquipoExistente();
   }
@@ -1041,7 +1048,7 @@ $(function(e){
       },
       error:function(xhr, ajaxOptions, thrownError){
         hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +'aquiu)' );
       }
     });//<!--./ajax-->
   }

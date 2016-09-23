@@ -29,6 +29,7 @@ class Recurso extends Eloquent {
     return $this->hasOne('Recurso','id','contenedor_id');   
   }
 
+  
   public function items(){
  
     return $this->hasMany('Recurso','contenedor_id','id');

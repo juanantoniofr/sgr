@@ -271,7 +271,8 @@ class GruposController extends BaseController {
 
 	    //Todos los grupos
 	    $grupos = GrupoRecurso::all();
-	    return View::make('admin.recursos.table',compact('grupos','sortby','order'));
+      
+	    return View::make('admin.recursos.recursos',compact('grupos','sortby','order'));
   	}
  
   /**
