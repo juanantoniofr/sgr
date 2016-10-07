@@ -12,7 +12,7 @@
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="alert alert-danger text-center modal_MsgError" role="alert" id="m_addusuario_msgError" style="display:none;margin:10px 0">Formulario con errores</div>
+        <div class="alert alert-danger text-center modal_msgError" role="alert" id="m_addusuario_msgError" style="display:none;margin:10px 0">Formulario con errores</div>
           
         <div class="form-group modal_divinput" id="m_addusuario_inputusername">  
           {{Form::label('username', 'UVUS (Usuario Virtual Universidad de Sevilla)')}}<span id="m_addusuario_textError_username" class="text-danger modal_spantexterror"></span>

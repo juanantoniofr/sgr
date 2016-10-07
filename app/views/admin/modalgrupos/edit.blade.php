@@ -29,6 +29,9 @@
             {{Form::textarea('descripcion','',array('class' => 'form-control', 'id' => 'fm_editgrupo_inputdescripcion'))}}
           </div>
 
+          <div class="form-group" id="m_edsitgrupo_grupo_id">
+            <span id="m_addPersonaGrupo_textError_grupo_id" class="text-danger modal_spantexterror text-center"></span>
+          </div>
           <div class="form-group hidden">
             {{Form::text('grupo_id','',array('class' => 'form-control'))}}
           </div>

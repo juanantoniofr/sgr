@@ -8,12 +8,16 @@
         </div>
 
         <div class="modal-body">
-          <div class="alert alert-danger text-center modal_MsgError" role="alert" id="m_eliminausuario_msgError" style="display:none;margin:10px 0">Formulario con errores: <span id="m_eliminausuario_textError_id" class="text-danger modal_spantexterror"></span></div>
+          <div class="alert alert-danger text-center modal_msgError" role="alert" id="m_eliminausuario_msgError" style="display:none;margin:10px 0">Formulario con errores: <span id="m_eliminausuario_textError_id" class="text-danger modal_spantexterror"></span></div>
           
           <div class="alert alert-warning text-center" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el usuario: "<b><span id="infoUsuario"></span>"</b> ?</div>
                 
           <div class="alert alert-danger text-center" id="modal_deleteUser_tienereservas" > El usuario tiene <span id="modal_deleteUser_numreservas"></span> reservas pendientes de realizar. Si continua, eliminará el usuario y sus reservas pendientes de forma permanente</div>
-                
+          
+
+          <div class="form-group" id="m_eliminausuario_id">
+            <span id="m_eliminausuario_textError_id" class="text-danger modal_spantexterror text-center"></span>
+          </div>      
           <div class="form-group hidden">
             {{Form::text('id','',array('class' => 'form-control'))}}
           </div>

@@ -11,11 +11,15 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delrecurso_textError"></div>
+                <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_delrecurso_textError"></div>
                 <!--Div alert --> 
                 <div class="alert alert-danger text-center" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el recurso: "<b><span id="mdrecurso_nombre"></span>"</b> ?</div>
                 <!--Div warning --> 
                 <div class="alert alert-warning text-center"> El recurso se eliminará de forma permanente</div>
+                
+                <div class="form-group" id="m_delrecurso_idrecurso">
+                  <span id="m_delrecurso_textError_idrecurso" class="text-danger modal_spantexterror text-center"></span>
+                </div>    
                 <div class="form-group hidden">
                     {{Form::text('idrecurso','',array('class' => 'form-control'))}}
                 </div>

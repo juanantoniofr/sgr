@@ -11,7 +11,7 @@
 
       <div class="modal-body">
 
-          <div class="alert alert-danger text-center modal_MsgError" role="alert" id="m_activaUsuario_msgError" style="">Formulario con errores</div>  
+          <div class="alert alert-danger text-center modal_msgError" role="alert" id="m_activaUsuario_msgError" style="">Formulario con errores</div>  
             
           <span id="m_activaUsuario_textError_username" class="text-danger modal_spantexterror text-center"></span> 
           <div class="form-group" id="m_activaUsuario_inputusername" >

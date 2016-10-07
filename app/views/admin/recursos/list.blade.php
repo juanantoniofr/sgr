@@ -21,15 +21,9 @@
         <div class="panel-body">
                                           
           <form class="navbar-form">
-            <div class="form-group ">
-              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Nuevo Espacio o Medio"><i class="fa fa-plus fa-fw"></i> Nuevo Espacio o Medio</a>
-            </div>
             <!--
             <div class="form-group ">
-              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Equipo"><i class="fa fa-plus fa-fw"></i> Añadir Equipo</a>
-            </div>
-            <div class="form-group ">
-              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Añadir nuevo Puesto"><i class="fa fa-plus fa-fw"></i> Añadir Puesto</a>
+              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Nuevo Espacio o Medio"><i class="fa fa-plus fa-fw"></i> Nuevo Espacio o Medio</a>
             </div>
             -->
             <div class="form-group ">
@@ -37,9 +31,7 @@
             </div>
           </form>
                   
-          <div class="text-center"  id="success_recurselist_msg" style="display:none" role="alert">
-            <i class="fa fa-check fa-fw text-success"></i><span id="success_recurselist_textmsg"></span> 
-          </div>
+          <div id="msg"></div> 
           
           <div id="tableRecursos">
             {{$table or ''}}
@@ -51,10 +43,11 @@
   </div> <!-- .container-fluid -->    
 
   <!-- grupos -->
-  {{ $modalAddGrupo           or '' }}
-  {{ $modalEditGrupo          or '' }}
-  {{ $modalDelGrupo           or '' }}
-  {{ $modalAddRecursosToGrupo or '' }}
+  {{ $modalAddGrupo                 or '' }}
+  {{ $modalEditGrupo                or '' }}
+  {{ $modalDelGrupo                 or '' }}
+  {{ $modalAddRecursosToGrupo       or '' }}
+  {{ $modalAddRelacionUsuarioGrupo  or '' }}
 
   <!-- recursos -->
   {{ $modalAddRecurso         or '' }}
@@ -62,7 +55,7 @@
   {{ $modalDelRecurso         or '' }}
   {{ $modalEnabledRecurso     or '' }}
   {{ $modalDisabledRecurso    or '' }}
-  {{ $modalAddPersona         or '' }}
+  
   {{ $modalRemovePersona      or '' }}
 
   <!-- Puestos -->
@@ -88,5 +81,10 @@
   <script type="text/javascript">CKEDITOR.replace( 'fm_editequipo_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_addequipo_inputdescripcion' );</script>
       
-  {{HTML::script('assets/js/admin.js')}}
+  {{  HTML::script('assets/js/recursos.js') }}
+  {{  HTML::script('assets/js/grupo.js')    }}
+  {{  HTML::script('assets/js/comun.js')    }}
+  {{  HTML::script('assets/js/admin.js')    }}
+  
+  
 @stop

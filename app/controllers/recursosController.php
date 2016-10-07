@@ -7,8 +7,7 @@ class recursosController extends BaseController{
     *
     * @return View::make('admin.recursos.list')  
   */
-  /******* EOF *******/
-  public function listar(){
+  public function listar(){ // :)
     //Input      
     $sortby = Input::get('sortby','nombre');
     $order = Input::get('order','asc');
@@ -16,11 +15,51 @@ class recursosController extends BaseController{
     //Todos los grupos
     $grupos = GrupoRecurso::all();
     $sgrUser = new sgrUser(Auth::user());
+    $recursosSinGrupo = Recurso::where('grupo_id','=','0')->where('tipo','=','espacio')->orWhere('tipo','=','tipoequipos')->get();
+    $itemsParaEspacios = Recurso::where('contenedor_id','=','0')->where('tipo','=','puesto')->get();
+    $itemsParaTipoequipos = Recurso::where('contenedor_id','=','0')->where('tipo','=','equipo')->get();
 
-    return View::make('admin.recursos.list')->nest('table','admin.recursos.recursos',compact('grupos','sortby','order'))->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecurso')->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalAddPersona','admin.modalgrupos.addPersona')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente')->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente')->nest('modalEditEquipo','admin.modalrecursos.editEquipo');
+    return View::make('admin.recursos.list')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente',compact('itemsParaEspacios'))->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente',compact('itemsParaTipoequipos'))->nest('modalAddPuesto','admin.modalrecursos.addPuesto')->nest('table','admin.recursos.recursos',compact('grupos','sortby','order'))->nest('modalAddRelacionUsuarioGrupo','admin.modalgrupos.addPersona')->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecursoExistente',compact('recursosSinGrupo'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalRemovePersona','admin.modalgrupos.removePersona')->nest('modalEditPuesto','admin.modalrecursos.editPuesto')->nest('modalAddEquipo','admin.modalrecursos.addEquipo')->nest('modalEditEquipo','admin.modalrecursos.editEquipo')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'));
   }
 
-  
+  /**
+    * // Añade recursos (puesto/equipo) existentes sin asignado recurso contenedor asignado
+    *
+    * @param Input::get('grupo_id') int indetificador de grupo
+    * @param Input::get('idrecursos') array indentificadores de recursos añadir al grupo
+    *
+    * @return $result array(boleano,string)
+  */
+  public function ajaxAddItemExistente(){ // 
+    //Input
+    $id = Input::get('contenedor_id','');
+    $idrecursos = Input::get('idrecursos',array());
+    //Output 
+    $result = array('errors' => array(),
+                    'msg'    => '',    
+                    'error'  => false,);
+    //Validate
+    $rules = array( 'contenedor_id'  => 'required|exists:Recursos,id',);
+
+    $messages = array('required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'        => Config::get('msg.idnotfound'),);
+    $validator = Validator::make(Input::all(), $rules, $messages);
+      
+    //Save Input or return error
+    if ($validator->fails()){
+      $result['errors'] = $validator->errors()->toArray();
+      $result['error'] = true;
+    }
+    else{
+      foreach ($idrecursos as $idrecurso) {
+        Recurso::find($idrecurso)->update(array('contenedor_id'=>$id));
+      }
+      $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+    }
+    return $result;
+  }
+
+
   /**
     * //Añade un nuevo recurso a la base de datos de cualquier tipo (puesto,equipo,espacio y tipoequipos)
     * // llamadas desde: admin\modalrecursos\add.blade.php
@@ -28,54 +67,50 @@ class recursosController extends BaseController{
     * @param Input::get('descripcion')    string
     * @param Input::get('tipo')           string
     * @param Input::get('id_lugar')       string
-    * @param Input::get('grupo_id')       int
     * @param Input::get('contenedor_id')  int  
     * @param Input::get('modo')           int (0|1)
     * @param Input::get('roles')          array
     *
     * @return $result                     array(boolean,string,array)    
   */ 
-  
-  /******* EOF *******/
-  public function add(){
+  public function AjaxAddNuevoRecurso(){ // :/
     
     //out
     $result = array('error' => false,
                     'msg'   => '',
                     'errors' => array());
+    
     //Input
     $nombre = Input::get('nombre');
     $tipo =  Input::get('tipo'); //espacio|tipoequipos
-    $grupo_id = Input::get('grupo_id',0);
     $contenedor_id = Input::get('contenedor_id','0');
     $modo = Input::get('modo'); //0=gestión con validación, 1=gestión sin validación
     $descripcion = Input::get('descripcion','');
     $id_lugar = Input::get('id_lugar','');
     $roles = Input::get('roles'); //roles con acceso para poder reservar (array())
+    $tipopadre = Input::get('tipopadre',''); //El elemento padre o contenedor de un recurso puede ser un grupo u otro recurso
     
     //Validación de formulario   
-    $rules = array( 'nombre'        => 'required|unique:recursos',
-                    'tipo'          => 'required|in:'.implode(',',Config::get('options.recursos')),  
-                    'grupo_id'      => 'required_if:tipo,'.Config::get('options.espacio').','.Config::get('options.tipoequipos').'|exists:grupoRecursos,id',
-                    'contenedor_id'    => 'required_if:tipo,'.Config::get('options.puesto').','.Config::get('options.equipo'),
-                    'modo'          => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
+    $rules = array( 'nombre'            => 'required|unique:recursos',
+                    'tipo'              => 'required|in:'.implode(',',Config::get('options.recursos')),  
+                    'contenedor_id'     => 'required',
+                    'modo'              => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
 
-    $messages = array('required'                    => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'unique'                      => 'Existe un recurso con el mismo nombre...',
-                      'tipo.in'                     => 'El tipo de recurso no está definido ..',
-                      'modo.in'                     => 'Modo de Gestión de solicitudes de reserva no definido....',
-                      'grupo_id.required_if'        => 'identificador de grupo requerido....',
-                      'contenedor_id.required_if'   => 'identificador de elemento contendor requerido....',
-                      'grupo_id.exists'             => 'No existe identificador de grupo...',
-                      'exist_contenedor'            => 'No existe identificador de elemento padre..',);
+    $messages = array('required'              => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'nombre.unique'         => 'Existe un recurso con el mismo nombre...',
+                      'tipo.in'               => 'El tipo de recurso no está definido ..',
+                      'modo.in'               => 'Modo de Gestión de solicitudes de reserva no definido....',
+                      'contenedor_idexists'   => 'Elemento contenedor no encontrado en BD.',);
     
     $validator = Validator::make(Input::all(), $rules, $messages);
 
-    if ($contenedor_id != 0){
-      $validator->sometimes('exist_contenedor','',function($input){
-        return Recurso::findOrFail($input['contenedor_id'])->count() > 0;
+    $validator->sometimes('contenedor_idexists','',function($input){
+        if ($input['tipoPadre'] == 'recurso') 
+          return Recurso::findOrFail($input['contenedor_id'])->count() > 0;
+        if ($input['tipoPadre'] == 'grupo') 
+          return GrupoRecurso::findOrFail($input['contenedor_id'])->count() > 0;
       });
-    }
+    
 
     if ($validator->fails()){
       //Si errores en el formulario
@@ -83,6 +118,16 @@ class recursosController extends BaseController{
       $result['errors'] = $validator->errors()->toArray();
     }
     else{  
+      
+      if ($tipopadre == 'recurso'){
+        $grupo_id = 0;
+        $contenedor_id = $contenedor_id;
+      }
+      else if ($tipopadre == 'grupo'){
+        $grupo_id = $contenedor_id;
+        $contenedor_id = 0;
+      }
+
       //Si no hay errores en el formulario
       $data = array(  'nombre'        => $nombre,
                       'tipo'          => $tipo,
@@ -91,12 +136,12 @@ class recursosController extends BaseController{
                       'descripcion'   => $descripcion,
                       'id_lugar'      => $id_lugar,
                       'acl'           => sgrACL::buildJsonAcl($modo,$roles),);
-      //$recurso = new Recurso;
+      
       $sgrRecurso = Factoria::getRecursoInstance(new Recurso);
       $sgrRecurso->setdatos($data);
       $sgrRecurso->save();
       
-      $result['msg'] = Config::get('msg.success');
+      $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
 
     return $result;
@@ -109,8 +154,8 @@ class recursosController extends BaseController{
     *
     * @return $result object Recurso
   */
-  /******* EOF *******/
-  public function getrecurso(){
+ 
+  public function getrecurso(){ // pa que sirve??
     //input
     $id = Input::get('idrecurso','');
     //Output 
@@ -296,7 +341,7 @@ class recursosController extends BaseController{
     * @return $result array()
     *
   */ 
-  public function getitems(){
+  public function getitems(){// pa que sirve ??
 
     //Input
     $idrecurso = Input::get('idrecurso','');
@@ -429,23 +474,7 @@ class recursosController extends BaseController{
     return $result;
   } 
 
-  /**
-    * //checboxes html 
-    * @param void
-    * @return string html checkboxes
-  */
-  public function getpuestosSinEspacio(){
-    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('espacio_id','=','0')->where('tipo','=',Config::get('options.puesto'))->get());
-  }
-
-  /**
-    * //checboxes html 
-    * @param void
-    * @return string html checkboxes
-  */
-  public function getequiposSinModelo(){
-    return View::make('admin.html.checkboxesItems')->with('items',Recurso::where('tipoequipo_id','=','0')->where('tipo','=',Config::get('options.equipo'))->get());
-  }
+  
 
   /**
     * //Devuelve el campo descripción dado un idrecurso
@@ -453,7 +482,7 @@ class recursosController extends BaseController{
     *
     * @return $descripcion string
   */
-  public function getDescripcion(){
+  public function getDescripcion(){ // precindible ??
 
     //Input
     $idRecurso = Input::get('idrecurso','');
@@ -486,7 +515,7 @@ class recursosController extends BaseController{
     * @param Input::get('tipo') string
     * @return View::make('admin.html.optionEspacios')
   */
-  public function htmlOptionrecursos(){
+  public function htmlOptionrecursos(){ // prescindible ???
     $tipoRecurso = Input::get('tipo','');
     $espacios = Recurso::where('tipo','=',$tipoRecurso)->get();
     return View::make('admin.html.optionEspacios')->with(compact('espacios'));

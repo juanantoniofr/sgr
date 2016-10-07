@@ -172,6 +172,7 @@ class UsersController extends BaseController {
     }
   }
   
+
   public function ajaxDelete(){ // :)
     //Input
     $id = Input::get('id','');
@@ -181,9 +182,7 @@ class UsersController extends BaseController {
                         'msg'     => '',  
                         );
 
-    $rules = array(
-        'id'  => 'required|exists:users',//$id requerido y debe existir en la tabla users        
-    );
+    $rules = array('id'  => 'required|exists:users',);//$id requerido y debe existir en la tabla users        
 
     $messages = array(
           'required'  => Config::get('msg.idempty'),
@@ -215,89 +214,20 @@ class UsersController extends BaseController {
     return View::make('admin.index')->with(compact('notificaciones'))->nest('dropdown','admin.dropdown',compact('sgrUser'))->nest('modalvalidaRegistroUser','admin.modalusuarios.validaRegistroUser');
   }
   
-  
-  public function ajaxUpdateUser(){ // :)
-    
-    //Output  
-    $respuesta = array( 'error'   => false,
-                        'errors'  => array(),
-                        'msg'     => '',  
-                        );
-
-    $rules = array(
-        'idnotificacion'  => 'required|exists:notificaciones,id',//$id requerido y debe existir en la tabla notificaciones 
-        'username'        => 'required|exists:users',//requerido y debe existir en la tabla users
-        'caducidad'       => 'required|date|date_format:d-m-Y',      
-    );
-
-    $messages = array(
-          'required'          => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idnotificacion.exists'     => Config::get('msg.idnotfound'),
-          'username.exists'   => Config::get('msg.usernamenotfound'),
-          'date'              => 'El campo <strong>:attribute</strong> debe ser una fecha válida',
-          'date_format'       => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
-          );
-
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    if ($validator->fails()){
-        $respuesta['error'] = true;
-        $respuesta['errors'] = $validator->errors()->toArray();
-        return $respuesta;
-    }
-    else{
-
-      //Input
-      $idnotificacion = Input::get('idnotificacion');
-      $username = Input::get('username');
-      $colectivo = Input::get('colectivo',Config::get('options.colectivoPorDefecto'));
-      $capacidad = Input::get('capacidad',Config::get('options.capacidadPorDefecto'));
-      $caducidad = Input::get('caducidad');//Por defecto hoy
-      $observaciones = Input::get('observaciones','');
-      $activar = Input::get('activar',false);
-
-      $user = User::where('username','=',$username)->first();
-      $user->estado = $activar; //Activación cuenta
-      $user->colectivo = $colectivo;
-      $user->capacidad = $capacidad;
-      $user->observaciones = $observaciones;
-      
-      // La fecha se debe guardar en formato USA Y-m-d  
-      $fecha = DateTime::createFromFormat('j-m-Y',Input::get('caducidad'));
-      $user->caducidad = $fecha->format('Y-m-d');
-      
-      $user->save();
-
-      
-      $this->cierraNotificacion($idnotificacion);
-      //mail to User by Activate
-      $sgrMail = new sgrMail();
-      $sgrMail->notificaActualizacionCuenta($user->id);            
-      
-      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
-      return $respuesta;
-
-    }
-  }
-  
-
   /**
     * @param $id int
     * @return $user Object User
   */
-  public function user(){ // ?????
+  /*public function user(){ // ?????
     $id = Input::get('id','');
     $user = User::findOrFail($id);
 
     return $user;
-  }
+  }*/
   
-  
-
- 
-
-  public function newUser(){
+  /*public function newUser(){
     return View::make('admin.userNew')->with("user",Auth::user())->nest('dropdown',Auth::user()->dropdownMenu());
-  }
+  }*/
  
   
 
@@ -322,10 +252,7 @@ class UsersController extends BaseController {
 
   
 
-  private function cierraNotificacion($id){
-      Notificacion::where('id','=',$id)->update(array('estado' => 'cerrada'));
-      return true;
-  }
+ 
 
   
  

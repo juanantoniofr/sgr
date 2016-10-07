@@ -11,6 +11,7 @@
 		}
 
 		/**
+			*
 			* habilita recurso para su reserva
 		*/
 		public function enabled(){
@@ -145,8 +146,71 @@
 			* Salva a BD el objeto Recurso ($this->recurso)
 		*/
 		public function save(){
+			
 			return $this->recurso->save();
 		}
-				
+		
+		public function getContenedores(){
+			$contenedores = array();
+			if ($this->recurso->contenedor != null)
+				$contenedores =  Recurso::where('tipo','=',$this->recurso->contenedor->tipo)->where('grupo_id','=',$this->recurso->contenedor->grupo_id)->get()->toArray();
+			return $contenedores;
+		}	
+
+		/**
+			* // Guarda relación gestor recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function attach_gestor($id){
+			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->attach($id);
+			return true;
+		}	
+
+		/**
+			* // Guarda relación administrardor recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function attach_administrador($id){
+			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->attach($id);
+			return true;
+		}	
+
+		/**
+			* // Guarda relación validador recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function attach_validador($id){
+			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->attach($id);
+			return true;
+		}	
+
+		/**
+			* // Remove relación gestor recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_gestor($id){
+			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->detach($id);
+			return true;
+		}	
+
+		/**
+			* // Remove relación administrador recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_administrador($id){
+			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
+			return true;
+		}	
+
+		/**
+			* // Remove relación validador recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_validador($id){
+			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
+			return true;
+		}	
+	
+
 	}
 ?>

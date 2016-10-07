@@ -10,7 +10,7 @@
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_editequipo_textError"></div>
+        <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_editequipo_textError"></div>
 
         <div class="form-group" id="fm_editequipo_inputid_lugar">  
           {{Form::label('id_lugar', 'Identificador de Lugar')}}
@@ -63,9 +63,16 @@
           </label>
         </div>
 
+        <div class="form-group" id="m_editequipo_id">
+          <span id="m_editequipo_textError_id" class="text-danger modal_spantexterror text-center"></span>
+        </div>
         <div class="form-group hidden">
             {{Form::text('id','',array('class' => 'form-control'))}}
         </div> 
+
+        <div class="form-group" id="m_editequipo_tipo">
+          <span id="m_editequipo_textError_tipo" class="text-danger modal_spantexterror text-center"></span>
+        </div>
         <div class="form-group hidden">
             {{Form::text('tipo','equipo',array('class' => 'form-control'))}}
         </div> 

@@ -10,7 +10,7 @@
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_editpuesto_textError"></div>
+        <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_editpuesto_textError"></div>
 
         <div class="form-group" id="fm_editpuesto_inputid_lugar">  
           {{Form::label('id_lugar', 'Identificador de Lugar')}}
@@ -63,8 +63,19 @@
           </label>
         </div>
 
-        <div class="form-group hidden">{{Form::text('id','',array('class' => 'form-control'))}}</div> 
-        <div class="form-group hidden">{{Form::text('tipo','puesto',array('class' => 'form-control'))}}</div> 
+        <div class="form-group" id="m_editpuesto_id">
+          <span id="m_editpuesto_textError_id" class="text-danger modal_spantexterror text-center"></span>
+        </div>
+        <div class="form-group hidden">
+          {{Form::text('id','',array('class' => 'form-control'))}}
+        </div>
+
+        <div class="form-group" id="m_editpuesto_tipo">
+          <span id="m_editpuesto_textError_tipo" class="text-danger modal_spantexterror text-center"></span>
+        </div> 
+        <div class="form-group hidden">
+          {{Form::text('tipo','puesto',array('class' => 'form-control'))}}
+        </div> 
       </div><!-- ./modal-body --> 
       
       <div class="modal-footer">

@@ -144,7 +144,6 @@ class sgrUser {
 		//Administradores sgrUser														$this->capacidad	=> '4',
 		
 		switch ($this->user->capacidad) {
-			
 			case '1': //Usuarios (Alumnos)
 			case '2': //Usuarios Avanzados (PDI & PAS de Administración)
 			case '3': //Técnicos (PAS)
@@ -153,7 +152,9 @@ class sgrUser {
 				return route('adminHome.html');	
 			
 			default:
-				return '';	
+				Session::put('msg',Config::get('msg.nohome'));
+				Session::put('alertLevel','warning');
+				return route('report.html');	
 			}
 
 	}

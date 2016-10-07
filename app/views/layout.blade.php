@@ -56,7 +56,7 @@
           <a href="{{route('ayuda')}}" title="Ayuda"><i class="fa fa-support fa-fw"></i> Ayuda</a>
         </li>
 
-        @if (Cas::isAuthenticated() && Auth::check())
+        @if (Auth::check())
           <li>
             <a href="{{route('contactar')}}" title="Contacto"><i class="fa fa-envelope fa-fw"></i> Contacto</a>
           </li>
@@ -112,9 +112,11 @@
     </div><!-- ./.modal-dialog -->
 </div><!-- ./#m_alert -->
 
-{{HTML::script('assets/js/jquery-1.11.0.js')}}
-{{HTML::script('assets/js/jquery-ui.js')}}
-{{HTML::script('assets/js/bootstrap.min.js')}}
+{{ HTML::script('assets/js/jquery-1.11.0.js') }}
+{{ HTML::script('assets/js/jquery-ui.js')     }}
+{{ HTML::script('assets/js/bootstrap.min.js') }}
+{{ HTML::script('assets/js/all.js') }}
+
 
 @yield('js')
 <!-- scripts -->  

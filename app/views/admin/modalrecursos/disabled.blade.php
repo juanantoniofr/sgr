@@ -11,7 +11,7 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_disabledrecurso_textError"></div>
+                <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_disabledrecurso_textError"></div>
                 
                 <div class="alert alert-danger text-center" role = "alert">
                     ¿Estás seguro que deseas <b>deshabilitar</b> el recurso: "<b><span id="m_disabled_nombre"></span>"</b> ?
@@ -31,8 +31,12 @@
                     <textarea class="form-control" rows="5" name="motivo" id="fm_disabledrecurso_motivo"></textarea>
                 </div>
                 
+
+                <div class="form-group" id="m_disabledrecurso_idrecurso">
+                  <span id="m_disabledrecurso_textError_idrecurso" class="text-danger modal_spantexterror text-center"></span>
+                </div>
                 <div class="form-group hidden">
-                    {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+                  {{Form::text('idrecurso','',array('class' => 'form-control'))}}
                 </div> 
 
             </div><!-- ./.modal-body -->

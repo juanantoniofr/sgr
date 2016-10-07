@@ -7,22 +7,34 @@
         
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h2 class="modal-title text-info" id="myModalLabel"><i class="fa fa-object-group fa-fw"></i> Añade recursos al grupo: <b><span id="m_addrecursotogrupo_nombre"></span></b></h2>
+            <h2 class="modal-title text-info" id="myModalLabel"><i class="fa fa-object-group fa-fw"></i> Añade elementos a: <b><span id="m_addrecursotogrupo_nombre"></span></b></h2>
         </div><!-- ./modal-header -->
       
         <div class="modal-body">
             
             <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addrecursotogrupo_textError"></div>
-            <span id="recursosSinGrupo"></span>
+            <!--  span id="recursosSinGrupo"></span> -->
+            @if ($recursosSinGrupo->count() > 0)
+               @foreach($recursosSinGrupo as $recurso)
+                <div class="checkbox" id="divcheckboxid_{{$recurso->id}}">
+                  <label>
+                    <input type="checkbox" id="checkboxid_{{$recurso->id}}" name="idrecursos[]" value="{{$recurso->id}}">{{$recurso->nombre}} <b>({{Config::get('string.'.$recurso->tipo)}})</b>
+                  </label>
+                </div>    
+              @endforeach
+            @else
+              <div class="alert alert-danger text-center" id="" rol="alert">
+                <span>No hay recursos sin grupo</span>
+              </div>  
+            @endif
             
+
+            <div class="form-group" id="m_addrecursotogrupo_grupo_id">
+              <span id="m_addrecursotogrupo_textError_grupo_id" class="text-danger modal_spantexterror text-center"></span>
+            </div>            
             <div class="form-group hidden">
             {{Form::text('grupo_id','',array('class' => 'form-control'))}}
             </div>
-            
-            <div class="form-group hidden">
-            {{Form::text('tipogrupo','',array('class' => 'form-control'))}}
-            </div>
-
         </div><!-- /#modal-body -->
         
 

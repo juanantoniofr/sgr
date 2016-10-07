@@ -3,7 +3,7 @@
 	abstract class abstractContenedorItems{
 
 		private $recurso;	//array obj recurso (espacio / tipoequipo)
-		private $items = array(); //array obj recurso (puesto / equipo)
+		private $items = array(); //array obj recursoItem (puesto / equipo)
 		
 
 		public function __construct($recurso){
@@ -154,6 +154,88 @@
 		public function save(){
 			return $this->recurso->save();
 		}
+
+		public function getContenedores(){
+			return array();
+		}
+
+		/**
+			* // Guarda relación gestor recurso-user
+			* @param $id int identificador de usuario
+			*
+			* @return true 
+		*/
+		public function attach_gestor($id){
+			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->attach($id);
+			foreach ($this->items as $item) {
+				$item->attach_gestor($id);
+			}
+			return true;
+		}	
+
+		/**
+			* // Guarda relación administrador recurso-user
+			* @param $id int identificador de usuario
+			*
+			* @return true 
+		*/
+		public function attach_administrador($id){
+			if (!$this->recurso->administradores->contains($id)) $this->recursos->administradores()->attach($id);
+			foreach ($this->items as $item) {
+				$item->attach_administrador($id);
+			}
+			return true;
+		}	
+
+		/**
+			* // Guarda relación validador recurso-user
+			* @param $id int identificador de usuario
+			*
+			* @return true 
+		*/
+		public function attach_validador($id){
+			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->attach($id);
+			foreach ($this->items as $item) {
+				$item->attach_validador($id);
+			}
+			return true;
+		}
+
+		/**
+			* // Remove relación gestor recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_gestor($id){
+			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->detach($id);
+			foreach ($this->items as $item) {
+				$item->detach_gestor($id);
+			}
+			return true;
+		}	
+
+		/**
+			* // Remove relación administrador recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_administrador($id){
+			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
+			foreach ($this->items as $item) {
+				$item->detach_administrador($id);
+			}
+			return true;
+		}	
+
+		/**
+			* // Remove relación validador recurso-user
+			* @param $id int identificador de usuario
+		*/
+		public function detach_validador($id){
+			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
+			foreach ($this->items as $item) {
+				$item->detach_validador($id);
+			}
+			return true;
+		}	
 
 	}
 ?>

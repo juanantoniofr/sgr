@@ -8,17 +8,19 @@ return array (
 	'actionSuccess'		=> 'Operación realizada con éxito....',	
 	'delusersuccess'	=> 'Usuario eliminado con éxito....',
 	'usernamenotfound'=> 'Usuario no encontrado....',
-
+	'delgruposuccess'	=> 'Grupo eliminado con éxito....',
+	'editgruposuccess'=> 'Grupo editado con éxito....',
 
 	//AuthController
 	'pagetitleLogin'		=> 	'mensaje inicio de sesión', //título para el navegador
 	'paneltitle'				=> 	'Inicio de sesión',
 	'uvusNoValido'			=>  'UVUS no es válido',
-	'uvusNoActivo'			=>	'Usuario sin activar',
+	'uvusNoActivo'			=>	'Usuario sin activar: En 24/48 horas activamos su cuenta.',
 	'cuentaCaducada'		=> 	'Cuenta caducada: En 24/48 horas renovamos su acceso.',
 	'uvusRegistrado'		=>	'Acceso registrado: En 24/48 horas activamos su cuenta.',
 	'errorSSO' 					=> 	'Error autenticación SSO',
 	'capacidadnovalida'	=> 	'Capacidad o rol de usuario no valido',
+	'nohome'						=>  'Página de inicio no definida',	
 
 	//404
 	'404pagetitleLogin'	=> 	'Página no encontrada',

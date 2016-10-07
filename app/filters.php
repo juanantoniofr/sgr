@@ -36,19 +36,21 @@ App::after(function($request, $response)
 
 Route::filter('auth', function(){
 	
-    /*if (!Cas::isAuthenticated() || !Auth::check()) 
+    if (!Cas::isAuthenticated() || !Auth::check()) {
+    
     	if (Request::ajax()) {
-
     		return Response::make('Necesitas iniciar sesión de nuevo. Por favor, recarga la página', 401);
     	}
-    	else return Redirect::to(route('wellcome'));*/
-    Auth::loginUsingId('58');
+    	else return Redirect::to(route('wellcome'));
+    
+    }
 });
 
-//Comprueba si la petición se realizó por ajax y el usaurio está autenticado
+//Comprueba si la petición se realizó por ajax 
 Route::filter('ajax_check',function(){
 		
 	if(!Request::ajax()) return Redirect::to(route('wellcome'));
+
 });
 
 //Comprobar si el usuario autentivcado tiene privilegios para realizar la acción requerida
@@ -96,6 +98,3 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
-
-
-

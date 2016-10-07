@@ -11,7 +11,7 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_enabledrecurso_textError"></div>
+                <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_enabledrecurso_textError"></div>
         
                 <div class="alert alert-danger text-center" role = "alert">¿Estás seguro que deseas <b>Habilitar</b> el recurso: "<b><span id="m_enabled_nombre"></span>"</b> ?</div>
                 <div class="alert alert-warning"> Al habilitar el recurso:
@@ -21,9 +21,13 @@
                         <li> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso, inidcando que vuelve a estar habilitado. </li>
                     </ul>
                 </div>
+
+            <div class="form-group" id="m_enabledrecurso_idrecurso">
+              <span id="m_enabledrecurso_textError_idrecurso" class="text-danger modal_spantexterror text-center"></span>
+            </div>    
             <div class="form-group hidden">
-                    {{Form::text('idrecurso','',array('class' => 'form-control'))}}
-                </div> 
+                {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+            </div> 
             </div><!-- ./.modal-body -->
 
              <div class="modal-footer">

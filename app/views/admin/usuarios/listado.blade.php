@@ -36,5 +36,6 @@
 
 @stop
 @section('js')
-<script src="../assets/js/user.js"></script>
+  {{  HTML::script('assets/js/user.js') }}
+  {{  HTML::script('assets/js/comun.js') }}
 @stop

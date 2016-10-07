@@ -2,106 +2,94 @@
 
 class AuthController extends BaseController {
  
+  
   /**
-    * Attempt user login
+    * // Determina si $user existe en BD
+    * @param $user Object User
+    * @return boolean 
+  */  
+  private function existsUser($user){
+    if($user != null) return true;
+    return false;
+  }
+  
+  /**
+    * // Salva usuario a la BD
+    * @param $attributes array campos sso
+    * @return true;
+  */
+  private function registraAcceso($attributes){
+
+    $user = new User;
+    $user->username   =   $attributes['uid'];
+    $user->nombre     =   isset($attributes['givenname']) ? $attributes['givenname'] : "";
+    $user->apellidos  =   isset($attributes['sn']) ? $attributes['sn'] : "";
+    $user->email      =   isset($attributes['irismailmainaddress']) ? $attributes['irismailmainaddress'] : "";
+    $user->dni        =   isset($attributes['irispersonaluniqueid']) ? $attributes['irispersonaluniqueid'] : "";
+    $user->caducidad  =   date('Y-m-d'); 
+    $user->estado     =   false;
+    $user->colectivo  =   Config::get('options.colectivoPorDefecto');
+    $user->capacidad  =   Config::get('options.capacidadPorDefecto');
+    $user->save();
+
+    return true;
+  }
+
+  /**
+    * //login
+    * @return redirect::to
   */
   public function doLogin(){
-      
-      if (Cas::authenticate()){
-        // login en sso ok 
-        $attributes = Cas::attr();
-        $statusUvus = stripos($attributes['schacuserstatus'],'uvus:OK');
+    
+    if (!Cas::authenticate()) return Redirect::to('report.html')->with('msg',Config::get('msg.errorSSO'))->with('alertLevel','danger');
 
-        if ($statusUvus == false){ //Uvus no valido :)
-          $pagetitle   = Config::get('msg.pagetitleLogin');
-          $paneltitle  = Config::get('msg.paneltitle');
-          $msg         = Config::get('msg.uvusNoValido');
-          $alertLevel  = 'danger';
-          return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-        }
+    $attributes = Cas::attr();
+    
+    $statusUvus = stripos($attributes['schacuserstatus'],'uvus:OK');
+    //Uvus no valido :)
+    if ($statusUvus == false) return Redirect::to(route('report.html'))->with('msg',Config::get('msg.uvusNoValido'))->with('alertLevel','danger');    
+    
+    $user = User::where('username','=',$attributes['uid'])->first();    
+    //No existe user en BD => Primer Acceso
+    if ($this->existsUser($user) == false) {   
+        // => registrar acceso
+        $this->registraAcceso($attributes);
+        // => Salva notificación para admins SGR
+        $motivo = 'Nuevo acceso';
+        $this->salvaNotificacion($attributes,$motivo);
+        // => send mail para admins SGR
+        $sgrMail = new sgrMail();
+        $sgrMail->notificaRegistroUser($user);//notifica a los administradores designados que hay un nuevo usuario a registrar.
+        // => Redirect report for user
+        return Redirect::to(route('report.html'))->with('msg',Config::get('msg.uvusRegistrado'))->with('alertLevel','danger');
+    }  
 
-        $uid = $attributes['uid'];
-        $user= User::where('username','=',$uid)->first();
-        
-        if (!empty($user)){//  Si ya registrado, 2º acceso o más
-          Auth::loginUsingId($user->id);//patch for phpCAS
-          
-          if (!$user->estado) {// Registrado pero 'No activo' :)
-            $pagetitle   = Config::get('msg.pagetitleLogin');
-            $paneltitle  = Config::get('msg.paneltitle');
-            $msg         = Config::get('msg.uvusNoActivo');
-            $alertLevel  = 'danger';
-            Auth::logout(); //patch for phpCAS
-            return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-          }
+    //User existe en BD
+    
+    // Cuenta desactivada :)
+    if ($user->estado == false) 
+      return Redirect::to(route('report.html'))->with('msg',Config::get('msg.uvusNoActivo'))->with('alertLevel','danger');
 
-          if (strtotime($user->caducidad) < strtotime(date('Y-m-d'))){ //Registrado pero Cuenta Caducada :)
-            //Información a para notificación de todos los usuarios    
-            $motivo = 'Cuenta caducada';
-            $this->salvaNotificacion($attributes,$motivo);
-            
-            $pagetitle   = Config::get('msg.pagetitleLogin');
-            $paneltitle  = Config::get('msg.paneltitle');
-            $msg         = Config::get('msg.cuentaCaducada');
+    //Cuenta Caducada :)
+    if (strtotime($user->caducidad) < strtotime(date('Y-m-d'))){ 
+      // => Salva notificación para admins SGR
+      $motivo = 'Cuenta caducada';
+      $this->salvaNotificacion($attributes,$motivo);
+      return Redirect::to(route('report.html'))->with('msg',Config::get('msg.cuentaCaducada'))->with('alertLevel','danger');    
+    }
 
-            //$btnredirect = '<a class="btn btn-primary" data-username="'.$uid.'" id="renuevaCaducidad" href="">Solicitar renovación de cuenta</a>';
-            $alertLevel  = 'danger'; 
-            Auth::logout();
-            return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel','btnredirect'));
-          }
-
-          //2º acceso o más, cuenta activa y no caducada -> login en laravel
-          //-> ir a página de inicio de su perfil
-          $sgrUser = new sgrUser($user);
-          $home =  $sgrUser->home();
-          if (empty($home)) {
-            $pagetitle   = Config::get('msg.pagetitleLogin');
-            $paneltitle  = Config::get('msg.paneltitle');
-            $msg         = Config::get('msg.capacidadnovalida');
-            $alertLevel  = 'danger'; 
-            return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-          }
-          return Redirect::to($sgrUser->home());
-        }
-        else {  //No registrado :)
-          //salvo el nuevo usuario
-          $user = new User;
-          $user->username   = $uid;
-          $user->nombre     = $nombre;
-          $user->apellidos  =  $apellidos;
-          $user->email      =  $email;
-          $user->dni        =  $dni;
-          $user->caducidad  = date('Y-m-d',strtotime('+1 years')); //Caducidad 5 años
-          $user->estado     = false;//No activa
-          $user->colectivo  = Config::get('options.colectivoPorDefecto');
-          $user->capacidad  = Config::get('options.capacidadPorDefecto');
-          $user->save();
-          //Información a para notificación de todos los usuarios    
-          $motivo = 'Nuevo acceso';
-          $this->salvaNotificacion($attributes,$motivo);
-
-          //mail administradores
-          $sgrMail = new sgrMail();
-          $sgrMail->notificaRegistroUser($user);//notifica a los administradores designados que hay un nuevo usuario a registrar.
-  
-          $pagetitle      = Config::get('msg.pagetitleLogin');
-          $paneltitle     = Config::get('msg.paneltitle');
-          $msg            = Config::get('msg.uvusRegistrado');
-          $alertLevel     = 'success';
-          
-          return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-        }
-      }
-      else{
-        $pagetitle   = Config::get('msg.pagetitleLogin');
-        $paneltitle  = Config::get('msg.paneltitle');
-        $msg         = Config::get('msg.errorSSO');
-        $alertLevel  = 'danger'; 
-        return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-      }
-
-   
+    //Cuenta OK
+    Auth::loginUsingId($user->id);
+    $sgrUser = new sgrUser($user);
+    return Redirect::to($sgrUser->home());
   }//<!-- doLogin -->
+  
+  /**
+    * //Salva a BD notificación para admins SGR
+    * @param $attributes array campos sso
+    * @param $motivo string (Cuenta caducada | Nuevo Acceso)
+    * @return true
+  */
   private function salvaNotificacion($attributes,$motivo){
     $nombre    = isset($attributes['givenname']) ? $attributes['givenname'] : "";
     $apellidos = isset($attributes['sn']) ? $attributes['sn'] : "";
@@ -131,12 +119,31 @@ class AuthController extends BaseController {
     return true;
   }
 
+  /**
+    * // logout sso | logout SGR 
+  */
   public function doLogout(){
-    Auth::logout();
-    Session::flush();
-    Cas::logout();
-    if (!Cas::isAuthenticated()) return Redirect::to(route('wellcome'));
-
+       
+    if (Cas::isAuthenticated()) Cas::logout();
+    else{ 
+      Auth::logout();
+      return View::make('wellcome');
+      }
   }//<!-- doLogout -->
+
+  /**
+    * // Genera página html para reporte a usuario
+    * @param $msg string 
+    * @param $alertLevel string (success | info | warning | primary)
+    * @return View::make
+  */
+  public function report(){
+
+      $pagetitle = Config::get('msg.pagetitleLogin');
+      $paneltitle = Config::get('msg.pagetitleLogin');
+      $msg = Session::get('msg','Error desconocido....');
+      $alertLevel = Session::get('alertLevel','info');//'danger';
+      return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+  }
 
 }

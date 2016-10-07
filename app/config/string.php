@@ -2,7 +2,7 @@
 
 return array (
 
-	'espacio' 					=> 'Espacios',
+	'espacio' 					=> 'Espacio',
 	'tipoequipos'				=> 'Equipos',
 	'puesto'						=> 'Puesto',
 	'equipo'						=> 'Equipo',
@@ -22,6 +22,11 @@ return array (
 	'estados'						=> array (
 													'0' => 'No Activa',
 													'1'	=> 'Activa',
+													),
+	'relaciones'				=> array(
+													'1' => 'Técnico (Atiende reservas)',
+													'2' => 'Administrador delegado (Gestiona recursos)',
+													'3' => 'Validador (Valida solicitudes de reserva)',
 													),
 										
 	);

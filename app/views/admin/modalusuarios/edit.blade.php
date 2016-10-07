@@ -9,7 +9,7 @@
         </div><!-- ./modal-header -->
 
         <div class="modal-body">
-          <div class="alert alert-danger text-center modal_MsgError" role="alert" style="display:none;margin:10px 0" id="m_editusuario_msgError">Formulario con errores</div>
+          <div class="alert alert-danger text-center modal_msgError" role="alert" style="display:none;margin:10px 0" id="m_editusuario_msgError">Formulario con errores</div>
 
           <div class="form-group" id="fg_username"> 
             <p class="form-control-static"><b>UVUS:</b> <span id="fm_editUser_username"></span></p>
