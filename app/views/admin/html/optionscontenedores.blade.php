@@ -1,3 +1,3 @@
- @foreach($recursosContenedores as $recursoContenedor)
-    <option value = "{{$recursoContenedor['id']}}">{{$recursoContenedor['nombre']}}</option>
+ @foreach($itemsContenedores as $contenedor)
+    <option value = "{{$contenedor['id']}}">{{$contenedor['nombre']}}</option>
 @endforeach

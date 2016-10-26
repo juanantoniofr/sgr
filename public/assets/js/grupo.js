@@ -1,6 +1,6 @@
 $(function(e){
 
-	//Muestra ventana modal para crear nuevo grupo de recursos
+	
   $('#btnNuevoGrupo').on('click',function(e){ // :)
     e.preventDefault();
     m_hideMsg();
@@ -12,7 +12,7 @@ $(function(e){
     e.preventDefault();
     showGifEspera();
     CKEDITOR.instances['fm_addgrupo_inputdescripcion'].updateElement();
-    $data = $('form#fm_addgrupo').serialize() + '&descripcion=' + $('#fm_addgrupo_inputdescripcion').html();
+    $data = $('form#fm_addgrupo').serialize();
     $.ajax({
       type:"POST",
       url:"addgrupo",
@@ -20,16 +20,14 @@ $(function(e){
       success: function($respuesta){
         if($respuesta.error === true){
           hideGifEspera();
-          $.each($respuesta.errors,function(index,value){
-            $('.divmodal_msgError').html('').fadeOut();
-            $('#fm_addgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
-            $('#fm_addgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-          });
-          $('#fm_addgrupo_textError').fadeIn('8000');
+          m_hideMsg();//Oculto mensaje de error en ventana modal.
+          hideMsg();//Oculto mensajes en cuerpo página html
+          m_showMsg($respuesta.errors,'#m_addgrupo');//muestro errores en la ventana modal
         }
         else {
           hideGifEspera();
-          $('#m_addgrupo').modal('hide');   
+          $('#m_addgrupo').modal('hide');
+          updateListadoRecursos();    
           showMsg($respuesta.msg);
         }
       },
@@ -50,17 +48,15 @@ $(function(e){
       data: $('form#fm_delgrupo').serialize(),
       success: function($respuesta){
         if($respuesta.error === true){  
-          hideGifEspera(); 
-          $.each($respuesta.errors,function(index,value){
-            $('.divmodal_msgError').html('').fadeOut();
-            $('#fm_editrecurso_input'+index).addClass('has-error');//resalta el campo de formulario con error
-            $('#fm_editrecurso_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-          });
-          $('#fm_editrecurso_textError').fadeIn('8000');
+          hideGifEspera();
+          m_hideMsg();//Oculto mensaje de error en ventana modal.
+          hideMsg();//Oculto mensajes en cuerpo página html
+          m_showMsg($respuesta.errors,'#m_delgrupo');//muestro errores en la ventana modal
         }
         else {
           hideGifEspera();
-          $('#m_delgrupo').modal('hide');   
+          $('#m_delgrupo').modal('hide');
+          updateListadoRecursos();   
           showMsg($respuesta.msg);
         }
       },
@@ -84,12 +80,9 @@ $(function(e){
       success: function($respuesta){
         if($respuesta.error === true){  
           hideGifEspera();
-          $.each($respuesta.errors,function(index,value){
-              $('.divmodal_msgError').html('').fadeOut();
-              $('#fm_editgrupo_input'+index).addClass('has-error');//resalta el campo de formulario con error
-              $('#fm_editgrupo_textError').append(value + '<br />');//añade texto de error a div alert-danger en ventana modal
-          });
-          $('#fm_editgrupo_textError').fadeIn('8000');
+          m_hideMsg();//Oculto mensaje de error en ventana modal.
+          hideMsg();//Oculto mensajes en cuerpo página html
+          m_showMsg($respuesta.errors,'#m_editgrupo');//muestro errores en la ventana modal
         }
         else {
           hideGifEspera();
@@ -130,7 +123,7 @@ $(function(e){
     				}
     			);
  			 		showMsg($respuesta['msg']);
- 			 		$grupo_id = $('form#addrecursotogrupo input[name="grupo_id"]').val();
+ 			 		$grupo_id = $('form#fm_addrecursotogrupo input[name="grupo_id"]').val();
           updateListadoRecursos('#ulrecursosdelgrupo_'+ $grupo_id);
       	}
       },

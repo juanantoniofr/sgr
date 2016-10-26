@@ -6,7 +6,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> <b>Añadir nuevo recurso en</b> <span id ="m_addrecurso_title_nombre"></span></h2>
+        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> Añadir nuevo <b><span id="m_addrecurso_title_tiporecursoAañadir"></span></b> en: <span class = "text-primary" id="m_addrecurso_title_nombre"></span></h2>
       </div><!-- ./modal-header -->
 
       <div class="modal-body">

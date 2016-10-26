@@ -50,29 +50,6 @@ class GruposController extends BaseController {
   }
 	
  
-
-	/**
-  	* Ajax function: devuelve la lista de grupos en forma de tabla
-  	*
-  	* @param Input::get('sortby')	string
-  	* @param Input::get('order')	string
-  	*
-  	* @return View::make('admin.recursos.table)  
-  */
-	public function getTable(){
-    	
-    	//Input      
-	    $sortby = Input::get('sortby','nombre');
-	    $order = Input::get('order','asc');
-
-	    //Todos los grupos
-	    $grupos = GrupoRecurso::all();
-      
-	    return View::make('admin.recursos.recursos',compact('grupos','sortby','order'));
-  	}
- 
- 
-
   /**
     * // Devuelve listas de input type checkbox para formulario con las personas que tienen alguna de las relaciones de supervisor//técnico//validador
     * 
@@ -125,6 +102,71 @@ class GruposController extends BaseController {
     return View::make('admin.html.optionGrupos')->with('grupos',grupoRecurso::all());
   }
 
+  /**
+    * Ajax function: devuelve la lista de grupos en forma de tabla
+    *
+    * @param Input::get('sortby') string
+    * @param Input::get('order')  string
+    *
+    * @return View::make('admin.recursos.table)  
+  */
+  public function ajaxGetViewRecursos(){ // :)
+      
+    //Input      
+    $sortby = Input::get('sortby','nombre');
+    $order = Input::get('order','asc');
+
+    //Todos los grupos
+    $grupos = GrupoRecurso::all();
+    foreach ($grupos as $grupo) {
+      $sgrGrupos[] = new sgrGrupo($grupo);
+    }
+      
+    return View::make('admin.recursos.recursos',compact('sgrGrupos','sortby','order'));
+  }
+
+
+  /**
+    * //develve html checkboxes con los recursos contenedores sin grupo
+    * @param $idgrupo int identificador de grupo
+    * @return View::make string
+  */
+  public function ajaxGetRecursoContenedoresSinGrupo(){
+    //input
+    $id = Input::get('idgrupo','');
+
+    //Output
+    $result = array('html'  => '',);
+    
+    //Validate
+    $rules = array(
+        'idgrupo'  => 'required|exists:grupoRecursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //get personas or return error
+    if ($validator->fails()){
+        $messages = $validator->messages();
+        $msg = '';
+        foreach ($messages->all() as $m){
+          $msg .=  $m . '<br />';
+        }
+        $result['html'] = (string) View::make('msg.error')->with(array('msg' => $msg));
+        //$result['html'] = $msg;
+    }
+    else{
+      $grupo = GrupoRecurso::findOrFail($id);
+      $recursosSinGrupo = Recurso::where('grupo_id','=','0')->where('tipo','=',$grupo->tipo)->get();
+      $result['html'] = (string) View::make('admin.html.optionscontendoressingrupo')->with(compact('recursosSinGrupo'));
+    }
+      
+    return $result;  
+  }
   /**
     * // Añade recursos existentes sin grupo asisagnado a un grupo
     *
@@ -193,6 +235,7 @@ class GruposController extends BaseController {
         'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
         'exists'    => 'No existe identificador de grupo...', 
         'in'        => 'El valor del campo tipo no está definido...',
+        'unique'      => 'BD error....',
       );
     $validator = Validator::make(Input::all(), $rules, $messages);
       

@@ -57,9 +57,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 //routes gestión de grupos
+  Route::get('admin/ajaxGetViewRecursos',array('uses' => 'GruposController@ajaxGetViewRecursos','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
   Route::post('admin/addgrupo',array('uses' => 'GruposController@add','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
   Route::post('admin/delgrupo',array('uses' => 'GruposController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
   Route::post('admin/editgrupo',array('uses' => 'GruposController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
+  Route::get('admin/ajaxGetRecursoContenedoresSinGrupo',array('uses' => 'GruposController@ajaxGetRecursoContenedoresSinGrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
   Route::post('admin/ajaxAddrecursoSingrupo',array('uses' => 'GruposController@ajaxAddrecursoSingrupo','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
 //fin
 //**************************
@@ -76,24 +78,16 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 // routes gestión de recursos :/
   Route::get('admin/recursos.html',array('as' => 'recursos.html','uses' => 'recursosController@listar','before' => array('auth','capacidad:4-6,msg'))); // :)
   Route::post('admin/ajaxAddItemExistente',array('uses'  => 'recursosController@ajaxAddItemExistente','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
-  Route::get('admin/ajaxGetDatosRecurso',array('uses'=>'recursosController@ajaxGetDatosRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
-  Route::post('admin/AjaxAddNuevoRecurso',array('uses' => 'recursosController@AjaxAddNuevoRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-  //
+  Route::post('admin/AjaxAddNuevoRecurso',array('uses' => 'recursosController@AjaxAddNuevoRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
 
-  
-
-
-  
-
-  
-  
-  Route::post('admin/updaterecurso',array('uses' => 'recursosController@edit','before' => array('auth','ajax_check','capacidad:4-6,msg')));//__Update propiedades recurso
-
+  Route::get('admin/ajaxGetDatosRecurso',array('uses'=>'recursosController@ajaxGetDatosRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)  
+  Route::post('admin/ajaxEditRecurso',array('uses' => 'recursosController@ajaxEditRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
+  Route::post('admin/ajaxDelRecurso',array('uses' => 'recursosController@ajaxDelRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :/
 
 
   Route::post('admin/disabled',array('uses'=>'recursosController@disabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
   Route::post('admin/enabled',array('uses'=>'recursosController@enabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-  Route::post('admin/delrecurso',array('uses' => 'recursosController@del','before' => array('auth','ajax_check','capacidad:4-6,msg')));
+  
 
   Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
   Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
@@ -106,7 +100,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
   
   
-  Route::get('admin/getTableGrupos',array('uses' => 'GruposController@getTable','before' => array('auth','ajax_check','capacidad:4-6,msg')));//devuelve tabla todos los grupos
+  
   
   
   
@@ -151,62 +145,61 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 
 //ValidacionController routes **********************
 //(roles 4 (admin) y 5 (validador))
-Route::get('validador/home.html',array('as' => 'validadorHome.html','uses' => 'ValidacionController@index','before' => array('auth','capacidad:4-5,msg')));
-Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'ValidacionController@valida','before' => array('auth','capacidad:4-5,msg')));
+  Route::get('validador/home.html',array('as' => 'validadorHome.html','uses' => 'ValidacionController@index','before' => array('auth','capacidad:4-5,msg')));
+  Route::get('validador/valida.html',array('as' => 'valida.html','uses' => 'ValidacionController@valida','before' => array('auth','capacidad:4-5,msg')));
+//******
 
 //PdfController routes *****************************
 Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
 
 //Calendarios
-Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
-Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
-Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
+  Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
+  Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
+  Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
+//******
 
 //EventoController
-Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
-Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
-Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
-Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
-Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
-Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
-Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
+  Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
+  Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
+  Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+  Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+  Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
+  Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
+  Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
+//***
+
 
 //Atención de eventos
-Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
-Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
+  Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
+  Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
 
 
-Route::get('print',array('uses' => 'CalendarController@imprime'));
+  Route::get('print',array('uses' => 'CalendarController@imprime'));
 
-Route::get('report',array('as' => 'report.html','uses' => 'AuthController@report'));
+  Route::get('report',array('as' => 'report.html','uses' => 'AuthController@report'));
 
-App::missing(function($exception){
-  $pagetitle   = Config::get('msg.404pagetitleLogin');
-  $paneltitle  = Config::get('msg.404paneltitle');
-  $msg         = Config::get('msg.404msg');
-  $alertLevel  = 'warning'; 
-  return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-});
+  App::missing(function($exception){
+    $pagetitle   = Config::get('msg.404pagetitleLogin');
+    $paneltitle  = Config::get('msg.404paneltitle');
+    $msg         = Config::get('msg.404msg');
+    $alertLevel  = 'warning'; 
+    return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+  });
 
-App::error(function(ModelNotFoundException $e){
-  $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
-  $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
-  $msg 					= Config::get('msg.objectNoFoundmsg');
-  $alertLevel 	= 'danger';
-	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-});
-
+  App::error(function(ModelNotFoundException $e){
+    $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
+    $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
+    $msg 					= Config::get('msg.objectNoFoundmsg');
+    $alertLevel 	= 'danger';
+  	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
+  });
+//**
 Route::get('test',array('as'=>'test',function(){
   
-  $grupo = GrupoRecurso::find('2');
-  echo "<pre>";
-  var_dump($grupo->gestores->toArray());
-  echo "</pre>";
+  $recurso = Recurso::findOrFail('115');
+  $sgrRecurso = Factoria::getRecursoInstance($recurso);
+  echo $sgrRecurso->delEventos();
   
-  /*Mail::send('emails.testmail',array(),function($m){
-      $m->to('juanafr@us.es')->subject('Development SGR. (test with Mail::send - uniticfcom)');
-    });
-  echo 'correo enviado...';*/
 }));
 
 //Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???

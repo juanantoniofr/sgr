@@ -10,16 +10,18 @@
       </div><!-- ./modal-header -->
       
       <div class="modal-body">
-        <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_addgrupo_textError"></div>
+        <div class="modal_msgError alert alert-danger text-center" role="alert" style="display:none;margin:10px 0" id="fm_addgrupo_textError">Formulario con errores</div>
         <!-- nombre del grupo -->
         <div class="form-group" id="fm_addgrupo_inputnombre">  
           {{Form::label('nombre', 'Nombre',array('class' => 'control-label'))}}
+           <span id="m_addgrupo_textError_nombre" class="text-danger modal_spantexterror text-center"></span>
           {{Form::text('nombre','',array('class' => 'form-control', 'id' => 'nombre'))}}
         </div>
 
         <div class="form-group" id="fm_addgrupo_inputtipo">  
           {{Form::label('tipo', 'Tipo de recurso')}}
-          {{Form::select('tipo', Config::get('options.tipoRecursos'),Config::get('options.defaulttiporecurso'),array('class' => 'form-control'))}}
+          <span id="m_addgrupo_textError_tipo" class="text-danger modal_spantexterror text-center"></span>
+          {{Form::select('tipo', Config::get('options.asoc_recursosContenedores'),Config::get('options.defaultrecursocontenedor'),array('class' => 'form-control'))}}
         </div>
 
         <!-- Descripción del grupo --> 

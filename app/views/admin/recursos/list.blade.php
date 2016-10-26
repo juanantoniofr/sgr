@@ -21,11 +21,6 @@
         <div class="panel-body">
                                           
           <form class="navbar-form">
-            <!--
-            <div class="form-group ">
-              <a  href="#" class="btn btn-primary" id="btnNuevoRecurso" title="Nuevo Espacio o Medio"><i class="fa fa-plus fa-fw"></i> Nuevo Espacio o Medio</a>
-            </div>
-            -->
             <div class="form-group ">
               <a href="#" class="btn btn-warning" id="btnNuevoGrupo" title="Añadir nuevo Grupo"><i class="fa fa-object-group fa-fw"></i> Nuevo Grupo</a>
             </div>
@@ -59,14 +54,14 @@
   {{ $modalRemovePersona      or '' }}
 
   <!-- Puestos -->
-  {{ $modalAddPuesto          or '' }}
-  {{ $modalEditPuesto         or '' }}
+  
+  
   {{ $modalAddPuestoExistente or '' }}
 
   <!-- Equipos -->
   {{ $modalAddEquipoExistente or '' }}
-  {{ $modalAddEquipo          or '' }}
-  {{ $modalEditEquipo         or '' }}
+  
+  
 @stop
 
 @section('js')
@@ -75,16 +70,13 @@
   <script type="text/javascript">CKEDITOR.replace( 'fm_editgrupo_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_addrecurso_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_editrecurso_inputdescripcion' );</script>
-  <script type="text/javascript">CKEDITOR.replace( 'fm_addpuesto_inputdescripcion' );</script>
+ 
   <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
-  <script type="text/javascript">CKEDITOR.replace( 'fm_editpuesto_inputdescripcion' );</script>
-  <script type="text/javascript">CKEDITOR.replace( 'fm_editequipo_inputdescripcion' );</script>
-  <script type="text/javascript">CKEDITOR.replace( 'fm_addequipo_inputdescripcion' );</script>
+  
       
   {{  HTML::script('assets/js/recursos.js') }}
   {{  HTML::script('assets/js/grupo.js')    }}
   {{  HTML::script('assets/js/comun.js')    }}
   {{  HTML::script('assets/js/admin.js')    }}
-  
   
 @stop

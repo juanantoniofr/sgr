@@ -6,36 +6,50 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> Editar recurso (espacio/equipo)</h2>
+        <h2 class="modal-title text-info"><i class="fa fa-pencil fa-fw"></i> Editar recurso <span class = "text-primary" id="m_editrecurso_title_nombre"></span></h2>
       </div><!-- ./modal-header -->
 
       <div class="modal-body">
-        <div class="modal_msgError alert alert-danger text-center" role="alert" id="fm_editrecurso_textError"></div>
+        <div class="modal_msgError alert alert-danger text-center" role="alert" style="display:none;margin:10px 0" id="fm_editrecurso_textError">Formulario con errores</div>
+          
+        <div class="form-group" id="m_editrecurso_id">
+          <span id="m_editrecurso_textError_id" class="text-danger modal_spantexterror text-center"></span>
+        </div>
         
         <div class="form-group" id="fm_editrecurso_inputid_lugar">  
           {{Form::label('id_lugar', 'Identificador de Lugar')}}
+          <span id="m_editrecurso_textError_id_lugar" class="text-danger modal_spantexterror text-center"></span>
           {{Form::text('id_lugar',Input::old('id_lugar'),array('class' => 'form-control'))}}
         </div>
               
         <div class="form-group" id="fm_editrecurso_inputnombre">
           {{Form::label('nombre', 'Nombre')}}
+          <span id="m_editrecurso_textError_nombre" class="text-danger modal_spantexterror text-center"></span>
           {{Form::text('nombre',Input::old('nombre'),array('class' => 'form-control'))}}
         </div>
-             
-        <div class="form-group" id="fm_editrecurso_inputgrupo_id">
-          {{Form::label('grupo_id', 'Grupo')}}
-          <select name="grupo_id" class="form-control" id="fm_editrecurso_optionsGrupos">
+        
+        
+        <div class="form-group" id="fm_editrecurso_inputPadre_id">
+          {{Form::label('padre_id', 'Incluido en:')}}
+          <span id="m_editrecurso_textError_padre_id" class="text-danger modal_spantexterror text-center"></span>
+          <select name="padre_id" class="form-control" id="fm_editrecurso_optionsPadre">
            
           </select>
         </div>
-        
-        <div class="form-group" id="fm_editrecurso_inputtipo">  
-            {{Form::label('tipo', 'Tipo de recurso')}}
-            {{Form::select('tipo', Config::get('options.tipoRecursos'),'',array('class' => 'form-control'))}}
+
+        <div class="form-group " id="fm_editrecurso_inputtipo">  
+            {{Form::label('tiposelect', 'Tipo')}}
+            <span id="m_editrecurso_textError_tipo" class="text-danger modal_spantexterror text-center"></span>
+            {{Form::select('tiposelect', Config::get('options.tipoRecursos'),'',array('class' => 'form-control', 'disabled' => 'disabled'))}}            
         </div>
+        <div class="form-group hidden">
+          {{Form::text('tipo','',array('class' => 'form-control'))}}
+        </div>
+        
         
         <div class="form-group" id="fm_editrecurso_inputmodo">  
           {{Form::label('modo', 'Gestión de solicitudes de reserva')}}
+          <span id="m_editrecurso_textError_modo" class="text-danger modal_spantexterror text-center"></span>
           {{Form::select('modo', array('0' => 'Con Validación', '1' => 'Sin Validación'),'1',array('class' => 'form-control'))}}
         </div>
 
@@ -45,7 +59,9 @@
         </div>
             
         <div class="form-group" id="fm_editrecurso_inputrol"> 
-          <label>Disponible para el Rol:</label><br />
+          <label>Disponible para el Rol:</label>
+          <span id="m_editrecurso_textError_roles" class="text-danger modal_spantexterror text-center"></span>
+          <br />
           <label class="checkbox-inline">
             <input type="checkbox" name = "roles[]" value="1" id="fm_editrecurso_roles1"> Alumno
           </label>
@@ -64,9 +80,7 @@
         </div>
 
 
-        <div class="form-group" id="m_editrecurso_id">
-          <span id="m_editrecurso_textError_id" class="text-danger modal_spantexterror text-center"></span>
-        </div>
+        
         <div class="form-group hidden">
           {{Form::text('id','',array('class' => 'form-control'))}}
         </div> 

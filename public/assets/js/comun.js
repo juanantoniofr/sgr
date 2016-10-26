@@ -1,3 +1,6 @@
+
+activelinks();
+
 function activelinks(){
     //grupos :)
     activelinkeditgrupo(); 									//:)
@@ -7,7 +10,7 @@ function activelinks(){
     activeLinkaddrecursoexistentetogrupo();	//:)
     
 		//recursos
-    activelinkaddnuevorecurso(); 		// :/
+    activelinkaddnuevorecurso(); 		// :)
 
 
     
@@ -28,22 +31,74 @@ function activelinks(){
     
     
     
-    activeLinkeditpuesto();
-    activeLinkeditequipo();
+    //activeLinkeditpuesto();
+    //activeLinkeditequipo();
     toggles();
+}
 
-    
-    
-    
+function activeLinkeditrecurso(){ // :)
+  //Muestra ventana modal editRecurso
+  $(".linkEditRecurso").on('click',function(e){
+    e.preventDefault();
+    showGifEspera();
+    $.ajax({
+      type: "GET",
+      url:  "ajaxGetDatosRecurso",
+      data: {id:$(this).data('id')},
+      success: function($respuesta){
+      	if ($respuesta.error === true){
+      		hideGifEspera();
+      		showErrores($respuesta.errors); //Muestra error en página actual (no modal)
+      	}
+      	else{
+	      	hideGifEspera();
+	        $recurso = $respuesta.recurso;
+	        console.log($respuesta);
+	        $('#m_editrecurso_title_nombre').html($recurso.nombre);
+	        CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
+	        CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
+	        $('#fm_editrecurso input[name="id"]').val($recurso.id);
+	        $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
+	        $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
+	        $('#fm_editrecurso select[name="tiposelect"]').val($recurso.tipo);
+	        $('#fm_editrecurso input[name="tipo"]').val($recurso.tipo);
+	        //$('#fm_editrecurso_optionstipo').val($recurso.tipo).text($(this).data('texttipo'));
+	        $('#fm_editrecurso_optionsPadre').html($respuesta.listadocontenedores);
+	        
+	        if($recurso.grupo_id != 0)
+	        	$('#fm_editrecurso select[name="padre_id"]').val($recurso.grupo_id);
+	        else if ($recurso.contenedor_id != 0)
+	        	$('#fm_editrecurso select[name="padre_id"]').val($recurso.contenedor_id);
+	        
+	        
+	        
+	        $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
+	        $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
+	            
+	        $('#fm_editrecurso input[type="checkbox"]').prop( "checked", false );
+	        $.each($arrayRoles,function(index,value){
+	          $('#fm_editrecurso input#fm_editrecurso_roles'+value).prop( "checked", true );
+	        });
+	        m_hideMsg();
+	        $('#m_editrecurso').modal('show');	
+      	}
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        hideGifEspera();
+        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+      }
+    });//<!-- ajax -->
+  });
 }
 
 function activelinkaddnuevorecurso(){ // :)
 	$(".addnuevorecursotogrupo, .addnuevoitemtorecurso").on('click',function(e){
 		e.preventDefault();
  		m_hideMsg();
+ 		$('#m_addrecurso_title_tiporecursoAañadir').html($(this).data('texttipo'));
  		$('#m_addrecurso_title_nombre').html($(this).data('nombre'));
- 		$('#fm_addrecurso_optionsContenedor_id').val($(this).data('idgrupo')).text($(this).data('nombre'));
- 		$('#fm_addrecurso_labelContenedor_id').text('Grupo');
+ 		$('#fm_addrecurso_optionsContenedor_id').val($(this).data('id')).text($(this).data('nombre'));
+ 		$('#fm_addrecurso_labelContenedor_id').text('Añadir en:');
  		$('#fm_addrecurso_optionstipo').val($(this).data('tipo')).text($(this).data('texttipo'));
  		$('form#fm_addrecurso input[name="tipopadre"]').val($(this).data('tipoelemento'));
   	$('#m_addrecurso').modal('show');
@@ -53,10 +108,11 @@ function activelinkaddnuevorecurso(){ // :)
 function updateListadoRecursos($iditemlista){ // :)
   $.ajax({
     type:"GET",
-    url:"getTableGrupos",
+    url:"ajaxGetViewRecursos",
     data:{'orderby':'','order':''},
     success:function($html){
       $('#tableRecursos').html($html);
+      
       $($iditemlista).fadeIn();
       $($iditemlista).parents().fadeIn();
       activelinks();
@@ -154,11 +210,14 @@ function activelinkeditgrupo(){ // :)
     $idgrupo = $(this).data('idgrupo');
     $descripcion = $(this).data('descripcion');
     $nombre = $(this).data('nombre');
-    $tipo = $(this).data('tipogrupo');
+    //$tipo = $(this).data('tipogrupo');
     $('form#fm_editgrupo input[name="nombre"]').val($nombre);
     $('form#fm_editgrupo input[name="descripcion"]').val($descripcion);
     $('form#fm_editgrupo input[name="grupo_id"]').val($idgrupo);
-    $('form#fm_editgrupo select[name="tipo"]').val($tipo);
+    
+
+    $('#fm_editgrupo_optionstipo').val($(this).data('tipogrupo')).text($(this).data('texttipo'));
+    //$('form#fm_editgrupo select[name="tipo"]').val($tipo);
     CKEDITOR.instances['fm_editgrupo_inputdescripcion'].setData($descripcion);
     CKEDITOR.instances['fm_editgrupo_inputdescripcion'].updateElement();
     m_hideMsg();
@@ -171,6 +230,23 @@ function activeLinkaddrecursoexistentetogrupo(){ // :)
   //Muestra ventana modal addrecursotogrupo
   $(".addrecursoexistentetogrupo").on('click',function(e){
     e.preventDefault();
+    showGifEspera();
+    
+     $.ajax({
+      type:"GET",
+      url:"ajaxGetRecursoContenedoresSinGrupo",
+      data:{idgrupo : $(this).data('idgrupo')},
+      success: function($respuesta){
+      	
+      	hideGifEspera();
+      	$('#m_addrecursotogrupo_recursos').html($respuesta.html);
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+      	hideGifEspera();
+      alert(xhr.responseText + ' (codeError: ' + xhr.status);
+      }
+    });
+    ///****************
     $('#m_addrecursotogrupo_nombre').html($(this).data('nombre'));
     $('form#fm_addrecursotogrupo input[name="grupo_id"]').val($(this).data('idgrupo'));
     m_hideMsg();
@@ -191,9 +267,8 @@ function activeLinkaddItemSinContenedor(){// :)
     $('#fm_add'+$tipoitem+'Existente_save').data('idmodal',$idmodal);
     $('#fm_add'+$tipoitem+'Existente_save').data('idform',$idform);
     m_hideMsg();
-    $('#'+$idmodal).modal('show');
-
-  });
+   	$('#'+$idmodal).modal('show');
+	});
 }
 
 //Muestra ventana modal para establecer relación persona-grupo
@@ -329,49 +404,37 @@ function setPersonasValidadoresGrupo($idgrupo){// :)
     });
 }
   
+//Delete recurso 
+function activelinkeliminarrecurso(){ // :/
+  $(".linkEliminaRecurso").on('click',function(e){
+    e.preventDefault();
+    if($(this).data('numeroelementos') > 0){
+      $('#malert_text').html('No se pueden eliminar un recurso con elementos asignados.');
+      $('#m_alert').modal('show');
+    }
+    else if($(this).data('numeroeventos') > 0){
+      $('#malert_text').html('No se pueden eliminar un recurso con reservas programadas.');
+      $('#m_alert').modal('show');
+    }
+    else {
+      $idrecurso = $(this).data('id');
+      console.log($(this).data('id'));
+      $nombre = $(this).data('nombre');
+      $('#mdrecurso_nombre').html($nombre);
+      $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+      $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
+      $('#fm_delrecurso_save').data('idrecursopadre',$(this).data('idrecursopadre')); 
+      m_hideMsg();
+      $('#m_delrecurso').modal('show');
+    }
+  });
+}
     
     
     
 		
     
-//Edit recurso ************
-function activeLinkeditrecurso(){
-  //Muestra ventana modal editRecurso
-  $(".linkEditRecurso").on('click',function(e){
-    e.preventDefault();
-    showGifEspera();
-    $.ajax({
-      type: "GET",
-      url:  "ajaxGetDatosRecurso",
-      data: {idrecurso:$(this).data('idrecurso')},
-      success: function($respuesta){
-        hideGifEspera();
-        $recurso = $respuesta.recurso;
-        CKEDITOR.instances['fm_editrecurso_inputdescripcion'].setData($recurso.descripcion);
-        CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
-        $('#fm_editrecurso input[name="id"]').val($recurso.id);
-        $('#fm_editrecurso input[name="nombre"]').val($recurso.nombre);
-        $('#fm_editrecurso input[name="id_lugar"]').val($recurso.id_lugar);
-        $('#fm_editrecurso_optionsGrupos').html($respuesta.listadogrupos);
-        $('#fm_editrecurso select[name="grupo_id"]').val($recurso.grupo_id);
-        $('#fm_editrecurso select[name="tipo"]').val($recurso.tipo);
-        $('#fm_editrecurso select[name="modo"]').val($.parseJSON($recurso.acl).m);    
-        $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-            
-        $('#fm_editrecurso input[type="checkbox"]').prop( "checked", false );
-        $.each($arrayRoles,function(index,value){
-          $('#fm_editrecurso input#fm_editrecurso_roles'+value).prop( "checked", true );
-        });
-        m_hideMsg();
-        $('#m_editrecurso').modal('show');
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });//<!-- ajax -->
-  });
-}
+
 
 
 //Muestra ventana modal para eliminar relación persona-recurso
@@ -403,109 +466,6 @@ function activelinkremovepersonas(){ //????
 
 
 
-//Edit Puesto*************
-function activeLinkeditpuesto(){
-  //Muestra ventana modal editpuesto
-  $(".linkEditPuesto").on('click',function(e){
-    e.preventDefault();
-    showGifEspera();
-    //$('#fm_editpuesto select[name="contenedor_id"] option:selected').text($(this).data('nombrecontenedor'));
-    $.ajax({
-      type: "GET",
-      url:  "getrecurso",
-      data: {idrecurso:$(this).data('idrecurso')},
-      success: function($respuesta){
-        $recurso = $respuesta.recurso;
-        hideGifEspera();
-        $('#m_editpuesto_title_nombrepuesto').html($recurso.nombre)
-        CKEDITOR.instances['fm_editpuesto_inputdescripcion'].setData($recurso.descripcion);
-        CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
-        $('#fm_editpuesto input[name="id"]').val($recurso.id);
-        $('#fm_editpuesto input[name="nombre"]').val($recurso.nombre);
-        $('#fm_editpuesto input[name="id_lugar"]').val($recurso.id_lugar);
-        $('#fm_editpuesto select[name="modo"]').val($.parseJSON($recurso.acl).m); 
-        $('#fm_editpuesto select[name="contenedor_id"]').html($respuesta.listadocontenedores);   
-        $('#fm_editpuesto select[name="contenedor_id"] option[value="'+ $recurso.contenedor_id +'"]').prop('selected', true);
-
-        $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-          
-        $('#fm_editpuesto input[type="checkbox"]').prop( "checked", false );
-        $.each($arrayRoles,function(index,value){
-          $('#fm_editpuesto input#fm_editpuesto_roles'+value).prop( "checked", true );
-        });
-        m_hideMsg();
-        $('#m_editpuesto').modal('show');
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });//<!-- ajax -->
-	});
-}
-
-function activeLinkeditequipo(){
-  //Muestra ventana modal editequipo
-  $(".linkEditEquipo").on('click',function(e){
-    e.preventDefault();
-    showGifEspera();
-    //$('#fm_editequipo select[name="contenedor_id"] option:selected').text($(this).data('modeloequipo'));
-    $.ajax({
-      type: "GET",
-      url:  "getrecurso",
-      data: {idrecurso:$(this).data('idrecurso')},
-      success: function($respuesta){
-        $recurso = $respuesta.recurso;
-        hideGifEspera();
-        $('#m_editequipo_title_nombreequipo').html($recurso.nombre)
-        CKEDITOR.instances['fm_editequipo_inputdescripcion'].setData($recurso.descripcion);
-        CKEDITOR.instances['fm_editequipo_inputdescripcion'].updateElement();
-        $('#fm_editequipo input[name="id"]').val($recurso.id);
-        $('#fm_editequipo input[name="nombre"]').val($recurso.nombre);
-        $('#fm_editequipo input[name="id_lugar"]').val($recurso.id_lugar);
-        $('#fm_editequipo select[name="modo"]').val($.parseJSON($recurso.acl).m);
-        $('#fm_editequipo select[name="contenedor_id"]').html($respuesta.listadocontenedores);
-        $('#fm_editequipo select[name="contenedor_id"] option:selected').val($recurso.contenedor_id);    
-        $arrayRoles = $.parseJSON($recurso.acl).r.split(',');
-        $('#fm_editequipo input[type="checkbox"]').prop( "checked", false );
-        $.each($arrayRoles,function(index,value){
-          $('#fm_editequipo input#fm_editequipo_roles'+value).prop( "checked", true );
-        });
-        m_hideMsg();
-        $('#m_editequipo').modal('show');
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });//<!-- ajax -->
-  });
-}
-
-//Delete recurso **************
-function activelinkeliminarrecurso(){
-  $(".linkEliminaRecurso").on('click',function(e){
-    e.preventDefault();
-    if($(this).data('numeroelementos') > 0){
-      $('#malert_text').html('No se pueden eliminar un recurso con elementos asignados.');
-      $('#m_alert').modal('show');
-    }
-    else if($(this).data('numeroeventos') > 0){
-      $('#malert_text').html('No se pueden eliminar un recurso con reservas programadas.');
-      $('#m_alert').modal('show');
-    }
-    else {
-      $idrecurso = $(this).data('idrecurso');
-      $nombre = $(this).data('nombre');
-      $('#mdrecurso_nombre').html($nombre);
-      $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
-      $('form#fm_delrecurso input[name="idrecurso"]').val($idrecurso);
-      $('#fm_delrecurso_save').data('idrecursopadre',$(this).data('idrecursopadre')); 
-      m_hideMsg();
-      $('#m_delrecurso').modal('show');
-    }
-  });
-}
 
 //Enabled recurso
 function activelinkenabled(){

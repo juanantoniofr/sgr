@@ -1,21 +1,21 @@
 $(function(e){  
-  //Ajax: Añadir Recurso (puesto/equipo) a recurso contenedor 
+   
   $('#fm_addpuestoExistente_save').on('click',function(e){
     e.preventDefault();
     showGifEspera();
     $idform = $('#fm_addpuestoExistente_save').data('idform');
     $idmodal = $('#fm_addpuestoExistente_save').data('idmodal');
-    ajaxadditem($idform,$idmodal);    
+    ajaxAddItemExistente($idform,$idmodal);    
   });
   $('#fm_addequipoExistente_save').on('click',function(e){
     e.preventDefault();
     showGifEspera();
     $idform = $(this).data('idform');
     $idmodal = $(this).data('idmodal');
-    ajaxadditem($idform,$idmodal);    
+    ajaxAddItemExistente($idform,$idmodal);    
   });
-
-  function ajaxadditem($idform,$idmodal){
+  //Ajax: Añadir Recurso (puesto/equipo) a recurso contenedor
+  function ajaxAddItemExistente($idform,$idmodal){// :)
     $.ajax({
       type: "POST",
       url:  "ajaxAddItemExistente",
@@ -36,8 +36,8 @@ $(function(e){
             }
           );
           showMsg($respuesta['msg']);
-
-          updateListadoRecursos('ulitems_'+$('form#'+$idform+' input[name="contenedor_id"]').val());
+          $id_padre = $('form#'+$idform+' input[name="contenedor_id"]').val();
+          updateListadoRecursos('.ul_'+ $id_padre);
         }
       },
       error: function(xhr, ajaxOptions, thrownError){
@@ -48,7 +48,7 @@ $(function(e){
   }
 
   //Ajax: Añadir nuevo recurso 
-  $('#fm_addrecurso_save').on('click',function(e){
+  $('#fm_addrecurso_save').on('click',function(e){ // :)
     e.preventDefault();
     showGifEspera();
     CKEDITOR.instances['fm_addrecurso_inputdescripcion'].updateElement();
@@ -68,15 +68,8 @@ $(function(e){
             hideGifEspera();
             $('#m_addrecurso').modal('hide');   
             showMsg($respuesta.msg);
-            if ($('form#fm_addrecurso input[name="tipopadre"]').val() == 'grupo'){
-              $grupo_id = $('form#fm_addrecurso select[name="contenedor_id"] option:selected').val();
-              updateListadoRecursos('#ulrecursosdelgrupo_'+ $grupo_id);
-            }
-            else if ($('form#fm_addrecurso input[name="tipopadre"]').val() == 'recurso'){
-              $recurso_id = $('form#fm_addrecurso select[name="contenedor_id"] option:selected').val();
-              updateListadoRecursos('#ulitems__'+ $recurso_id);
-            }
-            
+            $id_padre = $('form#fm_addrecurso select[name="contenedor_id"] option:selected').val();
+            updateListadoRecursos('.ul_'+ $id_padre);
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
@@ -84,6 +77,72 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
         }
       });//<!-- ajax -->
-    }); 
+  }); 
+  
+
+  //Ajax: Salvar edición recurso
+  $('#fm_editrecurso_save').on('click',function(e){ // :)
+    e.preventDefault();
+    CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
+    $data = $('form#fm_editrecurso').serialize();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "ajaxEditRecurso",
+        data: $data,
+        success: function($respuesta){
+          console.log($respuesta);
+          if($respuesta.error == true){ 
+            hideGifEspera();
+            m_hideMsg();//Oculto mensaje de error en ventana modal.
+            hideMsg();//Oculto mensajes en cuerpo página html
+            m_showMsg($respuesta.errors,'#m_editrecurso');//muestro errores en la ventana modal
+          }
+          else {
+            hideGifEspera();
+            $('#m_editrecurso').modal('hide');   
+            showMsg($respuesta['msg']);
+            $id_padre = $('form#fm_editrecurso select[name="padre_id"] option:selected').val();
+            console.log($id_padre);
+            updateListadoRecursos('.ul_'+ $id_padre);
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });
+  }); 
+
+  //Ajax: Eliminar recurso
+  $('#fm_delrecurso_save').on('click',function(e){ // :/
+    e.preventDefault();
+    showGifEspera();
+    $.ajax({
+      type: "POST",
+      url:  "ajaxDelRecurso",
+      data: $('form#fm_delrecurso').serialize(),
+        success: function($respuesta){
+          if($respuesta.error === true){  
+            hideGifEspera();
+            m_hideMsg();//Oculto mensaje de error en ventana modal.
+            hideMsg();//Oculto mensajes en cuerpo página html
+            m_showMsg($respuesta.errors,'#m_delrecurso');//muestro errores en la ventana modal
+          }
+          else {
+            hideGifEspera();
+            $('#m_delrecurso').modal('hide');   
+            showMsg($respuesta.msg);
+            console.log($('#fm_delrecurso_save').data('idrecursopadre'));
+            updateListadoRecursos('.ul_'+ $('#fm_delrecurso_save').data('idrecursopadre'));
+            $('#fm_delrecurso_save').data('idrecursopadre',""); 
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          hideGifEspera();
+          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+        }
+      });
+  });
 
 });

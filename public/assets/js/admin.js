@@ -78,37 +78,7 @@ $(function(e){
 
   //Editar
     
-    //Ajax: Salvar edición recurso
-    $('#fm_editrecurso_save').on('click',function(e){
-      e.preventDefault();
-      CKEDITOR.instances['fm_editrecurso_inputdescripcion'].updateElement();
-      $data = $('form#fm_editrecurso').serialize() + '&descripcion=' + $('#fm_editrecurso_inputdescripcion').html();
-      showGifEspera();
-      $.ajax({
-        type: "POST",
-        url:  "updaterecurso",
-        data: $data,
-        success: function($respuesta){
-          if($respuesta.error == true){ 
-            hideGifEspera();
-            m_hideMsg();//Oculto mensaje de error en ventana modal.
-            hideMsg();//Oculto mensajes en cuerpo página html
-            m_showMsg($respuesta.errors,'#m_editrecurso');//muestro errores en la ventana modal
-          }
-          else {
-            hideGifEspera();
-            $('#m_editrecurso').modal('hide');   
-            showMsg($respuesta['msg']);
-            updateListadoRecursos($('#fm_editrecurso input[name="id"]').val());
-            
-          }
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-        }
-      });
-    });  
+    
 
   
     //Ajax: Salvar edición de Puesto 
@@ -198,35 +168,7 @@ $(function(e){
   
   
   
-  //Ajax: Delete recurso
-  $('#fm_delrecurso_save').on('click',function(e){
-    e.preventDefault();
-    showGifEspera();
-    $.ajax({
-      type: "POST",
-      url:  "delrecurso",
-      data: $('form#fm_delrecurso').serialize(),
-        success: function($respuesta){
-          if($respuesta.error === true){  
-            hideGifEspera();
-            m_hideMsg();//Oculto mensaje de error en ventana modal.
-            hideMsg();//Oculto mensajes en cuerpo página html
-            m_showMsg($respuesta.errors,'#m_delrecurso');//muestro errores en la ventana modal
-          }
-          else {
-            hideGifEspera();
-            $('#m_delrecurso').modal('hide');   
-            showMsg($respuesta.msg);
-            updateListadoRecursos($('#fm_delrecurso_save').data('idrecursopadre'));
-            $('#fm_delrecurso_save').data('idrecursopadre',""); 
-          }
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-        }
-      });
-  });
+  
   
  
     
@@ -308,7 +250,7 @@ $(function(e){
 
   
 
-  activelinks();
+  
     
   
 

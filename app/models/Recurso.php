@@ -23,19 +23,18 @@ class Recurso extends Eloquent {
     return $this->belongsToMany('User', 'recurso_validadores', 'recurso_id', 'user_id');
   }
 
-  //identifica el espacio al que pertenece un puesto
+  //devuelve recurso contenedor 
   public function contenedor(){
     
     return $this->hasOne('Recurso','id','contenedor_id');   
   }
-
   
   public function items(){
  
     return $this->hasMany('Recurso','contenedor_id','id');
   }
 
-  //identifica el grupo al que pertence un recurso
+  //develve grupo de perenencia
   public function grupo(){
     
     return $this->hasOne('GrupoRecurso','id','grupo_id');   

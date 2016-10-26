@@ -3,11 +3,11 @@
 return array (
 
 	'espacio' 					=> 'Espacio',
-	'tipoequipos'				=> 'Equipos',
+	'tipoequipos'				=> 'Modelo de equipo',
 	'puesto'						=> 'Puesto',
 	'equipo'						=> 'Equipo',
-	'itemsespacio' 			=> 'Puestos',
-	'itemstipoequipos'	=> 'Equipos',
+	'itemsespacio' 			=> 'Puesto',
+	'itemstipoequipos'	=> 'Equipo',
 	'capacidades'				=> array(
 													'1' =>	'Usuario (Alumnos)',
 													'2'	=>	'Usuario Avanzado (PDI & PAS de Administración)',

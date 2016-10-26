@@ -11,11 +11,13 @@
             </div>
 
             <div class="modal-body">
-                <div class="divmodal_msgError alert alert-danger text-center" role="alert" id="fm_delgrupo_textError"></div>    
+                <div class="modal_msgError alert alert-danger text-center" role="alert" style="display:none;margin:10px 0" id="fm_delgrupo_textError">Formulario con errores</div>
+
                 <!--Div warning --> 
                 <div class="alert alert-danger text-center" role = "alert">¿Estás seguro que deseas <b>eliminar</b> el grupo: "<b><span id="mdgrupo_nombre"></span>"</b> ?</div>
                 
                 <div class="form-group" id="m_delgrupo_grupo_id">
+
                   <span id="m_delgrupo_textError_grupo_id" class="text-danger modal_spantexterror text-center"></span>
                 </div>
                 <div class="form-group hidden">
