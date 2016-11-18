@@ -18,22 +18,25 @@
                     <ul>
                         <li> Se habilitaran todos los elementos asociados a este recurso. </li>
                         <li> Se podrán añadir nuevas reservas o solicitudes de uso. </li>
-                        <li> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso, inidcando que vuelve a estar habilitado. </li>
+                        <li> Se enviará aviso vía correo a los usuarios que tienen reservado el recurso, indicando que vuelve a estar habilitado. </li>
                     </ul>
                 </div>
 
-            <div class="form-group" id="m_enabledrecurso_idrecurso">
-              <span id="m_enabledrecurso_textError_idrecurso" class="text-danger modal_spantexterror text-center"></span>
-            </div>    
-            <div class="form-group hidden">
-                {{Form::text('idrecurso','',array('class' => 'form-control'))}}
-            </div> 
+              <div class="form-group" id="m_enabledrecurso_idrecurso">
+                <span id="m_enabledrecurso_textError_idrecurso" class="text-danger modal_spantexterror text-center"></span>
+              </div>    
+              <div class="form-group hidden">
+                  {{Form::text('idrecurso','',array('class' => 'form-control'))}}
+              </div>
+              <div class="form-group hidden">
+                    {{Form::text('grupoid','',array('class' => 'form-control'))}}
+              </div>  
             </div><!-- ./.modal-body -->
 
              <div class="modal-footer">
                 <div class="col-lg-12" style="margin-top:10px">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" data-idrecursopadre="" id ="fm_enabledrecurso_save">
+                    <button type="submit" class="btn btn-primary" id ="fm_enabledrecurso_save">
                         <i class="fa fa-toggle-on fa-fw"></i> Habilitar
                     </button>
                 </div>

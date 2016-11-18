@@ -10,7 +10,7 @@ $(function(e){
     
 
     //Ajax: Salvar nuevo Puesto 
-    $('#fm_addpuesto_save').on('click',function(e){
+   /* $('#fm_addpuesto_save').on('click',function(e){
       e.preventDefault();
       showGifEspera();
       CKEDITOR.instances['fm_addpuesto_inputdescripcion'].updateElement();
@@ -39,12 +39,12 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
         }
       });//<!-- ajax -->
-    });
+    });*/
     
     
       
     //Ajax: Salvar nuevo equipo
-    $('#fm_addequipo_save').on('click',function(e){
+    /*$('#fm_addequipo_save').on('click',function(e){
       e.preventDefault();
       showGifEspera();
       CKEDITOR.instances['fm_addequipo_inputdescripcion'].updateElement();
@@ -72,7 +72,7 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
         }
       });//<!-- ajax -->
-    });
+    });*/
   // <!-- añadir nuevo -->
   
 
@@ -82,7 +82,7 @@ $(function(e){
 
   
     //Ajax: Salvar edición de Puesto 
-  $('#fm_editpuesto_save').on('click',function(e){
+  /*$('#fm_editpuesto_save').on('click',function(e){
       e.preventDefault();
       showGifEspera();
       CKEDITOR.instances['fm_editpuesto_inputdescripcion'].updateElement();
@@ -112,16 +112,15 @@ $(function(e){
           alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
         }
       });//<!-- ajax -->
-  });
+  });*/
 
   //Edit Equipo *************
   //Ajax: Salvar edición de Equipo 
-  $('#fm_editequipo_save').on('click',function(e){
+  /*$('#fm_editequipo_save').on('click',function(e){
     e.preventDefault();
     showGifEspera();
     CKEDITOR.instances['fm_editequipo_inputdescripcion'].updateElement();
     $data = $('form#fm_editequipo').serialize() + '&descripcion=' + $('#fm_editequipo_inputdescripcion').html();
-    console.log($data);
     $.ajax({
       type: "POST",
       url: "updaterecurso",
@@ -145,7 +144,7 @@ $(function(e){
         alert(xhr.responseText + ' (codeError: ' + xhr.status) +')';
       }
     });//<!-- ajax -->
-  });
+  });*/
   
  
 
@@ -165,106 +164,5 @@ $(function(e){
           }
       }); 
   }*/
-  
-  
-  
-  
-  
  
-    
- 
-  
-  
-    
-  
-
-  
-    
-  
-
- 
-  
- 
-  //Ajax: enabled recurso
-  $('#fm_enabledrecurso_save').on('click',function(e){
-    e.preventDefault();
-    showGifEspera();
-    $.ajax({
-      type:"POST",
-      url:"enabled",
-      data: $('#fm_enabledrecurso').serialize(),
-      success: function($respuesta){
-        if($respuesta.error === true){
-          hideGifEspera();
-          m_hideMsg();//Oculto mensaje de error en ventana modal.
-          hideMsg();//Oculto mensajes en cuerpo página html
-          m_showMsg($respuesta.errors,'#m_enabledrecurso');//muestro errores en la ventana modal
-        }
-        else {
-          hideGifEspera();
-          $('#m_enabledrecurso').modal('hide');   
-          showMsg($respuesta.msg);
-          updateListadoRecursos($('#fm_enabledrecurso_save').data('idrecursopadre')); 
-          $('#fm_enabledrecurso_save').data('idrecursopadre',"");
-        }
-      },
-      error:function(xhr, ajaxOptions, thrownError){
-            hideGifEspera();
-            alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });//<--./ajax-->
-  });
-
- 
-
-  $('#fm_disabledrecurso_save').on('click',function(e){
-    e.preventDefault();
-    CKEDITOR.instances['fm_disabledrecurso_inputdescripcion'].updateElement();
-      $data = $('form#fm_disabledrecurso').serialize() + '&descripcion=' + $('#fm_disabledrecurso_inputdescripcion').html();
-    showGifEspera();
-    $.ajax({
-      type:"POST",
-      url:"disabled",
-      data: $data,
-      success: function($respuesta){
-        if($respuesta.error === true){
-          hideGifEspera();
-          m_hideMsg();//Oculto mensaje de error en ventana modal.
-          hideMsg();//Oculto mensajes en cuerpo página html
-          m_showMsg($respuesta.errors,'#m_disabledrecurso');//muestro errores en la ventana modal
-        }
-        else {
-          hideGifEspera();
-          $('#m_disabledrecurso').modal('hide');   
-          showMsg($respuesta.msg);
-          updateListadoRecursos($('#fm_disabledrecurso_save').data('idrecursopadre'));
-          $('#fm_disabledrecurso_save').data('idrecursopadre',"");
-        }
-      },
-      error:function(xhr, ajaxOptions, thrownError){
-        hideGifEspera();
-        alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });//<--./ajax-->
-  });
-
-  
-
-  
-    
-  
-
- 
-
-  
-  
-    
- 
-
-  
-
- 
-    
- 
-
 });

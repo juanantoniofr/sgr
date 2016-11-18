@@ -1,4 +1,4 @@
-<!-- / Modal edit recurso  -->
+<!-- / Modal edit recurso  :) -->
 <div class="modal fade myModal-lg" id="m_editrecurso" tabindex="-5" role="dialog" aria-hidden="true" aria-labelledby="modalEditRecursoLabel">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_editrecurso'))}}          
    <div class="modal-dialog modal-lg">

@@ -12,19 +12,23 @@
 			foreach ($this->items as $item) {
 				$item->enabled();
 			}		
-			$this->recurso->disabled = 0; 
+			$this->recurso->disabled = 0;
+			$this->recurso->motivodisabled = ''; 
+			$this->recurso->save();
 			return true;
 		}
 	
 		/**
-			*
 			* deshabilita recurso y todos sus items (puestos/equipos) para su reserva
+			* @param $motivo string 
 		*/
-		public function disabled(){
+		public function disabled($motivo = ''){
 			foreach ($this->items as $item) {
-				$item->disabled();
+				$item->disabled($motivo);
 			}		
 			$this->recurso->disabled = true; //true
+			$this->recurso->motivodisabled = $motivo;
+			$this->recurso->save();
 			return true;
 		}
 
@@ -157,7 +161,7 @@
 			* @return true 
 		*/
 		public function attach_administrador($id){
-			if (!$this->recurso->administradores->contains($id)) $this->recursos->administradores()->attach($id);
+			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->attach($id);
 			foreach ($this->items as $item) {
 				$item->attach_administrador($id);
 			}
@@ -183,7 +187,7 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_gestor($id){
-			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->detach($id);
+			if ($this->recurso->gestores->contains($id)) $this->recurso->gestores()->detach($id);
 			foreach ($this->items as $item) {
 				$item->detach_gestor($id);
 			}
@@ -195,7 +199,7 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_administrador($id){
-			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
+			if ($this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
 			foreach ($this->items as $item) {
 				$item->detach_administrador($id);
 			}
@@ -207,7 +211,7 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_validador($id){
-			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
+			if ($this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
 			foreach ($this->items as $item) {
 				$item->detach_validador($id);
 			}

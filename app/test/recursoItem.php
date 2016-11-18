@@ -4,6 +4,32 @@
   	//private $recurso;
 		
 		/**
+			* deshabilita recurso para su reserva
+			* @param $motivo string 
+		*/
+		public function disabled($motivo = ''){
+			$this->recurso->disabled = true; //true
+			$this->recurso->motivodisabled = $motivo;
+			$this->recurso->save();
+			return true;
+		}
+
+		/**
+			* habilita recurso para su reserva
+		*/
+		public function enabled(){
+			$this->recurso->disabled = false; //false
+			$this->recurso->motivodisabled = '';
+			if ($this->contenedor != null){
+				$this->contenedor->disabled = 0;
+				$this->contenedor->save();
+			}
+			$this->recurso->save();
+			return true;
+
+		}
+
+		/**
       * Devuelve true si $capacidad tiene permiso para ver (listar) recurso
       * @param void
       * @return $visible boolean 

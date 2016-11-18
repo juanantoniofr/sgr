@@ -58,5 +58,4 @@ Validator::extend('sametypes',function($attributes,$value,$parameters){
 	return false;
 });
 
-
 ?>

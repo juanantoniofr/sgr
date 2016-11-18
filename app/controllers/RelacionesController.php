@@ -3,21 +3,23 @@
 class RelacionesController extends BaseController {
 
 	/**
-    * //Establece la relación users-grupoRecursos (supervisor-validador-tecnico)
+    * //Establece la relación users-grupoRecursos || users-recursos(pendiente) (supervisor-validador-tecnico)
     *
-    * @param Input::get('idgrupo')    int
+    * @param Input::get('id')    int
+    * @param $tipo string en Config::get('options.objectWithRelation')
     * @param Input::get('username')   string
     * @param Input::get('rol')        string
     *
     * @return $result array
     * 
   */
-  public function ajaxAddrelacionUsuarioGrupo(){ // :)
+  public function ajaxAddRelacion(){ // :)
     
     //input
-    $idgrupo   = Input::get('idgrupo','');
+    $id 		   = Input::get('id','');
     $username  = Input::get('username','');
-    $rol       = Input::get('rol','');      
+    $rol       = Input::get('rol','');
+    $tipo      = Input::get('tipo','');       
     
     
     //Output 
@@ -27,16 +29,18 @@ class RelacionesController extends BaseController {
                     );
     //Validate
     $rules = array(
-        'idgrupo'    => 'required|exists:grupoRecursos,id', //exists:table,column
-        'username'   => 'required|exists:users,username',
-        'rol'        => 'required|in:1,2,3'
+        'id'    			=> 'required',//|exists:grupoRecursos,id', //exists:table,column
+        'username'   	=> 'required|exists:users,username',
+        'rol'        	=> 'required|in:1,2,3',
+				'tipo'				=> 'required|in:'.Config::get('options.objectWithRelation'),
+
         );
 
     $messages = array(
           'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idgrupo.exists'      => 'No existe identificador de grupo en BD.',
+          'tipo.in'							=> 'Tipo de objeto no reconocido',
           'username.exists'     => 'No existe usuario en la BD.',
-          'in'                  => 'El campo <strong>:attribute</strong> no coincide con ninguno de los valores aceptados.',
+          'rol.in'              => 'El campo <strong>:attribute</strong> no coincide con ninguno de los valores aceptados.',
           );
 
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -48,53 +52,126 @@ class RelacionesController extends BaseController {
         return $result;
     }
     else{
-      $grupo = grupoRecurso::find($idgrupo);
       $user = User::where('username','=',$username)->first();
-      $idUser = $user->id;
+    	$idUser = $user->id;
+    	if ($tipo == 'grupo')
+    		$result = $this->addRelacionConGrupo($id,$idUser,$username,$rol);
+    	elseif ($tipo == 'recurso')
+    		$result = $this->addRelacionConRecurso($id,$idUser,$username,$rol);
+
+    }//fin else
+
+    $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+    return $result;
+  }
+
+
+  public function addRelacionConRecurso($idrecurso,$iduser,$username,$rol){
+  	//Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
+  	$recurso = Recurso::findOrFail($idrecurso);
+    
+    switch ($rol) {
+    	//gestores
+      case '1':
+        $gestores = $recurso->gestores;
+        if ($gestores->contains($iduser)){
+          $result['error'] = true;
+          $result['errors']['gestor'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este recuso.';
+          return $result;
+        }
+        $sgrRecurso = Factoria::getRecursoInstance($recurso);
+        $sgrRecurso->attach_gestor($iduser);
+        break;
+        
+      //Supervisor
+      case '2':
+      	$administradores = $recurso->administradores;
+        if ($administradores->contains($iduser)){
+          $result['error'] = true;
+          $result['errors']['administrador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>administrador</b></i> de este Recurso.';
+          return $result;
+        }
+        $sgrRecurso = Factoria::getRecursoInstance($recurso);
+        $sgrRecurso->attach_administrador($iduser);
+        break;
       
-      switch ($rol) {
-        //tecnicos
-        case '1':
+      //Validador
+      case '3':
+        $validadores = $recurso->validadores;
+        if ($validadores->contains($iduser)){
+          $result['error'] = true;
+          $result['errors']['validador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este recurso.';
+          return $result;
+        }
+        $sgrRecurso = Factoria::getRecursoInstance($recurso);
+        $sgrRecurso->attach_validador($iduser);
+        $result['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
+       	break;
+      
+      default:
+        $result['error'] = false;
+        $result['msg'] = 'Identificador de rol no esperado: ' . $rol;
+      break;
+    }//fin case
+    return $result;
+  }
+
+
+  public function addRelacionConGrupo($idgrupo,$iduser,$username,$rol){
+  	//Output 
+    $result = array( 'errors'    => array(),
+                      'msg'   => '',    
+                      'error'   => false,
+                    );
+  	$grupo = grupoRecurso::find($idgrupo);
+    
+    switch ($rol) {
+    	//gestores
+      case '1':
           $gestores = $grupo->gestores;
-          if ($gestores->contains($idUser)){
+          if ($gestores->contains($iduser)){
             $result['error'] = true;
             $result['errors']['gestor'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>técnico</b></i> de este Grupo.';
             return $result;
           }
-          $grupo->gestores()->attach($idUser);
-          $recursos = $grupo->recursos->each(function($recurso) use ($idUser) {
+          $grupo->gestores()->attach($iduser);
+          $recursos = $grupo->recursos->each(function($recurso) use ($iduser) {
           	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->attach_gestor($idUser);
+          	$sgrRecurso->attach_gestor($iduser);
           });
           break;
         
         //Supervisor
         case '2':
           $administradores = $grupo->administradores;
-          if ($administradores->contains($idUser)){
+          if ($administradores->contains($iduser)){
             $result['error'] = true;
             $result['errors']['administrador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>administrador</b></i> de este Grupo.';
             return $result;
           }
-          $grupo->administradores()->attach($idUser);
-          $recursos = $grupo->recursos->each(function($recurso) use ($idUser) {
+          $grupo->administradores()->attach($iduser);
+          $recursos = $grupo->recursos->each(function($recurso) use ($iduser) {
           	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->attach_administrador($idUser);
+          	$sgrRecurso->attach_administrador($iduser);
           });
           break;
       
         //Validador
         case '3':
           $validadores = $grupo->validadores;
-          if ($validadores->contains($idUser)){
+          if ($validadores->contains($iduser)){
             $result['error'] = true;
             $result['errors']['validador'] = 'Usuario con UVUS <i>'.$username.'</i> ya es <i><b>validador</b></i> de este Grupo.';
-            return $respuesta;
+            return $result;
           }
-          $grupo->validadores()->attach($idUser);
-          $recursos = $grupo->recursos->each(function($recurso) use ($idUser) {
+          $grupo->validadores()->attach($iduser);
+          $recursos = $grupo->recursos->each(function($recurso) use ($iduser) {
           	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->attach_validador($idUser);
+          	$sgrRecurso->attach_validador($iduser);
           });
           $result['msg'] = 'Usuario <i>'.$username.'</i> añadido como <i><b>validador</b></i> con éxito.';
           break;
@@ -104,22 +181,20 @@ class RelacionesController extends BaseController {
           $result['msg'] = 'Identificador de rol no esperado: ' . $rol;
         break;
       }//fin case
-    }//fin else
-
-    $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
-    return $result;
+      return $result;
   }
-
 
   /**
   	*
-  	* //devuelve array objetc User que son gestores del grupo $idgrupo
-  	* @param $idgrupo int identificador de grupo
+  	* //devuelve array objetc User que son gestores de grupo || recurso con identificador $id
+  	* @param $id int identificador de grupo || recurso
+  	* @param $tipo string en Config::get('options.objectWithRelation')
   	* @return array()
   **/
-  public function ajaxGetGestoresGrupo(){//:)
+  public function ajaxGetGestores(){//:/
   	//input
-    $idgrupo   = Input::get('idgrupo','');
+    $id   = Input::get('id','');
+    $tipo 	= Input::get('tipo','');
     
     //Output 
     $result = array( 'errors'   	 => array(),
@@ -127,12 +202,13 @@ class RelacionesController extends BaseController {
                      'error'   	=> false,
                     );
     //Validate
-    $rules = array( 'idgrupo'    => 'required|exists:grupoRecursos,id', //exists:table,column
+    $rules = array( 'id'    => 'required',//|exists:grupoRecursos,id', //exists:table,column
+    								'tipo'	=> 'required|in:'.Config::get('options.objectWithRelation'),
         						);
 
     $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idgrupo.exists'      => 'No existe identificador de grupo en BD.',
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'in'				=> 'Tipo de objeto no reconocido',
           );
 
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -144,20 +220,25 @@ class RelacionesController extends BaseController {
         return $result;
     }
     else{
-    	$result['gestores'] = grupoRecurso::find($idgrupo)->gestores->toArray();
+    	if ($tipo == 'grupo')
+    		$result['gestores'] = grupoRecurso::find($id)->gestores->toArray();
+    	elseif ($tipo == 'recurso')
+    		$result['gestores'] = Recurso::find($id)->gestores->toArray();
     }
     return $result;	
   }	
 
   /**
   	*
-  	* //devuelve array objetc User que son administradores del grupo $idgrupo
-  	* @param $idgrupo int identificador de grupo
+  	* //devuelve array objetc User que son administradores del grupo || recurso con identificador $id
+  	* @param $id int identificador de grupo || recurso
+  	* @param $tipo string en Config::get('options.objectWithRelation')
   	* @return array()
   **/
-  public function ajaxGetAdministradoresGrupo(){ // :)
+  public function ajaxGetAdministradores(){ // :)
   	//input
-    $idgrupo   = Input::get('idgrupo','');
+    $id   = Input::get('id','');
+    $tipo = Input::get('tipo','');
     
     //Output 
     $result = array( 'errors'   	 				=> array(),
@@ -165,13 +246,13 @@ class RelacionesController extends BaseController {
                      'error'   						=> false,
                     );
     //Validate
-    $rules = array( 'idgrupo'    => 'required|exists:grupoRecursos,id', //exists:table,column
-        						);
+    $rules = array( 'id'    => 'required',//|exists:grupoRecursos,id', //exists:table,column
+        						'tipo'	=> 'required|in:'.Config::get('options.objectWithRelation'),
+        					);
 
-    $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idgrupo.exists'      => 'No existe identificador de grupo en BD.',
-          );
+    $messages = array(	'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          							'in'				=> 'Tipo de objeto no reconocido',
+          					);
 
     $validator = Validator::make(Input::all(), $rules, $messages);
     
@@ -182,21 +263,25 @@ class RelacionesController extends BaseController {
         return $result;
     }
     else{
-    	$result['administradores'] = grupoRecurso::find($idgrupo)->administradores->toArray();
+    	if ($tipo == 'grupo')
+    		$result['administradores'] = grupoRecurso::find($id)->administradores->toArray();
+    	elseif ($tipo == 'recurso')
+    		$result['administradores'] = Recurso::find($id)->administradores->toArray();
     }
     return $result;	
   }	
 
   /**
   	*
-  	* //devuelve array objetc User que son validadores del grupo $idgrupo
-  	* @param $idgrupo int identificador de grupo
+  	* //devuelve array objetc User que son validadores del grupo || recurso con identificador $id
+  	* @param $idgrupo int identificador de grupo || recurso
+  	* @param $tipo string en Config::get('options.objectWithRelation')
   	* @return array()
   **/
-
-  public function ajaxGetValidadoresGrupo(){//:)
+  public function ajaxGetValidadores(){//:)
   	//input
-    $idgrupo   = Input::get('idgrupo','');
+    $id 	= Input::get('id','');
+    $tipo = Input::get('tipo','');
     
     //Output 
     $result = array( 'errors'   		 => array(),
@@ -204,13 +289,13 @@ class RelacionesController extends BaseController {
                      'error'   			=> false,
                     );
     //Validate
-    $rules = array( 'idgrupo'    => 'required|exists:grupoRecursos,id', //exists:table,column
-        						);
+    $rules = array( 'id'    => 'required',//|exists:grupoRecursos,id', //exists:table,column
+        						'tipo'	=> 'required|in:'.Config::get('options.objectWithRelation'),
+        					);
 
-    $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idgrupo.exists'      => 'No existe identificador de grupo en BD.',
-          );
+    $messages = array(	'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          							'in'				=> 'Tipo de objeto no reconocido',
+          					);
 
     $validator = Validator::make(Input::all(), $rules, $messages);
     
@@ -221,15 +306,18 @@ class RelacionesController extends BaseController {
         return $result;
     }
     else{
-    	$result['validadores'] = grupoRecurso::find($idgrupo)->validadores->toArray();
+    	if ($tipo == 'grupo')
+    		$result['validadores'] = grupoRecurso::find($id)->validadores->toArray();
+    	elseif ($tipo == 'recurso')
+    		$result['validadores'] = Recurso::find($id)->validadores->toArray();
     }
     return $result;	
   }	
   
   /**
-    * //elimina la relación grupoRecursos-persona
+    * //elimina la relación grupoRecursos-persona || recurso-persona
     *
-    * @param Input::get('idgrupo') int
+    * @param Input::get('id') int identificador de grupo || recurso
     * @param Input::get('administrador_id) array
     * @param Input::get('validadores_id') array
     * @param Input::get('tecnicos_id') array
@@ -237,29 +325,30 @@ class RelacionesController extends BaseController {
     * @return $result array    
     *
   */
-  public function ajaxRemoverelacionUsuarioGrupo(){ // :)
+  public function ajaxRemoveRelacion(){ // :)
     
     //input
-    $idgrupo            = Input::get('idgrupo','');
-    $administradores    = Input::get('administradores_id',array());
-    $validadores        = Input::get('validadores_id',array());
-    $gestores           = Input::get('gestores_id',array());
+    $id      				 = Input::get('id','');
+    $tipo						 = Input::get('tipo','');
+    $administradores = Input::get('administradores_id',array());
+    $validadores     = Input::get('validadores_id',array());
+    $gestores        = Input::get('gestores_id',array());
     
     //Output 
     $result = array( 	'errors'    	=> array(),
                       'msg'   		=> '',    
                       'error'   	=> false,
+                      'test'			=> $id,
                     );
 
     //Validate
-    $rules = array(
-        'idgrupo'  => 'required|exists:grupoRecursos,id', //exists:table,column
-        );
+    $rules = array( 'id'    => 'required',//|exists:grupoRecursos,id', //exists:table,column
+        						'tipo'	=> 'required|in:'.Config::get('options.objectWithRelation'),
+        					);
 
-    $messages = array(
-          'required'            => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'idgrupo.exists'      => 'No existe identificador de recurso en BD.',
-          );
+    $messages = array(	'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          							'in'				=> 'Tipo de objeto no reconocido',
+          					);
 
     $validator = Validator::make(Input::all(), $rules, $messages);
 
@@ -270,33 +359,61 @@ class RelacionesController extends BaseController {
       return $result;
     }
     else {
-      $grupo = grupoRecurso::findOrFail($idgrupo);
+
+    	if ($tipo == 'grupo')
+    		$this->removeRelacionConGrupo($id,$administradores,$validadores,$gestores);//$result['validadores'] = grupoRecurso::find($id)->validadores->toArray();
+    	elseif ($tipo == 'recurso')
+    		$this->removeRelacionConRecurso($id,$administradores,$validadores,$gestores);//$result['validadores'] = Recurso::find($id)->validadores->toArray();
+
       
-      foreach ($administradores as $administrador) {
-        $grupo->administradores()->detach($administrador);
-        $recursos = $grupo->recursos->each(function($recurso) use ($administrador) {
-          	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->detach_administrador($administrador);
-          });
-      }
-      foreach ($validadores as $validador) {
-        $grupo->validadores()->detach($validador);
-        $recursos = $grupo->recursos->each(function($recurso) use ($validador) {
-          	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->detach_validador($validador);
-          });
-      }
-      foreach ($gestores as $gestor) {
-        $grupo->gestores()->detach($gestor);
-        $recursos = $grupo->recursos->each(function($recurso) use ($gestor) {
-          	$sgrRecurso = Factoria::getRecursoInstance($recurso);
-          	$sgrRecurso->detach_gestor($gestor);
-          });
-      }
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
 
     return $result;
   }
+
+  public function removeRelacionConGrupo($id,$administradores,$validadores,$gestores){
+  	$grupo = grupoRecurso::findOrFail($id);
+    
+    foreach ($administradores as $administrador) {
+      $grupo->administradores()->detach($administrador);
+      $recursos = $grupo->recursos->each(function($recurso) use ($administrador) {
+       	$sgrRecurso = Factoria::getRecursoInstance($recurso);
+       	$sgrRecurso->detach_administrador($administrador);
+      });
+    }
+    foreach ($validadores as $validador) {
+      $grupo->validadores()->detach($validador);
+      $recursos = $grupo->recursos->each(function($recurso) use ($validador) {
+    	 	$sgrRecurso = Factoria::getRecursoInstance($recurso);
+       	$sgrRecurso->detach_validador($validador);
+      });
+    }
+    foreach ($gestores as $gestor) {
+      $grupo->gestores()->detach($gestor);
+      $recursos = $grupo->recursos->each(function($recurso) use ($gestor) {
+       	$sgrRecurso = Factoria::getRecursoInstance($recurso);
+       	$sgrRecurso->detach_gestor($gestor);
+      });
+   	}
+   	return true;
+  }
+
+	public function removeRelacionConRecurso($id,$administradores,$validadores,$gestores){
+  	$recurso = recurso::findOrFail($id);
+    $sgrRecurso = Factoria::getRecursoInstance($recurso);
+    
+    foreach ($administradores as $administrador) {
+    	$sgrRecurso->detach_administrador($administrador);
+    }
+    foreach ($validadores as $validador) {
+      $sgrRecurso->detach_validador($validador);
+    }
+    foreach ($gestores as $gestor) {
+     	$sgrRecurso->detach_gestor($gestor);
+    }
+   	return true;
+  }
+
 
 }

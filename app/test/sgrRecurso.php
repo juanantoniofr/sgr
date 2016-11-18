@@ -4,7 +4,7 @@
 
 		protected $recurso; //obj Recurso
 		protected $items = array(); //array de obj sgrRecurso 
-		protected $contendor; //Obj Recurso
+		protected $contendor; //Obj Recurso || null
 		
 		public function __construct($recurso = ''){
 			if (empty($recurso)) 	$this->recurso = new Recurso;
@@ -13,8 +13,9 @@
 			foreach ($recurso->items as $item) {
 				$this->items[] = new recursoItem($item);
 			}
-			if ($this->recurso->contenedor != null)		$this->contenedor = $this->recurso->contenedor;
-			else $this->contenedor = new Recurso;
+			$this->contenedor = $this->recurso->contenedor;
+			//if ($this->recurso->contenedor != null)		$this->contenedor = $this->recurso->contenedor;
+			//else $this->contenedor = null;
 
 			return $this;
 		}
@@ -42,22 +43,7 @@
 
 			return $this->recurso->administradores->contains($id);
 		}
-		/**
-			* habilita recurso para su reserva
-		*/
-		public function enabled(){
-			
-			return $this->recurso->disabled = 0; //false
-		}
-
-		/**
-			* deshabilita recurso para su reserva
-		*/
-		public function disabled(){
-			
-			return $this->recurso->disabled = 1; //true
-		}
-
+		
 		public function isDisabled(){
 
 			return $this->recurso->disabled; 

@@ -1,4 +1,4 @@
-<!-- / Modal edit grupo  -->
+<!-- / Modal edit grupo  :) -->
 <div class="modal fade myModal-lg " id="m_editgrupo" tabindex="-2" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_editgrupo'))}}          
     <div class="modal-dialog modal-md">

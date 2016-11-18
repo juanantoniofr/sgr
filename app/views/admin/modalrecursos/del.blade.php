@@ -1,4 +1,4 @@
-<!-- modal eliminar recurso -->
+<!-- modal eliminar recurso :)-->
 <div class="modal fade" id="m_delrecurso" tabindex="-7" role="dialog" aria-labelledby="borrarRecurso" aria-hidden="true">
     {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_delrecurso'))}}  
     <div class="modal-dialog modal-md">
@@ -23,6 +23,9 @@
                 <div class="form-group hidden">
                     {{Form::text('idrecurso','',array('class' => 'form-control'))}}
                 </div>
+                <div class="form-group hidden">
+                  {{Form::text('grupoid','',array('class' => 'form-control'))}}
+                </div> 
 
                 
             </div><!-- ./.modal-body -->
@@ -30,7 +33,7 @@
             <div class="modal-footer">
                 <div class="col-md-12" style="margin-top:10px">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" data-idrecursopadre="" id ="fm_delrecurso_save">
+                    <button type="submit" class="btn btn-primary" id="fm_delrecurso_save">
                         <i class="fa fa-trash-o fa-fw"></i> Eliminar
                     </button>
                 </div>

@@ -134,64 +134,6 @@ $(function(e){
     });
   });
 
-  //Ajax: añadir relacion(administrador//gestor//validador) persona-grupo 
-  $('#fm_addPersonaGrupo_save').on('click',function(e){ // :)
-    e.preventDefault();
-    showGifEspera();
-        
-    $.ajax({
-      type: "POST",
-      url:  "ajaxAddrelacionUsuarioGrupo",
-      data: $('form#fm_addPersonaGrupo').serialize(),
-      success: function($respuesta){
-            if ($respuesta.error === true) {
-              hideGifEspera();
-              m_hideMsg();//Oculto mensaje de error en ventana modal.
-              hideMsg();//Oculto mensajes en cuerpo página html
-              m_showMsg($respuesta.errors,'#m_addPersonaGrupo');//muestro errores en la ventana modal
-             }
-            else {
-              hideGifEspera();
-              $('#m_addPersonaGrupo').modal('hide');   
-              showMsg($respuesta.msg);
-              $grupo_id = $('form#addPersonaGrupo input[name="idgrupo"]').val();
-              updateListadoRecursos('#ulrecursosdelgrupo_'+ $grupo_id); 
-            }   
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-            hideGifEspera();
-            alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-      }
-    });
-  });
-
-	//Ajax: elimina relación (administrador//gestor//validor) persona-grupo
-  $('#fm_removePersonaGrupo_save').on('click',function(e){// :)
-    e.preventDefault();
-    showGifEspera();
-    $.ajax({
-      type: "POST",
-      url:  "ajaxRemoverelacionUsuarioGrupo",
-      data: $('form#fm_removePersonaGrupo').serialize(),
-      success: function($respuesta){
-          if ($respuesta.error === true) {
-            hideGifEspera();
-            m_hideMsg();//Oculto mensaje de error en ventana modal.
-            hideMsg();//Oculto mensajes en cuerpo página html
-            m_showMsg($respuesta.errors,'#m_removePersonaGrupo');//muestro errores en la ventana modal
-          }
-          else {
-            hideGifEspera();
-            $('#m_removePersonaGrupo').modal('hide');   
-            showMsg($respuesta.msg);
-            updateListadoRecursos(); 
-          }
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          hideGifEspera();
-          alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-        }
-      });
-  });
+ 
 
 });

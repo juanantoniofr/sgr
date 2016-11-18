@@ -21,16 +21,16 @@
         <small style="margin:10px"> | </small>
 
         <!-- presonas -->
-        <a class="addRelacionUsuarioGrupo"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}"  title="Añadir administradores, gestores, y/o validadores" ><i class="fa fa-user-plus fa-fw"></i></a>
-        <a class="delRelacionUsuarioGrupo"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}" ><i class="fa fa-user-times fa-fw"></i></a>
-        <a class="verUsuarioConRelacionGrupo"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}" title="Ver  Administradores, gestores y/o validadores" ><i class="fa fa-eye fa-fw"></i></a>
+        <a class="addRelacion"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}"  title="Añadir administradores, gestores, y/o validadores" data-tipo = "grupo" data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-user-plus fa-fw"></i></a>
+        <a class="delRelacion"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}"  title="Eliminar administradores, gestores, y/o validadores" data-tipo = "grupo" data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-user-times fa-fw"></i></a>
+        <a class="verRelacion"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}" title="Ver  Administradores, gestores y/o validadores" data-tipo = "grupo" data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-eye fa-fw"></i></a>
       </span>
     @endif
         
     <a href="#" class="badge listarRecursos" data-ulrecursosdelgrupo="#ulrecursosdelgrupo_{{$sgrGrupo->id()}}" data-grupoid="{{$sgrGrupo->id()}}"><i class="i_{{$sgrGrupo->id()}} fa fa-angle-double-down fa-fw"></i>{{count($sgrGrupo->recursos())}}</a>
      
-    <!-- recurso en el grupo -->
-    <ul style="margin-left:1.5em;display:none" id="ulrecursosdelgrupo_{{$sgrGrupo->id()}}" class="list-group ul_{{$sgrGrupo->id()}}">
+    <!-- Opciones de administración de cada recurso en el grupo -->
+    <ul style="margin-left:1.5em;display:none" id="ulrecursosdelgrupo_{{$sgrGrupo->id()}}" class="list-group ul_{{$sgrGrupo->id()}} ">
       @foreach($sgrGrupo->recursos() as $sgrRecurso)
         <li class="list-group-item listitemrecurso">
           <a  href= "#spanopcionesrecurso_{{$sgrRecurso->id()}}" class="@if($sgrRecurso->isDisabled()) text-warning @else text-success @endif toggleOpcionesRecurso @if(count($sgrRecurso->items()) > 0) listarItems @endif" @if(count($sgrRecurso->items()) > 0) title="Ver {{Config::get('string.items'.$sgrRecurso->tipo())}}" data-ulitemsid="#ulitems_{{$sgrRecurso->id()}}" data-recursoid="{{$sgrRecurso->id()}}" @endif> {{$sgrRecurso->nombre()}} @if(count($sgrRecurso->items()) > 0) <i class="i_{{$sgrRecurso->id()}} fa fa-angle-double-down fa-fw"></i> @endif</a>
@@ -48,10 +48,10 @@
               <!-- enabled/disabled -->
               @if($sgrRecurso->isDisabled())
                 <!-- habilitar -->
-                <a href="#" title="Habilitar {{Config::get('string.'.$sgrRecurso->tipo())}}" class="enabled text-success" data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}"><i class="fa fa-toggle-off fa-fw"></i></a>
+                <a href="#" title="Habilitar {{Config::get('string.'.$sgrRecurso->tipo())}}" class="enabled text-success" data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-toggle-off fa-fw"></i></a>
               @else    
                 <!-- deshabilitar -->
-                <a href="#" title = "Deshabilitar {{Config::get('string.'.$sgrRecurso->tipo())}}" class="disabled text-warning" data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" ><i class="fa fa-toggle-on fa-fw "></i></a>
+                <a href="#" title = "Deshabilitar {{Config::get('string.'.$sgrRecurso->tipo())}}" class="disabled text-warning" data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-toggle-on fa-fw "></i></a>
               @endif 
                             
               <small style="margin:10px"> | </small>
@@ -65,14 +65,15 @@
               <small style="margin:10px"> | </small>
 
               <!-- presonas -->
-              <a class="addUserWithRol" href="#" title="Añadir administradores, gestores, y/o validadores"  data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}"><i class="fa fa-user-plus fa-fw"></i></a>
-              <a class="removeUserWithRol" href="#" title="Eliminar Administradores, gestores y/o validadores"  data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}"><i class="fa fa-user-times fa-fw"></i></a>
-              <a class="verUsuarioConRelacionRecurso"  href="#" data-id="{{$sgrGrupo->id()}}" data-nombre="{{$sgrGrupo->nombre()}}" title="Ver  Administradores, gestores y/o validadores" ><i class="fa fa-eye fa-fw"></i></a>
+              <a class="addRelacion" href="#" title="Añadir administradores, gestores, y/o validadores"  data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" data-tipo='recurso' data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-user-plus fa-fw"></i></a>
+              <a class="delRelacion" href="#" title="Eliminar Administradores, gestores y/o validadores"  data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" data-tipo='recurso' data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-user-times fa-fw"></i></a>
+              <a class="verRelacion"  href="#" data-id="{{$sgrRecurso->id()}}" data-nombre="{{$sgrRecurso->nombre()}}" title="Ver  Administradores, gestores y/o validadores" data-tipo='recurso' data-grupoid="{{$sgrGrupo->id()}}"><i class="fa fa-eye fa-fw"></i></a>
             </span>
           @endif
                       
           <!--items -->
           @if(count($sgrRecurso->items()) > 0)
+           
             <a href="#" class="badge listarItems" data-ulitemsid="#ulitems_{{$sgrRecurso->id()}}" data-recursoid="{{$sgrRecurso->id()}}"><i class="i_{{$sgrRecurso->id()}} fa fa-angle-double-down fa-fw"></i>{{count($sgrRecurso->items())}}</a>
           @endif
 
@@ -86,32 +87,21 @@
                     class=" @if($item->isDisabled()) text-warning @else text-success @endif
                             toggleOpcionesItem">{{$item->nombre()}}
                   </a>
-
+                  <!-- opciones de administración de recursos tipo item -->
                   @if ( Auth::user()->isAdmin() || $item->isAdministrador(Auth::user()->id) )
                                 
                     <span style="display:none" id="spanopcionesitem_{{$item->id()}}" class="opcionesItem">
                       <!-- editar -->
                       <a href="#" title="Editar {{Config::get('string.'.$item->tipo())}}" class="linkEditRecurso text-info" data-id="{{$item->id()}}" data-nombrecontenedor="{{$item->contenedor()->nombre}}"><i class="fa fa-pencil fa-fw"></i></a>
-             
-
-
-
                       <!-- eliminar -->
-                      <a href="#" title="Eliminar {{Config::get('string.'.$item->tipo())}}" class = "linkEliminaRecurso text-info" data-id="{{$item->id()}}" data-nombre="{{$item->nombre()}}" data-numeroeventos="{{$item->getEventos(strtotime('now'),Config::get('options.estadosEvento'),Config::get('options.maxtimestamp'))->count()}}" data-idrecursopadre="{{$sgrRecurso->id()}}">
-
-                       
-
-
-             
-
-
-                      <i class="fa fa-trash-o fa-fw"></i></a>
+                      <a href="#" title="Eliminar {{Config::get('string.'.$item->tipo())}}" class = "linkEliminaRecurso text-info" data-id="{{$item->id()}}" data-nombre="{{$item->nombre()}}" data-numeroeventos="{{$item->getEventos(strtotime('now'),Config::get('options.estadosEvento'),Config::get('options.maxtimestamp'))->count()}}" data-grupoid="{{$item->contenedor()->id}}"><i class="fa fa-trash-o fa-fw"></i></a>
+                      
                       @if($item->isDisabled())
                         <!-- habilitar  -->
-                        <a id="link_{{$item->id}}" href="" class = "enabled text-success" data-idrecurso="{{$item->id()}}" data-nombrerecurso="{{$item->nombre()}}" title = "Habilitar {{Config::get('string.'.$item->tipo())}}" data-idrecursopadre="{{$item->contenedor()->id}}"><i class="fa fa-toggle-off fa-fw"></i></a>
+                        <a href="#" title = "Habilitar {{Config::get('string.'.$item->tipo())}}" class="enabled text-success" data-id="{{$item->id()}}" data-nombre="{{$item->nombre()}}"  data-grupoid="{{$sgrRecurso->id()}}"><i class="fa fa-toggle-off fa-fw"></i></a>
                       @else    
                         <!-- deshabilitar-->
-                        <a id="link_{{$item->id()}}" href="" class = "disabled text-warning" data-idrecurso="{{$item->id()}}" data-nombrerecurso="{{$item->nombre()}}" title = "Deshabilitar {{Config::get('string.'.$item->tipo())}}" data-idrecursopadre="{{$item->contenedor()->id}}"><i class="fa fa-toggle-on fa-fw "></i></a>
+                        <a href="#" title="Deshabilitar {{Config::get('string.'.$item->tipo())}}" class="disabled text-warning" data-id="{{$item->id()}}" data-nombre="{{$item->nombre()}}"  data-grupoid="{{$sgrRecurso->id()}}"><i class="fa fa-toggle-on fa-fw "></i></a>
                       @endif 
                     </span>
                   @endif   

@@ -49,49 +49,6 @@ class GruposController extends BaseController {
     return $htmloptionsrecursos;
   }
 	
- 
-  /**
-    * // Devuelve listas de input type checkbox para formulario con las personas que tienen alguna de las relaciones de supervisor//técnico//validador
-    * 
-    * @param Input::get('idrecurso') int identificador de recurso
-    *
-    * @return $result array
-  */
-  public function htmlCheckboxPersonas(){//sirve de algo ????
-
-    //input
-    $id = Input::get('idgrupo','');
-
-    //Output
-    $result = array( 'errors'                 => array(),
-                     'error'                 => false,
-                     'htmlCheckboxPersonas'  => '',
-                    );
-    
-    //Validate
-    $rules = array(
-        'idgrupo'  => 'required|exists:grupoRecursos,id', //exists:table,column
-        );
-
-    $messages = array(
-          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
-          'exists'    => 'No existe identificador de recurso en BD.', 
-          );
-    $validator = Validator::make(Input::all(), $rules, $messages);
-    
-    //get personas or return error
-    if ($validator->fails()){
-        $result['errors'] = $validator->errors()->toArray();
-        $result['error'] = true;
-    }
-    else{
-      $grupo = grupoRecurso::findOrFail($id);
-      $result['htmlCheckboxPersonas'] = (string) View::make('admin.html.checkboxPersonas')->with(compact('grupo'));
-    }
-      
-    return $result;  
-  }
-
   /**
     * //Devuelve todos los grupos
     * @param void

@@ -14,6 +14,7 @@ class GrupoRecurso extends Eloquent{
 
   //Devuelve los usuarios administradores de un grupo
   public function administradores(){
+    
     return $this->belongsToMany('User','grupo_administradores','grupo_id','user_id');
   }
  	
@@ -24,6 +25,7 @@ class GrupoRecurso extends Eloquent{
 
   //Devuelve los usuarios administradores de un grupo
   public function gestores(){
+    
     return $this->belongsToMany('User','grupo_gestores','grupo_id','user_id');
   }
 

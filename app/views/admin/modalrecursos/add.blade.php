@@ -1,4 +1,4 @@
-<!-- / Modal add recurso  -->
+<!-- / Modal add recurso (Espacio|tipoequipo|puesto|equipo) :) -->
 <div class="modal fade myModal-lg" id="m_addrecurso" tabindex="-4" role="dialog" aria-hidden="true" aria-labelledby="modalAddRecursoLabel">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addrecurso'))}}
   <div class="modal-dialog modal-lg">
@@ -6,7 +6,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> Añadir nuevo <b><span id="m_addrecurso_title_tiporecursoAañadir"></span></b> en: <span class = "text-primary" id="m_addrecurso_title_nombre"></span></h2>
+        <h2 class="modal-title text-info"><i class="fa fa-institution fa-fw"></i> XXAñadir nuevo <b><span id="m_addrecurso_title_tiporecursoAañadir"></span></b> en: <span class = "text-primary" id="m_addrecurso_title_nombre"></span></h2>
       </div><!-- ./modal-header -->
 
       <div class="modal-body">

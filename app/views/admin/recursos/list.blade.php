@@ -42,7 +42,10 @@
   {{ $modalEditGrupo                or '' }}
   {{ $modalDelGrupo                 or '' }}
   {{ $modalAddRecursosToGrupo       or '' }}
-  {{ $modalAddRelacionUsuarioGrupo  or '' }}
+  
+  <!-- relaciones -->
+  {{ $modalAddRelacion         or '' }}
+  {{ $modalRemoveRelacion      or '' }}
 
   <!-- recursos -->
   {{ $modalAddRecurso         or '' }}
@@ -51,7 +54,6 @@
   {{ $modalEnabledRecurso     or '' }}
   {{ $modalDisabledRecurso    or '' }}
   
-  {{ $modalRemovePersona      or '' }}
 
   <!-- Puestos -->
   
@@ -70,13 +72,12 @@
   <script type="text/javascript">CKEDITOR.replace( 'fm_editgrupo_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_addrecurso_inputdescripcion' );</script>
   <script type="text/javascript">CKEDITOR.replace( 'fm_editrecurso_inputdescripcion' );</script>
- 
   <script type="text/javascript">CKEDITOR.replace( 'fm_disabledrecurso_motivo' );</script>
   
-      
-  {{  HTML::script('assets/js/recursos.js') }}
-  {{  HTML::script('assets/js/grupo.js')    }}
-  {{  HTML::script('assets/js/comun.js')    }}
-  {{  HTML::script('assets/js/admin.js')    }}
+  {{  HTML::script('assets/js/relaciones.js') }}    
+  {{  HTML::script('assets/js/recursos.js')   }}
+  {{  HTML::script('assets/js/grupo.js')      }}
+  {{  HTML::script('assets/js/comun.js')      }}
+  {{  HTML::script('assets/js/admin.js')      }}
   
 @stop

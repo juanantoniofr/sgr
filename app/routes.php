@@ -66,12 +66,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //fin
 //**************************
 
-//routes relaciones user-grupo (gestor//administrador//validador)
-  Route::post('admin/ajaxAddrelacionUsuarioGrupo',array('uses' => 'RelacionesController@ajaxAddrelacionUsuarioGrupo','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
-  Route::get('admin/ajaxGetGestoresGrupo',array('uses' => 'RelacionesController@ajaxGetGestoresGrupo','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
-  Route::get('admin/ajaxGetAdministradoresGrupo',array('uses' => 'RelacionesController@ajaxGetAdministradoresGrupo','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
-  Route::get('admin/ajaxGetValidadoresGrupo',array('uses' => 'RelacionesController@ajaxGetValidadoresGrupo','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
-  Route::post('admin/ajaxRemoverelacionUsuarioGrupo',array('uses' => 'RelacionesController@ajaxRemoverelacionUsuarioGrupo','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
+//routes relaciones user-grupo || user-recurso (gestor//administrador//validador)
+  Route::post('admin/ajaxAddRelacion',array('uses' => 'RelacionesController@ajaxAddRelacion','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
+  Route::get('admin/ajaxGetGestores',array('uses' => 'RelacionesController@ajaxGetGestores','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
+  Route::get('admin/ajaxGetAdministradores',array('uses' => 'RelacionesController@ajaxGetAdministradores','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
+  Route::get('admin/ajaxGetValidadores',array('uses' => 'RelacionesController@ajaxGetValidadores','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
+  Route::post('admin/ajaxRemoveRelacion',array('uses' => 'RelacionesController@ajaxRemoveRelacion','before' => array('auth','auth_ajax','capacidad:4-6,msg'))); // :)
 //fin
 //*************************
 
@@ -82,51 +82,28 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
   Route::get('admin/ajaxGetDatosRecurso',array('uses'=>'recursosController@ajaxGetDatosRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)  
   Route::post('admin/ajaxEditRecurso',array('uses' => 'recursosController@ajaxEditRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg')));// :)
-  Route::post('admin/ajaxDelRecurso',array('uses' => 'recursosController@ajaxDelRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :/
+  Route::post('admin/ajaxDelRecurso',array('uses' => 'recursosController@ajaxDelRecurso','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
+  Route::post('admin/AjaxDisabled',array('uses'=>'recursosController@AjaxDisabled','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
+  Route::post('admin/AjaxEnabled',array('uses'=>'recursosController@AjaxEnabled','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
+//fin gestión de recursos
+//******************************* 
 
 
-  Route::post('admin/disabled',array('uses'=>'recursosController@disabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-  Route::post('admin/enabled',array('uses'=>'recursosController@enabled','before' => array('auth','ajax_check','capacidad:4-6,msg')));
-  
+
 
   Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
   Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
   Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
-
-
-
-  
-
-
-  
-  
-  
-  
-  
-  
-  
-  Route::post('admin/removePersonas',array('uses' => 'RelacionesController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
-  Route::get('admin/htmlCheckboxPersonas',array('uses' => 'GruposController@htmlCheckboxPersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));  
+  //Route::post('admin/removePersonas',array('uses' => 'RelacionesController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+ 
   Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
   Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'GruposController@getRecursos','before' => array('auth','ajax_check')));
-//fin gestión de recursos
-//*******************************
-
-
-
-
-
-
-
-
-
-
-
 
 
 //routes POD
-Route::get('admin/pod.html',array('as' => 'pod.html','uses' => 'PodController@index','before' => array('auth','capacidad:4,msg')));
-Route::post('admin/pod.html',array('as' => 'uploadPOD','uses' => 'PodController@savePOD','before' => array('auth','capacidad:4,msg')));
+  Route::get('admin/pod.html',array('as' => 'pod.html','uses' => 'PodController@index','before' => array('auth','capacidad:4,msg')));
+  Route::post('admin/pod.html',array('as' => 'uploadPOD','uses' => 'PodController@savePOD','before' => array('auth','capacidad:4,msg')) );
+//fin routes POD
 
 //routes logs & config
 Route::get('admin/config.html',array('as' => 'config.html',function(){
