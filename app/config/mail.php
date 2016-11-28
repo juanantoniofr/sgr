@@ -54,8 +54,8 @@ return array(
 	|
 	*/
 
-	//'from' => array('address' => 'uniticfcom@gmail.com', 'name' => 'Uniticfcom SGR development'),
-	'from' => array('address' => 'fcomunitic@gmail.com', 'name' => 'Fcomunitic SGR development'),
+	'from' => array('address' => 'uniticfcom@gmail.com', 'name' => 'SGR fcom'),
+	//'from' => array('address' => 'fcomunitic@gmail.com', 'name' => 'SGR fcom'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -81,7 +81,7 @@ return array(
 	|
 	*/
 
-	//'username' => 'uniticfcom@gmail.com',
+	'username' => 'uniticfcom@gmail.com',
 	//'username' => 'fcomunitic@gmail.com',
 
 	/*
@@ -95,8 +95,9 @@ return array(
 	|
 	*/
 
-	//'password' =>  'p4ssunitic',
+	//'password' =>  'p4ssunitic',//fcomunitic
 	'password' =>  'p4ss_un1t1c',//uniticfcom
+
 
 	/*
 	|--------------------------------------------------------------------------
@@ -108,7 +109,7 @@ return array(
 	| been provided here, which will work well on most of your systems.
 	|
 	*/
-	//'sendmail'	=> 'C:\xampp\sendmail\sendmail.exe -t',
+	
 	'sendmail' => '/usr/sbin/sendmail -bs',
 
 	/*
