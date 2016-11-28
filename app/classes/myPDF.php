@@ -31,7 +31,7 @@ class myPDF {
 		/*
 		in: $hmtl -> Cuerpo en html del archivo pdf
 		*/
-		$pdf = new PDFex(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', true);
+		$pdf = new PDFex(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 		// set document information
 		$pdf->SetCreator(PDF_CREATOR);
@@ -84,16 +84,13 @@ class myPDF {
 		$pdf->AddPage();
 
 		// set text shadow effect
-		//$pdf->setTextShadow(array('enabled'=>true, 'depth_w'=>0.2, 'depth_h'=>0.2, 'color'=>array(196,196,196), 'opacity'=>1, 'blend_mode'=>'Normal'));
+		$pdf->setTextShadow(array('enabled'=>true, 'depth_w'=>0.2, 'depth_h'=>0.2, 'color'=>array(196,196,196), 'opacity'=>1, 'blend_mode'=>'Normal'));
 
 		// Set some content to print
 		
 		// Print text using writeHTMLCell()
-		//$pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
-		// output the HTML content
-		$pdf->setCellMargins('','','',1);
-		$pdf->writeHTML($html, true, false, true, false, '');
-		//$pdf->writeHTML($html, true, true, false, false, '');
+		$pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
+		//$pdf->writeHTML($html);
 		// ---------------------------------------------------------
 
 		// Close and output PDF document
