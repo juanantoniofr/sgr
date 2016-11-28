@@ -32,35 +32,82 @@ App::after(function($request, $response)
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
+/*		El filtro req2 permite bloquear el acceso al calendario para reservar a los alumnos con el número de horas máximo a la semana (12h) agotado
+*/
 
-
-Route::filter('auth', function(){
+//Developed
+/*Route::filter('auth', function()
+{
+	//$user = User::find('30');
+	//Auth::login($user);
+	if (Auth::guest()) return Redirect::to(route('loginsso'));
 	
-    if (!Cas::isAuthenticated() || !Auth::check()) {
-    
+});*/
+Route::filter('auth', function()
+{
+	
+    if (!Cas::isAuthenticated() || !Auth::check()) 
     	if (Request::ajax()) {
+
     		return Response::make('Necesitas iniciar sesión de nuevo. Por favor, recarga la página', 401);
     	}
     	else return Redirect::to(route('wellcome'));
-    
-    }
 });
 
-//Comprueba si la petición se realizó por ajax 
+//Comprueba si la petición se realizó por ajax y el usaurio está autenticado
 Route::filter('ajax_check',function(){
 		
 	if(!Request::ajax()) return Redirect::to(route('wellcome'));
-
+	
 });
 
 //Comprobar si el usuario autentivcado tiene privilegios para realizar la acción requerida
 Route::filter('capacidad',function($ruta,$peticion,$capacidad,$redirect) {
+	
 	$roles  = explode("-",$capacidad);
-	if (!in_array(Auth::user()->capacidad, $roles))	return Redirect::to($redirect);
+	if (!in_array(Auth::user()->capacidad, $roles)){
+		$msg = 'Privilegios insuficientes';
+		$title = 'Error de acceso';
+		return Redirect::to($redirect)->with(compact('title','msg'));
+	}
+	if (strtotime(Auth::user()->caducidad) < strtotime('now')){
+		$msg = 'Cuenta caducada';
+		$title = 'Error de acceso';
+		return Redirect::to($redirect)->with(compact('title','msg'));
+	}
+	if (Auth::user()->estado == 0){
+		$msg = 'Cuenta desactivada';
+		$title = 'Error de acceso';
+		return Redirect::to($redirect)->with(compact('title','msg'));
+	}
+});
+//Comprobar si el sistema permite a los usarios registrar reservas.
+
+Route::filter('inicioCurso',function(){
+
+	if (ACL::isUser() || ACL::isAvanceUser()){
+		$hoy = strtotime('today');
+		$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
+		if ($diaInicio > $hoy) {
+			$title = 'Acceso limitado';
+			$msg = 'MSG: No es posible realizar reservas hasta que se finalice la carga del POD: fecha prevista a partir del día ' . date('d-m-Y',strtotime(Config::get('options.inicio_gestiondesatendida')));
+			return Redirect::to('loginerror')->with(compact('title','msg'));
+		}
+	}
+});
+//Comprobar si el sistema permite a los usarios registrar reservas.
+
+Route::filter('inicioCurso',function(){
+
+	if (ACL::isUser() || ACL::isAvanceUser()){
+		$hoy = strtotime('today');
+		$diaInicio = strtotime(Config::get('options.inicio_gestiondesatendida'));
+		if ($diaInicio > $hoy) return Redirect::to('user/msg');
+	}
 });
 
-
-Route::filter('auth.basic', function(){
+Route::filter('auth.basic', function()
+{
 	return Auth::basic();
 });
 
@@ -98,3 +145,6 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
+
+
+

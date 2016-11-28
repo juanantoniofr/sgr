@@ -1,6 +1,6 @@
 <?php
 
-//req1: alumno solo pueden reservar entre firstMonday y lastFriday  
+//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
 Validator::extend('req1', function($attribute, $value, $parameters){
 	    return false;
 	});   
@@ -34,10 +34,15 @@ Validator::extend('date_es',function($attributes,$value,$parameters){
 Validator::extend('datefincurso',function($attributes,$value,$parameters){
 	return false;
 });
-//date_InicioCurso: fecha mínima de reservas dentro del curso académico 
+//date_inicioCurso: fecha de inicio de reservas dentro del curso académico 
 Validator::extend('dateiniciocurso',function($attributes,$value,$parameters){
 	return false;
 });
+//dateiniciotitulospropios: fecha de inicio de reservas para titulos propios
+Validator::extend('dateiniciotitulospropios',function($attributes,$value,$parameters){
+	return false;
+});
+
 //reservaUnica: alumnos no puden reservar dos equipos o puestos a la misma hora
 Validator::extend('reservaunica',function($attributes,$value,$parameters){
 	return false;
@@ -50,12 +55,7 @@ Validator::extend('existeuvus',function($attributes,$value,$parameters){
 
 //recurso deshabilitado
 Validator::extend('deshabilitado',function($attributes,$value,$parameters){
-	return false;
-});
-
-//$grupo->tipo debe ser igual a $recurso->tipo
-Validator::extend('sametypes',function($attributes,$value,$parameters){
-	return false;
+    return false;
 });
 
 ?>
