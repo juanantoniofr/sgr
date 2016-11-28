@@ -116,6 +116,60 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	
 	
 	
+	
+
+	
+	
+	
+	
+	/**
+	 * Implementa requisito: Alumnos no pueden hacer reservas periodicas
+	 * @param void
+	 * @return $repetir boolean true si el usuario puede hacer reservas periodicas (usuarios con capacidad 1, alumnos, no pueden)
+	*/
+	public function puedePeriodica(){
+		
+		$repetir = true;
+
+		//Perfil alumno: -> No puede realizar reservas periodicas
+		if ($this->isUser()) $repetir = false; 
+
+		return $repetir;
+	}
+
+	//Alumnos
+	public static function isUser(){
+		$isUser = false;
+
+		if (Auth::user()->capacidad == 1) $isUser = true;
+
+		return $isUser;
+	}
+	//PDI
+	public static function isAvanceUser(){
+		$isUser = false;
+
+		if (Auth::user()->capacidad == 2) $isUser = true;
+
+		return $isUser;
+	}
+	//PAS
+	public static function isTecnico(){
+		$isTecnico = false;
+
+		if (Auth::user()->capacidad == 3) $isTecnico = true;
+
+		return $isTecnico;
+	}
+	//root
+	public static function isAdmin(){
+		$isAdmin = false;
+
+		if (Auth::user()->capacidad == 4) $isAdmin = true;
+
+		return $isAdmin;
+	}
+	
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -175,60 +229,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	     parent::setAttribute($key, $value);
 	   }
 	}
-
-	
-	
-	
-	
-	/**
-	 * Implementa requisito: Alumnos no pueden hacer reservas periodicas
-	 * @param void
-	 * @return $repetir boolean true si el usuario puede hacer reservas periodicas (usuarios con capacidad 1, alumnos, no pueden)
-	*/
-	public function puedePeriodica(){
-		
-		$repetir = true;
-
-		//Perfil alumno: -> No puede realizar reservas periodicas
-		if ($this->isUser()) $repetir = false; 
-
-		return $repetir;
-	}
-
-	//Alumnos
-	public static function isUser(){
-		$isUser = false;
-
-		if (Auth::user()->capacidad == 1) $isUser = true;
-
-		return $isUser;
-	}
-	//PDI
-	public static function isAvanceUser(){
-		$isUser = false;
-
-		if (Auth::user()->capacidad == 2) $isUser = true;
-
-		return $isUser;
-	}
-	//PAS
-	public static function isTecnico(){
-		$isTecnico = false;
-
-		if (Auth::user()->capacidad == 3) $isTecnico = true;
-
-		return $isTecnico;
-	}
-	//root
-	public static function isAdmin(){
-		$isAdmin = false;
-
-		if (Auth::user()->capacidad == 4) $isAdmin = true;
-
-		return $isAdmin;
-	}
-	
-	
 
 
 }

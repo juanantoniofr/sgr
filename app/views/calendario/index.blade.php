@@ -11,28 +11,18 @@
 
 
   <div class="row">
-  <div id = "espera" style="display:none"></div>
+    <div id = "espera" style="display:none"></div>
 
     <div id="calendario">
-      <h2>
-        Calendario: <span id ="recurseName"></span> 
-
-      </h2>
-
-      <hr />
+      <h2>Calendario: <span id ="recurseName"></span></h2>
 
       <div class="form-inline pull-left" role="form">
         <div class="form-group">
-          <button class="btn btn-danger disabled"  data-toggle="modal" data-target=".myModal-sm" id="btnNuevaReserva" data-fristday="{{date('d-m-Y',sgrCalendario::fristMonday())}}"><i class="fa fa-calendar fa-fw" ></i>
-           Nueva reserva
-          </button>
-         <!--<a class="btn btn-warning" id="appletLaunch" alt="Lanzar applet lector de tarjetas" style="" > <i class="fa fa-credit-card fa-fw" ></i>Leer carnet</a>-->
-          <a class="btn btn-info" id="infoButton" alt="Muestra descripción del recurso..." style="display:none" > <i class="fa fa-eye fa-fw" ></i>Descripción</a>
-           
+          <button class="btn btn-danger disabled"  data-toggle="modal" data-target=".myModal-sm" id="btnNuevaReserva" data-fristday="{{date('d-m-Y',sgrCalendario::fristMonday())}}"><i class="fa fa-calendar fa-fw" ></i>Nueva reserva</button>
+          <a class="btn btn-info" id="infoButton" alt="Muestra descripción del recurso..." style="display:none" > <i class="fa fa-eye fa-fw" ></i>Descripción</a>           
         </div>
       </div>  
 
-      
       <div class="form-inline pull-right btn-group">
         <div class="btn-group" style = "margin-right:10px" id="btnNav">
           <button class="btn btn-primary" data-calendar-nav="prev" id="navprev"><< </button>
@@ -44,54 +34,38 @@
           <button class="btn btn-warning active" data-calendar-view="month">Mes</button>
           <button class="btn btn-warning" data-calendar-view="week">semana</button>
           <!--<button class="btn btn-warning" data-calendar-view="day">Day</button>-->
-          <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" data-container='body' title="Agenda" data-calendar-view="agenda">
-          <i class="fa fa-list fa-fw"></i> Mi Agenda
-          </button>
+          <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" data-container='body' title="Agenda" data-calendar-view="agenda"><i class="fa fa-list fa-fw"></i> Mi Agenda</button>
         </div>
-        <div class = "btn-group"  >
-          <button type="button" data-view="{{$viewActive}}" data-day="{{$sgrCalendario->dia()}}" data-month="{{$sgrCalendario->mes()}}" data-year="{{$sgrCalendario->year()}}"  id="btnprint" class="btn btn-primary disabled">
-            <i class="fa fa-print fa-fw" ></i> Imprimir
-          </button>
+        <div class = "btn-group">
+          <button type="button" data-view="{{$viewActive}}" data-day="{{$sgrCalendario->dia()}}" data-month="{{$sgrCalendario->mes()}}" data-year="{{$sgrCalendario->year()}}"  id="btnprint" class="btn btn-primary disabled"><i class="fa fa-print fa-fw" ></i>Imprimir</button>
         </div>
-     </div>
+      </div>
 
-
-      
 
       <div class="pull-left col-md-12">          
-      @if(isset($msg) && !empty($msg))
-        <div class="alert alert-danger text-center" role="alert" id="alert_msg" data-nh="{{$nh}}"><strong>{{$msg}}</strong></div> 
-      @else
-        <div class="alert alert-danger text-center" role="alert" id="alert"><strong> Por favor, seleccione espacio o medio a reservar</strong></div> 
-       
-      @endif
-      <div style = "display:none" class="alert alert-info col-md-12 text-center" role="alert" id="msg"></div> 
-      <div style = "display:none" class="alert alert-success col-md-12 text-center" role="alert" id="message"></div>
-      <div style = "display:none" class="alert alert-warning col-md-12 text-center" role="alert" id="warning"></div>
-    
-    </div>
-
-      
-      <div id="loadCalendar">  
-      
+        @if(isset($msg) && !empty($msg))
+          <div class="alert alert-danger text-center" role="alert" id="alert_msg" data-nh="{{$nh}}"><strong>{{$msg}}</strong></div> 
+        @else
+          <div class="alert alert-danger text-center" role="alert" id="alert"><strong> Por favor, seleccione espacio o medio a reservar</strong></div> 
+        @endif
+          <div style = "display:none" class="alert alert-info col-md-12 text-center" role="alert" id="msg"></div> 
+          <div style = "display:none" class="alert alert-success col-md-12 text-center" role="alert" id="message"></div>
+          <div style = "display:none" class="alert alert-warning col-md-12 text-center" role="alert" id="warning"></div>
+          <div style = "display:none" id="ajax_msg"></div>
       </div>
+      
+      <div id="loadCalendar"></div>
    
     </div>   
 
 
- </div>
- <!-- /#row -->
-</div>
-
-  <!-- /#page-wrapper -->
+ </div><!-- /#row -->
+</div><!-- /#page-wrapper -->
 
 <!-- Modal eliminar reserva -->
 {{$modalDeleteReserva or ''}}
-
 <!-- Modal añadir & editar reserva -->
 {{$modalAddReserva or ''}}
-
-
 <!-- ./modal addEvent & editEvent -->
 
 <!-- Modal print -->
@@ -157,8 +131,6 @@
 
 
 @section('js')
-  
-  
   <script type="text/javascript">
         function writeToContainer(valor){
                 $('#dni').html(valor).change();

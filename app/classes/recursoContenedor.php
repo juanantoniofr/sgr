@@ -41,7 +41,10 @@
 			foreach ($this->items as $item) {
 				if ($item->esVisible($capacidad)) return true; //true si al menos un puesto / equipo es visible
 			}
-			return false; // si no salimos antes, ningún item (puesto / equipo) es visible => el espacio / tipoequipo tampoco es visible
+			$permisos = json_decode($this->recurso->acl,true); 
+      if (strpos($permisos['r'],$capacidad) !== false) return true;
+			
+			return false; // si no salimos antes
 		}
 		
 		/**

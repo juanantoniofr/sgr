@@ -32,7 +32,6 @@ $(function(e){
 				data: {username:getUvus()},
 
 				success: function(respuesta){
-				
 					if (respuesta === '-1'){
 						
 						$('#errorgetEvents span').html('Usuario no leido....');

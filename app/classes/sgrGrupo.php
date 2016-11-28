@@ -51,6 +51,7 @@ class sgrGrupo {
 	}
 
 	/**
+		*
 		* //devuelve los recursos (sgrRecursos) en el grupo
 	*/
 	public function recursos(){
@@ -58,6 +59,16 @@ class sgrGrupo {
 		return $this->sgrRecursos;
 	}
 
+	public function recursosvisibles($capacidad = ''){
+		$recursosvisibles = array();
+		if (in_array($capacidad, Config::get('options.capacidades')) == false) return $recursosvisibles;
+
+		foreach ($this->sgrRecursos as $sgrRecurso) {
+			if ($sgrRecurso->esVisible($capacidad)) $recursosvisibles[] = $sgrRecurso;
+		}
+
+		return $recursosvisibles;
+	}
 
 }
 ?>

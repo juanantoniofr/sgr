@@ -29,6 +29,7 @@ return array (
 	
 	
 	//Capacidades - Rol o perfil de usuario
+	'capacidades'								=> array('1','2','3','4','5','6'),
 	'capacidadUsuario'				 	=> '1', //Usuarios (Alumnos)
 	'capacidadUsuarioAvanzado' 	=> '2', //Usuarios Avanzados (PDI & PAS de Administración)
 	'capacidadTécnico' 					=> '3', //Técnicos (PAS)
@@ -96,6 +97,8 @@ return array (
 	'tipoequipos'					=>	'tipoequipos',
 	'tipoItemsContenidosEn_espacio' 			=> 'puesto',
 	'tipoItemsContenidosEn_tipoequipos' 	=> 'equipo',
+
+	'objectWithRelation' => 'grupo,recurso',
 
 	'defaultview'					=>	'month',
 	'viewsCalendar'				=> 	array('month','week','year','day'),

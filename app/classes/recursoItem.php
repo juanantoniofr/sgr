@@ -15,6 +15,7 @@
 		}
 
 		/**
+			*
 			* habilita recurso para su reserva
 		*/
 		public function enabled(){

@@ -1,10 +1,10 @@
-@foreach ($recursos as $recurso)
-  <option value="{{$recurso->id}}" 
-  				data-numeroitems="{{$recurso->items->count()}}"
-  				data-disabled="{{$recurso->disabled}}" 
+@foreach ($sgrRecursos as $sgrRecurso)
+  <option value="{{$sgrRecurso->id()}}" 
+  				data-numeroitems="{{count($sgrRecurso->itemsVisiblesParaCapacidad(Auth::user()->capacidad))}}"
+  				data-disabled="{{$sgrRecurso->isDisabled()}}" 
   				data-atendido=@if (Auth::user()->atiende)) "1" @else "0" @endif
-  				@if ($recurso->disabled) class="text-danger" @endif
+  				@if ($sgrRecurso->isDisabled()) class="text-danger" @endif
   				>
-  				{{$recurso->nombre}} @if ($recurso->disabled) (Deshabilitado) @endif 
+  				{{$sgrRecurso->nombre()}} @if ($sgrRecurso->isDisabled()) (Deshabilitado) @endif 
   </option>                  
 @endforeach

@@ -88,36 +88,55 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //fin gestión de recursos
 //******************************* 
 
-
-
-
-  Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
-  Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
-  Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
-  //Route::post('admin/removePersonas',array('uses' => 'RelacionesController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
- 
-  Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
-  Route::get('getRecursos',array('as' => 'getRecursos','uses' => 'GruposController@getRecursos','before' => array('auth','ajax_check')));
-
-
 //routes POD
   Route::get('admin/pod.html',array('as' => 'pod.html','uses' => 'PodController@index','before' => array('auth','capacidad:4,msg')));
   Route::post('admin/pod.html',array('as' => 'uploadPOD','uses' => 'PodController@savePOD','before' => array('auth','capacidad:4,msg')) );
 //fin routes POD
 
 //routes logs & config
-Route::get('admin/config.html',array('as' => 'config.html',function(){
-	return View::make('admin.config')->nest('dropdown',Auth::user()->dropdownMenu());
-	},
-	'before' => array('auth','capacidad:4,msg')
-));
+  Route::get('admin/config.html',array('as' => 'config.html',function(){
+  	return View::make('admin.config')->nest('dropdown',Auth::user()->dropdownMenu());
+  	},
+  	'before' => array('auth','capacidad:4,msg')
+  ));
 
-Route::get('admin/logs.html',array('as' => 'logs.html',function(){
-	return View::make('admin.logs')->nest('dropdown',Auth::user()->dropdownMenu());
-	},
-	'before' => array('auth','capacidad:4,msg')
-));
+  Route::get('admin/logs.html',array('as' => 'logs.html',function(){
+  	return View::make('admin.logs')->nest('dropdown',Auth::user()->dropdownMenu());
+  	},
+  	'before' => array('auth','capacidad:4,msg')
+  ));
+//fin routes logs & config
+
+
+//Calendarios
+  Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth'))); // :/
+  Route::get('AjaxGetRecursos',array('uses' => 'GruposController@AjaxGetRecursos','before' => array('auth','ajax_check'))); // :)
+  Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check'))); // :/
+
+  Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
+  Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
+//******
+
+
+
+
+
+
+
 //EE de equipo (capacidad = 6) y administradores de la aplicación (capacidad = 4)
+
+
+
+
+
+  Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
+  Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+  
+  //Route::post('admin/removePersonas',array('uses' => 'RelacionesController@removePersonas','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+ 
+  Route::get('admin/htmlOptionGrupos',array('uses' => 'GruposController@htmlOptionGrupos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
+
+
 
 
 //ValidacionController routes **********************
@@ -129,11 +148,7 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 //PdfController routes *****************************
 Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
 
-//Calendarios
-  Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
-  Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
-  Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
-//******
+
 
 //EventoController
   Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
@@ -149,36 +164,45 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 //Atención de eventos
   Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
   Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
-
+//Fin Atención de eventos
 
   Route::get('print',array('uses' => 'CalendarController@imprime'));
 
   Route::get('report',array('as' => 'report.html','uses' => 'AuthController@report'));
 
-  App::missing(function($exception){
+
+
+App::missing(function($exception){
     $pagetitle   = Config::get('msg.404pagetitleLogin');
     $paneltitle  = Config::get('msg.404paneltitle');
     $msg         = Config::get('msg.404msg');
     $alertLevel  = 'warning'; 
     return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-  });
+});
 
-  App::error(function(ModelNotFoundException $e){
+App::error(function(ModelNotFoundException $e){
     $pagetitle   	= Config::get('msg.objectNoFoundpagetitle');
     $paneltitle  	= Config::get('msg.objectNoFoundpagetitlepaneltitle');
     $msg 					= Config::get('msg.objectNoFoundmsg');
     $alertLevel 	= 'danger';
   	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
-  });
-//**
+});
+
 Route::get('test',array('as'=>'test',function(){
   
-  $recurso = Recurso::findOrFail('115');
-  $sgrRecurso = Factoria::getRecursoInstance($recurso);
-  echo $sgrRecurso->delEventos();
-  
+  $grupos = GrupoRecurso::all();
+    foreach ($grupos as $grupo){
+      $sgrGrupos[] = new sgrGrupo($grupo);
+    }
+  foreach ($sgrGrupos as $sgrGrupo) {
+    echo $sgrGrupo->nombre() . ', es visible?';
+    foreach ($sgrGrupo->recursos() as $sgrRecurso) {
+      echo $sgrRecurso->nombre();
+      if ($sgrRecurso->esVisible('4')) echo  ' --> si<br />';
+    else echo ' --> no<br />';   
+    }
+    
+    
+   }
 }));
 
-//Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???
-
-//Route::get('admin/adduser.html',array('as' => 'adduser','uses' => 'UsersController@newUser','before' => array('auth','capacidad:4,msg'))); //?

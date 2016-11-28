@@ -16,7 +16,9 @@ class sgrUser {
 		return $this->user;
 	}
 
+	
 	/**
+		*
 		* //Elimina relaciones: administrador, gestor o validador de un recurso
 	*/
 	public function detach(){
@@ -62,6 +64,7 @@ class sgrUser {
 		return true;
 	}
 
+	//Roles
 	/**
 		* @param void
 		* @return string rol de usuario: (usuario (alumnos) | Usuarios Avanzados (PDI & PAS de Administración) | Técnicos (PAS) | administrador SGR)
@@ -78,62 +81,85 @@ class sgrUser {
 			}
 	}
 
-	public function delete(){ //:)
-		return $this->user->delete();
-	}
-
 	public function esAdminSgr(){ //:)
+	
 		return Config::get('options.capacidadAdminSgr') == $this->user->capacidad;
 	}
 
 	public function esValidadorSgr(){ //:)
+	
 		return (bool) $this->user->recursosValidados()->first();
 	}
 
+	public function esGestorSgr(){ //:)
+
+		return (bool) $this->user->recursosGestionados()->first();	
+	}
+
+	public function delete(){ //:)
+	
+		return $this->user->delete();
+	}
+
+	
+
 	public function id(){ //:)
+		
 		return $this->user->id;
 	}
 
 	public function estado(){ //:)
+		
 		return $this->user->estado;
 	}
 
 	public function nombre(){ //:)
+		
 		return $this->user->nombre;
 	}
 
 	public function apellidos(){ //:)
+		
 		return $this->user->apellidos;
 	}
 
 	public function username(){ //:)
+		
 		return $this->user->username;
 	}
 
 	public function colectivo(){ //:)
+		
 		return $this->user->colectivo;
 	}
+
 	public function observaciones(){ //:)
+		
 		return $this->user->observaciones;
 	}
 
 	public function updated_at(){ //:)
+		
 		return $this->user->updated_at;
 	}
 
 	public function email(){ // :)
+		
 		return $this->user->email;
 	}
 
 	public function capacidad(){ // :)
+		
 		return $this->user->capacidad;
 	}
 
 	public function caducidad(){ // :)
+		
 		return $this->user->caducidad;
 	}
 
 	public function caducado(){
+		
 		return strtotime($this->user->caducidad) < strtotime('today');
 	}
 

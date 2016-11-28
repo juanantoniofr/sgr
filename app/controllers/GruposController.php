@@ -2,51 +2,55 @@
 
 class GruposController extends BaseController {
 
-  /**
-    * //devuelve array con los nombres de los grupos con algún recurso visible para su reserva para el usuario con identificador igual a $id
-    * 
-    * @param $capacidad int
-    *
-    * @return $grupos Object GrupoRecursos
-    * 
-  */
-  static public function gruposVisibles($capacidad){
   
-    $grupos = GrupoRecurso::all()->filter(function($grupo) use ($capacidad){
-      $recursos = $grupo->recursos->filter(function($recurso) use ($capacidad){
-            $sgrRecurso = Factoria::getRecursoInstance($recurso);
-            return $sgrRecurso->esVisible($capacidad);
-        }); 
-      if ($recursos->count() > 0 ) return true;
-    });
-    return $grupos;
-  }
-
   /**
-    * //Devuelve los recursos de un mismo grupo en forma de html options para select en sidebar
-    * @param void
+    * Ajax function: devuelve html input select con los recursos visibles para Auth:user() en el grupo con id = groupID
     *
-    * @return View::make('calendario.optionsRecursos') string
+    * @param Input::get('groupID') int
+    *
+    * @return $result['html' => View::make('calendario.optionsRecursos') string, 'error' => booleano]
   */
-  public function getRecursos(){
+  public function AjaxGetRecursos(){ // :)
     
-    //Input
+  //input
     $id = Input::get('groupID','');
-      
-    //Output 
-    $htmloptionsrecursos = '';
-        
-    if(!empty($id)){
-      $grupo = GrupoRecurso::findOrFail($id);
-      //se filtran para obtener sólo aquellos visibles 
-      $recursos = $grupo->recursos->filter(function($recurso){
-          $sgrRecurso = Factoria::getRecursoInstance($recurso);
-          return $sgrRecurso->esVisible(Auth::user()->capacidad);
-          });
-      $htmloptionsrecursos = (string ) View::make('calendario.allViews.optionsRecursos')->with(compact('recursos'));
-    }
 
-    return $htmloptionsrecursos;
+    //Output
+    $result = array('error' => false,
+                    'html'  => '',);
+    
+    //Validate
+    $rules = array(
+        'groupID'  => 'required|exists:grupoRecursos,id', //exists:table,column
+        );
+
+    $messages = array(
+          'required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'exists'    => 'No existe identificador de recurso en BD.', 
+          );
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    
+    //get personas or return error
+    if ($validator->fails()){
+        $messages = $validator->messages();
+        $msg = '';
+        foreach ($messages->all() as $m){
+          $msg .=  $m . '<br />';
+        }
+        $result['error'] = true;
+        $result['html'] = (string) View::make('msg.error')->with(array('msg' => $msg));
+        
+    }
+    else{
+      $grupo = GrupoRecurso::findOrFail($id);
+      $sgrGrupo = new sgrGrupo($grupo);
+      $sgrRecursos = $sgrGrupo->recursosVisibles(Auth::user()->capacidad);
+      
+      $result['html'] = (string) View::make('calendario.allViews.optionsRecursos')->with(compact('sgrRecursos'));
+    }
+      
+    return $result;    
+
   }
 	
   /**

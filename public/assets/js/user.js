@@ -7,12 +7,6 @@ $(function(e){
     activaLinkEditaUsuario();
   }
 
-  function clearMsgErrorsModal(){ // :)
-    $('.modal_MsgError').fadeOut();
-    $('.modal_divinput').removeClass('has-error');
-    $('.modal_spantexterror').html('');
-  }
-
   $("#addUser").on('click',function(e){ // :)
     e.preventDefault();
     $("#addUserDatePicker" ).datepicker({
@@ -25,7 +19,7 @@ $(function(e){
             monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
             dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
     });
-    clearMsgErrorsModal();
+    m_hideMsg();
     $('#modalAddUser').modal('show');
   }); //:)
    
@@ -35,7 +29,7 @@ $(function(e){
     showGifEspera();
     $data = $('form#nuevoUsuario').serialize();
    
-    clearMsgErrorsModal();
+    m_hideMsg();
     $.ajax({
       type: "POST",
       url: "ajaxAddUsuario",
@@ -45,7 +39,7 @@ $(function(e){
           $('#modalAddUser').modal('hide');
           hideGifEspera();
           getUsuarios();
-          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+          showMsg($respuesta.msg);
         }
         //Hay errores de validación del formulario
         else {
@@ -99,7 +93,7 @@ $(function(e){
     e.preventDefault();
     showGifEspera();
     $data = $('form#fm_eliminausuario').serialize();
-    clearMsgErrorsModal();
+    m_hideMsg();
     $.ajax({
       type: "POST",
       url: "ajaxEliminausuario",
@@ -109,7 +103,7 @@ $(function(e){
           $('#modalEliminaUsuario').modal('hide');
           hideGifEspera();
           getUsuarios();
-          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+          showMsg($respuesta.msg);
         }
         //Hay errores de validación del formulario
         else {
@@ -154,14 +148,13 @@ $(function(e){
       $('#datepickerUserEdit').val( $(this).data('caducidad') ); 
       
       $('form#formEditUser input[name="id"]').val($(this).data('id')); 
-      clearMsgErrorsModal();
+      m_hideMsg();
       $('#modalEditUser').modal('show');
     });  
   }
   
   //Ajax edit user
   $('#btnEditUser').on('click',function(e){ // :)
-
     e.preventDefault();
     showGifEspera();
     $.ajax({
@@ -173,17 +166,14 @@ $(function(e){
           $('#modalEditUser').modal('hide');
           hideGifEspera();
           getUsuarios();
-          $('#msg').fadeOut('slow').html($respuesta.msg).fadeIn('slow');
+          showMsg($respuesta.msg);
         }
         //Hay errores de validación del formulario
         else {
           hideGifEspera();
           $.each($respuesta.errors,function(index,value){
             $('#m_editusuario_input'+index).addClass('has-error');//resalta el campo de formulario con error
-            alert(index + value);
             $('#m_editusuario_textError_'+index).html(' &nbsp; ' + value);//añade texto de error a span alert-danger en ventana modal
-
-              
           });
           $('#m_editusuario_msgError').fadeIn('8000');
         }
@@ -195,36 +185,6 @@ $(function(e){
     });
   }); 
   
-
- 
-
-  
-
-  /*
-  function parseDate(strFecha,$delimiter,$locale) {
-    
-    $delimiter  = typeof $delimiter !== 'undefined' ? $delimiter : '-';
-      $locale   = typeof $locale    !== 'undefined' ? $locale : 'es-ES';
-
-    var sfecha = $.trim(strFecha);
-    var aFecha = sfecha.split($delimiter);
-    
-    if ($locale == 'es-ES'){
-      var day = $.trim(aFecha[0]);                  
-      var month = $.trim(aFecha[1]);
-      var year = $.trim(aFecha[2]);
-    }
-    else if ($locale = 'en-EN'){
-      var day = $.trim(aFecha[2]);                  
-      var month = $.trim(aFecha[1]);
-      var year = $.trim(aFecha[0]); 
-    }
-  
-    var aDate = [day,month,year];
-
-    return aDate;
-  }
-*/
   $('form#formEditUser .datepicker').datepicker({
         showOtherMonths: true,
         selectOtherMonths: true,
@@ -237,12 +197,6 @@ $(function(e){
       });
 
 
-  function showGifEspera(){
-    $('#espera').css('display','inline').css('z-index','1000');
-  }
-
-  function hideGifEspera(){
-    $('#espera').css('display','inline').css('z-index','-1000');
-  }
+ 
 
 });

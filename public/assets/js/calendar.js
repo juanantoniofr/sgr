@@ -51,34 +51,32 @@ $(function(e){
 		$('#selectGroupRecurse').on('change',function(e){
 			showGifEspera();
 			$('#message').fadeOut("slow");
-			$('#selectItems').fadeOut('fast',
-																function(){
-																	$('select#items option:selected').prop('selected', false);
-																	$('select#items option').detach();
-																}
-												);
-			$('#selectRecurseInGroup').fadeOut(	'fast',
-																					function(){
-																						$('select#recurse option').detach();
-																					}
-																	);
-			//alert($('select#selectGroupRecurse option:selected').val());
-			$.ajax({
-				type:"GET",
-				url:"getRecursos",
-				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
-				success: function(respuesta){
-					
-					$('#selectRecurseInGroup').fadeIn('fast',function(){
-						$('#recurse').html(respuesta);
-						$('select#recurse option:first').prop('selected', 'selected');
-						$('select#recurse').change();
+			$('#selectItems').fadeOut('fast',function(){
+					$('select#items option:selected').prop('selected', false);
+					$('select#items option').detach();
 					});
+			$('#selectRecurseInGroup').fadeOut(	'fast',function(){$('select#recurse option').detach();});
+			$.ajax({ // :)
+				type:"GET",
+				url:"AjaxGetRecursos",
+				data: { groupID:$('select#selectGroupRecurse option:selected').val()},
+				success: function($respuesta){
+					if ($respuesta.error == false){
+						$('#ajax_msg').html('').fadeOut();
+						$('#selectRecurseInGroup').fadeIn('fast',function(){
+							$('#recurse').html($respuesta.html);
+							$('select#recurse option:first').prop('selected', 'selected');
+							$('select#recurse').change();
+						});
+					}
+					else {
+						$('#ajax_msg').html($respuesta.html);	
+					}
 					hideGifEspera();
 				},
 				error: function(xhr, ajaxOptions, thrownError){
 						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+						$('#ajax_msg').html(xhr.responseText + ' (codeError: ' + xhr.status +')').fadeIn();
 				}
 			});
 		});

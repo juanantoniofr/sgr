@@ -1,3 +1,4 @@
+<!-- :) -->
 <div class="col-sm-6 col-md-3 sidebar"  style="margin-top:20px !important;">
   
   <form class="form" role="form" id="selectRecurse" >
@@ -6,8 +7,8 @@
       <label for="groupName">Seleccione recurso:</label> 
       <select class="form-control" id="selectGroupRecurse" name="groupID" >
         <option value="0" disabled selected>Espacio o equipo:</option>
-        @foreach ($grupos as $grupo)
-          <option value="{{$grupo->id}}">{{$grupo->nombre}}</option>
+        @foreach ($sgrGrupos as $sgrGrupo)
+          @if(count($sgrGrupo->recursosvisibles(Auth::user()->capacidad)) > 0) <option value="{{$sgrGrupo->id()}}">{{$sgrGrupo->nombre()}}</option> @endif
         @endforeach
       </select>
     
@@ -32,7 +33,7 @@
 
   <span id = "dni" style="display:none"></span>
   
-  @if (Auth::user()->isTecnico())
+  @if ($sgrUser->esGestorSgr())
     <div style="width:216px;margin-top:10px">               
       <div id='divApplet'>
         <applet id="lector"  

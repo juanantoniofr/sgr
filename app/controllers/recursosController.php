@@ -357,7 +357,7 @@ class recursosController extends BaseController{
     *
     * @return $result array
   */
-  public function AjaxEnabled(){ // :/
+  public function AjaxEnabled(){ // :)
  
     //input
     $id = Input::get('idrecurso','');

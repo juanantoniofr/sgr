@@ -2,16 +2,18 @@
 
 return array (
 
-	'success' 						=> 'Datos salvados con éxito....',
-	'idnotfound'					=> 'Identificador no encontrado....',
-	'idempty'							=> 'Identificador vacío....',
-	'actionSuccess'				=> 'Operación realizada con éxito....',	
-	'delusersuccess'			=> 'Usuario eliminado con éxito....',
-	'usernamenotfound'		=> 'Usuario no encontrado....',
-	'delgruposuccess'			=> 'Grupo eliminado con éxito....',
-	'editgruposuccess'		=> 'Grupo editado con éxito....',
-	'editrecursosuccess'	=> 'Recurso editado con éxito....',
-	'delrecursosuccess'		=> 'Recurso eliminado con éxito....',
+	'success' 								=> 'Datos salvados con éxito....',
+	'idnotfound'							=> 'Identificador no encontrado....',
+	'idempty'									=> 'Identificador vacío....',
+	'actionSuccess'						=> 'Operación realizada con éxito....',	
+	'delusersuccess'					=> 'Usuario eliminado con éxito....',
+	'usernamenotfound'				=> 'Usuario no encontrado....',
+	'delgruposuccess'					=> 'Grupo eliminado con éxito....',
+	'editgruposuccess'				=> 'Grupo editado con éxito....',
+	'editrecursosuccess'			=> 'Recurso editado con éxito....',
+	'delrecursosuccess'				=> 'Recurso eliminado con éxito....',
+	'disabledrecursosuccess'	=> 'Recurso deshabilitado con éxito.....',
+	'enabledrecursosuccess'		=> 'Recurso habilitado con éxito.....',
 
 	//AuthController
 	'pagetitleLogin'		=> 	'mensaje inicio de sesión', //título para el navegador

@@ -3,14 +3,19 @@
 class CalendarController extends BaseController {
 	
 	//Carga la vista por defecto: Mensual 
-	public function index(){//***
+	public function index(){// :/
 		$viewActive = Config::get('options.defaultview'); //vista por defecto
 		$fecha = new DateTime();
 		$sgrRecurso = Factoria::getRecursoInstance();
 		$sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-		$gruposderecursos = GruposController::gruposVisibles(Auth::user()->capacidad);
-		$dropdown = Auth::user()->dropdownMenu();
-		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('dropdown',$dropdown)->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
+		$sgrUser = new sgrUser(Auth::user());
+		$grupos = GrupoRecurso::all();
+		foreach ($grupos as $grupo){
+			$sgrGrupos[] = new sgrGrupo($grupo);
+		}
+		
+		
+		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->nest('sidebar','calendario.sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'sgrGrupos' => $sgrGrupos,'sgrUser' => $sgrUser))->nest( 'dropdown','admin.dropdown',compact('sgrUser'))->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
 	}
 
 	public function getCalendar(){
