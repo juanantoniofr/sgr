@@ -16,20 +16,10 @@ class HomeController extends BaseController {
 	*/
 
 	public function showWellcome(){
-
-		if (Cas::isAuthenticated() == false){
-			Auth::logout();
-			return View::make('wellcome');
-		} 
-
-		if (Auth::check() == true){
-			$sgrUser = new sgrUser(Auth::user());
-			return Redirect::to($sgrUser->home());
-		} 
-
-		return View::make('wellcome');
-
-  }
+		
+		if (!Cas::isAuthenticated() || !Auth::check()) return View::make('wellcome');
+   		else return Redirect::to(ACL::getHome());
+    }
 
 	public function sendmailcontact(){
 

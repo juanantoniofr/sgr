@@ -12,6 +12,67 @@ class PodController extends BaseController {
 		return View::make('admin.pod')->nest('dropdown','admin.dropdown');	
 	}
 
+	public function testPOD(){
+
+		
+		$numFila = 1;
+
+		$csv = new csv();
+		
+		$file = Input::file('csvfile'); //controlar que no sea vacio !!!!!
+		if (empty($file)){
+			$msgEmpty = "No se ha seleccionado ningún archivo *.csv"; 
+			return View::make('admin.pod')->with(compact('msgEmpty'));	
+		}
+
+
+		$f = fopen($file,"r");
+		
+		while (($fila = fgetcsv($f,0,',','"')) !== false){
+			//$content es un array donde cada posición almacena los valores de las columnas del csv
+			$result = array();
+			$columnIdLugar = $csv->getNumColumnIdLugar();
+			$id_lugar = $fila[$columnIdLugar];
+			
+			$datosfila = $csv->filterFila($fila); //nos quedamos con las columnas que hay que guardar en la Base de Datos.
+
+			/*if( $this->existeLugar($id_lugar) ){
+				//Conjunto de espacios a reservas: si el espacio tiene puestos, $recursos contiene cada uno de ellos.
+				$recursos = Recurso::where('id_lugar','=',$id_lugar)->get(); 
+				
+
+				//Comprueba si el csv tiene solapamientos
+				if ($this->existeSolapamientocsv($datosfila,$file,$numFila)){
+					$this->warningSolapesCSV[$numFila] = $datosfila;
+				}
+				elseif ($this->existeSolapamientodb($datosfila,$numFila,$recursos)){
+					$this->warningSolapesDB[$numFila] = $datosfila;
+				}
+				else{
+					//identificador único de la serie de eventos
+					do {
+						$evento_id = md5(microtime());
+					} while (Evento::where('evento_id','=',$evento_id)->count() > 0);					
+
+					foreach ($recursos as $recurso) {
+						$this->save($datosfila,$numFila,$recurso,$evento_id);
+					}
+					$this->success[$numFila] = $datosfila;
+				}
+			}
+			else 
+				$this->warningNoLugar[$numFila] = $datosfila;
+			*/
+			$numFila++;
+			
+		}
+		//$fila = fgetcsv($f,0,';','"');
+		fclose($f);
+		//$errores = $csv->getErroresLugar();
+		return View::make('admin.test')->with(compact('datosfila'));
+		//return View::make('admin.pod')->with(array('events' => $this->success,'noexistelugar' => $this->warningNoLugar,'solapesdb' => $this->warningSolapesDB,'solapescsv' => $this->warningSolapesCSV));
+	}
+
 	public function savePOD(){
 
 		
@@ -28,14 +89,14 @@ class PodController extends BaseController {
 
 		$f = fopen($file,"r");
 		
-		while (($fila = fgetcsv($f,0,';','"')) !== false){
+		while (($fila = fgetcsv($f,0,',','"')) !== false){
 			//$content es un array donde cada posición almacena los valores de las columnas del csv
 			$result = array();
 			$columnIdLugar = $csv->getNumColumnIdLugar();
 			$id_lugar = $fila[$columnIdLugar];
-			
+			//echo $id_lugar .'<br />';
 			$datosfila = $csv->filterFila($fila); //nos quedamos con las columnas que hay que guardar en la Base de Datos.
-
+			//var_dump($datosfila);
 			if( $this->existeLugar($id_lugar) ){
 				//Conjunto de espacios a reservas: si el espacio tiene puestos, $recursos contiene cada uno de ellos.
 				$recursos = Recurso::where('id_lugar','=',$id_lugar)->get(); 
@@ -64,9 +125,8 @@ class PodController extends BaseController {
 				$this->warningNoLugar[$numFila] = $datosfila;
 			
 			$numFila++;
-			
 		}
-		//$fila = fgetcsv($f,0,';','"');
+		
 		fclose($f);
 		//$errores = $csv->getErroresLugar();
 		//return View::make('admin.test')->with(compact('fila'));
@@ -76,10 +136,10 @@ class PodController extends BaseController {
 	private function save($data,$numFila,$recurso,$evento_id){
 		
 		$result = true;
-		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
-		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
+		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
+		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
 		
-		$nRepeticiones = sgrDate::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
+		$nRepeticiones = Date::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
 
 		
 		
@@ -95,13 +155,13 @@ class PodController extends BaseController {
 				
 				$evento->evento_id = $evento_id;
 				//fechas de inicio y fin
-				$evento->fechaFin = sgrDate::parsedatetime(sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'d-m-Y','Y-m-d');//¿por que, no es $fechaDesde ya calculado??
-				$evento->fechaInicio = sgrDate::parsedatetime(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'d-m-Y','Y-m-d');
+				$evento->fechaFin = Date::toDB(Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']),'-');//¿por que, no es $fechaDesde ya calculado??
+				$evento->fechaInicio = Date::toDB(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),'-');
 				
 				//fecha Evento
-				$startDate = sgrDate::timeStamp_fristDayNextToDate(sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA'],'Y-m-d');
-				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-				$evento->fechaEvento = sgrDate::parsedatetime($currentfecha,'d-m-Y','Y-m-d');
+				$startDate = Date::timeStamp_fristDayNextToDate(Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']),$data['COD_DIA_SEMANA']);
+				$currentfecha = Date::currentFecha($startDate,$j);
+				$evento->fechaEvento = Date::toDB($currentfecha,'-');
 
 				//horario
 				$evento->horaInicio = $data['INI'];
@@ -159,19 +219,19 @@ class PodController extends BaseController {
 	private function existeSolapamientodb($data,$numFila,$recursos){
 		
 	
-		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
-		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
+		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);
+		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);
 		
-		$nRepeticiones = sgrDate::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
+		$nRepeticiones = Date::numRepeticiones($fechaDesde,$fechaHasta,$data['COD_DIA_SEMANA']);
 
 		for($j=0;$j < $nRepeticiones; $j++ ){ //foreach 
 			
 			//fecha Evento
-			$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA'],'Y-m-d');
-			$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);
-			$sgrEvento = new sgrEvento;
+			$startDate = Date::timeStamp_fristDayNextToDate($fechaDesde,$data['COD_DIA_SEMANA']);
+			$currentfecha = Date::currentFecha($startDate,$j);
+			
 			foreach ($recursos as $recurso) {
-				if ( 0 < $sgrEvento->solapa($recurso->id,$currentfecha,$data['INI'],$data['FIN']) ){
+				if ( 0 < Calendar::getNumSolapamientos($recurso->id,$currentfecha,$data['INI'],$data['FIN']) ){
 					//hay solape: fin -> return true
 					return true;
 					}	
@@ -188,8 +248,8 @@ class PodController extends BaseController {
 		$csv = new csv();
 		//estado del evento?? (solapamientos)
 		$idLugar = $data['ID_LUGAR'];
-		$fechaDesde = sgrDate::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);//d-m-Y
-		$fechaHasta = sgrDate::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);//d-m-Y
+		$fechaDesde = Date::dateCSVtoSpanish($data['F_DESDE_HORARIO1']);//d-m-Y
+		$fechaHasta = Date::dateCSVtoSpanish($data['F_HASTA_HORARIO1']);//d-m-Y
 		$horaInicio = $data['INI'];
 		$horaFin = $data['FIN'];
 		$diaSemana = $data['COD_DIA_SEMANA'];
@@ -199,17 +259,17 @@ class PodController extends BaseController {
 		$contadorfila = 1;
 		
 		
-		while (($fila = fgetcsv($f,0,';','"')) !== false && !$solapamientos){
+		while (($fila = fgetcsv($f,0,',','"')) !== false && !$solapamientos){
 						
 			$datosfila = $csv->filterFila($fila);
 			if ($datosfila['ID_LUGAR'] == $idLugar && $datosfila['COD_DIA_SEMANA'] == $diaSemana && $contadorfila != $numFila){
 				//posible solapamiento
-				$filafechaDesde = sgrDate::dateCSVtoSpanish($datosfila['F_DESDE_HORARIO1']);//d-m-Y
-				$filafechaHasta = sgrDate::dateCSVtoSpanish($datosfila['F_HASTA_HORARIO1']);//d-m-Y
+				$filafechaDesde = Date::dateCSVtoSpanish($datosfila['F_DESDE_HORARIO1']);//d-m-Y
+				$filafechaHasta = Date::dateCSVtoSpanish($datosfila['F_HASTA_HORARIO1']);//d-m-Y
 				$filahoraInicio = $datosfila['INI'];
 				$filahoraFin = $datosfila['FIN'];
-				if (strtotime(sgrDate::parsedatetime($fechaDesde,'d-m-Y','Y-m-d')) <= strtotime(sgrDate::parsedatetime($filafechaHasta,'d-m-Y','Y-m-d')) &&
-					strtotime(sgrDate::parsedatetime($fechaHasta,'d-m-Y','Y-m-d')) >= strtotime(sgrDate::parsedatetime($filafechaDesde,'d-m-Y','Y-m-d')) ){
+				if (strtotime(Date::toDB($fechaDesde,'-')) <= strtotime(Date::toDB($filafechaHasta,'-')) &&
+					strtotime(Date::toDB($fechaHasta,'-')) >= strtotime(Date::toDB($filafechaDesde,'-')) ){
 						//posible solapamiento
 						if(strtotime($horaInicio) < strtotime($filahoraFin) && strtotime($horaFin) > strtotime($filahoraInicio)){
 							//hay solapamiento
