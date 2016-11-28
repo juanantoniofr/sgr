@@ -30,16 +30,14 @@ $(function(e){
 		$month = $('#btnprint').data('month');
 		$year = $('#btnprint').data('year');
 		$idRecurso = $('select#recurse option:selected').val();
-		$item = $('select#items option:selected').val();
-		//$groupID = $('select#selectGroupRecurse option:selected').val();
+		$groupID = $('select#selectGroupRecurse option:selected').val();
 
 		$title = $('#checktitulo').prop('checked');
 		$nombre = $('#checknombre').prop('checked');
 		$colectivo = $('#checkcolectivo').prop('checked');
 		$total = $('#checktotal').prop('checked');
 
-		//$url = 'print?view='+$view+'&day='+$day+'&month='+$month+'&year='+$year+'&idRecurso='+$idRecurso+'&groupID='+$groupID+'&titulo='+$title+'&nombre='+$nombre+'&colectivo='+$colectivo+'&total='+$total;
-		$url = 'print?view='+$view+'&day='+$day+'&month='+$month+'&year='+$year+'&idRecurso='+$idRecurso+'&item='+$item+'&titulo='+$title+'&nombre='+$nombre+'&colectivo='+$colectivo+'&total='+$total;
+		$url = 'print?view='+$view+'&day='+$day+'&month='+$month+'&year='+$year+'&idRecurso='+$idRecurso+'&groupID='+$groupID+'&titulo='+$title+'&nombre='+$nombre+'&colectivo='+$colectivo+'&total='+$total;
 		$('a#modalImprimir').attr('href', $url);
 	}
 
