@@ -6,11 +6,9 @@ class Notificacion extends Eloquent {
 
     public $timestamps = false;
 
-  //identifica usuario origen de la notificación
-  public function user(){
-    
-    return $this->hasOne('User','username','source');   
-  } 
+ 	
+
+	
 
 }
 
