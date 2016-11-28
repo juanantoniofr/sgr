@@ -6,7 +6,10 @@
             <div class="form-group ">
                 <a href="{{route('calendarios.html')}}" class="btn btn-danger" title="Añadir nueva reserva"><i class="fa fa-calendar fa-fw"></i> Nueva reserva</a>
             </div>
-           
+           <!-- <div class="form-group">
+                <a href="{{route('validadorHome.html',array('verpendientes' => true))}}" class="btn btn-primary" title="Listar solicitudes"><i class="fa fa-list fa-fw"></i> Listar</a>
+            </div>                      
+               --> 
         </form>
 
         <form class="navbar-form navbar-right" id ="filter">    
@@ -28,10 +31,10 @@
                     <div class="form-group ">
                        <select class="form-control " name = "id_recurso" id="selectRecurso">
                             <option value="0" @if($id_recurso == 0) selected="selected" @endif >Todos los espacios</option>
-                            @foreach($recursos as $recurso)
-                                <option value="{{$recurso->id}}" 
-                                    @if ($id_recurso == $recurso->id) selected="selected" @endif>
-                                    {{$recurso->nombre}}
+                            @foreach($eventsByrecurso as $event)
+                                <option value="{{$event->recurso_id}}" 
+                                    @if ($id_recurso == $event->recurso_id) selected="selected" @endif>
+                                    {{$event->recursoOwn->nombre}}
                                 </option>
                             @endforeach
                         </select>
@@ -41,9 +44,9 @@
                         <select class="form-control" id="selectUser" name="id_user">
                             <option value="0" @if($id_user == 0) selected="selected" @endif>Todos los usuarios</option>
                             @foreach($eventsByUser as $event)
-                                <option value="{{$event->user->id}}" 
-                                    @if($id_user == $event->user->id)selected="selected" @endif>
-                                    {{$event->user->apellidos}}, {{$event->user->nombre}}
+                                <option value="{{$event->userOwn->id}}" 
+                                    @if($id_user == $event->userOwn->id)selected="selected" @endif>
+                                    {{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}
                                 </option>
                             @endforeach
                         </select>

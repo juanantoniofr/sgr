@@ -25,21 +25,21 @@
 		   
 			<!-- msg for user -->
 			@if($solapamientos)
-			   	<div class="alert alert-danger text-center" role="alert" >
+			   	<div class="alert alert-danger" role="alert" >
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				    	<strong>No se pudo aprobar la solicitud: solapamiento con solicitud ya aprobada.</strong>
 				</div>
 			@endif
 
 			@if(!empty($msg))
-			   	<div class="alert alert-success text-center" role="alert" >
+			   	<div class="alert alert-success" role="alert" >
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				    	{{ $msg }}
 				</div>
 			@endif    	   	          
 
-			@if (count($events)  == 0) 
-	            <div class="alert alert-warning text-center" role="alert">No hay solicitudes....</div>
+			@if (!$events->count()) 
+	            <div class="alert alert-warning" role="alert">No hay solicitudes....</div>
 			@else 
 				<div class="table-responsive"> 
 		  			<table class="table table-hover table-striped">
@@ -59,10 +59,7 @@
 				                        	'sortby' => 'titulo',
 				                            'order' => 'desc',
 				                            'id_recurso' => $idrecurso,
-				                            'id_user'	=>	$iduser,
-				                            'verpendientes' => $verpendientes,
-				                            'verdenegadas' => $verdenegadas,
-				                            'veraprobadas' => $veraprobadas,
+				                            'id_user'	=>	$iduser
 				                            )
 				                        )
 				                   }}
@@ -74,10 +71,7 @@
 				                                'sortby' => 'titulo',
 				                                'order' => 'asc',
 				                                'id_recurso' => $idrecurso,
-				                                'id_user'	=>	$iduser,
-				                                'verpendientes' => $verpendientes,
-				                            	'verdenegadas' => $verdenegadas,
-				                            	'veraprobadas' => $veraprobadas,
+				                                'id_user'	=>	$iduser
 				                            )
 				                        )
 				                    }}
@@ -93,10 +87,7 @@
 				                        	'sortby' => 'created_at',
 				                            'order' => 'desc',
 				                            'id_recurso' => $idrecurso,
-				                            'id_user'	=>	$iduser,
-				                            'verpendientes' => $verpendientes,
-				                            'verdenegadas' => $verdenegadas,
-				                            'veraprobadas' => $veraprobadas,
+				                            'id_user'	=>	$iduser
 				                            )
 				                        )
 				                   }}
@@ -108,10 +99,7 @@
 				                                'sortby' => 'created_at',
 				                                'order' => 'asc',
 				                                'id_recurso' => $idrecurso,
-				                            	'id_user'	=>	$iduser,
-				                            	'verpendientes' => $verpendientes,
-				                            	'verdenegadas' => $verdenegadas,
-				                            	'veraprobadas' => $veraprobadas,
+				                            	'id_user'	=>	$iduser
 				                            )
 				                        )
 				                    }}
@@ -120,72 +108,79 @@
 			  				</th>
 		  				</thead>
 		    			<tbody>
+
 		    				@foreach($events as $event)
-		    					@if ($event->estado == 'aprobada')
-		    						<tr  class=" text-success event"  data-idEvent = "{{$event->id}}">
-			    						<td >
-			                        		<span  class="glyphicon glyphicon-check" aria-hidden="true" data-toggle="tooltip" title="Solicitud aprobada">Aprobada </span> 
-			                        	</td>
-			    						<td><i class="fa fa-calendar fa-fw "></i></td>
-			    						<td>
-			    							 <span class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
-			    						</td>
-			    						<td>
-			                        		<span>{{$event->recurso->nombre}}</span>
-			                        	</td>
-			                    @elseif($event->estado == 'denegada')
-			                   		<tr class=" text-danger event"  data-idEvent = "{{$event->id}}">
-			    						<td>
-			                        		<span  class="fa fa-minus-circle fa-fw" aria-hidden="true" data-toggle="tooltip" title="Solicitud denegada">Denegada</span>
-			                        	</td>
-			    						<td><i class="fa fa-calendar fa-fw "></i></td>
-			    						<td>
-			    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
-			    						</td>
-			    						
-			                        	<td>
-			                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
-			                        	</td>
-
-
-			    				@elseif ($event->solape(strtotime($event->fechaEvento)))
-				    					<tr class=" text-warning event"  data-idEvent = "{{$event->id}}">
-				    						<td>
-				                        		<span  class="fa fa-warning fa-fw" aria-hidden="true" data-toggle="tooltip" title="Solicitud con solapamiento">Solapamiento!!</span>
+		    				
+			    					@if ($event->estado == 'aprobada')
+			    						<tr  class=" text-success event"  data-idEvent = "{{$event->id}}">
+				    						<td >
+				                        		<span  class="glyphicon glyphicon-check" aria-hidden="true" data-toggle="tooltip" title="Solicitud aprobada">Aprobada </span> 
 				                        	</td>
 				    						<td><i class="fa fa-calendar fa-fw "></i></td>
 				    						<td>
-				    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
+				    							 <span data-toggle="tooltip" title="Aprobada" class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+				    						</td>
+				    						<td>
+				                        		<span aria-hidden="true" data-toggle="tooltip" title="Aprobada">{{$event->recursoOwn->nombre}}</span>
+				                        	</td>
+				                        
+				                    @elseif($event->estado == 'denegada')
+			                   			<tr class=" text-danger event"  data-idEvent = "{{$event->id}}">
+				    						<td>
+				                        		<span  class="fa fa-minus-circle fa-fw" aria-hidden="true" data-toggle="tooltip" title="Solicitud denegada">Denegada</span>
+				                        	</td>
+				    						<td><i class="fa fa-calendar fa-fw "></i></td>
+				    						<td>
+				    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
 				    						</td>
 				    						
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
 				                        	</td>
-				    			@else
-				    				    <tr class="event  text-info"  data-idEvent = "{{$event->id}}">
+				                        
+			                    	@elseif($event->estado == 'pendiente' && !Calendar::hasSolapamientos($event->evento_id,$event->recurso_id))
+			                    	    <tr class="event  text-info"  data-idEvent = "{{$event->id}}">
 				    				    	<td>
 				                        		<span  class="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" title="Solicitud pendiente de validación">Pendiente</span>
 				                        	</td>
 				    				    	<td><i class="fa fa-calendar fa-fw "></i></td>
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... " class="small"><strong>Inicio:</strong> {{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong>Fin: </strong>{{sgrDate::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario: </strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{sgrDate::sgrdiassemana($event->diasRepeticion)}}</span>
+				                        		<span title="Click para aprobar o denegar... " class="small"><strong>Inicio:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong>Fin: </strong>{{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario: </strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
 				                        	</td>
 				                        	
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
 				                        	</td>
-			                    @endif
+				                        
+				                   	@elseif($event->estado == 'pendiente' && Calendar::hasSolapamientos($event->evento_id,$event->recurso_id))
+				    					<tr class=" text-warning event"  data-idEvent = "{{$event->id}}">
+				    						<td>
+				                        		<span  class="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip"
+				                        		title="Solicitud Pendiente: Con solapamiento">Pendiente (hay Solapamiento)</span>
+				                        	</td>
+				    						
+
+				    						<td><i class="fa fa-calendar fa-fw "></i></td>
+				    						<td>
+				    							 <span title="Click para aprobar o denegar... " class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
+				    						</td>
+				    						
+				                        	<td>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        	</td>
+				                        
+				    			
+			                   		@endif
 			                    
 			    				        
-				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->user->apellidos}}, {{$event->user->nombre}}</span></td>
+				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}</span></td>
 
 				                        <td><i class="fa fa-angle-double-right fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->titulo}}</span></td>
 				                        
 				                        <td><i class="fa fa-clock-o fa-fw "></i><span title="Click para aprobar o denegar... " class="pull-center  small"><em> {{date('d \d\e M \d\e Y \a \l\a\s H:i',strtotime($event->created_at))}}</em></span></td>
 				                    </tr>
 				                
-			                @endforeach
-			            	
+			                    @endforeach
 		    			</tbody>
 					</table>
 				</div><!-- /.table-responsive -->

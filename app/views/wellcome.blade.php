@@ -24,11 +24,16 @@
 
 
 @section('content')
-    <div class = "container">
+<div class = "container">
+        
+       
+      
+      
         <p id = "font-lato">Sistema de Gestión de Reservas<br /> Facultad de Comunicación</p>
         <div class="col-md-12 col-sx-12 text-center" style = "">
-            <a href="{{route('loginsso')}}" class="btn btn-primary" style="margin-top:10px;width:15%;">Login</a>
+            <a href="{{route('loginsso')}}" class="btn btn-primary" style="margin-top:10px;width:25%;">Login</a>
         </div>
-        
+       
+    
     </div>
 @stop 

@@ -45,5 +45,5 @@ table {
 </style>
 <h3>Notificación automática SGR</h3>
 
-<h3>Petición de alta de usuario con UVUS: {{$u->username}}</h3>
+<h3>Accesos con UVUS {{$u->username}} caducado</h3>
 

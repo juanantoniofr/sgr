@@ -16,9 +16,7 @@
     {{HTML::style('assets/css/normalize.css')}}
     {{HTML::style('assets/css/stilo.css')}}
     <!--{{HTML::style('assets/font-awesome-4.1.0/css/font-awesome.min.css')}}-->
-    <!--<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -45,28 +43,21 @@
     </div><!-- /.navbar-header -->
     
     <div class="collapse navbar-collapse" id="navbar-collapse">
-      <ul class="nav navbar-nav navbar-right" >
+        <ul class="nav navbar-nav navbar-right" >
 
-        {{$dropdown or ''}}
-        <li>
-          <a href="{{asset('assets/R_mav.pdf')}}" target="_blank" title="Reglamento Servicio Medios Audiovisuales"><i class="fa fa-book fa-fw"></i> Normativa</a>
-        </li>
+          {{$dropdown or ''}}
+          <li><a href="{{asset('assets/R_mav.pdf')}}" target="_blank" title="Reglamento Servicio Medios Audiovisuales"><i class="fa fa-book fa-fw"></i> Normativa</a></li>
 
-        <li>
-          <a href="{{route('ayuda')}}" title="Ayuda"><i class="fa fa-support fa-fw"></i> Ayuda</a>
-        </li>
+          <li><a href="{{route('ayuda')}}" title="Ayuda"><i class="fa fa-support fa-fw"></i> Ayuda</a></li>
 
-        @if (Auth::check())
-          <li>
-            <a href="{{route('contactar')}}" title="Contacto"><i class="fa fa-envelope fa-fw"></i> Contacto</a>
-          </li>
-          <li>
-            <a href="{{URL::route('logout')}}" title="Salir"><i class="fa fa-sign-out fa-fw"></i> Logout ({{Auth::user()->nombre}} {{Auth::user()->apellidos}} )</a>
-          </li>
-        @endif
-      </ul>
+          @if (Cas::isAuthenticated() && Auth::check())
+          <li><a href="{{route('contactar')}}" title="Contacto"><i class="fa fa-envelope fa-fw"></i> Contacto</a></li>
+          <li><a href="{{URL::route('logout')}}" title="Salir"><i class="fa fa-sign-out fa-fw"></i> Logout ({{Auth::user()->nombre}} {{Auth::user()->apellidos}})</a></li>
+
+          @endif
+        </ul>
     </div> 
-  </div>
+    </div>
   </nav>
 
  
@@ -88,35 +79,9 @@
 @yield('modal')
 <!-- scripts -->
 
-<!-- modal alert -->
-<div class="modal fade" id="m_alert" tabindex="-100" role="dialog" aria-labelledby="alert" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-      
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h2 class="modal-title text-warning"><i class="fa fa-warning fa-fw"></i> Aviso</h2>
-            </div>
-
-            <div class="modal-body">
-                <!--Div warning --> 
-                <div class="alert alert-warning text-center" role = "alert"><p id="malert_text"></p></div>
-            </div><!-- ./.modal-body -->
-
-            <div class="modal-footer">
-                <div class="col-lg-12" style="margin-top:10px">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div><!-- ./.modal-content -->
-    </div><!-- ./.modal-dialog -->
-</div><!-- ./#m_alert -->
-
-{{ HTML::script('assets/js/jquery-1.11.0.js') }}
-{{ HTML::script('assets/js/jquery-ui.js')     }}
-{{ HTML::script('assets/js/bootstrap.min.js') }}
-{{ HTML::script('assets/js/all.js') }}
-
+{{HTML::script('assets/js/jquery-1.11.0.js')}}
+{{HTML::script('assets/js/jquery-ui.js')}}
+{{HTML::script('assets/js/bootstrap.min.js')}}
 
 @yield('js')
 <!-- scripts -->  

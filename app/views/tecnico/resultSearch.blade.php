@@ -1,22 +1,18 @@
-<span style="display:none" id="usuarioAtendido" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}"></span>
+@if ($events->count() > 0)
+    @foreach ($events as $event)
+    	<div class="list-group">
+            <a href="#" class="list-group-item reserva" data-observaciones="{{$event->atencion->observaciones or ''}}" data-idserie="{{$event->evento_id}}" data-idevento="{{$event->id}}" data-fechaevento="{{$event->fechaEvento}}" data-uvus="{{$event->userOwn->username}} ({{$event->userOwn->nombre}} {{$event->userOwn->apellidos}})" data-recurso="{{$event->recursoOwn->nombre}} ({{$event->recursoOwn->grupo}})">
+            	<span class="@if($event->atendida) text-success @else text-warning @endif">
+                <i class="fa @if($event->atendida) fa-check @else fa-info @endif fa-fw"></i>
+                {{$event->recursoOwn->nombre}} ({{$event->recursoOwn->grupo}}) - ({{strftime('%d/%m/%Y',Date::getTimeStampEN($event->fechaEvento))}}) - {{$event->horaInicio}} // {{$event->horaFin}} // {{$event->titulo}} // {{$event->estado}}</span>
 
-@if ($eventos->count() > 0)
-	@foreach($eventos as $event)
+                @if (!empty($event->atencion->observaciones) ) <span class="text-danger text-center"> ({{$event->atencion->observaciones}} )</span>@endif
+            </a>
 
-	   <div class="radio">
-        <label href="#" id="evento_{{$event->id}}" data-idevento="{{$event->id}}">
-            <input type="radio" name="idevento" value="{{$event->id}}" data-observaciones="{{$event->atencion->observaciones or ''}}">
-            <span id = "infoEvento_{{$event->id}}" class="@if($event->atendido()) text-success @else text-info @endif">
-                <i class="fa @if($event->atendido()) fa-calendar-check-o @else fa-calendar-o @endif fa-fw"></i>
-                {{$event->recurso->nombre}} ({{$event->recurso->grupo->nombre}}):
-                <br /><b class="text-info">Fecha:</b> {{date('d-m-Y',strtotime($event->fechaEvento))}}
-                <br /><b class="text-info">Horario:</b> {{date('G:i',strtotime($event->horaInicio))}}-{{date('G:i',strtotime($event->horaFin))}}
-            </span>
-        </label>
-       </div>    
+        </div>
     @endforeach
 @else
-    <div class="alert alert-danger text-center" id="nohayreservas" rol="alert">
-        <span>No hay reservas para el usuario con uvus: {{$usuarioAtendido->username or ''}} {{$usuarioAtendido->nombre or ''}} {{$usuarioAtendido->apellidos or ''}}</span>
-    </div>  
-@endif 
+	<div class="alert alert-info text-center" id="nohayreservas" rol="alert">
+	    <span>No hay reservas para el usuario con uvus: {{$username or ''}} </span>
+	</div>  
+@endif  

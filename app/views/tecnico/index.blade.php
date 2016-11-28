@@ -28,7 +28,7 @@
             
                     <applet id="lector"  
                         code="fcom.maviuno.LectorCarnetUniversitario/InfoUI.class" 
-                        codebase="https://juanantonio.us.es/sgr1/public/assets/applet"
+                        codebase="https://servidorfcom.us.es/sgr/assets/applet"
                         archive="LectorCarnetUniversitario.jar, json-simple-1.1.1.jar" 
                         width=448
                         height=358>
@@ -54,7 +54,6 @@
                 </div><!-- /.panel-heading -->
         
                 <div class="panel-body"  >
-                    
                     <div style = "display:none" class="alert alert-success alert-dismissable col-md-12 text-center" role="alert" id="success"><span></span></div>
                     <div style = "display:none" class="alert alert-danger alert-dismissable col-md-12 text-center" role="alert" id="error"><span></span></div>
                     <div style = "display:none" class="alert alert-danger alert-dismissable col-md-12 text-center" role="alert" id="errorgetEvents"><span></span></div>
@@ -67,8 +66,7 @@
                         <a href="" class="btn btn-primary updateList"><i class="fa fa-refresh fa-fw"></i> Actualizar lista</a>
 
                        <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-top:10px;">Reservas:</h4>
-                        
-                            <p class="" id="resultsearch" ></p>
+                        <p class="" id="resultsearch" ></p>
 
                         
                     </div>                    

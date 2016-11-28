@@ -20,7 +20,7 @@
       <h3>Acceso</h3>
       <div class="thumbnail">
         <div class="embed-responsive embed-responsive-4by3">
-          <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/tuyk33tNVmw?rel=0&HD=1" frameborder="0" allowfullscreen></iframe>
+          <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/tuyk33tNVmw?rel=0&HD=1" frameborder="0" allowfullscreen HD></iframe>
         </div>
 
         <div class="caption">
@@ -35,7 +35,7 @@
       <h3>Reserva puntual</h3>
       <div class="thumbnail">
         <div class="embed-responsive embed-responsive-4by3">
-            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/v2SNAtQipHo?rel=0&HD=1" frameborder="0" allowfullscreen></iframe>
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/v2SNAtQipHo?rel=0&HD=1" frameborder="0" allowfullscreen HD></iframe>
         </div>
         
         <div class="caption">

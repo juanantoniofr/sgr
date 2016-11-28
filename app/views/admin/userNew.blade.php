@@ -33,14 +33,14 @@
 
             
             @if (Session::has('message'))
-                <div class="alert alert-success alert-dismissable text-center">
+                <div class="alert alert-success alert-dismissable">
                   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                   {{ Session::get('message') }}
                 </div>
             @endif
 
             @if ($errors->has())
-                <div class="alert alert-danger text-center alert-dismissable">
+                <div class="alert alert-danger alert-dismissable">
                   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                   <p>Formulario con errores. Revise los campos requeridos.....</p>
                 </div>

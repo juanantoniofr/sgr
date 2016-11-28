@@ -21,7 +21,7 @@
         
 
   
-  <div class="alert alert-danger text-center" role="alert">
+  <div class="alert alert-danger" role="alert">
     <p>No existe reserva </p>
     
     
