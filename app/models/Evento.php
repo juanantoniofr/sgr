@@ -140,44 +140,7 @@ class Evento extends Eloquent{
 	    		$this->messages['fInicio.dateiniciotitulospropios'] = 'Las reservas para titulos propios se habilitarán a partir de '.date('d-m-Y',strtotime(Config::get('options.inicio_titulospropios')));
 	    	}
     	//fin mensages
-      	/*
-			  $recurso = Recurso::find($data['id_recurso']);
-			  $acl = json_decode($recurso->acl,true);
-			  $rol = Auth::user()->capacidad;
-			  if (is_array($acl)) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond1 ok <br />";
-			  else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond1 no ok <br />";
-				if (array_key_exists('maxhd', $acl)) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond2 ok <br />";
-				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond2 no ok <br />";
-				if (is_array($acl['maxhd'])) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond3 ok <br />";
-				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond3 no ok <br />";
-				if (array_key_exists($rol, $acl['maxhd'])) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond4 ok <br />";  	
-				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond4 no ok <br />";
-      	
-      	$maxhorasdias = $acl['maxhd'][$rol];
-			  
-
-			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "maxhorasdias = ". $maxhorasdias ."<br />";
-			  
-			  
-			  
-
-			  $numHorasReservadasDia = 0;
-			  $eventos = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])) )->where('recurso_id','=',$data['id_recurso'])->get();
- 			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "numEventos dia = ". $eventos->count() ."<br />";  	
-
-			  foreach ($eventos as $evento) {
-			  	$horas = (strtotime($evento->horaFin) - strtotime($evento->horaInicio)) / (60*60);
-			  	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "horas evento= ". $horas ."<br />";
-			  	$numHorasReservadasDia = $numHorasReservadasDia + $horas; 
-			  }
-			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "numHorasReservadasDia = ". $numHorasReservadasDia ."<br />";
-			  $numhorasevento = (strtotime($data['hFin']) - strtotime($data['hInicio'])) / (60*60);
-			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "Horas  nuevo evento = ". $numhorasevento ."<br />";
-			  if ($numhorasevento + $numHorasReservadasDia > $maxhorasdias) 	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "supera<br />";
-			 else	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "no supera<br />";
-				*/			
-
-
+     
       // make a new validator object
       $v = Validator::make($data, $this->rules, $this->messages);
    
