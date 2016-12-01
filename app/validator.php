@@ -58,4 +58,10 @@ Validator::extend('deshabilitado',function($attributes,$value,$parameters){
     return false;
 });
 
+
+//3hmaximo alumno día
+Validator::extend('maxhd',function($attributes,$value,$parameters){
+    return false;
+});
+
 ?>

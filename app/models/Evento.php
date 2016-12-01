@@ -48,8 +48,8 @@ class Evento extends Eloquent{
 
  	private $rules = array (
 			'titulo' 			=>	'required',
-			'actividad'			=>	'required',
-			'fInicio' 			=>  'required|date|date_format:d-m-Y',
+			'actividad'		=>	'required',
+			'fInicio' 		=>  'required|date|date_format:d-m-Y',
 			'hInicio'			=>	'required|date_format:H:i',
 			'hFin'				=>	'required|date_format:H:i',
 			'dias'				=> 	'required_with:fInicio,fEvento',
@@ -57,32 +57,35 @@ class Evento extends Eloquent{
 			);
 
 	private	$messages = array (
-			'required'				=>	' El campo <strong>:attribute</strong> es obligatorio.',
-			'dias.required_with'	=>	' El campo <strong>"Días"</strong> es obligatorio. ',
-			'date'					=>	'<strong>Fecha no válida</strong>. <br />',
-			'date_format'  			=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
+			'required'													=>	' El campo <strong>:attribute</strong> es obligatorio.',
+			'dias.required_with'								=>	' El campo <strong>"Días"</strong> es obligatorio. ',
+			'date'															=>	'<strong>Fecha no válida</strong>. <br />',
+			'date_format'  											=>	'<strong>Formato de fecha no válido</strong>. Formato admitido: d-m-Y.',
 
-			'fInicio.after' 		=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
-			'fInicio.req1' 			=>	'',
-			'fInicio.req5' 			=>	'',
-			'fInicio.req6' 			=>	'',
+			'fInicio.after' 										=>	' La <strong>Fecha de Inicio</strong> debe ser posterior al día actual.',
+			'fInicio.req1' 											=>	'',
+			'fInicio.req5' 											=>	'',
+			'fInicio.req6' 											=>	'',
 
-			'fFin.after'			=>	' La <strong>"fecha de finalización"</strong> debe ser posterior a la <strong>"fecha de inicio"</strong>. <br />',
-			'fFin.datefincurso' 	=>  '',
-			'fInicio.dateiniciocurso' 	=>  '',
+			'fFin.after'												=>	' La <strong>"fecha de finalización"</strong> debe ser posterior a la <strong>"fecha de inicio"</strong>. <br />',
+			'fFin.datefincurso' 								=>  '',
+			'fInicio.dateiniciocurso' 					=>  '',
 			'fInicio.dateiniciotitulospropios' 	=>  '',
 
-			'hFin.after'			=>	' La <strong>"hora de inicio"</strong> tiene que ser anterior a la <strong>"hora de finalización"</strong>. ',
-			'hFin.req2' 			=>	' Se supera el máximo de horas a la semana.. (12h). ',
+			'hFin.after'												=>	' La <strong>"hora de inicio"</strong> tiene que ser anterior a la <strong>"hora de finalización"</strong>. ',
+			'hFin.req2' 												=>	' Se supera el máximo de horas a la semana.. (12h). ',
 			
-			'dias.req4'				=>	'',
+			'dias.req4'													=>	'',
 			
-			'fEvento.reservaunica'	=> 	' No está permitido reservar dos puestos o equipos el mismo día y a la misma hora. Puede consultar la su Agenda para comprobar coincidencias.',
+			'fEvento.reservaunica'							=> 	' No está permitido reservar dos puestos o equipos el mismo día y a la misma hora. Puede consultar la su Agenda para comprobar coincidencias.',
 			
-			'titulo.required' 		=>	' El campo <strong>título</strong> es obligatorio.',
-			'titulo.req3' 			=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
-			'titulo.existeuvus'		=>	' No es posible añadir reservas para usuarios no registrados.',
-            'titulo.deshabilitado'  =>  'Espacio deshabilitado temporalmente..',			
+			'titulo.required' 									=>	' El campo <strong>título</strong> es obligatorio.',
+			'titulo.req3' 											=>	' Recurso ocupado, la solicitud de reserva no se puede registrar.',
+			'titulo.existeuvus'									=>	' No es posible añadir reservas para usuarios no registrados.',
+      'titulo.deshabilitado'  						=>  ' Espacio deshabilitado temporalmente..',	
+      'hFin.maxhd'												=>	' Supera el número máximo de horas diarias (3h) que se pueden reservar para autoaprendizaje en este espacio.',
+      'titulo.maxhd' => '',
+      
 			);	
 	
     private $errors = array();
@@ -103,84 +106,147 @@ class Evento extends Eloquent{
 
         
     	//mensages
-    	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
-    	if (ACL::isUser()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',ACL::lastFriday()) .'</strong><br />';
-    	}
+	    	//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)	
+	    	if (ACL::isUser()){
+	    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+	    		$this->messages['fInicio.req1'] = '<br />Puedes reservar entre el <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong> y el <strong>' .strftime('%A, %d de %B de %Y',ACL::lastFriday()) .'</strong><br />';
+	    	}
 
-    	
-    	if (ACL::isAvanceUser()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$this->messages['fInicio.req5'] = 'No permitidas reservas en la semana en curso o anteriores. Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong><br />';
-    	}
+	    	
+	    	if (ACL::isAvanceUser()){
+	    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+	    		$this->messages['fInicio.req5'] = 'No permitidas reservas en la semana en curso o anteriores. Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',ACL::fristMonday()) . '</strong><br />';
+	    	}
 
-    	if (ACL::isTecnico() || ACL::isSupervisor() || ACL::isValidador()){
-    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-    		$tsToday = strtotime('today');
-    		$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
-    	}
+	    	if (ACL::isTecnico() || ACL::isSupervisor() || ACL::isValidador()){
+	    		setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+	    		$tsToday = strtotime('today');
+	    		$this->messages['fInicio.req6'] = 'Puedes reservar a partir del <strong>' . strftime('%A, %d de %B de %Y',$tsToday) . '</strong><br />';
+	    	}
 
-    	if (isset($data['dias']) && in_array('6', $data['dias'])){
-    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>sábado</strong><br />";
-    	}
-    	if (isset($data['dias']) && in_array('0', $data['dias']) )
-    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>domingo</strong><br />";
-    	
-    	if (!empty($data['fFin'])){
-    		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
-    	}
-    	if (!empty($data['fInicio'])){
-    		$this->messages['fInicio.dateiniciocurso'] = 'Las reservas se habilitarán a partir del día '.date('d-m-Y',strtotime(Config::get('options.inicio_cursoAcademico')));
-    	}
-    	if (!empty($data['fInicio'])){
-    		$this->messages['fInicio.dateiniciotitulospropios'] = 'Las reservas para titulos propios se habilitarán a partir de '.date('d-m-Y',strtotime(Config::get('options.inicio_titulospropios')));
-    	}
-
-    	/*if (!empty($data['reservarParaUvus'])){
-    		$this->messages['titulo.existeuvus'] = 'No es posible añadir reservas para usuarios no registrados.';
-    	}*/
-    	
+	    	if (isset($data['dias']) && in_array('6', $data['dias'])){
+	    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>sábado</strong><br />";
+	    	}
+	    	if (isset($data['dias']) && in_array('0', $data['dias']) )
+	    		$this->messages['dias.req4'] = $this->messages['dias.req4'] . " No se puede reservar en <strong>domingo</strong><br />";
+	    	
+	    	if (!empty($data['fFin'])){
+	    		$this->messages['fFin.datefincurso'] = 'Las reservas deben de finalizar dentro del curso académico actual. (Fecha limite: '.date('d-m-Y',strtotime(Config::get('options.fin_cursoAcademico'))).')';
+	    	}
+	    	if (!empty($data['fInicio'])){
+	    		$this->messages['fInicio.dateiniciocurso'] = 'Las reservas se habilitarán a partir del día '.date('d-m-Y',strtotime(Config::get('options.inicio_cursoAcademico')));
+	    	}
+	    	if (!empty($data['fInicio'])){
+	    		$this->messages['fInicio.dateiniciotitulospropios'] = 'Las reservas para titulos propios se habilitarán a partir de '.date('d-m-Y',strtotime(Config::get('options.inicio_titulospropios')));
+	    	}
     	//fin mensages
-       
-    	
-        // make a new validator object
-        $v = Validator::make($data, $this->rules, $this->messages);
+      	/*
+			  $recurso = Recurso::find($data['id_recurso']);
+			  $acl = json_decode($recurso->acl,true);
+			  $rol = Auth::user()->capacidad;
+			  if (is_array($acl)) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond1 ok <br />";
+			  else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond1 no ok <br />";
+				if (array_key_exists('maxhd', $acl)) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond2 ok <br />";
+				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond2 no ok <br />";
+				if (is_array($acl['maxhd'])) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond3 ok <br />";
+				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond3 no ok <br />";
+				if (array_key_exists($rol, $acl['maxhd'])) $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond4 ok <br />";  	
+				else $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "cond4 no ok <br />";
+      	
+      	$maxhorasdias = $acl['maxhd'][$rol];
+			  
+
+			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "maxhorasdias = ". $maxhorasdias ."<br />";
+			  
+			  
+			  
+
+			  $numHorasReservadasDia = 0;
+			  $eventos = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])) )->where('recurso_id','=',$data['id_recurso'])->get();
+ 			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "numEventos dia = ". $eventos->count() ."<br />";  	
+
+			  foreach ($eventos as $evento) {
+			  	$horas = (strtotime($evento->horaFin) - strtotime($evento->horaInicio)) / (60*60);
+			  	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "horas evento= ". $horas ."<br />";
+			  	$numHorasReservadasDia = $numHorasReservadasDia + $horas; 
+			  }
+			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "numHorasReservadasDia = ". $numHorasReservadasDia ."<br />";
+			  $numhorasevento = (strtotime($data['hFin']) - strtotime($data['hInicio'])) / (60*60);
+			  $this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "Horas  nuevo evento = ". $numhorasevento ."<br />";
+			  if ($numhorasevento + $numHorasReservadasDia > $maxhorasdias) 	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "supera<br />";
+			 else	$this->messages['titulo.maxhd'] =  $this->messages['titulo.maxhd'] . "no supera<br />";
+				*/			
+
+
+      // make a new validator object
+      $v = Validator::make($data, $this->rules, $this->messages);
    
    		//requisito: reserva para otro usuario -> debe de existir en la Base de Datos
-        if (!empty($data['reservarParaUvus'])){
-        	$v->sometimes('titulo','existeuvus',function($data){
-  				if (User::where('username','=',$data['reservarParaUvus'])->count() == 0) return true;      		
-        	});	
-        }
+      if (!empty($data['reservarParaUvus'])){
+      	$v->sometimes('titulo','existeuvus',function($data){
+  			if (User::where('username','=',$data['reservarParaUvus'])->count() == 0) return true;      		
+       	});	
+      }
 
- 	
+      //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
+			if ( !empty($data['fEvento']) && !empty($data['hFin']) && !empty($data['hInicio']) ){
+				$v->sometimes('fEvento','reservaunica',function($data){
+					if (Auth::user()->capacidad == '1'){
+						//setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+			    	//determinar si tiene reserva en otro recurso con misma fechaEvento, horainicio y horafin solapadas.
+			    	$id_recurso = Recurso::find($data['id_recurso'])->id;
+			    	$where = 	" (( horaInicio <= '".$data['hInicio']."' and horaFin >= '".$data['hFin']."' ) "; 
+						$where .= 	" or ( horaFin > '".$data['hFin']."' and horaInicio < '".$data['hFin']."')";
+						$where .=	" or ( horaInicio > '".$data['hInicio']."' and horaInicio < '".$data['hFin']."')";
+						$where .=	" or horaFin < '".$data['hFin']."' and horaFin > '".$data['hInicio']."')";
+						$where .=	" and recurso_id != " . $id_recurso;
+					
 
-        //requisito: alumnos no pueden reservar dos recurso a la misma hora, mismo día
-		if ( !empty($data['fEvento']) && !empty($data['hFin']) && !empty($data['hInicio']) ){
-			$v->sometimes('fEvento','reservaunica',function($data){
-				if (Auth::user()->capacidad == '1'){
-					//setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
-		    		//determinar si tiene reserva en otro recurso con misma fechaEvento, horainicio y horafin solapadas.
-		    		$id_recurso = Recurso::find($data['id_recurso'])->id;
-		    		$where = 	" (( horaInicio <= '".$data['hInicio']."' and horaFin >= '".$data['hFin']."' ) "; 
-					$where .= 	" or ( horaFin > '".$data['hFin']."' and horaInicio < '".$data['hFin']."')";
-					$where .=	" or ( horaInicio > '".$data['hInicio']."' and horaInicio < '".$data['hFin']."')";
-					$where .=	" or horaFin < '".$data['hFin']."' and horaFin > '".$data['hInicio']."')";
-					$where .=	" and recurso_id != " . $id_recurso;
-				
+			    	$numEventosOtroRecurso = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])))->whereRaw($where)->count();
+			    	
+			    	if ($numEventosOtroRecurso > 0) return true;
+			    		
+			    }
+				});
+    	}
 
-		    		$numEventosOtroRecurso = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])))->whereRaw($where)->count();
-		    	
-		    		if ($numEventosOtroRecurso > 0) return true;
-		    		
-		    	}
-			});
-        }
+    	//requisito: alumnos no pueden reservar más de tres al día en el estudio de fotografía
+    	
+			if ( !empty($data['fEvento']) && !empty($data['hFin']) && !empty($data['hInicio']) && !empty($data['id_recurso'])){
+				$v->sometimes('hFin','maxhd',function($data){
+						
+						//setlocale(LC_ALL,'es_ES@euro','es_ES','esp');
+			    	//determinar si tiene reserva en otro recurso con misma fechaEvento, horainicio y horafin solapadas.
+			    	$recurso = Recurso::find($data['id_recurso']);
+			    	
+			    	
+			    	$acl = json_decode($recurso->acl,true);
+			    	
+			    	$rol = Auth::user()->capacidad;
+
+			    	if( is_array($acl) && array_key_exists('maxhd', $acl) && is_array($acl['maxhd']) && array_key_exists($rol, $acl['maxhd']))
+			    	{
+			    		
+			    		$maxhorasdias = $acl['maxhd'][$rol];
+			    		$numHorasReservadasDia = 0;
+
+			    		$eventos = Evento::where('user_id','=',Auth::user()->id)->where('fechaEvento','=',date('Y-m-d',strtotime($data['fEvento'])) )->where('recurso_id','=',$data['id_recurso'])->get();
+
+			    		foreach ($eventos as $evento) {
+			    				$horas = (strtotime($evento->horaFin) - strtotime($evento->horaInicio)) / (60*60);
+			    				$numHorasReservadasDia = $numHorasReservadasDia + $horas; 
+			    			}
+			    		$numhorasevento = (strtotime($data['hFin']) - strtotime($data['hInicio'])) / (60*60);
+			    		if (($numhorasevento + $numHorasReservadasDia) > $maxhorasdias) return true;		
+			    	}
+			    		    	
+			  });
+    	}
+    	
 
 
-	   //req1: alumno solo pueden reservar entre firstMonday y lastFriday  
-	    if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
+	  //req1: alumno solo pueden reservar entre firstMonday y lastFriday  
+	  if (!empty($data['fInicio']) && strtotime($data['fInicio']) != false){
 			$v->sometimes('fInicio','req1',function($data){
 				if (ACL::isUser()) {
 					if ( ACL::fristMonday() > Date::getTimeStamp($data['fInicio'])  || ACL::lastFriday()  < Date::getTimeStamp($data['fInicio'])) return true;
