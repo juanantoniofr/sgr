@@ -178,11 +178,31 @@ App::error(function(ModelNotFoundException $e)
 
 Route::get('test',array('as'=>'test',function(){
 	
-	Mail::queue('emails.test', array('msg' => 'prueba'), function($message)
-		{
-    		$message->to('juanantonio.fr@gmail.com', 'test sgr')->subject('test1 with send with 21-nov  ');
-		});
-	echo "Mail enviado...";
+	/*$json_acl = "{\"mh\":[
+												{\"Alumno\":\"3\"}
+												]
+									}";*/
+
+	$recurso = Recurso::find('38');
+	$acl = json_decode($recurso->acl, true);
+	$rol = User::find('1769')->capacidad;
+	echo $rol . " - <br />";
+	echo "<pre>";
+		var_dump($acl);
+	echo "</pre>";
+	if (is_array($acl)) echo "cond1 ok <br />";
+	if (array_key_exists('maxhd', $acl)) echo "cond2 ok <br />";
+	if (is_array($acl['maxhd'])) echo "cond3 ok <br />";
+	if (array_key_exists($rol, $acl['maxhd'])) echo "cond4 ok <br />";
+	if(is_array($acl) && array_key_exists('maxhd', $acl) && is_array($acl['maxhd']) && array_key_exists($rol, $acl['maxhd'])){
+		echo "test ok";
+	}
+	else 
+		echo "chungo...";
+	
+							
+
+	
 	
 }));
 
