@@ -1,6 +1,6 @@
 <?php
 class ACL {
-/** relacionUSES */
+/** desde nueva rama de sgrv0 para aplicar nueva funcionalidad */
 
 //Primer lunes reservable a partir de la fecha del día de hoy
 
