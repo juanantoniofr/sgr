@@ -9,32 +9,63 @@ class AuthController extends BaseController {
 
     if (Cas::authenticate()){
       // login en sso ok 
-      //$attributes = phpCAS::getAttributes();
       $attributes = Cas::attr();
+      
+      //Comprobando relación US ES
+      $usesrelacion = $attributes['usesrelacion'];
+      //$usesrelacion = array('PDIEXTERNO', 'ALUMNOEEPP', 'ALUMNOSECUNDARIA');
+      $relacionvalida = false;
+      $relacionespermitidas = array('PAS', 'PDI', 'ALUMNO');
+      if (is_array($usesrelacion)){
+        foreach ($usesrelacion as $relacion) {
+          if ( in_array(strtoupper($relacion),$relacionespermitidas) === true) {
+            $relacionvalida = true;
+          }
+        }
+        if (!$relacionvalida) $msg = '<b>Acceso no permitido:</b> el servidor de autenticación devolvió que su relación actual con la Universidad de Sevilla es de: '. implode(', ',$usesrelacion) ;
+      }
+      elseif (is_string($usesrelacion)){
+          if ( in_array(strtoupper($usesrelacion),$relacionespermitidas) === true) $relacionvalida = true;
+          else $msg = '<b>Acceso no permitido:</b> el servidor de autenticación devolvió que su relación actual con la Universidad de Sevilla es de: '. $usesrelacion ;
+      }
+      
+      if (!$relacionvalida) {
+        Auth::logout();
+        //$msg = $msg . '<br /><div class="text-center alert" role="alert">Relaciones permitidas: '.implode(', ',$relacionespermitidas) .'</div>';
+        return View::make('loginError')->with(compact('msg'));
+      }
+    
+
+
       $statusUvus = stripos($attributes['schacuserstatus'],'uvus:OK');
 
 
       if ($statusUvus == false){
         $msg = 'Has iniciado sesión correctamente pero, <b>su UVUS no es válido</b><br />';
+        Auth::logout();
         return View::make('loginError')->with(compact('msg'));
       }
+
+
 
       $uid = $attributes['uid'];
             
       $user= User::where('username','=',$uid)->first();
             
-      //  No registrado??
+      
       if (!empty($user)){
         // Registrado pero -> No activo
         if (!$user->estado) {
           $msg = '<b>Usuario sin activar</b><br />
             Si en 24/48 horas persiste esta situación, puede ponerse en contacto con la Unidad TIC de la F. de Comunicación para solucionarlo.';
+          Auth::logout();
           return View::make('loginError')->with(compact('msg'));
         }
 
         //Registrado pero -> Caducada
         if (strtotime($user->caducidad) < strtotime(date('Y-m-d'))){
           AuthController::cuentaCaducada($attributes);
+          Auth::logout();
           return View::make('loginError')->with('msg','Su acceso a <i>reservas fcom</i></b> ha caducado.<br />En 24/48 horas activaremos su cuenta.');
         }
 
@@ -86,7 +117,7 @@ class AuthController extends BaseController {
         $sgrMail->notificaRegistroUser($user);
 
         //-> login en laravel
-        Auth::loginUsingId($user->id); 
+        //Auth::loginUsingId($user->id); 
 
         $msg = 'Usuario registrado en <i>reservas fcom</i>.<br />En 24/48 horas activaremos su cuenta<br />';
         return View::make('loginError')->with(compact('msg'));
@@ -96,9 +127,10 @@ class AuthController extends BaseController {
     }
     else{
       $msg = '<b>error autenticación sso</b><br />';
+      Auth::logout();
       return View::make('loginError')->with(compact('msg'));
     }
-    
+   
   }
  
   public static function cuentaCaducada($attributes){
