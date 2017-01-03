@@ -5,7 +5,8 @@ class recursosController extends BaseController{
     * @param Input::get('sortby') string
     * @param Input::get('order')  string
     *
-    * @return View::make('admin.recursos.list')  
+    * @return View::make('admin.recursos.list') 
+    * añadir nueva linea en rama master 
   */
   public function listar(){ // :)
     //Input      
