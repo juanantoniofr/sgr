@@ -56,7 +56,10 @@ return array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
 
-			'database'  => 'sgproduccion',
+			/*'database'  => 'sgproduccion',
+			'username'  => 'sgr',
+			'password'  => 'sgr',*/
+			'database'  => 'sgr1',
 			'username'  => 'sgr',
 			'password'  => 'sgr',
 
