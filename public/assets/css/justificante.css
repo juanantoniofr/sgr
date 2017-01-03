@@ -1,0 +1,53 @@
+
+#header{
+	padding: 4px;
+}
+
+#content {
+}	
+
+h1, h2 {
+	margin: 0px;
+	padding: 2px;
+}
+p#titulo, p#registro{
+	font-size: 1.2em;
+	font-weight: bold;
+	padding: 0px;
+	margin: 5px;
+}
+
+
+p#registro{
+	font-size: 1.0em;
+}
+span#titulo {
+	font-weight: normal;
+	
+}
+
+p{
+	clear: both;
+}
+
+.label {
+	color:blue;
+	width: 28%;
+	padding: 20px;
+	padding-right: 15px;
+	border:1px solid #ccc;
+	display: block;
+	float:left;
+	text-align: right;
+	color: #323;	
+	font-weight: bold;
+}
+
+.data {
+	
+	width: 65%;
+	padding: 20px 5px;
+	border:1px solid #ccc;
+	display: block;
+	float: left;
+}
