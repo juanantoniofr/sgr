@@ -56,12 +56,12 @@ return array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
 
-			/*'database'  => 'sgproduccion',
-			'username'  => 'sgr',
-			'password'  => 'sgr',*/
-			'database'  => 'sgr1',
+			'database'  => 'sgproduccion',
 			'username'  => 'sgr',
 			'password'  => 'sgr',
+			/*'database'  => 'sgr1',
+			'username'  => 'sgr',
+			'password'  => 'sgr',*/
 
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
