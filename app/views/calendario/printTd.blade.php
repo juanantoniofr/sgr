@@ -1,4 +1,4 @@
-@if($view == 'month') <span style="float:right;font-size:0.5em;color:#aaa">{{ $day }}</span><br />@endif
+<!-- marca branch master2 -->@if($view == 'month') <span style="float:right;font-size:0.5em;color:#aaa">{{ $day }}</span><br />@endif
 @foreach($currentday->events($id_recurso,$id_grupo) as $event)
 
     <span class= "evento" style = "

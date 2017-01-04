@@ -1,6 +1,7 @@
 <?php
 
-//req1: alumno solo pueden reservar entre firstMonday y lastFriday  (por implementar)
+/* marca branch master2 */
+//req1: alumno solo pueden reservar entre firstMonday y lastFriday  
 Validator::extend('req1', function($attribute, $value, $parameters){
 	    return false;
 	});   

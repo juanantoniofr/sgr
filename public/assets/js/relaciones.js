@@ -1,3 +1,4 @@
+/* marca branch master2 */
 $(function(e){ 
   //Ajax: añadir relacion(administrador//gestor//validador) persona-grupo || persona-recurso 
   $('#fm_addRelacion_save').on('click',function(e){ // :)

@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
-
+/* marca branch master2 */
 class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	protected $table = 'users';

@@ -1,4 +1,4 @@
-<?php
+<!-- marca branch master2 --><?php
 $presenter = new Illuminate\Pagination\BootstrapPresenter($paginator);
 ?>
 
@@ -33,7 +33,3 @@ function getNext($currentPage, $lastPage, $url)
         return '<li class="next"><a  href="'.$url.'" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>';
 }
 ?>
-
-
-
-

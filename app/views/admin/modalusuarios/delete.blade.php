@@ -1,4 +1,4 @@
-<!-- modal eliminar Usuario -->
+<!-- marca branch master2 --><!-- modal eliminar Usuario -->
 <div class="modal fade" id="modalEliminaUsuario" tabindex="-1" role="dialog" aria-labelledby="eliminaUsuario" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_eliminausuario'))}}  
     <div class="modal-dialog">

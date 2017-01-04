@@ -1,4 +1,4 @@
-<!-- / Modal añade equipo existenten a tipoequipos  -->
+<!-- marca branch master2 --><!-- / Modal añade equipo existenten a tipoequipos  -->
 <div class="modal fade myModal-lg " id="m_addequipoExistente" tabindex="-16" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addequipoExistente'))}}          
   <div class="modal-dialog modal-lg">

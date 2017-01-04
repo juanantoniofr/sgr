@@ -1,1 +1,1 @@
-<span id="alternate">@if($view == 'week') {{$day or ''}} / @endif {{$nombreMes or ''}} / {{$year or ''}}</span>
+<!-- marca branch master2 --><span id="alternate">@if($view == 'week') {{$day or ''}} / @endif {{$nombreMes or ''}} / {{$year or ''}}</span>

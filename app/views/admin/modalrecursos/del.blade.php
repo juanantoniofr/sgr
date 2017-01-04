@@ -1,4 +1,4 @@
-<!-- modal eliminar recurso :)-->
+<!-- marca branch master2 --><!-- modal eliminar recurso :)-->
 <div class="modal fade" id="m_delrecurso" tabindex="-7" role="dialog" aria-labelledby="borrarRecurso" aria-hidden="true">
     {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_delrecurso'))}}  
     <div class="modal-dialog modal-md">

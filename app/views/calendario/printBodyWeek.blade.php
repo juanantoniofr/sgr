@@ -1,4 +1,4 @@
-@for ( $j=0; $j < count($horas)-1 ; $j++ )
+<!-- marca branch master2 -->@for ( $j=0; $j < count($horas)-1 ; $j++ )
 	<tr>
       	<td style="font-weight: bold;" width="9%"><small>{{$horas[$j]}}-{{$horas[$j+1]}}</small></td>
       	@for ( $i=0 ; $i<7 ; $i++ )

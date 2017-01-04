@@ -1,1 +1,1 @@
-<div class = "alert alert-success text-center" role="alert">{{$msg or ''}}</div>
+<!-- marca branch master2 --><div class = "alert alert-success text-center" role="alert">{{$msg or ''}}</div>

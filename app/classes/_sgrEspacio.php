@@ -1,0 +1,282 @@
+<?php
+/* marca branch master2 */
+	class sgrEspacio extends sgrRecurso{
+
+	//private $recurso;
+	private $puestos;
+	private $sgrPuestos; //array de elementos de tipo $sgrPuesto o vacio
+	private $sgrItems; ////array de elementos de tipo $sgrPuesto o vacio
+	
+
+	/*public function setRecurso($recurso){
+		$this->recurso = $recurso;
+		$this->puestos = $this->recurso->puestos;
+		$this->sgrPuestos = array();
+		foreach ($recurso->puestos as $puesto) {
+			$sgrPuesto = RecursoFactory::getRecursoInstance(Config::get('options.puesto'));
+			$sgrPuesto->setRecurso($puesto);
+			$this->sgrPuestos[] = $sgrPuesto;
+		}
+		return true;
+	}*/
+	
+	/*
+	public function recurso(){
+			return $this->recurso;
+	}
+	*/
+
+
+	/**
+   	*
+   	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy 
+  */
+	
+	public function eventosfuturos(){
+		if ($this->recurso->puestos->count() > 0){
+				//Tiene puestos
+				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
+  		  return Evento::whereIn('recurso_id',$id_puestos)->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+  		}
+			else //No tiene puestos
+				return $this->recurso->events()->where('fechaEvento','>=',date('Y-m-d'))->whereIn('estado',array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente')))->get();
+	}
+
+	
+
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento 
+		* @param $dataEvento array
+		*	@param $excluyeId int excluir de la comprobación el evento con id igual $excluyeId 
+		*
+		* @return boolean
+	*/
+	/*public function recursoOcupado($dataEvento,$excluyeId = ''){
+		$estado = array();
+		$estado[] = 'aprobada';
+		for ($tsfechaEvento = strtotime($dataEvento['fInicio']);$tsfechaEvento<=strtotime($dataEvento['fFin']);$tsfechaEvento = strtotime('+1 week ',$tsfechaEvento)) {
+				$eventos = $this->getEvents(date('Y-m-d',$tsfechaEvento),$estado);
+				if ( $eventos->count() > 0 ){
+					foreach ($eventos as $evento) {
+						if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
+							return true;
+						if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin) && $evento->evento_id != $excluyeId)
+							return true; 	 	
+					}//fin foreach
+				}//fin if 
+		}//fin del for
+		return false;
+	}
+	*/
+	
+	/**
+		* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
+		* @param $dataEvento array
+		*	@param $fecha string (Y-m-d)
+		*
+		* @return boolean
+	*/
+	/*
+	private function solapaEvento($dataEvento,$fecha){
+		$estado = array();
+		$estado[] = 'aprobada';
+		$eventos = $this->getEvents($fecha,$estado);
+		if ( $eventos->count() > 0 ){
+			foreach ($eventos as $evento) {
+				if (strtotime($evento->horaInicio) <= strtotime($dataEvento['hInicio']) && strtotime($dataEvento['hInicio']) < strtotime($evento->horaFin))
+					return true;
+				if (strtotime($evento->horaInicio) < strtotime($dataEvento['hFin']) && strtotime($dataEvento['hFin']) < strtotime($evento->horaFin))
+					return true; 	 	
+			}//fin foreach
+		}//fin if 
+		return false;
+	}
+	*/
+
+	/**
+		* //Añade un evento para la fecha $currentfecha con identificador de serie $idserie:
+		* 	--> Si tiene puestos y son reservables individualmente: se reserva todos los puestos.
+		*		--> en caso contrario: se reserva el espacio
+		* @param $dataEvento array 
+		* @param $fecha string Y-m-d
+		* @param $idserie string
+	*/
+	/*public function addEvent($dataEvento,$currentfecha,$idserie){
+		if ($this->recurso->puestos->count() > 0){
+			foreach($this->sgrPuestos as $sgrPuesto){
+				$result = $sgrPuesto->addEvent($dataEvento,$currentfecha,$idserie);
+			}
+			return $result;
+  	}
+		else {
+			$evento = new Evento();
+			$evento = $this->setdataevent($evento,$dataEvento,$currentfecha,$idserie);
+			if ($evento->save()) return $evento->id;
+			return false;
+		}
+	}//fin function addEvent
+	*/
+
+	/*
+	public function deleteEvent($idSerie){
+		return Evento::where('evento_id','=',Input::get('idSerie'))->delete();
+	}			
+	*/
+
+	/*	
+	private function setdataevent($evento,$data,$currentfecha,$idserie){
+		$evento->recurso_id = $this->recurso->id;
+		//Procesar información de formulario
+		$hInicio = date('H:i:s',strtotime($data['hInicio']));
+		$hFin = date('H:i:s',strtotime($data['hFin']));
+		
+		$date = DateTime::createFromFormat('d-m-Y',$data['fInicio']);
+		$evento->fechaInicio = $date->format('Y-m-d');
+		$date = DateTime::createFromFormat('d-m-Y',$data['fFin']);
+		$evento->fechaFin = $date->format('Y-m-d');
+		//Estado inicial del evento (reserva)
+		$estado = 'denegada';
+		//si no se requiere validación 
+		if( $this->recurso->validacion() === false){
+			if ( $this->solapaEvento($data,$currentfecha) === false ) $estado = 'aprobada'; //NO validación && recurso no ocupado			
+			//else $estado = 'pendiente';
+		}
+		//si se requiere validación (se pueden solapar las peticiones)
+		else {
+			$estado = 'pendiente'; //Si validación pendiente por defecto
+			if ( !$this->solapaEvento($data,$currentfecha) && Auth::user()->isValidador() ) //NO ocupado	y auth user es validador		
+			 $estado = 'aprobada';
+		}
+		$evento->estado = $estado;
+		//fin estado inicial
+
+		$repeticion = 1;
+		
+		$evento->diasRepeticion = json_encode($data['dias']);
+				
+		if ($data['repetir'] == 'SR') {
+			$repeticion = 0;
+			$evento->fechaFin = $currentfecha;
+			$evento->fechaInicio = $currentfecha;
+			$evento->diasRepeticion = json_encode(array(date('N',strtotime($currentfecha))));
+		}
+		$evento->repeticion = $repeticion;
+
+		$evento->evento_id = $idserie;
+		$evento->titulo = $data['titulo'];
+		$evento->actividad = $data['actividad'];
+		
+		$evento->fechaEvento = $currentfecha;
+		$evento->dia = date('N',strtotime($currentfecha));
+		$evento->horaInicio = $data['hInicio'];
+		$evento->horaFin = $data['hFin'];
+		$evento->reservadoPor_id = Auth::user()->id;//Persona que reserva
+					
+		//Propietaria de la reserva
+		$evento->user_id = Auth::user()->id;//Puede ser la persona que reserva
+					
+		//U otro usuario
+		$uvus = Input::get('reservarParaUvus','');
+		if (!empty($uvus)) {
+			$user = User::where('username','=',$uvus)->first();
+			if ($user->count() > 0) $evento->user_id = $user->id;
+		}
+		
+		return $evento;
+	}
+	*/
+
+
+	/**
+		* //Devuelve los eventos para el día $fechaEvento
+		*	@param $fechaEvento string formato Y-m-d
+		* @param $estado array estados de la reserva
+		*	@return Collection Object Evento
+		*
+	*/
+	/*public function getEvents($fechaEvento,$estado = ''){
+
+			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independiente de su estado
+
+			if ($this->recurso->puestos->count() > 0){
+				foreach($this->recurso->puestos as $puesto)	$id_puestos[] = $puesto->id;
+  		  return Evento::whereIn('recurso_id',$id_puestos)->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->groupby('evento_id')->orderby('horaFin','desc')->orderby('horaInicio')->get();
+  		}
+			else{
+				$use = array('fechaEvento' => $fechaEvento,'estado' => $estado);
+				return $this->recurso->events->filter(function($evento) use ($use){
+					return in_array($evento->estado,$use['estado']) && $evento->fechaEvento == $use['fechaEvento'];
+				});
+			}
+	}
+	*/
+	
+
+	
+	/*
+	public function save(){
+		foreach ($this->puestos as $puesto) {
+			$puesto->save();
+		}		
+		$this->recurso->save();
+		return true;
+	}
+	*/
+
+	/*
+	public function del(){
+		//Softdelete recurso
+    foreach ($this->puestos as $puesto) {
+			$puesto->espacio_id = 0;
+			$puesto->save();
+		}
+
+		$this->recurso->delete();		
+	}
+	*/
+	
+	/*
+	public function delEvents(){
+		//Softdelete eventos
+		foreach ($this->puestos as $puesto) {
+			$puesto->events()->delete();
+		}
+		$this->recurso->events()->delete();
+	}
+	*/
+
+	/*
+	public function update($data){
+		$idrecursocontenedor = $this->recurso->id;
+		//para cada uno de los puestos
+		foreach ($this->recurso->puestos as $item) {
+			//si cambia el tipo
+			if ($data['tipo'] != $this->recurso->tipo){
+				$item->tipo = Config::get('options.equipo');
+				$item->tipoequipo_id = $idrecursocontenedor;
+				$item->espacio_id = 0;
+			}
+			
+			//updateAcl
+			$item->acl = $data['acl'];
+			$item->save();
+		}
+		
+		//update recurso		
+		$this->recurso->update($data);
+		return true;
+	}
+	*/
+
+	/*
+	public function add($data){
+		foreach ($data as $key => $value) {
+			$this->recurso->$key = $value;
+		}
+		return true;
+	}	
+	*/
+
+
+	}	
+?>

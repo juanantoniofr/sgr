@@ -1,4 +1,4 @@
-<div 
+<!-- marca branch master2 --><div 
   class = "day month @if($sgrDia->reservable(Auth::user()->id) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" >
 
   <div class="titleEvents"><small>{{ $sgrDia->numerodia() }}</small></div>

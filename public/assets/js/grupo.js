@@ -1,5 +1,5 @@
 $(function(e){
-
+/* marca branch master2 */
 	
   $('#btnNuevoGrupo').on('click',function(e){ // :)
     e.preventDefault();

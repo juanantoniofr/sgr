@@ -1,5 +1,5 @@
 @extends('layout')
-
+<!-- marca branch master2 -->
 @section('title')
   SGR: Gestión de Espacios y Equipos
 @stop

@@ -1,4 +1,4 @@
-<div class="col-lg-12">
+<!-- marca branch master2 --><div class="col-lg-12">
         <h3 class=""><i class="fa fa-check fa-fw"></i> Validaciones</h3>
         
         

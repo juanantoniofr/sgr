@@ -1,3 +1,4 @@
+<!-- marca branch master2 -->
 <!-- / Modal añade recurso existente a un grupo  -->
 <div class="modal fade myModal-lg " id="m_addrecursotogrupo" tabindex="-6" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addrecursotogrupo'))}}          

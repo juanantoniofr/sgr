@@ -1,3 +1,4 @@
+
 @if ($events->count() > 0)
     @foreach ($events as $event)
     	<div class="list-group">
@@ -5,6 +6,9 @@
             	<span class="@if($event->atendida) text-success @else text-warning @endif">
                 <i class="fa @if($event->atendida) fa-check @else fa-info @endif fa-fw"></i>
                 {{$event->recursoOwn->nombre}} ({{$event->recursoOwn->grupo}}) - ({{strftime('%d/%m/%Y',Date::getTimeStampEN($event->fechaEvento))}}) - {{$event->horaInicio}} // {{$event->horaFin}} // {{$event->titulo}} // {{$event->estado}}</span>
+
+<!-- marca branch master2 --><span style="display:none" id="usuarioAtendido" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}"></span>
+
 
                 @if (!empty($event->atencion->observaciones) ) <span class="text-danger text-center"> ({{$event->atencion->observaciones}} )</span>@endif
             </a>

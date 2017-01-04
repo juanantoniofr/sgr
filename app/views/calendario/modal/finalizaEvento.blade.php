@@ -1,4 +1,4 @@
-<!-- / Modal finaliza reserva  -->
+<!-- marca branch master2 --><!-- / Modal finaliza reserva  -->
 <div class="modal fade myModal-lg " id="modalFinalizareserva" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     

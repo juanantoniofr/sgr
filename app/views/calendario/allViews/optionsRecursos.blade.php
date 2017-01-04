@@ -1,4 +1,4 @@
-@foreach ($sgrRecursos as $sgrRecurso)
+<!-- marca branch master2 -->@foreach ($sgrRecursos as $sgrRecurso)
   <option value="{{$sgrRecurso->id()}}" 
   				data-numeroitems="{{count($sgrRecurso->itemsVisiblesParaCapacidad(Auth::user()->capacidad))}}"
   				data-disabled="{{$sgrRecurso->isDisabled()}}" 

@@ -1,3 +1,4 @@
+<!-- marca branch master2 --><!-- :) -->
 <li class="dropdown ">
   <a href="{{Auth::user()->getHome()}}" title="Menú" class="dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-list fa-fw"></i> Menú  <span class="caret "></span></a>
   

@@ -1,5 +1,5 @@
 $(function(e){
-	
+	/* marca branch master2 */
 
 	$('.event').click(function(e){
 
@@ -72,10 +72,7 @@ $(function(e){
 			$('#modalValidacion').modal('show');
 	});
 
-
-	
-
-    $("#caducidad").datepicker({
+  $("#caducidad").datepicker({
             showOtherMonths: true,
             selectOtherMonths: true,
             showAnim: 'slideDown',
@@ -84,13 +81,13 @@ $(function(e){
             firstDay: 1,
             monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
             dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
-        });
+  });
 
-    function showGifEspera(){
-        $('#espera').css('display','inline').css('z-index','100');
-    }
+  function showGifEspera(){
+    $('#espera').css('display','inline').css('z-index','100');
+  }
 
-    function hideGifEspera(){
-        $('#espera').css('display','none').css('z-index','-100');
-    }
+  function hideGifEspera(){
+    $('#espera').css('display','none').css('z-index','-100');
+  }
 });

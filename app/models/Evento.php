@@ -1,4 +1,6 @@
 <?php
+/* marca branch master2 */
+//use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class Evento extends Eloquent{
 

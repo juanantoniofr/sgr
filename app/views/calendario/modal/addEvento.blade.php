@@ -1,4 +1,4 @@
-<!-- / Modal addEvent // editEvent  -->
+<!-- marca branch master2 --><!-- / Modal addEvent // editEvent  -->
 <div class="modal fade myModal-lg" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="formNewEvent" aria-hidden="true">
     
   <div class="modal-dialog modal-lg">

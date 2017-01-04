@@ -1,4 +1,4 @@
-@if(count($events)>0)
+<!-- marca branch master2 -->@if(count($events)>0)
 	
 	<table class="table table-bordered">
 	<thead>

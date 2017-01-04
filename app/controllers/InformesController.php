@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class InformesController extends BaseController {
 
  	public function index(){

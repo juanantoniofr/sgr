@@ -1,4 +1,4 @@
-<!-- modal add relacion persona-grupo || persona-recurso :) -->
+<!-- marca branch master2 --><!-- modal add relacion persona-grupo || persona-recurso :) -->
 <div class="modal fade" id="m_addRelacion" tabindex="-10" role="dialog" aria-labelledby="modalAddPersonaLabel">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addRelacion'))}}  
   <div class="modal-dialog modal-md">

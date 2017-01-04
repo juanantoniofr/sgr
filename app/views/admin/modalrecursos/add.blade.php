@@ -1,3 +1,4 @@
+<!-- marca branch master2 -->
 <!-- / Modal add recurso (Espacio|tipoequipo|puesto|equipo) :) -->
 <div class="modal fade myModal-lg" id="m_addrecurso" tabindex="-4" role="dialog" aria-hidden="true" aria-labelledby="modalAddRecursoLabel">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addrecurso'))}}
