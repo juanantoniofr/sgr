@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class sgrEvento {
 
 	private $evento;

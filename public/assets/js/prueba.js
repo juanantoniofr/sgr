@@ -1,5 +1,5 @@
 $(function(e){
-
+/* marca branch master2 */
 	$('#SCReader').on('change',function(e){
 		
 		json = lector.getJsonObject().toString();//get("numeroSerie");

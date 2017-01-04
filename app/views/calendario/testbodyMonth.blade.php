@@ -1,4 +1,4 @@
-@foreach($sgrCalendario->sgrWeeks() as $sgrWeek)
+<!-- marca branch master2 -->@foreach($sgrCalendario->sgrWeeks() as $sgrWeek)
 	<tr>
 	@foreach($sgrWeek->sgrDays() as $sgrDia)
 		<td>

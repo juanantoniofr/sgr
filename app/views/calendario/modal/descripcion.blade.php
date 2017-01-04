@@ -1,4 +1,4 @@
-<!-- / Modal descripcion recurso  -->
+<!-- marca branch master2 --><!-- / Modal descripcion recurso  -->
  
   <div class="modal fade myModal-lg " id="modalDescripcion" tabindex="-3" role="dialog" aria-hidden="true">
     

@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 return array (
 
 	//Último día de la semana en curso para poder reservar para la semana siguiente (en este caso es el jueves día 4 de la semana)

@@ -1,4 +1,4 @@
-<?php
+<?php/* marca branch master2 */
 	class recursoItem extends sgrRecurso {
   
   	//private $recurso;

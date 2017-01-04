@@ -1,4 +1,4 @@
-@if ($addOptionReservarTodo)
+<!-- marca branch master2 -->@if ($addOptionReservarTodo)
   <option id="allitems" data-numeroitems = "{{$items->count()}}" data-numeroitemsdisabled = "{{$numerodeitemsdisabled}}" value="0" data-disabled="{{$disabledAll}}">Todos los puestos/equipos ,{{$items->count() - $numerodeitemsdisabled}}/{{$items->count()}}</option>
 @endif
 @foreach ($items as $item)

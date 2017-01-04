@@ -1,5 +1,5 @@
 <?php
-  
+  /* marca branch master2 */
   class RecursoFactory{
   
     public static function getRecursoInstance($tipo){

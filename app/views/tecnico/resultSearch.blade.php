@@ -1,4 +1,4 @@
-<span style="display:none" id="usuarioAtendido" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}"></span>
+<!-- marca branch master2 --><span style="display:none" id="usuarioAtendido" data-uvus="{{$usuarioAtendido->username}}" data-nombre="{{$usuarioAtendido->nombre}} {{$usuarioAtendido->apellidos}}"></span>
 
 @if ($eventos->count() > 0)
 	@foreach($eventos as $event)

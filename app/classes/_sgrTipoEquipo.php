@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 	class sgrTipoEquipo implements sgrInterfaceRecurso{
 
 	private $recurso;

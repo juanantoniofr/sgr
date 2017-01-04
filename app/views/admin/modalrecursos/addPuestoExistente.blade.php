@@ -1,4 +1,4 @@
-<!-- / Modal añade puesto existente a espacio  -->
+<!-- marca branch master2 --><!-- / Modal añade puesto existente a espacio  -->
 <div class="modal fade myModal-lg " id="m_addpuestoExistente" tabindex="-15" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addpuestoExistente'))}}          
   <div class="modal-dialog modal-lg">

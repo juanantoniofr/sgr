@@ -1,4 +1,4 @@
-<!-- modal baja supervisor//gestor//validador en grupo :)-->
+<!-- marca branch master2 --><!-- modal baja supervisor//gestor//validador en grupo :)-->
 <div class="modal fade" id="m_removeRelacion" tabindex="-11" role="dialog" aria-labelledby="removeUserWithRol" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_removeRelacion'))}}  
   <div class="modal-dialog modal-md">

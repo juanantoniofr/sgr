@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 	class sgrGestorEventos {
 
 			public function __construct($recurso,$eventos){}

@@ -1,6 +1,6 @@
 $(function(e){
 
-	
+	/* marca branch master2 */
 	function getNombre(){
 		var $json = lector.getJsonObject().toString();
 		var $obj = $.parseJSON($json);

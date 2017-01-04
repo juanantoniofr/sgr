@@ -1,5 +1,5 @@
 @extends('layout')
-
+<!-- marca branch master2 -->
 @section('head')
 	<style>
 		@import url(//fonts.googleapis.com/css?family=Lato:700);

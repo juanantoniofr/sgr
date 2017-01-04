@@ -1,3 +1,4 @@
+<!-- marca branch master2 -->
 <!-- / Modal add grupo  -->
 <div class="modal fade myModal-md" id="m_addgrupo" tabindex="-1" role="dialog" aria-hidden="true">
   {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_addgrupo'))}}          

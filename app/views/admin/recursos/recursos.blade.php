@@ -1,4 +1,4 @@
-<ul class="list-group">
+<!-- marca branch master2 --><ul class="list-group">
 @foreach($sgrGrupos as $sgrGrupo)
  
   <li  class="list-group-item col-md-12 listitemgrupo">

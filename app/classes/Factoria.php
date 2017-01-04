@@ -1,5 +1,5 @@
 <?php
-  
+  /* marca branch master2 */
   class Factoria{
   
     public static function getRecursoInstance($recurso = ''){

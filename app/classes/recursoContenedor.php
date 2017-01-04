@@ -1,4 +1,5 @@
 <?php
+/* marca branch master2 */
 	class recursoContenedor extends sgrRecurso {
   
 		//private $recurso;	//array obj recurso (espacio / tipoequipo)

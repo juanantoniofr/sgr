@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class sgrGrupo {
 
 	private $grupo; //Objeto de tipo GrupoRecurso

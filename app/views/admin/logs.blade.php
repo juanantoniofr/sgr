@@ -1,5 +1,5 @@
 @extends('layout')
-
+<!-- marca branch master2 -->
 @section('title')
     SGR: Configuración
 @stop

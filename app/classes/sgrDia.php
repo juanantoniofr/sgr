@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class sgrDia {
 
 	private $timestamp; //timestamp de la fecha

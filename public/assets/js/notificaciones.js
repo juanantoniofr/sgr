@@ -1,5 +1,5 @@
 $(function(e){
-
+/* marca branch master2 */
 	$('.list-group').on('click',function(e){// :)
 		$('form#activeUser input[name="username"]').val($(this).data('username'));
 		$('form#activeUser input[name="idnotificacion"]').val($(this).data('idnotificacion'));

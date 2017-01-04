@@ -1,4 +1,4 @@
-@foreach($sgrCalendario->sgrWeeks() as $sgrWeek)
+<!-- marca branch master2 -->@foreach($sgrCalendario->sgrWeeks() as $sgrWeek)
 	<tr class="fila">
 	@foreach($sgrWeek->sgrDays() as $sgrDia)
 		<td class="celda" @if ($sgrDia->festivo()) width="5%" @else width="18%" @endif>

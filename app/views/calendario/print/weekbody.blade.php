@@ -1,4 +1,4 @@
-<tr>
+<!-- marca branch master2 --><tr>
   <td class="primeraColumna" width="9%">
     <div style="position:relative;" >
     @for ( $j=0; $j < count(Config::get('options.horarioApertura'))-1 ; $j++ )

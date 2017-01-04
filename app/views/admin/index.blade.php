@@ -1,5 +1,5 @@
 @extends('layout')
-
+<!-- marca branch master2 -->
 @section('title')
     Acceso para administradores: Inicio
 @stop

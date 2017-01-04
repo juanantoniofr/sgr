@@ -1,4 +1,4 @@
-<!-- modal deshabilitar recurso -->
+<!-- marca branch master2 --><!-- modal deshabilitar recurso -->
 <div class="modal fade" id="m_disabledrecurso" tabindex="-9" role="dialog" aria-labelledby="disabledRecurso" aria-hidden="true">
     {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_disabledrecurso'))}}  
     <div class="modal-dialog modal-md">

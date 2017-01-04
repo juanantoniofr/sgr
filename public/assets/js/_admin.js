@@ -1,6 +1,6 @@
 $(function(e){
 
- 
+ /* marca branch master2 */
   //Añadir nuevo
   //Recursos (Espacio // TipoEquipos)
     

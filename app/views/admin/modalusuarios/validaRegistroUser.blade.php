@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalUser" >
+<!-- marca branch master2 --><div class="modal fade" id="modalUser" >
    <form class="form-horizontal" role="form" id = "activeUser" data-item=''>
   <div class="modal-dialog">
     <div class="modal-content">

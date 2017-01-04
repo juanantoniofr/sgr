@@ -1,4 +1,4 @@
-<div class="col-lg-12">
+<!-- marca branch master2 --><div class="col-lg-12">
         <h3 class=""><i class="fa fa-users fa-fw"></i> Gestión de Administradores</h3>
         
         <form class="navbar-form navbar-left">    

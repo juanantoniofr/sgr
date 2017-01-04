@@ -1,4 +1,4 @@
-<?php
+<?php/* marca branch master2 */
 class sgrMail {
 	
 	private $mailAdminSGR = 'juanafr@us.es';

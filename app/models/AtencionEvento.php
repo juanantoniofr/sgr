@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class AtencionEvento extends Eloquent{
 
  	protected $table = 'atencionEventos';

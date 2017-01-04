@@ -1,5 +1,5 @@
 <?php
-	
+	/* marca branch master2 */
 	interface sgrInterfaceRecurso{
 		
 		public function enabled();

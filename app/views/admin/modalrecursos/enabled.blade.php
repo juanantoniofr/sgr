@@ -1,4 +1,4 @@
-<!-- modal habilitar recurso -->
+<!-- marca branch master2 --><!-- modal habilitar recurso -->
 <div class="modal fade" id="m_enabledrecurso" tabindex="-8" role="dialog" aria-labelledby="enabledRecurso" aria-hidden="true">
     {{Form::open(array('method' => 'POST','role' => 'form','id'=>'fm_enabledrecurso'))}}  
     <div class="modal-dialog modal-md">

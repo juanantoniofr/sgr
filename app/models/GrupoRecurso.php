@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class GrupoRecurso extends Eloquent{
 
  	protected $table = 'grupoRecursos';

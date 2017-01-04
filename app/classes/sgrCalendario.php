@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 class sgrCalendario {
 	
 	private $fecha;						//objeto DateTime (php) || empty

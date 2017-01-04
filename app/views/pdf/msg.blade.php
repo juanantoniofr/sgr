@@ -1,5 +1,5 @@
 @extends('layout')
-
+<!-- marca branch master2 -->
 @section('title')
   <title>Comprobante sgr</title>
 @stop

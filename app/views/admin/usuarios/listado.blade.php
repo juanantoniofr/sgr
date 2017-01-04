@@ -1,4 +1,4 @@
-@extends('layout')
+<!-- marca branch master2 -->@extends('layout')
 <!-- :( -->
 @section('title')
   SGR: Gestión de Usuarios

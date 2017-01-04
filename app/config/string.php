@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 return array (
 
 	'espacio' 					=> 'Espacio',

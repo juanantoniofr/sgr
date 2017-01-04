@@ -1,6 +1,6 @@
 
 activelinks();
-
+/* marca branch master2 */
 function activelinks(){
     //grupos :) (add en grupos.js )
 		activelinkeditgrupo(); 									//:) 	edit

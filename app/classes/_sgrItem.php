@@ -1,5 +1,5 @@
 <?php
-
+/* marca branch master2 */
 	abstract class sgrItem{
 
 		private $recurso; //obj Recurso

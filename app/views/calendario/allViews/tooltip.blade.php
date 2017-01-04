@@ -1,4 +1,4 @@
-	<p style="width=100%;text-align:center" class=" alert @if ($event->solape($time)) alert-danger @elseif ($event->estado == 'aprobada') alert-success @elseif ($event->estado == 'pendiente') alert-danger @endif">
+<!-- marca branch master2 -->	<p style="width=100%;text-align:center" class=" alert @if ($event->solape($time)) alert-danger @elseif ($event->estado == 'aprobada') alert-success @elseif ($event->estado == 'pendiente') alert-danger @endif">
 		
 		Estado:<strong> Solicitud @if ($event->solape($time)) Solapada @else {{ucfirst($event->estado)}} @endif</strong>
 
