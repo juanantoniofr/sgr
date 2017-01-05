@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
+
 class sgrDate{
-	
+	/* :) 1-5-2017 */	
 	/**
 	 	* calcula el número de horas de una reserva: diferencia entre horaInicio y horaFin
  	 	* 

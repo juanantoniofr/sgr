@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-	abstract class sgrItem{
 
+	abstract class sgrItem{
+		/* :) 1-5-2017 */
 		private $recurso; //obj Recurso
 
 		public function __construct(){

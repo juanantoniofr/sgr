@@ -1,33 +1,112 @@
 <?php
+/* :) 5-1-2017 */
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
-/* marca branch master2 */
 class User extends Eloquent implements UserInterface, RemindableInterface{
-
 	protected $table = 'users';
 	public $timestamps = true;
 	protected $softDelete = false;
 	//protected $hidden = array('password');
+	public function recursosAdministrados(){
+    
+    return $this->belongsToMany('Recurso', 'recurso_administradores', 'user_id', 'recurso_id');
+  }
+  public function gruposAdministrados(){
+    
+    return $this->belongsToMany('GrupoRecurso', 'grupo_administradores', 'user_id', 'grupo_id');
+  }
+  //devuelve los recursos que gestiona sus reservas: anula, libera, finaliza reservas
+  public function recursosGestionados(){
+    
+    return $this->belongsToMany('Recurso', 'recurso_gestores', 'user_id', 'recurso_id');
+  }
+  //devuelve los recursos que valida (aprueba//deniega reservas)
+  public function recursosValidados(){
+    
+    return $this->belongsToMany('Recurso', 'recurso_validadores', 'user_id', 'recurso_id');
+  }
 
-	//devuelve los recurso que valida
-	public function supervisa()
-    {
-        return $this->belongsToMany('Recurso');
+  //modela la relación "atender evento": 1 usuario (técnico) atiende muchos eventos
+  public function atenciones(){
+
+    return $this->hasMany('atencionEventos','tecnico_id');
+  }
+  //devuelve los eventos del usuario
+  public function eventos(){
+
+    return $this->hasMany('Evento','user_id');
+  }
+ /**
+    *   //Determina si un día es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol)
+    *   @param $timestamp int fecha a valorar
+    *   @return $isAviable boolean 
+    *
+  */
+  public function isDayAviable($timestamp,$idrecurso){
+    
+    $isAviable = false;
+    $intCurrentDate = $timestamp; //mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
+    $capacidad = $this->capacidad;
+    switch ($capacidad) {
+      case '1': //alumnos
+        $intfristMondayAviable = sgrCalendario::fristMonday();
+        $intlastFridayAviable = sgrCalendario::lastFriday();
+        if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
+        break;  
+      case '2': //pdi & pas administración
+        $intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+        if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+        break;
+      case '3': //Técnicos MAV
+        //No atiende el recurso => igual que case 2 
+        if (!$this->atiendeRecurso($idrecurso)){
+          $intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+          //$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+          if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+        }
+        //sí atiende el recurso => igual que case 4, 5 y 6
+        else {
+          $intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+          //$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+          if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+        }
+        break;
+      case '4': //administradores SGR
+      case '5': //Validadores
+      case '6': //administradores (EE MAV)
+        $intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+        if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+        break;
     }
-
-    //devuelve los eventos del usuario
-	public function userEvents(){
-
-		return $this->hasMany('Evento','user_id');
-	
-	}
+    return $isAviable;
+  }
+  /**
+   * Implementa requisito: usuarios del perfil alumno (capacidad = 1) pueden reservar como másimo 12 horas a la semana.
+   * 
+   *  @param void
+   *  @return $nh int Número de horas reservadas por el usuario logueado en la semana reservable inmediatemente siguiente a la actual (perfil alumno) 
+  */
+  public function numHorasReservadas(){
+    
+    $nh = 0;
+    $fristMonday = sgrCalendario::fristMonday(); //devuelve timestamp
+    $lastFriday = sgrCalendario::lastFriday(); //devuelve timestamp 
+    $fm = date('Y-m-d',$fristMonday); //formato para la consulta sql (fechaIni en Inglés)
+    $lf = date('Y-m-d',$lastFriday); //formato para la consulta sql (fechaFin en Inglés)
+    $events = $this->userEvents()->where('fechaEvento','>=',$fm)->where('fechaEvento','<=',$lf)->get();
+    foreach ($events as $key => $event) {
+      $nh = $nh + sgrDate::diffHours($event->horaInicio,$event->horaFin);
+    }
+    
+    return $nh;
+  } 
 	/**
 	 * Get the unique identifier for the user.
 	 *
 	 * @return mixed
 	 */
-	public function getAuthIdentifier()
-	{
+	public function getAuthIdentifier(){
+
 		return $this->getKey();
 	}
 
@@ -36,151 +115,78 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	 *
 	 * @return string
 	 */
-	public function getAuthPassword()
-	{
+	public function getAuthPassword(){
+
 		//return $this->password;
 		return null;
 	}
-
 	/**
 	 * Get the e-mail address where password reminders are sent.
 	 *
 	 * @return string
 	 */
-	public function getReminderEmail()
-	{
+	public function getReminderEmail(){
+
 		return $this->email;
 	}
-
-	public function getRememberToken()
-	{
+	public function getRememberToken(){
 	    //return $this->remember_token;
 	    return null;
 	}
+	public function setRememberToken($value){
 
-	public function setRememberToken($value)
-	{
 	   // $this->remember_token = $value;
 	}
-
-	public function getRememberTokenName()
-	{
+	public function getRememberTokenName(){
 	    //return 'remember_token';
 	    return null;
 	}
-
-	/*
-  		* Overrides the method to ignore the remember token.
-  	*/
- 	public function setAttribute($key, $value)
- 	{
+	/**
+		*
+  	* Overrides the method to ignore the remember token.
+  */
+ 	public function setAttribute($key, $value){
 	   $isRememberTokenAttribute = $key == $this->getRememberTokenName();
 	   if (!$isRememberTokenAttribute)
 	   {
 	     parent::setAttribute($key, $value);
 	   }
 	}
-
-	//Validador
-    public function isValidador(){
-        $isValidador = false;
- 
-        if (Auth::user()->capacidad == 5) $isValidador = true;
- 
-        return $isValidador;
-    }
-
-	//PDI
-    public function isPDI(){
-        $isPDI = false;
- 
-        if (Auth::user()->capacidad == 2) $isPDI = true;
- 
-        return $isPDI;
-    }
-
-    //Supervisor
-    public function isSupervisor(){
-        $isSupervisor = false;
- 
-        if (Auth::user()->capacidad == 6) $isSupervisor = true;
- 
-        return $isSupervisor;
-    }
-    //Admin
-    public function isAdmin(){
-        $isAdmin = false;
- 
-        if (Auth::user()->capacidad == 4) $isAdmin = true;
- 
-        return $isAdmin;
-    }
-
-	public function caducado(){
-		return strtotime($this->caducidad) < strtotime('today');
-	}
-
-	public function getRol(){
-		
-		
-		switch ($this->capacidad) {
-			case '1':
-				return 'Usuario (Alumno)';
-			case '2':
-				return 'PDI // PAS Administración';
-			case '3':
-				return 'PAS (técnico MAV)';
-			case '4':
-				return 'Administrador (SGR)';
-			case '5': 
-				return 'Validador';
-			case '6': 
-				return 'Supervisor (E.E Unidad)';	
-			default:
-				return 'No definido..';
-			}
-	}
-
-	
-	public function getHome(){
-		
-		switch ($this->capacidad) {
-			case '6': //validador
-				return route('recursos');
-			case '5': //validador
-				return route('validadorHome.html');
-			case '4': //root
-				return route('adminHome.html');
-			case '3': //pas - técnico MAV
-				return route('tecnicoHome.html');
-			case '2': //pdi - pas Administración
-				return route('calendarios.html');
-			case '1': //alumno
-				return route('calendarios.html');
-			default:
-				return 'No definido..';
-			}
-
-	}
-
-	public function dropdownMenu(){
-		
-		switch ($this->capacidad) {
-			case '5': //validador
-				return 'validador.dropdown';
-			case '4': //root
-				return 'admin.dropdown';
-			case '3': //pas - técnico 
-				return 'tecnico.dropdown';
-			case '6': //pas - supervisor
-				return 'tecnico.dropdown';
-			case '2': //pdi
-				return 'emptydropdown';
-			case '1': //alumno
-				return 'emptydropdown';
-			default:
-				return 'emptydropdown';
-			}
-	}
+	/**
+   * Implementa requisito: Alumnos no pueden hacer reservas periodicas
+   * @param void
+   * @return $repetir boolean true si el usuario puede hacer reservas periodicas (usuarios con capacidad 1, alumnos, no pueden)
+  */
+  public function puedePeriodica(){
+    
+    $repetir = true;
+    //Perfil alumno: -> No puede realizar reservas periodicas
+    if ($this->isUser()) $repetir = false; 
+    return $repetir;
+  }
+  //Alumnos
+  public static function isUser(){
+    $isUser = false;
+    if (Auth::user()->capacidad == 1) $isUser = true;
+    return $isUser;
+  }
+  //PDI
+  public static function isAvanceUser(){
+    $isUser = false;
+    if (Auth::user()->capacidad == 2) $isUser = true;
+    return $isUser;
+  }
+	//PAS
+  public static function isTecnico(){
+    $isTecnico = false;
+    if (Auth::user()->capacidad == 3) $isTecnico = true;
+    return $isTecnico;
+  }
+  //root
+  public static function isAdmin(){
+    $isAdmin = false;
+    if (Auth::user()->capacidad == 4) $isAdmin = true;
+    return $isAdmin;
+  }
 
 }

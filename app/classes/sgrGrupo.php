@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-class sgrGrupo {
 
+class sgrGrupo {
+/* :) 1-5-2017 */
 	private $grupo; //Objeto de tipo GrupoRecurso
 	private $sgrRecursos = array(); //array de objetos sgrRecurso
 

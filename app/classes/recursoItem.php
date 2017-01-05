@@ -1,6 +1,6 @@
-<?php/* marca branch master2 */
+<?php
 	class recursoItem extends sgrRecurso {
-  
+  /* :) 1-5-2017 */
   	//private $recurso;
 		
 		/**
@@ -173,7 +173,6 @@
 			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
 			return true;
 		}	
-
 		/**
 			* // Remove relación validador recurso-user
 			* @param $id int identificador de usuario
@@ -182,7 +181,6 @@
 			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
 			return true;
 		}	
-
 		/**
 			* // Remove todas las relaciones (administrador/gestor/validador) recurso-user
 			* @param void
@@ -215,9 +213,6 @@
 		}
 			return true;
 		}
-
-		
-		
 		/**
 			* //Devuelve los eventos para $fechaEvento con estado en $estados
 			* @param $fechaEvento string formato Y-m-d
@@ -229,8 +224,6 @@
 			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado
 			return $this->recurso->eventos()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
 		}
-
-
 		/**
 			* Devuelve recursos contenedores del mismo tipo y del mismo grupo que el recurso contenedor de $this->recurso
 			* @param void
@@ -246,9 +239,11 @@
 		}
 		
 		/**
+			*
 			* // elimina el recurso de la BD
 		*/
 		public function del(){
+			
 			return $this->recurso->delete();
 		}
 
@@ -279,9 +274,5 @@
 			$this->recurso->acl = $acl;
 			return true;
 		}	
-
-		
-	
-		
   }
 ?>

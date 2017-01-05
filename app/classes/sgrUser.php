@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-class sgrUser {
 
+class sgrUser {
+	/* :) 1-5-2017 */
 	private $user;
 	
 

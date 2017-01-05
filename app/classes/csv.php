@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-class csv{
 
+class csv{
+	/* :) 1-5-2017 */
 	private $columns = array(	'F_HASTA' 			=>	'0', //fecha inicio
 								'F_DESDE'			=>	'1', //fecha fin
 								'AUL_CODNUM'		=>	'2',

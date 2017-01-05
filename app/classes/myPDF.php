@@ -1,8 +1,8 @@
 <?php
-/* marca branch master2 */
+
 // Extend the TCPDF class to create custom Header and Footer
 class PDFex extends TCPDF {
-
+/* :) 1-5-2017 */
     //Page header
     public function Header() {
         // Logo

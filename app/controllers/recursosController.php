@@ -1,12 +1,11 @@
-<?php/* marca branch master2 */
+<?php
 class recursosController extends BaseController{
-  
+  /* :) 5-1-2017 recursoscontroller */
   /** 
     * @param Input::get('sortby') string
     * @param Input::get('order')  string
     *
-    * @return View::make('admin.recursos.list') 
-    * añadir nueva linea en rama master 
+    * @return View::make('admin.recursos.list')  
   */
   public function listar(){ // :)
     //Input      
@@ -23,10 +22,8 @@ class recursosController extends BaseController{
     $recursosSinGrupo = Recurso::where('grupo_id','=','0')->where('tipo','=','espacio')->orWhere('tipo','=','tipoequipos')->get();
     $itemsParaEspacios = Recurso::where('contenedor_id','=','0')->where('tipo','=','puesto')->get();
     $itemsParaTipoequipos = Recurso::where('contenedor_id','=','0')->where('tipo','=','equipo')->get();
-
-    return View::make('admin.recursos.list')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente',compact('itemsParaEspacios'))->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente',compact('itemsParaTipoequipos'))->nest('table','admin.recursos.recursos',compact('sgrGrupos','sortby','order'))->nest('modalAddRelacion','admin.modalrelaciones.addPersona')->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecursoExistente',compact('recursosSinGrupo'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalRemoveRelacion','admin.modalrelaciones.removePersona')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'));
+    return View::make('admin.recursos.list')->nest('modalAddPuestoExistente','admin.modalrecursos.addPuestoExistente',compact('itemsParaEspacios'))->nest('modalAddEquipoExistente','admin.modalrecursos.addEquipoExistente',compact('itemsParaTipoequipos'))->nest('table','admin.recursos.recursos',compact('sgrGrupos','sortby','order'))->nest('modalAddRelacion','admin.modalrelaciones.addPersona')->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('modalAddGrupo','admin.modalgrupos.add')->nest('modalEditGrupo','admin.modalgrupos.edit')->nest('modalDelGrupo','admin.modalgrupos.del')->nest('modalAddRecursosToGrupo','admin.modalgrupos.addRecursoExistente',compact('recursosSinGrupo'))->nest('modalEditRecurso','admin.modalrecursos.edit',compact('grupos'))->nest('modalDelRecurso','admin.modalrecursos.del')->nest('modalEnabledRecurso','admin.modalrecursos.enabled')->nest('modalDisabledRecurso','admin.modalrecursos.disabled')->nest('modalRemoveRelacion','admin.modalrelaciones.removePersona')->nest('modalAddRecurso','admin.modalrecursos.add',compact('grupos'))->nest('modalAlert','modalAlert');
   }
-
   /**
     * // Añade recursos (puesto/equipo) existentes sin asignado recurso contenedor asignado
     *
@@ -45,7 +42,6 @@ class recursosController extends BaseController{
                     'error'  => false,);
     //Validate
     $rules = array( 'contenedor_id'  => 'required|exists:Recursos,id',);
-
     $messages = array('required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
                       'exists'        => Config::get('msg.idnotfound'),);
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -63,7 +59,6 @@ class recursosController extends BaseController{
     }
     return $result;
   }
-
   /**
     * //Añade un nuevo recurso a la base de datos de cualquier tipo (puesto,equipo,espacio y tipoequipos)
     * // llamadas desde: admin\modalrecursos\add.blade.php
@@ -99,7 +94,6 @@ class recursosController extends BaseController{
                     'tipo'              => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'contenedor_id'     => 'required',
                     'modo'              => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
-
     $messages = array('required'              => 'El campo <strong>:attribute</strong> es obligatorio....',
                       'nombre.unique'         => 'Existe un recurso con el mismo nombre...',
                       'tipo.in'               => 'El tipo de recurso no está definido ..',
@@ -107,7 +101,6 @@ class recursosController extends BaseController{
                       'contenedor_idexists'   => 'Elemento contenedor no encontrado en BD.',);
     
     $validator = Validator::make(Input::all(), $rules, $messages);
-
     $validator->sometimes('contenedor_idexists','',function($input){
         if ($input['tipoPadre'] == 'recurso') 
           return Recurso::findOrFail($input['contenedor_id'])->count() > 0;
@@ -115,7 +108,6 @@ class recursosController extends BaseController{
           return GrupoRecurso::findOrFail($input['contenedor_id'])->count() > 0;
       });
     
-
     if ($validator->fails()){
       //Si errores en el formulario
       $result['error'] = true;
@@ -131,7 +123,6 @@ class recursosController extends BaseController{
         $grupo_id = $contenedor_id;
         $contenedor_id = 0;
       }
-
       //Si no hay errores en el formulario
       $data = array(  'nombre'        => $nombre,
                       'tipo'          => $tipo,
@@ -147,10 +138,8 @@ class recursosController extends BaseController{
       
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
-
     return $result;
   }
-
   /**
     * devuelve recurso dado su id (para modal admin.modalrecursos.edit)
     * 
@@ -172,7 +161,6 @@ class recursosController extends BaseController{
     $messages = array(  'required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
                         'exists'    => 'No existe identificador de grupo...',);
     $validator = Validator::make(Input::all(), $rules, $messages);
-
     //Save Input or return error
     if ($validator->fails()){
         $result['errors'] = $validator->errors()->toArray();
@@ -188,7 +176,6 @@ class recursosController extends BaseController{
       $result['msg'] = $id;
       $result['listadocontenedores'] = (string) View::make('admin.html.optionscontenedores')->with(compact('itemsContenedores'));
       
-
      } 
     return $result;
   }
@@ -249,7 +236,6 @@ class recursosController extends BaseController{
       //Si errores en el formulario
       $result['error'] = true;
       $result['errors'] = $validator->errors()->toArray();
-
     }
     else{  
       $recurso = Recurso::findOrFail($id);
@@ -261,7 +247,6 @@ class recursosController extends BaseController{
     }
     return $result;
   }
-
   /**
     * @param Input::get('idrecurso') int
     *
@@ -280,16 +265,13 @@ class recursosController extends BaseController{
     $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio....',
                       'exists'    => 'No existe identificador de grupo...',);
     $validator = Validator::make(Input::all(), $rules, $messages);
-
     //$validator->sometime --> no tiene eventos futuros
-
     //Save Input or return error
     if ($validator->fails()){
         $result['errors'] = $validator->errors()->toArray();
         $result['error'] = true;
     }
     else{
-
       //Softdelete recurso y eventos
       $recurso = Recurso::findOrFail($id);
       $sgrRecurso = Factoria::getRecursoInstance($recurso);
@@ -304,7 +286,6 @@ class recursosController extends BaseController{
     
     return $result;
   }
-
  /**
     * //Deshabilita un recursos para su reserva (actúa en casacada)
     *
@@ -318,14 +299,12 @@ class recursosController extends BaseController{
     //input
     $id = Input::get('idrecurso','');
     $motivo = Input::get('motivo','');
-
     //Output 
     $result = array( 'errors'    => array(),
                       'msg'   => '',    
                       'error'   => false,);
     //Validate
     $rules = array('idrecurso'  => 'required|exists:recursos,id',);
-
     $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
                       'exists'    => 'No existe identificador de recurso en BD.',);
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -344,13 +323,11 @@ class recursosController extends BaseController{
       //Enviar mail a usuarios con reserva futuras
       $sgrMail = new sgrMail();
       $sgrMail->notificaDeshabilitaRecurso($id,$motivo);
-
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.disabledrecursosuccess')));
     }
     
     return $result;
   }
-
  /**
     * //habilita un recursos para su reserva
     *
@@ -358,7 +335,7 @@ class recursosController extends BaseController{
     *
     * @return $result array
   */
-  public function AjaxEnabled(){ // :)
+  public function AjaxEnabled(){ // :/
  
     //input
     $id = Input::get('idrecurso','');
@@ -371,7 +348,6 @@ class recursosController extends BaseController{
     $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
                       'exists'    => 'No existe identificador de recurso en BD.',);
     $validator = Validator::make(Input::all(), $rules, $messages);
-
     //Save Input or return error
     if ($validator->fails()){
         $result['errors'] = $validator->errors()->toArray();
@@ -382,8 +358,6 @@ class recursosController extends BaseController{
       $recurso = Recurso::findOrFail($id);
       $sgrRecurso = Factoria::getRecursoInstance($recurso);
       $sgrRecurso->enabled();
-
-
       //Enviar mail a usuarios con reserva futuras
       $sgrMail = new sgrMail();
       $sgrMail->notificaHabilitaRecurso($id);
@@ -393,15 +367,7 @@ class recursosController extends BaseController{
     
     return $result;
   } 
-
-
-
-
-
-
-
  
-
   /**
     * // Obtiene los items (equipos o espacios) de un espacio o tipoequipos
     *
@@ -411,7 +377,6 @@ class recursosController extends BaseController{
     *
   */ 
   public function getitems(){// pa que sirve ??
-
     //Input
     $idrecurso = Input::get('idrecurso','');
     //Output
@@ -453,14 +418,10 @@ class recursosController extends BaseController{
     }
     return $result;
   }
-
   
   
-
  
-
   
-
   /**
     * //Devuelve el campo descripción dado un idrecurso
     * @param Input::get('idrecurso','') int identificador de recurso
@@ -468,7 +429,6 @@ class recursosController extends BaseController{
     * @return $descripcion string
   */
   public function getDescripcion(){ // precindible ??
-
     //Input
     $idRecurso = Input::get('idrecurso','');
     //Output 
@@ -479,7 +439,6 @@ class recursosController extends BaseController{
     $rules = array('idrecurso'  => 'required|exists:recursos,id',);
     $messages = array('required'  => 'El campo <strong>:attribute</strong> es obligatorio.',
                       'exists'    => 'No existe identificador de recurso en BD.',);
-
     $validator = Validator::make(Input::all(), $rules, $messages);
     //Obtener descripción or return error
     if ($validator->fails()){
@@ -494,7 +453,6 @@ class recursosController extends BaseController{
     
     return $result;
   } 
-
   /**
     * //Devuelve todos los recurso del tipo Input::get('tipo') formateados como html options 
     * @param Input::get('tipo') string
@@ -505,5 +463,4 @@ class recursosController extends BaseController{
     $espacios = Recurso::where('tipo','=',$tipoRecurso)->get();
     return View::make('admin.html.optionEspacios')->with(compact('espacios'));
   }
-
 }

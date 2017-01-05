@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-class sgrEvento {
 
+class sgrEvento {
+	/* :) 1-5-2017 */
 	private $evento;
 
 	public function __construct($evento = ''){

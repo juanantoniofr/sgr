@@ -1,7 +1,6 @@
-<?php/* marca branch master2 */
-
+<?php
 class sgrMail {
-	
+	/* :) 1-5-2017 */
 	private $mailAdminSGR = 'juanantonio.fr@gmail.com';
 	private $subject =	array(	'addEvento'		=> 'Nueva solicitud de reserva',
 								'editEvento'	=> 'Modificación de solicitud de reserva',

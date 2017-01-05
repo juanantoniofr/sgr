@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
+
 	class sgrPuesto extends sgrItem implements sgrInterfaceRecurso{
-		
+		/* :) 1-5-2017 */		
 		//private $recurso;
 
 		/*public function __construct(){

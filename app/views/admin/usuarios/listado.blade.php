@@ -1,5 +1,5 @@
-<!-- marca branch master2 -->@extends('layout')
-<!-- :( -->
+@extends('layout')
+<!-- :) 1-5-2017 -->
 @section('title')
   SGR: Gestión de Usuarios
 @stop

@@ -1,7 +1,6 @@
 <?php
-	/* marca branch master2 */
 	interface sgrInterfaceRecurso{
-		
+	/* :) 1-5-2017 */		
 		public function enabled();
 		public function disabled();
 		public function save();

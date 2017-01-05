@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
+
 	class recursoContenedor extends sgrRecurso {
-  
+		/* :) 1-5-2017 */  
 		//private $recurso;	//array obj recurso (espacio / tipoequipo)
 		//private $items = array(); //array obj recursoItem (puesto / equipo)
 		

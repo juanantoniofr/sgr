@@ -1,7 +1,7 @@
 <?php 
-/* marca branch master2 */
-	class sgrRecurso{
 
+	class sgrRecurso{
+		/* :) 1-5-2017 */
 		protected $recurso; //obj Recurso
 		protected $items = array(); //array de obj sgrRecurso 
 		protected $contendor; //Obj Recurso || null

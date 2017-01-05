@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-	class sgrEspacio extends sgrRecurso{
 
+	class sgrEspacio extends sgrRecurso{
+		/* :) 1-5-2017 */
 	//private $recurso;
 	private $puestos;
 	private $sgrPuestos; //array de elementos de tipo $sgrPuesto o vacio

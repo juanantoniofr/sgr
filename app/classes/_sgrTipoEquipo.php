@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-	class sgrTipoEquipo implements sgrInterfaceRecurso{
 
+	class sgrTipoEquipo implements sgrInterfaceRecurso{
+		/* :) 1-5-2017 */
 	private $recurso;
 	private $equipos;
 	private $sgrEquipos; //array de elementos de tipo $sgrPuesto o vacio

@@ -1,5 +1,5 @@
 @extends('layout')
-<!-- marca branch master2 -->
+<!-- :) 1-5-2017 list recurso-->
 @section('title')
   SGR: Gestión de Espacios y Equipos
 @stop
@@ -78,6 +78,6 @@
   {{  HTML::script('assets/js/recursos.js')   }}
   {{  HTML::script('assets/js/grupo.js')      }}
   {{  HTML::script('assets/js/comun.js')      }}
-  {{  HTML::script('assets/js/admin.js')      }}
+  {{  HTML::script('assets/js/all.js')      }}
   
 @stop

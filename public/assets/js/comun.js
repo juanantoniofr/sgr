@@ -215,6 +215,7 @@ function toggles(){ // :)
 	  $(".linkEliminaRecurso").on('click',function(e){
 	    e.preventDefault();
 	    if($(this).data('numeroelementos') > 0){
+	      $('#malert_title').html('Eliminar recurso');
 	      $('#malert_text').html('No se pueden eliminar un recurso con elementos asignados.');
 	      $('#m_alert').modal('show');
 	    }
@@ -240,7 +241,9 @@ function toggles(){ // :)
 	function activelinkdelgrupo(){ // :)
 	  $(".linkdelgrupo").on('click',function(e){
 	    e.preventDefault();
+
 	    if($(this).data('numeroelementos') > 0){
+	      $('#malert_title').html('Eliminar grupo');
 	      $('#malert_text').html('No se pueden eliminar un grupo con recursos asignados.');
 	      $('#m_alert').modal('show');
 	    }
@@ -384,6 +387,7 @@ function toggles(){ // :)
 	      data:{id : $id, tipo:$tipo},
 	      success: function($respuesta){
 	      	$stringhtml = '';
+	      	console.log($respuesta);
 	      	if ($respuesta.error === true) {
 	      		//$('#fm_removeRelacion-checkboxes').append('Errores al recuperar usuarios administradores');
 	      		$stringhtml = '<p class="text-danger">Errores al recuperar usuarios administradores</p>';

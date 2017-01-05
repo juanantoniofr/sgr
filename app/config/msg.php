@@ -1,5 +1,5 @@
 <?php
-/* marca branch master2 */
+/* :) 5-1-2017 msg*/
 return array (
 
 	'success' 								=> 'Datos salvados con éxito....',

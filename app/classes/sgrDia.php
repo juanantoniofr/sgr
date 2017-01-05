@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
-class sgrDia {
 
+class sgrDia {
+	/* :) 1-5-2017 */
 	private $timestamp; //timestamp de la fecha
 	private $eventos;//array de objetos de tipo Eventos
 	private $sgrRecurso;

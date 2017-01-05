@@ -1,7 +1,7 @@
 <?php
-/* marca branch master2 */
+
 class sgrCalendario {
-	
+	/* :) 1-5-2017 */	
 	private $fecha;						//objeto DateTime (php) || empty
 	private $sgrRecurso;			//Objeto sgrRecurso 
 	private $currentDay;			//timestamp	

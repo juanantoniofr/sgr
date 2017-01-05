@@ -1,7 +1,7 @@
 <?php
 
 class Date{
-	
+	/* :) 1-5-2017 */
 	/**
      * Devuelve $fecha en formato $farmatosalida
      * 

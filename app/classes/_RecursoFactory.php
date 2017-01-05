@@ -1,7 +1,7 @@
 <?php
-  /* marca branch master2 */
+
   class RecursoFactory{
-  
+    /* :) 1-5-2017 */  
     public static function getRecursoInstance($tipo){
         
         switch($tipo){

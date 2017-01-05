@@ -243,7 +243,7 @@ class RelacionesController extends BaseController {
     //Output 
     $result = array( 'errors'   	 				=> array(),
                      'administradores'   	=> '',    
-                     'error'   						=> false,
+                     'error'   						=> false,                    
                     );
     //Validate
     $rules = array( 'id'    => 'required',//|exists:grupoRecursos,id', //exists:table,column
@@ -268,6 +268,7 @@ class RelacionesController extends BaseController {
     	elseif ($tipo == 'recurso')
     		$result['administradores'] = Recurso::find($id)->administradores->toArray();
     }
+    
     return $result;	
   }	
 
