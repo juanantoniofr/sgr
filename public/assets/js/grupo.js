@@ -47,6 +47,7 @@ $(function(e){
       url:  "delgrupo",
       data: $('form#fm_delgrupo').serialize(),
       success: function($respuesta){
+        console.log($respuesta);
         if($respuesta.error === true){  
           hideGifEspera();
           m_hideMsg();//Oculto mensaje de error en ventana modal.

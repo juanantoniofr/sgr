@@ -22,13 +22,14 @@ return array (
 							 'deny' => 4,
 							 'request' => 5,
 							 ),
-
+  'fecha_caducidadAlumnos'  => '2017-9-30',
 	'fin_cursoAcademico' 	=> '2017-07-31',
 	'inicio_gestiondesatendida' => '2015-09-1',
 	'inicio_cursoAcademico' => '2016-09-26',
 	'inicio_titulospropios'	=> '2016-09-14',
 	'userexcluded'			=> array('morenobujez'),
-	'capacidadUsuario'          => '1', //Usuarios (Alumnos)
+	
+  'capacidadUsuario'          => '1', //Usuarios (Alumnos)
   'capacidadUsuarioAvanzado'  => '2', //Usuarios Avanzados (PDI & PAS de Administración)
   'capacidadTécnico'          => '3', //Técnicos (PAS)
   'capacidadAdminSgr'         => '4', //Administradores de SGR

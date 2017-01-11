@@ -387,9 +387,7 @@ function toggles(){ // :)
 	      data:{id : $id, tipo:$tipo},
 	      success: function($respuesta){
 	      	$stringhtml = '';
-	      	console.log($respuesta);
 	      	if ($respuesta.error === true) {
-	      		//$('#fm_removeRelacion-checkboxes').append('Errores al recuperar usuarios administradores');
 	      		$stringhtml = '<p class="text-danger">Errores al recuperar usuarios administradores</p>';
 	      	}
 	      	else{

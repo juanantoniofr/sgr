@@ -5,6 +5,8 @@ $(function(e){
 		$('form#activeUser input[name="username"]').val($(this).data('username'));
 		$('form#activeUser input[name="idnotificacion"]').val($(this).data('idnotificacion'));
 		$('form#activeUser input[name="id"]').val($(this).data('iduser'));
+		var $defaultCaducidad = new Date($(this).data('defaultcaducidad'));
+		configuredatepicker($defaultCaducidad);
 		m_hideMsg();
 		$('#modalUser').modal('show');
 	});
@@ -79,21 +81,20 @@ $(function(e){
 		$("#modalUser").modal('hide');
 	});	
 
-	var $currentDate = new Date();
-	var $defaultDate = new Date($currentDate.getFullYear() + 1, 9 , 30); //Date(year,month,day)
-	$("#datepickerCaducidad").datepicker({
-		defaultDate: $defaultDate,
-		showOtherMonths: true,
-	 	selectOtherMonths: true,
-		showAnim: 'slideDown',
-		dateFormat: 'd-m-yy',
-		showButtonPanel: true,
-		firstDay: 1,
-		monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
-		dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
-	});
+	function configuredatepicker($defaultDate){
+		$("#datepickerCaducidad").datepicker({
+			showOtherMonths: true,
+	   	selectOtherMonths: true,
+	   	showAnim: 'slideDown',
+			dateFormat: 'd-m-yy',
+	 		showButtonPanel: true,
+	 		firstDay: 1,
+			monthNames: ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio', 'Agosto','Septiembre', 'Octubre','Noviembre', 'Diciembre'],
+			dayNamesMin: ['Do','Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa']
+	  	});
 	
-	$("#datepickerCaducidad").val($defaultDate.getDate() + '-' + $defaultDate.getMonth() + '-' + $defaultDate.getFullYear());
+		$("#datepickerCaducidad").val($defaultDate.getDate() + '-' + ($defaultDate.getMonth() + 1) + '-' + $defaultDate.getFullYear());
+	}
 
 	function showGifEspera(){
 		$('#espera').css('display','inline').css('z-index','1000');

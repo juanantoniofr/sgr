@@ -14,9 +14,6 @@
 				$this->items[] = new recursoItem($item);
 			}
 			$this->contenedor = $this->recurso->contenedor;
-			//if ($this->recurso->contenedor != null)		$this->contenedor = $this->recurso->contenedor;
-			//else $this->contenedor = null;
-
 			return $this;
 		}
 
@@ -99,9 +96,6 @@
 			
 			return $eventos;
 		}
-
-		
-
 
 	}
 ?>

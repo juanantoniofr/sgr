@@ -11,11 +11,11 @@ class sgrACL {
     *
     * @return $acl string 
   */
-  public static function buildJsonAcl($modo,$roles){
+  public static function buildJsonAcl($modo,$roles,$maxhd = array()){
 
     $acl = array('r' => '',
-                  'm' => '0',//por defecto gestión Atendida de las solicitudes de uso.
-                  );
+                 'm' => '0',//por defecto gestión Atendida de las solicitudes de uso.
+                 'maxhd' => $maxhd);
     $acl['m'] = $modo;
     $roles[] = Config::get('options.idroladministrador'); //Administrador tiene accseso
     $listIdRolesConAcceso = implode(',',$roles);

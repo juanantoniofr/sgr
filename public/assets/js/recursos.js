@@ -91,6 +91,7 @@ $(function(e){
       url:  "ajaxEditRecurso",
         data: $data,
         success: function($respuesta){
+          console.log($respuesta);
           if($respuesta.error == true){ 
             hideGifEspera();
             m_hideMsg();//Oculto mensaje de error en ventana modal.

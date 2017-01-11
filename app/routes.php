@@ -141,9 +141,19 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 //**
 Route::get('test',array('as'=>'test',function(){
   
-  $recurso = Recurso::findOrFail('115');
-  $sgrRecurso = Factoria::getRecursoInstance($recurso);
-  echo $sgrRecurso->delEventos();
+  $grupo = GrupoRecurso::findOrFail(52);
+  $administradores = $grupo->administradores;
+  foreach ($administradores as $administrador) {
+    echo $administrador->nombre;
+      echo "<pre>";
+  var_dump($administrador);
+  echo "</pre>";
+
+    }
+    echo "<hr>";
+  echo "<pre>";
+  var_dump($administradores);
+  echo "</pre>";
   
 }));
 //Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???

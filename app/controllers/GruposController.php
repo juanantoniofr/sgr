@@ -159,6 +159,7 @@ class GruposController extends BaseController {
     else{
       foreach ($idrecursos as $idrecurso) {
         Recurso::find($idrecurso)->update(array('grupo_id'=>$id));
+        Recurso::find($idrecurso)->administradores()->attach(Auth::user()->id);
       }
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
@@ -262,9 +263,10 @@ class GruposController extends BaseController {
     $id = Input::get('grupo_id','');
     
     //Output 
-    $respuesta = array( 'errors' => array(),
-                        'msg'   => '',    
-                        'error'   => false,);
+    $result = array( 'errors' => array(),
+                     'msg'   => '',    
+                     'error'   => false,
+                     'test'  => '');
     //Validate
     $rules = array('grupo_id' => 'required|exists:grupoRecursos,id',);
 
@@ -286,19 +288,9 @@ class GruposController extends BaseController {
       return $result;
     }
     
-    $administradores = $grupo->administradores();
-    foreach ($administradores as $administrador) {
-      $supervisor->detach($administrador->id);
-    }
-    $validadores = $grupo->validadores();
-    foreach ($validadores as $validador) {
-      $validador->detach($validador->id);
-    }
-
-    $gestores = $grupo->gestores();
-      foreach ($gestores as $gestor) {
-        $tecnico->detach($gestor->id);
-      }
+    $administradores = $grupo->administradores()->detach();
+    $validadores = $grupo->validadores()->detach();
+    $gestores = $grupo->gestores()->detach();
 
     $grupo->delete();
     $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.delgruposuccess')));

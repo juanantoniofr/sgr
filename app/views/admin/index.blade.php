@@ -37,7 +37,7 @@
                 <div class="panel-body" id='listTask'>
                             @if($notificaciones->count()>0)
                                 @foreach($notificaciones as $notificacion)
-                                    <div class="list-group" data-uvus = "{{$notificacion->source}}" data-sourceId = "{{$notificacion->id}}">
+                                    <div class="list-group" data-defaultcaducidad="{{Config::get('options.fecha_caducidadAlumnos')}}" data-uvus = "{{$notificacion->source}}" data-sourceId = "{{$notificacion->id}}">
                                         <a href="#"   class="list-group-item" title="Activar" data-toggle="modal" data-target="#modalUser">
                                             {{$notificacion->msg }}
                                            <!-- <span class="pull-right text-muted small"><em>hace 4 minutos</em>

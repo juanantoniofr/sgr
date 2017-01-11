@@ -41,19 +41,28 @@ class recursosController extends BaseController{
                     'msg'    => '',    
                     'error'  => false,);
     //Validate
-    $rules = array( 'contenedor_id'  => 'required|exists:Recursos,id',);
-    $messages = array('required'      => 'El campo <strong>:attribute</strong> es obligatorio....',
-                      'exists'        => Config::get('msg.idnotfound'),);
+    $rules = array( 'contenedor_id'  => 'required',);
+    
+    $messages = array('required'              => 'El campo <strong>:attribute</strong> es obligatorio....',
+                      'exists'                => Config::get('msg.idnotfound'),
+                      );
+    
     $validator = Validator::make(Input::all(), $rules, $messages);
-      
+        
     //Save Input or return error
     if ($validator->fails()){
       $result['errors'] = $validator->errors()->toArray();
       $result['error'] = true;
     }
     else{
+    
       foreach ($idrecursos as $idrecurso) {
-        Recurso::find($idrecurso)->update(array('contenedor_id'=>$id));
+        //Recurso::find($idrecurso)->update(array('contenedor_id'=>$id));
+        $sgrRecurso = Factoria::getRecursoInstance(Recurso::find($idrecurso));
+        $data = array('contenedor_id' => $id);
+        $sgrRecurso->setdatos($data);
+        $sgrRecurso->save();
+        $sgrRecurso->attach_administrador(Auth::user()->id);
       }
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
@@ -135,6 +144,8 @@ class recursosController extends BaseController{
       $sgrRecurso = Factoria::getRecursoInstance(new Recurso);
       $sgrRecurso->setdatos($data);
       $sgrRecurso->save();
+      $sgrRecurso->attach_administrador(Auth::user()->id);
+      //$sgrRecurso->save();
       
       $result['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
     }
@@ -205,14 +216,15 @@ class recursosController extends BaseController{
     $result = array('error'   => false,
                     'msg'     => '',
                     'errors'  => array());
-    
+   
     //Validación de formulario   
     $rules = array( 'id'              => 'required|exists:recursos',
                     'nombre'          => 'required|unique:recursos,nombre,'.Input::get('id').',id,deleted_at,NULL',
                     'tipo'            => 'required|in:'.implode(',',Config::get('options.recursos')),  
                     'padre_id'        => 'required',
                     'modo'            => 'required|in:'.implode(',',Config::get('options.modoGestion')),);
-     $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
+   
+    $messages = array( 'id.exists'               => 'Identificador de recurso no encontrado....',
                         'required'                => 'El campo <strong>:attribute</strong> es obligatorio....',
                         'unique'                  => 'Existe un recurso con el mismo nombre...',
                         'tipo.in'                 => 'El tipo de recurso no está definido...',

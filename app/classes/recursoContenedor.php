@@ -278,7 +278,14 @@
 			*
 		*/
 		public function edit($datos){
-			$acl = sgrACL::buildJsonAcl($datos['modo'],$datos['roles']);
+			//input's check 
+			$roles = array();
+			if (isset($datos['roles'])) $roles = $datos['roles'];
+			$maxhd = array();
+			$currentAcl = json_decode($this->recurso->acl,true);
+			if (isset($currentAcl['maxhd'])) $maxhd = $currentAcl['maxhd'];
+
+			$acl = sgrACL::buildJsonAcl($datos['modo'],$roles,$maxhd);
 			$data = array('nombre'        => $datos['nombre'],
                     'tipo'          => $datos['tipo'],
                     'grupo_id'      => $datos['padre_id'],
@@ -294,6 +301,7 @@
 			}
 			return true;
 		}	
+
 
 	
   }
