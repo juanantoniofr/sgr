@@ -1,7 +1,6 @@
 <?php
 
 class sgrWeek {
-	/* :) 1-5-2017 */
 	private $sgrDias;
 	
 	/**
@@ -25,10 +24,10 @@ class sgrWeek {
 	}
 
 	/**
-	 * Devuelve el objeto sgrDia cuyo numero de dia de la semana es $numDia si existe, en caso contrario devuelve false
- 	 * 
- 	 * @param $numDia int Número del día la semana 0->lunes,..., 6->domingo
- 	 * @return Obj sgrDia | false
+		* Devuelve el objeto sgrDia cuyo numero de dia de la semana es $numDia si existe, en caso contrario devuelve false
+ 	 	* 
+ 	 	* @param $numDia int Número del día la semana 0->lunes,..., 6->domingo
+ 	 	* @return Obj sgrDia | false
 	*/
 	public function dia($numDia){
 		
@@ -38,20 +37,22 @@ class sgrWeek {
 	}
 
 	/**
-	* @return array object sgrDia
+		*
+		* @return array object sgrDia
 	*/
 	public function sgrDays(){
+		
 		return $this->sgrDias;
 	}
 
 
 	/**
-	 * Devuelve timestamp del lunes inmediatamente anterior a fecha=$day-$month-$year
- 	 * 
- 	 * @param $day string
- 	 * @param $month string
- 	 * @param $year string
- 	 * @return $timestamp int timestamp lunes inmediatamente anterior a $day-$month-$year
+		* Devuelve timestamp del lunes inmediatamente anterior a fecha=$day-$month-$year
+ 	 	* 
+ 	 	* @param $day string
+ 	 	* @param $month string
+ 	 	* @param $year string
+ 	 	* @return $timestamp int timestamp lunes inmediatamente anterior a $day-$month-$year
 	*/
 	private function timestamplunesanterior($day,$month,$year){
 		

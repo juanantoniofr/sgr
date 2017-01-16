@@ -54,7 +54,7 @@ class Evento extends Eloquent{
     //el día está disponible para editar eventos para el usuario propiestario del evento ($this->user) o para el ususario autenticado ($user) es 
     return false;
   }
-/**
+  /**
     * Los eventos se podrán anular hasta el día anterior a su fecha de realización.
     * @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
     * @return boolean

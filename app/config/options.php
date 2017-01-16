@@ -35,6 +35,9 @@ return array (
   'capacidadAdminSgr'         => '4', //Administradores de SGR
   'capacidadPorDefecto'       => '1',
   'colectivoPorDefecto'       => 'Alumno',
+  'capacidades'               => array('1','2','3','4'),
+
+
   'relacionPorDefecto'        => '1',
   
   'tipoelementosids'          => '1,2',
@@ -66,6 +69,7 @@ return array (
                                 'anulada',
                                 'liberada',
                           ),
+  'eventoAprobado'    => 'aprobada',
 	'reservaAprobada'   => 'aprobada',
   'eventoAprobado'    => 'aprobada',
   'reservaPendiente'  => 'pendiente',

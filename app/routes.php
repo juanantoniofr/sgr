@@ -75,6 +75,16 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
   Route::post('admin/AjaxEnabled',array('uses'=>'recursosController@AjaxEnabled','before' => array('auth','ajax_check','capacidad:4-6,msg'))); // :)
 //fin gestión de recursos
 //******************************* 
+// routes generación de Calendarios
+  Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
+  Route::get('AjaxGetRecursos',array('uses' => 'GruposController@AjaxGetRecursos','before' => array('auth','ajax_check')));
+
+  Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
+  Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
+//fin generación de Calendarios
+//******************************* 
+
+
   Route::get('getDescripcion',array('as' => 'getDescripcion','uses' => 'recursosController@getDescripcion','before' => array('auth','ajax_check')));
   Route::get('admin/htmlOptionrecursos',array('uses' => 'recursosController@htmlOptionrecursos','before' => array('auth','auth_ajax','capacidad:4-6,msg')));
   Route::get('getitems',array('uses'=>'recursosController@getitems','before' => array('auth','ajax_check')));
@@ -105,11 +115,7 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 //******
 //PdfController routes *****************************
 Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
-//Calendarios
-  Route::get('calendarios.html',array('https','as' => 'calendarios.html','uses' => 'CalendarController@index','before' => array('auth')));
-  Route::get('ajaxCalendar',array('uses' => 'CalendarController@getCalendar','before' => array('auth','ajax_check')));
-  Route::get('validador/ajaxDataEvent',array('uses' => 'CalendarController@ajaxDataEvent','before' =>array('auth','ajax_check') ));
-//******
+
 //EventoController
   Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
   Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
@@ -141,19 +147,42 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 //**
 Route::get('test',array('as'=>'test',function(){
   
-  $grupo = GrupoRecurso::findOrFail(52);
-  $administradores = $grupo->administradores;
-  foreach ($administradores as $administrador) {
-    echo $administrador->nombre;
-      echo "<pre>";
-  var_dump($administrador);
-  echo "</pre>";
-
-    }
-    echo "<hr>";
-  echo "<pre>";
-  var_dump($administradores);
-  echo "</pre>";
+  //fecha
+  $fechadesdeform = '25-1-2017';
+  $fecha = DateTime::createFromFormat('d-m-Y',$fechadesdeform);
+  //recurso
+  $recurso = Recurso::findOrFail(73);
+  $sgrRecurso = Factoria::getRecursoInstance($recurso);
+  //calendario
+ // $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+ // $sgrWeeks = $sgrCalendario->sgrWeeks();
+  //foreach ($sgrWeeks as $week) {
+   // foreach ($week->sgrDays() as $sgrDay) {
+      $sgrDay = new sgrDia(strtotime($fecha->format('Y-m-d')),$sgrRecurso);
+      if ( $sgrDay->haySolape(strtotime('8:30')) ) echo 'hay';
+      else echo 'no hay';
+     
+   // }
+  //}
+      /*$aFechas = array(strtotime($fecha->format('Y-m-d')),strtotime($fecha->format('Y-m-d')));
+      if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
+      if (empty($ffin)) $aFechas[1] = Config::get('options.maxtimestamp');
+      
+      $estados = Config::get('options.estadosEvento'); 
+      $datos = array('aFechas' => $aFechas, 'estados' => $estados);
+      
+      
+      $eventos = $recurso->eventos->filter(function($evento) use ($datos){
+        return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
+      });*/
+       /*   if (in_array($eventos[0],$eventos[1][0])) echo "po si está....";
+          else{
+            echo $eventos[0];
+            echo "<pre>";
+              var_dump($eventos[1][0]);
+            echo "</pre>";
+          }
+        */
   
 }));
 //Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???

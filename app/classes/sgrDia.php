@@ -1,11 +1,9 @@
 <?php
 
 class sgrDia {
-	/* :) 1-5-2017 */
 	private $timestamp; //timestamp de la fecha
 	private $eventos;//array de objetos de tipo Eventos
 	private $sgrRecurso;
-	//private $events; 	
 	private $esDomingo;
 	private $esSabado;
 	
@@ -26,7 +24,7 @@ class sgrDia {
 		$this->timestamp = $tsfecha;
 
 		$this->sgrRecurso = $sgrRecurso;
-		if (!empty($sgrRecurso)) $this->eventos = $sgrRecurso->eventos(date('Y-m-d',$tsfecha));
+		if (!empty($sgrRecurso)) $this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);//$this->eventos = $sgrRecurso->eventos(date('Y-m-d',$tsfecha));
 
 		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			
@@ -133,7 +131,7 @@ class sgrDia {
         $abreviatura=utf8_encode(ucfirst(date('D',$this->timestamp)));
     } 
 		//return substr($abreviatura,0,1);
-		return $abreviatura;
+		return utf8_decode($abreviatura);
 	}
 
 	/**
@@ -171,6 +169,26 @@ class sgrDia {
 		return $this->festivo;
 		}
 	
+	/**
+		* // dada una hora determinada por su timestamp, comprueba si hay solapes 
+		* @param $timestamp int timestamp de una hora del día 
+		* @return true|false 
+	*/
+	public function haySolape($timestampIni,$timestampFin){
+
+		$haysolapes = false;
+		$numsolapes = 0;
+		if (empty($timestampIni)) return false;
+		if (empty($timestampFin)) return false;
+		
+		foreach ($this->eventos as $evento) {
+			if ( strtotime($evento->horaInicio) <= $timestampIni && strtotime($evento->horaFin) > $timestampIni && $evento->estado == Config::get('options.eventoAprobado') ) $numsolapes++;
+			if ( strtotime($evento->horaInicio) < $timestampFin && strtotime($evento->horaFin) > $timestampFin && $evento->estado == Config::get('options.eventoAprobado') ) $numsolapes++;
+		}
+		if ($numsolapes > 1) $haysolapes = true;
+		return $haysolapes;
+	}
+
 	/**
 		*
 		*	@param $hora int hora del día

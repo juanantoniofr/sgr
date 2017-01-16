@@ -16,7 +16,16 @@ class sgrUser {
 		return $this->user;
 	}
 
-	
+	/**
+		* // devuelve el menú dropdown para $this->user
+		*	@param void
+		* @return string View::make('dropdownmenu')
+	*/
+	public function dropdownmenu(){
+		
+		return (string) View::make('dropdownmenu')->with('sgrUser',$this);
+	}
+
 	/**
 		*
 		* //Elimina relaciones: administrador, gestor o validador de un recurso
@@ -100,8 +109,6 @@ class sgrUser {
 	
 		return $this->user->delete();
 	}
-
-	
 
 	public function id(){ //:)
 		

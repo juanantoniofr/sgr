@@ -4,6 +4,26 @@ class GruposController extends BaseController {
 
   
   /**
+    * //devuelve array con los nombres de los grupos con algún recurso visible para su reserva para el usuario con identificador igual a $id
+    * 
+    * @param $capacidad int
+    *
+    * @return $grupos Object GrupoRecursos
+    * 
+  */
+  static public function gruposVisibles($capacidad){
+  
+    $grupos = GrupoRecurso::all()->filter(function($grupo) use ($capacidad){
+      $recursos = $grupo->recursos->filter(function($recurso) use ($capacidad){
+            $sgrRecurso = Factoria::getRecursoInstance($recurso);
+            return $sgrRecurso->esVisible($capacidad);
+        }); 
+      if ($recursos->count() > 0 ) return true;
+    });
+    return $grupos;
+  }
+
+  /**
     * Ajax function: devuelve html input select con los recursos visibles para Auth:user() en el grupo con id = groupID
     *
     * @param Input::get('groupID') int
@@ -32,13 +52,13 @@ class GruposController extends BaseController {
     
     //get personas or return error
     if ($validator->fails()){
-        $messages = $validator->messages();
+        $mensajes = $validator->messages();
         $msg = '';
-        foreach ($messages->all() as $m){
+        foreach ($mensajes->all() as $m){
           $msg .=  $m . '<br />';
         }
         $result['error'] = true;
-        $result['html'] = (string) View::make('msg.error')->with(array('msg' => $msg));
+        $result['html'] = (string) View::make('msg.error')->with('msg',$msg);
         
     }
     else{

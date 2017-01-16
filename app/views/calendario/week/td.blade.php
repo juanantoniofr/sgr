@@ -1,4 +1,4 @@
-<!-- marca branch master2 -->@if (!$sgrDia->festivo())
+@if (!$sgrDia->festivo())
 	
 @endif
 <div 

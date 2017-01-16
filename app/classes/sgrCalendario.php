@@ -1,7 +1,7 @@
 <?php
 
 class sgrCalendario {
-	/* :) 1-5-2017 */	
+	
 	private $fecha;						//objeto DateTime (php) || empty
 	private $sgrRecurso;			//Objeto sgrRecurso 
 	private $currentDay;			//timestamp	
@@ -15,17 +15,9 @@ class sgrCalendario {
 	*/
 	function __construct($fecha,$sgrRecurso){
 		
-		//sgrRecurso
 		$this->sgrRecurso = $sgrRecurso;
-		
-		//DateTime
-		//if (empty($fecha)) $this->fecha = new DateTime();
-		//else $this->fecha = $fecha;
 		$this->fecha = $fecha;
-		//timestamp
 		$this->currentDay 	= $this->fecha->getTimestamp();
-		
-		//sgrWeeks
 		$this->setSemanas();
 		return $this;
 	}
@@ -73,6 +65,7 @@ class sgrCalendario {
 
 	//public functions
 	public function sgrWeeks(){
+		
 		return $this->sgrWeeks;
 	}
 	
@@ -87,6 +80,7 @@ class sgrCalendario {
 	}
 
 	public function ultimoDia(){
+		
 		return (int) date('t', mktime(0,0,0,$this->fecha->format('m'),1,$this->fecha->format('Y')));
 	}
 	
@@ -103,9 +97,10 @@ class sgrCalendario {
 	}
 
 
-	//private functions
+//private functions
 	/**
-	*	 Genera un array de objetos sgrWeek (semanas del mes)
+		*
+		*	 Genera un array de objetos sgrWeek (semanas del mes)
 	*/
 	private function setSemanas(){
 		
@@ -123,14 +118,14 @@ class sgrCalendario {
 		
 		return $this->sgrWeeks = $semanas;
 	}
-
+//**** ./private functions
 	
 	//static functions
 
 	/**
-	 *
-	 *		@param void 
-	 *		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
+		*
+	 	*		@param void 
+	 	*		@return  $l timestamp del lunes de la primera semana reservable a partir del día actual
 	*/
 	public static function fristMonday(){
 		
@@ -153,14 +148,12 @@ class sgrCalendario {
 	   	}
 
 	   return $l;
-	
 	}
 
 	/**
-	 *		@param void 
-	 *		@return  $v timestamp del viernes de la primera semana reservable a partir del día actual
+		*		@param void 
+	 	*		@return  $v timestamp del viernes de la primera semana reservable a partir del día actual
 	*/
-	
 	public static function lastFriday(){
 
 		$v = '';
@@ -185,5 +178,4 @@ class sgrCalendario {
 
 	}
 }
-
 ?>

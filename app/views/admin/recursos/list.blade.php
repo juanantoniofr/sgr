@@ -1,5 +1,5 @@
 @extends('layout')
-<!-- :) 1-5-2017 list recurso-->
+
 @section('title')
   SGR: Gestión de Espacios y Equipos
 @stop

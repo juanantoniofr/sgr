@@ -388,7 +388,7 @@ class recursosController extends BaseController{
     * @return $result array()
     *
   */ 
-  public function getitems(){// pa que sirve ??
+  public function getitems(){// 
     //Input
     $idrecurso = Input::get('idrecurso','');
     //Output
@@ -408,8 +408,8 @@ class recursosController extends BaseController{
     }
     else{ 
       $recurso = Recurso::findOrFail($idrecurso);
-      $sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-      $sgrRecurso->setRecurso($recurso);
+      $sgrRecurso = Factoria::getRecursoInstance($recurso);
+    
       //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
       $items = $sgrRecurso->items();
       $addOptionReservarTodo = false;
@@ -420,14 +420,14 @@ class recursosController extends BaseController{
       $numerodeitemsdisabled = 0;
       $disabledAll = 0;
       foreach ($items as $item) {
-        if($item->disabled == '1') $numerodeitemsdisabled++;
+        if($item->isDisabled() == '1') $numerodeitemsdisabled++;
       }
-      if($numerodeitemsdisabled == $items->count()) $disabledAll = 1;
+      if($numerodeitemsdisabled == count($items)) $disabledAll = 1;
       
+      $disabledAll = $sgrRecurso->isDisabled();
       //Añadir opción reservar "todos los puestos"
       $result['listoptions'] = (string) View::make('calendario.allViews.optionsItems')->with(compact('items','addOptionReservarTodo','disabledAll','numerodeitemsdisabled'));
-      //$result['listoptions'] = "<pre>".var_dump($items)."</pre>";
-    }
+      }
     return $result;
   }
   

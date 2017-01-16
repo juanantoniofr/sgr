@@ -1,4 +1,3 @@
-<!-- marca branch master2 -->
 @if ($recursosSinGrupo->count() > 0)
   @foreach($recursosSinGrupo as $recurso)
     <div class="checkbox" id="divcheckboxid_{{$recurso->id}}">
