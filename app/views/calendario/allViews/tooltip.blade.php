@@ -4,7 +4,7 @@
 
 		 @if ($event->numeroRecursos() > 1) ({{$event->numeroRecursos()}} {{$event->recurso->tipo}}/s)
 	     @else ({{$event->recurso->nombre}})
-	     @endif
+	   @endif
 
 </p>
 
@@ -17,11 +17,11 @@
 
 <p style="width=100%;text-align:center">{{Config::get('options.tiporeserva')[$event->repeticion]}}</p>
 
-<p style="width=100%;text-align:center">{{$event->user->nombre }} {{$event->user->apellidos}}</p>
+<p style="width=100%;text-align:center">{{ $event->user->nombre }} {{ $event->user->apellidos}}</p>
 
 <hr />
 
-@if($event->esEditable(Auth::user()->id))
+@if($event->user_id == Auth::user()->id || $event->reservadoPor_id == Auth::user()->id)
 	<a class = "comprobante" href="{{ URL::route('justificante',array('idEventos' => $event->evento_id)) }}" data-id-evento="{{ $event->id }}" data-id-serie="{{ $event->evento_id }}" data-periodica="{{ $event->repeticion }}" title="Comprobante" target="_blank"><span class="fa fa-file-pdf-o fa-fw text-success" aria-hidden="true"></span></a>
 	|
 		

@@ -86,7 +86,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
    *  @param void
    *  @return $nh int Número de horas reservadas por el usuario logueado en la semana reservable inmediatemente siguiente a la actual (perfil alumno) 
   */
-  public function numHorasReservadas(){
+  /*public function numHorasReservadas(){
     
     $nh = 0;
     $fristMonday = sgrCalendario::fristMonday(); //devuelve timestamp
@@ -99,7 +99,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
     }
     
     return $nh;
-  } 
+  } */
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -157,25 +157,25 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
    * @param void
    * @return $repetir boolean true si el usuario puede hacer reservas periodicas (usuarios con capacidad 1, alumnos, no pueden)
   */
-  public function puedePeriodica(){
+  /*public function puedePeriodica(){
     
     $repetir = true;
     //Perfil alumno: -> No puede realizar reservas periodicas
     if ($this->isUser()) $repetir = false; 
     return $repetir;
-  }
+  }*/
   //Alumnos
-  public static function isUser(){
+  /*public static function isUser(){
     $isUser = false;
     if (Auth::user()->capacidad == 1) $isUser = true;
     return $isUser;
-  }
+  }*/
   //PDI
-  public static function isAvanceUser(){
+  /*public static function isAvanceUser(){
     $isUser = false;
     if (Auth::user()->capacidad == 2) $isUser = true;
     return $isUser;
-  }
+  }*/
 	//PAS
   public static function isTecnico(){
     $isTecnico = false;

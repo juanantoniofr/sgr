@@ -73,52 +73,7 @@
 			return false;
 		}
 
-		/**
-			* //Devuelve los eventos para el día $fechaEvento
-			*	@param $fechaEvento string formato Y-m-d
-			* @param $estado array estados de la reserva
-			*	@return Collection Object Evento
-		*/
-		public function eventos($fechaEvento,$estado = ''){
-			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado	
-			return $this->recurso->eventosItems()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
-		}
-
-		//Eventos
-		/**
-			* //Devuelve los eventos entre $fechas con estado en $estado
-			* @param $fini int timestamp fecha inicial
-			*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
-			* @param $ffin int timestamp fecha final
-			*	@return Collection Objets type Evento 
-			*
-		*/
-		public function getEventos($fini = '',$estados = array(),$ffin = ''){//
-			/*
-				//sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado
-				'estadoEvento' => array('denegada',
-																'aprobada',
-																'pendiente',
-																'finalizada',
-																'anulada',
-																'liberada',)
-			*/
-			if (empty($estados)) $estados = Config::get('options.estadosEvento');   
-			
-			$aFechas = array($fini,$ffin);
-			if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
-			if (empty($ffin))	$aFechas[1] = Config::get('options.maxtimestamp');
-			
-
-			$datos = array('aFechas' => $aFechas, 'estados' => $estados);
-			
-			
-			$eventos = $this->recurso->eventosItems->filter(function($evento) use ($datos){
-				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
-			});
-			return $eventos;
-		}
-
+		
 		/**
 			* // Devuelve los itmes visibles (acl tiene permiso de lectura "r") para el usuario
 			* @return array Object recurso (tipo=puesto)
@@ -131,44 +86,6 @@
 			return $visibles;
 		}
 
-		/**
-	   	*
-  	 	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy en cualquier item
-  	 	*
-  	*/
-		public function eventosfuturos(){
-			$conEstado = array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente'));
-			return $this->recurso->eventosItems()->whereIn('estado',$conEstado)->where('fechaEvento','>=',date('Y-m-d'))->get();
-		}
-
-		/**
-			* //Comprueba si algún item está ocupado
-			* @param $dataEvento array
-			*	@param $excluyeId int excluir de la comprobación el evento con id igual $excluyeId 
-			*
-			* @return boolean
-		*/
-		public function recursoOcupado($dataEvento,$excluyeId = ''){
-			foreach ($this->items as $item) {
-				if ($item->recursoOcupado($dataEvento,$excluyeId)) return true;
-			}
-			return false;
-		}
-
-		/**
-			* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
-			* @param $dataEvento array
-			*	@param $fecha string (Y-m-d)
-			*
-			* @return boolean
-		*/
-		public function solapaEvento($dataEvento,$fecha){
-			foreach ($this->items as $item) {
-				if ($item->solapaEvento($dataEvento,$fecha)) return true;
-			}
-			return false;
-		}
-		
 		/**
 			* da valor a los atributos del objeto tipo Recurso ($this->recurso)
 			* @param $data array definición de los datos de un recurso
@@ -282,19 +199,7 @@
 			return true;
 		}	
 
-		/**
-			* //elimina eventos entre fechaini y fechafin
-			* @param fini int timestamp
-			* @param ffin int tiemstamp
-			* @return boolean
-		*/
-		public function delEventos($fini = '',$fini = ''){
-			//Softdelete eventos
-			foreach ($this->items as $item) {
-				$item->delEventos($fini,$ffin);
-			}
-			return true;
-		}
+		
 
 		/**
 			* // elimina el recurso de la BD
@@ -348,6 +253,118 @@
 			return true;
 		}	
 
+
+		
+		//Eventos
+
+		public function addEvento($datosevento,$id_serie){
+			
+			$tsfechainicio = strtotime($datosevento['fInicio']);
+			$tsfechafin = strtotime($datosevento['fFin']);
+			$tsdia = 24 * 60 * 60;
+			for($i = $tsfechainicio; $i <= $tsfechafin;$i = $i + $tsdia) {
+				foreach ($this->items as $item) {
+						$item->addEvento($datosevento,$id_serie,$i);
+					}	
+			}
+			return $id_serie;
+		}
+		/**
+			* //Devuelve los eventos entre $fechas con estado en $estado
+			* @param $fini int timestamp fecha inicial
+			*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
+			* @param $ffin int timestamp fecha final
+			*	@return Collection Objets type Evento 
+			*
+		*/
+		public function getEventos($fini = '',$estados = array(),$ffin = ''){//
+			/*
+				//sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado
+				'estadoEvento' => array('denegada',
+																'aprobada',
+																'pendiente',
+																'finalizada',
+																'anulada',
+																'liberada',)
+			*/
+			if (empty($estados)) $estados = Config::get('options.estadosEvento');   
+			
+			$aFechas = array($fini,$ffin);
+			if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
+			if (empty($ffin))	$aFechas[1] = Config::get('options.maxtimestamp');
+			
+
+			$datos = array('aFechas' => $aFechas, 'estados' => $estados);
+			
+			
+			$eventos = $this->recurso->eventosItems->filter(function($evento) use ($datos){
+				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
+			});
+			return $eventos;
+		}
+
+		/**
+	   	*
+  	 	* //Devuelve los eventos pendientes de realización (aprobados o pendientes) a partir de hoy en cualquier item
+  	 	*
+  	*/
+		public function eventosfuturos(){
+			$conEstado = array(Config::get('options.reservaAprobada'),Config::get('options.reservaPendiente'));
+			return $this->recurso->eventosItems()->whereIn('estado',$conEstado)->where('fechaEvento','>=',date('Y-m-d'))->get();
+		}
+
+		/**
+			* //elimina eventos entre fechaini y fechafin
+			* @param fini int timestamp
+			* @param ffin int tiemstamp
+			* @return boolean
+		*/
+		public function delEventos($fini = '',$fini = ''){
+			//Softdelete eventos
+			foreach ($this->items as $item) {
+				$item->delEventos($fini,$ffin);
+			}
+			return true;
+		}
+
+		/**
+			* //Devuelve los eventos para el día $fechaEvento
+			*	@param $fechaEvento string formato Y-m-d
+			* @param $estado array estados de la reserva
+			*	@return Collection Object Evento
+		*/
+		public function eventos($fechaEvento,$estado = ''){
+			if (empty($estado)) $estado = Config::get('options.estadoEventos'); //sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado	
+			return $this->recurso->eventosItems()->whereIn('estado',$estado)->where('fechaEvento','=',$fechaEvento)->get();
+		}
+
+		/**
+			* //Comprueba si algún item está ocupado
+			* @param $dataEvento array
+			*	@param $excluyeId int excluir de la comprobación el evento con id igual $excluyeId 
+			*
+			* @return boolean
+		*/
+		public function recursoOcupado($dataEvento,$excluyeId = ''){
+			foreach ($this->items as $item) {
+				if ($item->recursoOcupado($dataEvento,$excluyeId)) return true;
+			}
+			return false;
+		}
+
+		/**
+			* //Comprueba si el recurso está ocupado para el evento definido por $dataEvento en la fecha $fecha 
+			* @param $dataEvento array
+			*	@param $fecha string (Y-m-d)
+			*
+			* @return boolean
+		*/
+		public function solapaEvento($dataEvento,$fecha){
+			foreach ($this->items as $item) {
+				if ($item->solapaEvento($dataEvento,$fecha)) return true;
+			}
+			return false;
+		}
 
 	
   }

@@ -12,7 +12,7 @@ class CalendarController extends BaseController {
 		$gruposderecursos = GruposController::gruposVisibles($sgrUser->capacidad());
 		$dropdown = $sgrUser->dropdownmenu();
 		
-		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->with('dropdown',$dropdown)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento')->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
+		return View::make('calendario.index')->with('sgrCalendario',$sgrCalendario)->with('viewActive',$viewActive)->with('dropdown',$dropdown)->nest('sidebar','sidebar',array('tsPrimerLunes' => $sgrCalendario->fecha()->getTimestamp(),'grupos' => $gruposderecursos))->nest('modalDeleteReserva','calendario.modal.deleteEvento')->nest('modalAddReserva','calendario.modal.addEvento',compact('sgrUser'))->nest('modalfinalizareserva','calendario.modal.finalizaEvento')->nest('modalanulareserva','calendario.modal.anulaEvento')->nest('modaldescripcion','calendario.modal.descripcion')->nest('modalAtenderReserva','calendario.modal.atenderEvento')->nest('modalMsg','modalMsg');
 	}
 
 	public function getCalendar(){

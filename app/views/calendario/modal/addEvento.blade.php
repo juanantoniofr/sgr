@@ -1,4 +1,4 @@
-<!-- marca branch master2 --><!-- / Modal addEvent // editEvent  -->
+<!-- / Modal addEvent // editEvent  -->
 <div class="modal fade myModal-lg" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="formNewEvent" aria-hidden="true">
     
   <div class="modal-dialog modal-lg">
@@ -39,11 +39,11 @@
             <label class="control-label col-sm-2">Actividad:</label>
             <div class="col-sm-8">
               <select class="form-control"  name="actividad" id="tipoActividad" >
-                @if (Auth::user()->capacidad > 1)<option value="Docencia Reglada PAP">Docencia Reglada PAP</option>@endif
-                @if (Auth::user()->capacidad > 1)<option value="Títulos propios">Títulos propios</option>@endif
-                @if (Auth::user()->capacidad > 1)<option value="Otra actividad docente/investigadora">Otra actividad docente/investigadora</option>@endif
+                @if ($sgrUser->capacidad() > 1)<option value="Docencia Reglada PAP">Docencia Reglada PAP</option>@endif
+                @if ($sgrUser->capacidad() > 1)<option value="Títulos propios">Títulos propios</option>@endif
+                @if ($sgrUser->capacidad() > 1)<option value="Otra actividad docente/investigadora">Otra actividad docente/investigadora</option>@endif
                 <option value="Autoaprendizaje">Autoaprendizaje</option>
-                  @if (Auth::user()->capacidad > 1)<option value="Otra actividad">Otra actividad</option>@endif
+                  @if ($sgrUser->capacidad() > 1)<option value="Otra actividad">Otra actividad</option>@endif
               </select>
             </div>
           </div>
@@ -93,7 +93,7 @@
             <div class="col-md-10">  
               <select class="form-control" name="repetir" id="newReservaRepetir" >
                 <option value="SR">Sin repetición</option>
-                @if (Auth::user()->puedePeriodica()) 
+                @if (!$sgrUser->isUserSgr()) 
                   <option value="CS">Cada Semana</option>
                 @endif
               </select>
@@ -113,7 +113,7 @@
             </div>
           </div>
           <!-- reserva periódica -->
-          <div @if (!Auth::user()->puedePeriodica()) {{'style="display:none"'}} @endif>
+          <div @if ($sgrUser->isUserSgr()) {{'style="display:none"'}} @endif>
             <div id="inputRepeticion">
               <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva periódica</h4> 
           
@@ -168,7 +168,7 @@
             <div class="form-group" id="reservadoPor">
               <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
               <div class = "col-md-10">  
-                <input type="text" name = "reservadoPor" id = "reservadoPor" class="form-control" value="{{Auth::user()->username}}"  readonly  />
+                <input type="text" name = "reservadoPor" id = "reservadoPor" class="form-control" value="{{$sgrUser->username()}}"  readonly  />
               </div>             
             </div>
 

@@ -3,7 +3,8 @@
 class sgrDia {
 	private $timestamp; //timestamp de la fecha
 	private $eventos;//array de objetos de tipo Eventos
-	private $sgrRecurso;
+	private $sgrEventos = array(); // array de objetos tipo sgrEventos
+	private $sgrRecurso = array();
 	private $esDomingo;
 	private $esSabado;
 	
@@ -24,7 +25,12 @@ class sgrDia {
 		$this->timestamp = $tsfecha;
 
 		$this->sgrRecurso = $sgrRecurso;
-		if (!empty($sgrRecurso)) $this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);//$this->eventos = $sgrRecurso->eventos(date('Y-m-d',$tsfecha));
+		if (!empty($sgrRecurso)) {
+			$this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);
+			foreach ($this->eventos as $evento) {
+				$this->sgrEventos[] = new sgrEvento($evento);
+			}
+		}
 
 		if(!empty($horario) && is_array($horasdisponibles)) $this->horario = $horario;
 			
@@ -49,6 +55,9 @@ class sgrDia {
 		return $this->eventos;
 	}
 
+	public function sgrEventos(){
+		return $this->sgrEventos;
+	}
 
 	public function left($event){
 		$left = 0;
@@ -199,6 +208,14 @@ class sgrDia {
 		return $this->timestamp + (60 * 60 * (int) $hora) + (60 * (int) $minuto);		
 		}
 
+	/**
+		* //Devuelve el número de eventos para $this
+		*
+	*/
+	public function numeroDeEventos(){
+
+		return count($this->sgrEventos);
+	}
 	//private
 	/**
 		* Determina si el día es festivo (domingo || sábabo)

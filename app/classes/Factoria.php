@@ -1,7 +1,7 @@
 <?php
   
   class Factoria{
-    /* :) 1-5-2017 */
+    
     public static function getRecursoInstance($recurso = ''){
     	if (empty($recurso)) return new recursoItem(new Recurso);
     	

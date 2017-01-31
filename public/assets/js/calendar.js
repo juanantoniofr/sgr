@@ -1274,7 +1274,6 @@ $(function(e){
 		$('#message').fadeOut("slow");
 		$("button#save").addClass('disabled');
 		$data = $('#fm_addEvent').serialize();
-		console.log($data);
 		$.ajax({
     	type: "POST",
 			url: "saveajaxevent",

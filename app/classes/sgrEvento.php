@@ -1,7 +1,7 @@
 <?php
 
 class sgrEvento {
-	/* :) 1-5-2017 */
+	
 	private $evento;
 
 	public function __construct($evento = ''){
@@ -17,8 +17,6 @@ class sgrEvento {
 
 		return $this->evento->delete();
 	} 
-
-	///para repasar ************
 
 	/**
 		* //finalizar evento: cambia la hora fin del evento
@@ -45,7 +43,8 @@ class sgrEvento {
 		//$finalizarEvento->evento_idSerie = $evento->evento_id;
 		$finalizarEvento->evento_id = $evento->id;
 		//$finalizarEvento->user_id = $evento->user->id;
-		$finalizarEvento->tecnico_id = Auth::user()->id;
+		$sgrUser = new sgrUser(Auth::user);
+		$finalizarEvento->tecnico_id = $sgrUser->id();
 		$finalizarEvento->momento = date('Y-m-d H:i:s',time());//momento actual
 		$finalizarEvento->observaciones = Input::get('observaciones','');
 		
@@ -101,7 +100,20 @@ class sgrEvento {
 		}
 		else {
 			$result['data'] = Input::all();
-			$result['idEvents'] = $this->saveEvents(Input::all());
+			
+			/* nuevo */
+			$id = Input::get('id_recurso','');
+			$recurso = Recurso::findOrFail($id);
+			$sgrRecurso = Factoria::getRecursoInstance($recurso);
+			$id_serie = $this->getIdUnique(); //identificador de la serie de eventos (reservas periodicas, o puntuales sobre varios equipos o puestos)
+
+			$datosdesdeform = Input::all();
+			$result['idEvents'] = $sgrRecurso->addEvento($datosdesdeform,$id_serie);
+			
+			/* fin de lo nuevo */
+
+			//$result['idEvents'] = $this->saveEvents(Input::all());
+
 
 			//Msg confirmación al usuario (add reserva)
 			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
@@ -112,14 +124,15 @@ class sgrEvento {
 				$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
 			}
 			//notificar a validadores si espacio requiere validación
-			if ( $event->recurso->validacion() ){
+			/*if ( $event->recurso->validacion() ){
 				$sgrMail = new sgrMail();
 				$sgrMail->notificaNuevoEvento($event);
-			}
+			}*/
 		}
+		return Input::all();
 		return $result;
 	}
-
+	/*
 	private function saveEvents($data){
 		$dias = $data['dias']; //1->lunes...., 5->viernes
 		$respuesta = array();
@@ -137,16 +150,16 @@ class sgrEvento {
 			}
 		}
 		return $evento_id;
-	}
-
+	}*/
+	/*
 	private function saveEvent($data,$currentfecha,$evento_id){
 		$idrecurso = $data['id_recurso'];//$direcurso puede indentificar a un puesto/un equipo/un tipoequipo/espacio (con o sin puestos)
 		$recurso = Recurso::findOrFail($idrecurso);
-		$sgrRecurso = RecursoFactory::getRecursoInstance($recurso->tipo);
-		$sgrRecurso->setRecurso($recurso);
+		$sgrRecurso = Factoria::getRecursoInstance($recurso);
+		
 
 		return $sgrRecurso->addEvent($data,$currentfecha,$evento_id);//addEvent devuelve el identificador del evento añadido
-	}
+	}*/
 
 	//Edit
 	public function edit(){
@@ -164,7 +177,8 @@ class sgrEvento {
 		else{
 			
 			//si el usuario es alumno: comprobamos req2 (MAX HORAS = 12 a la semana en cualquier espacio o medio )	
-			if (Auth::user()->isUser() && $this->superaHoras()){
+			$sgrUser = new sgrUser(Auth::user());
+			if ($sgrUser->isUserSgr() && $this->superaHoras()){
 				$result['error'] = true;
 				$error = array('hFin' =>'Se supera el máximo de horas a la semana.. (12h)');	
 				$result['msgErrors'] = $error;	
@@ -203,6 +217,48 @@ class sgrEvento {
 		return $result;			
 	} 
 		
+
+	/**
+		* Devuelve horaInicio (H:m:s) como H:m
+		*
+	*/
+	public function horaInicio(){
+		return $this->evento->horaInicio;
+	}	
+
+	/**
+		* Devuelve horaFin (H:m:s) como H:m
+		*
+	*/
+	public function horaFin(){
+		return $this->evento->horaFin;
+	}	
+
+	public function estado(){
+		return $this->evento->estado;
+	}
+
+	//devuelve true si hay el evenyo fue finalizado o false en caso contrario
+  public function finalizado(){
+    return $this->evento->finalizacion()->count() > 0;
+  } 
+
+  public function serieId(){
+  	return $this->evento->evento_id;
+  }
+
+  public function id(){
+  	return $this->evento->id;
+  }
+
+  public function titulo(){
+  	return $this->evento->titulo;
+  }
+
+  public function evento(){
+  	return $this->evento;
+  }
+
 	private function editEvents($fechaInicio,$fechaFin,$idSerie){
 		
 		$result = '';

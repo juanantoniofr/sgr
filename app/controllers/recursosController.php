@@ -1,6 +1,5 @@
 <?php
 class recursosController extends BaseController{
-  /* :) 5-1-2017 recursoscontroller */
   /** 
     * @param Input::get('sortby') string
     * @param Input::get('order')  string
@@ -298,7 +297,7 @@ class recursosController extends BaseController{
     
     return $result;
   }
- /**
+  /**
     * //Deshabilita un recursos para su reserva (actúa en casacada)
     *
     * @param Input::get('idrecurso') int
@@ -409,11 +408,11 @@ class recursosController extends BaseController{
     else{ 
       $recurso = Recurso::findOrFail($idrecurso);
       $sgrRecurso = Factoria::getRecursoInstance($recurso);
-    
+      $sgrUser = new sgrUser(Auth::user());
       //se filtran para obtener sólo aquellos visibles o atendidos para el usuario logeado
       $items = $sgrRecurso->items();
       $addOptionReservarTodo = false;
-      if (count($items) > 0 && !Auth::user()->isUser()) $addOptionReservarTodo = true;
+      if (count($items) > 0 && !$sgrUser->isUserSgr()) $addOptionReservarTodo = true;
       //$addOptionReservarTodo = $recurso->usuariopuedereservartodoslospuestos(Auth::user()->id);
       
       //número de puestos or equipos disabled
@@ -430,9 +429,6 @@ class recursosController extends BaseController{
       }
     return $result;
   }
-  
-  
- 
   
   /**
     * //Devuelve el campo descripción dado un idrecurso
@@ -465,6 +461,7 @@ class recursosController extends BaseController{
     
     return $result;
   } 
+
   /**
     * //Devuelve todos los recurso del tipo Input::get('tipo') formateados como html options 
     * @param Input::get('tipo') string

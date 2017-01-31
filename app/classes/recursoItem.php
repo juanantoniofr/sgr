@@ -1,6 +1,6 @@
 <?php
 	class recursoItem extends sgrRecurso {
-  /* :) 1-5-2017 */
+  
   	//private $recurso;
 		
 		/**
@@ -291,6 +291,31 @@
 		}
 
 		//Eventos
+		public function addEvento($datosevento,$id_serie,$tsfechaevento = ''){
+			$evento = new Evento;
+			if (empty($tsfechaevento)) $fechaEvento = $datosevento['fEvento'];
+			else $fechaEvento = date('Y-m-d',$tsfechaevento);
+			$evento->evento_id 				= $id_serie;
+			$evento->titulo						= $datosevento['titulo'];
+			$evento->actividad				= $datosevento['actividad'];
+			$evento->recurso_id				= $this->recurso->id;
+			$evento->fechaEvento 			= $fechaEvento;
+			$evento->fechaInicio 			= $datosevento['fInicio'];
+			//$evento->repeticion 			= $datosevento['repetir'];	
+			$evento->repeticion 			= 0; //??????	
+			$evento->diasRepeticion 	= json_encode($datosevento['dias']);
+			$evento->fechaFin 				= $datosevento['fFin'];
+			$evento->user_id					= $datosevento['reservarParaUvus'];
+			$evento->reservadoPor_id	= $datosevento['reservadoPor'];
+			$evento->estado 					= 'aprobada'; //???
+			$evento->horaInicio				= $datosevento['hInicio'];
+			$evento->horaFin				  = $datosevento['hFin'];
+
+			$evento->save();
+
+			return $id_serie;
+
+		}
 		/**
 			* //Devuelve los eventos entre $fechas con estado en $estado
 			* @param $fini int timestamp fecha inicial

@@ -148,19 +148,32 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
 Route::get('test',array('as'=>'test',function(){
   
   //fecha
-  $fechadesdeform = '25-1-2017';
-  $fecha = DateTime::createFromFormat('d-m-Y',$fechadesdeform);
+  $fecha = "2017-01-25";
+  $sgrRecurso = Factoria::getRecursoInstance(Recurso::find(45));
+  $sgrDia = new sgrDia(strtotime($fecha),$sgrRecurso);
+  $sgrEventos = $sgrDia->sgrEventos();
+  foreach ($sgrDia->sgrEventos() as $sgrEvento) {
+    echo htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$sgrEvento->evento()) );
+
+  }
+
+  echo "<pre>";
+    //var_dump($sgrDia);
+    //var_dump($sgrRecurso);
+    //var_dump($sgrEventos);
+    //var_dump($sgrDia->sgrEventos);
+  echo "</pre>";
   //recurso
-  $recurso = Recurso::findOrFail(73);
-  $sgrRecurso = Factoria::getRecursoInstance($recurso);
+  //$recurso = Recurso::findOrFail(73);
+  //$sgrRecurso = Factoria::getRecursoInstance($recurso);
   //calendario
  // $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
  // $sgrWeeks = $sgrCalendario->sgrWeeks();
   //foreach ($sgrWeeks as $week) {
    // foreach ($week->sgrDays() as $sgrDay) {
-      $sgrDay = new sgrDia(strtotime($fecha->format('Y-m-d')),$sgrRecurso);
-      if ( $sgrDay->haySolape(strtotime('8:30')) ) echo 'hay';
-      else echo 'no hay';
+    //  $sgrDay = new sgrDia(strtotime($fecha->format('Y-m-d')),$sgrRecurso);
+     // if ( $sgrDay->haySolape(strtotime('8:30')) ) echo 'hay';
+     // else echo 'no hay';
      
    // }
   //}
