@@ -1,7 +1,7 @@
 <?php  
 
 class sgrACL {
-  /* :) 1-5-2017 */
+  /* :) */
   /**
     *
     * // Devuelve en formato json los roles con acceso a un recurso

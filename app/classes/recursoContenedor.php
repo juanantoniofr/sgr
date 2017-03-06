@@ -118,6 +118,7 @@
 			foreach ($this->items as $item) {
 				$item->attach_gestor($id);
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -132,6 +133,7 @@
 			foreach ($this->items as $item) {
 				$item->attach_administrador($id);
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -146,6 +148,7 @@
 			foreach ($this->items as $item) {
 				$item->attach_validador($id);
 			}
+			$this->recurso->save();
 			return true;
 		}
 
@@ -158,6 +161,7 @@
 			foreach ($this->items as $item) {
 				$item->detach_gestor($id);
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -170,6 +174,7 @@
 			foreach ($this->items as $item) {
 				$item->detach_administrador($id);
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -182,6 +187,7 @@
 			foreach ($this->items as $item) {
 				$item->detach_validador($id);
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -196,6 +202,7 @@
 			foreach ($this->items as $item) {
 				$item->detach_all();
 			}
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -260,7 +267,9 @@
 		public function addEvento($datosevento,$id_serie){
 			
 			$tsfechainicio = strtotime($datosevento['fInicio']);
-			$tsfechafin = strtotime($datosevento['fFin']);
+			if ($datosevento['repetir'] == 'SR') $tsfechafin = $tsfechainicio;
+			else $tsfechafin = strtotime($datosevento['fFin']);
+			
 			$tsdia = 24 * 60 * 60;
 			for($i = $tsfechainicio; $i <= $tsfechafin;$i = $i + $tsdia) {
 				foreach ($this->items as $item) {
@@ -300,7 +309,7 @@
 			$eventos = $this->recurso->eventosItems->filter(function($evento) use ($datos){
 				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
 			});
-			return $eventos;
+			return $eventos->groupby('titulo');
 		}
 
 		/**
@@ -366,6 +375,19 @@
 			return false;
 		}
 
-	
+		public function userPuedeReservar($timestamp,$user){
+			
+			//si algún item no se puede reservar, y se retorna false
+			foreach ($this->items as $item) {
+				if ($item->userPuedeReservar($timestamp,$user) === false) return false;
+			}
+
+			//si no tiene items y es reservable (si tiene --> si llega aquí todos los items se pueden reservar)
+			$sgrUser = new sgrUser($user);
+			return $sgrUser->userPuedeReservar($timestamp,$this->recurso->id);
+		
+		}
+		
+		
   }
 ?>

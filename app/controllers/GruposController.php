@@ -1,5 +1,5 @@
 <?php
-/* marca branch master2 */
+
 class GruposController extends BaseController {
 
   
@@ -64,6 +64,7 @@ class GruposController extends BaseController {
     else{
       $grupo = GrupoRecurso::findOrFail($id);
       $sgrGrupo = new sgrGrupo($grupo);
+      $sgrRecursos = array();
       $sgrRecursos = $sgrGrupo->recursosVisibles(Auth::user()->capacidad);
       
       $result['html'] = (string) View::make('calendario.allViews.optionsRecursos')->with(compact('sgrRecursos'));

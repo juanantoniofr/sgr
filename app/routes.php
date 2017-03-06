@@ -146,56 +146,145 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
   });
 //**
 Route::get('test',array('as'=>'test',function(){
-  
-  //fecha
-  $fecha = "2017-01-25";
-  $sgrRecurso = Factoria::getRecursoInstance(Recurso::find(45));
-  $sgrDia = new sgrDia(strtotime($fecha),$sgrRecurso);
-  $sgrEventos = $sgrDia->sgrEventos();
-  foreach ($sgrDia->sgrEventos() as $sgrEvento) {
-    echo htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$sgrEvento->evento()) );
-
-  }
-
+  $id_recurso = 52;
+  $viewActive = 'month';
+  $day = '6';
+  $year = '2017';
+  $month = '3';
+  $fecha = new DateTime($year.'-'.$month.'-'.$day);
+  $recurso = Recurso::findOrFail($id_recurso);
+  $sgrRecurso = Factoria::getRecursoInstance($recurso);
+  $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+  //$caption = (string) CalendarController::caption($viewActive,$day,$sgrCalendario->nombreMes(),$year);
+  //$head = (string) CalendarController::head($viewActive,$sgrCalendario);
+  //$body = (string) CalendarController::body($viewActive,$sgrCalendario);
   echo "<pre>";
-    //var_dump($sgrDia);
-    //var_dump($sgrRecurso);
-    //var_dump($sgrEventos);
-    //var_dump($sgrDia->sgrEventos);
+   // var_dump($sgrCalendario);
   echo "</pre>";
-  //recurso
-  //$recurso = Recurso::findOrFail(73);
-  //$sgrRecurso = Factoria::getRecursoInstance($recurso);
-  //calendario
- // $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
- // $sgrWeeks = $sgrCalendario->sgrWeeks();
-  //foreach ($sgrWeeks as $week) {
-   // foreach ($week->sgrDays() as $sgrDay) {
-    //  $sgrDay = new sgrDia(strtotime($fecha->format('Y-m-d')),$sgrRecurso);
-     // if ( $sgrDay->haySolape(strtotime('8:30')) ) echo 'hay';
-     // else echo 'no hay';
-     
-   // }
-  //}
-      /*$aFechas = array(strtotime($fecha->format('Y-m-d')),strtotime($fecha->format('Y-m-d')));
-      if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
-      if (empty($ffin)) $aFechas[1] = Config::get('options.maxtimestamp');
+  $sgrDia = $sgrCalendario->sgrDia('6');
+  if ($sgrDia != false){
+  echo '<div'; 
+    
+    echo '  class = "day month ';
+    if($sgrDia->sgrRecurso()->userPuedeReservar($sgrDia->timestamp(),Auth::user()) && !$sgrDia->festivo())
+      echo ' formlaunch ';
+    else 
+      echo ' disable ';
+    if($sgrDia->festivo()) 
+      echo  ' festivo ';
+    echo '" data-fecha=" ' .date('j-n-Y',$sgrDia->timestamp()). ' " >';
+    
+      echo '<div class="titleEvents"><small>' . $sgrDia->numerodia() .'</small></div>';
+
+      echo '<div class="divEvents" data-numero-de-eventos="' .$sgrDia->numeroDeEventos(). '">';
+
+        if ($sgrDia->numeroDeEventos() > 4) echo '<a style="display:none" class="cerrar" href="">Cerrar</a>';
+        foreach($sgrDia->sgrEventos() as $sgrEvento){
+          echo '<div class="divEvent" data-fecha="' .date('j-n-Y',$sgrDia->timestamp()). '" data-hora="' .substr($sgrEvento->horaInicio(),0,2). '">';
+
+            echo '<a class = "linkpopover linkEvento linkpopover_month ';
+                    if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin()))) echo ' text-danger ';
+                    else
+                      if($sgrEvento->estado() == 'aprobada' && !$sgrEvento->finalizado()) echo  ' text-success ';
+                        elseif($sgrEvento->finalizado())  echo ' text-info ';
+                        elseif ($sgrEvento->estado() == 'pendiente') echo ' text-info ';
+                        elseif ($sgrEvent->estado() == 'denegada')  echo ' text-warning ';
+                    echo $sgrEvento->serieId() . ' ' . $sgrEvento->id()  . '"';
+                    echo 'id="' . $sgrEvento->id(). '"';
+                    echo ' data-id-serie="'.$sgrEvento->serieId().'" '; 
+                    echo ' data-id="'.$sgrEvento->id().'"';
+                    echo ' href="" ';
+                    echo ' rel="popover" ';
+                    echo ' data-html="true" ';
+                    echo ' data-title="'. sgrDate::parsedatetime($sgrEvento->horaInicio() ,'H:i:s', 'G:i') . '-' . sgrDate::parsedatetime($sgrEvento->horaFin(), 'H:i:s', 'G:i') . ' ' . $sgrEvento->titulo() .'"';
+                    echo ' data-content=" ' .htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('sgrEvento',$sgrEvento) ) . '"';
+                    //`^^^^^^^^^^^
+                    echo '>';
+                      if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) && $sgrEvento->estado() != 'aprobada')
+                          echo '<span title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>';
+                      else
+                      {
+                        echo '<span  title="Solicitud ';
+                                if ( $sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) ) echo ' solapada ';
+                                else echo $sgrEvento->estado() .'"'; 
+                                echo 'class=" fa fa-fw ';
+                                if ( $sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) ) echo ' fa-ban text-danger ';
+                                else
+                                  if($sgrEvento->estado() == 'aprobada' && !$sgrEvento->finalizado()) echo 'fa-check text-success ';
+                                  elseif($sgrEvento->finalizado())  echo ' fa-clock-o text-info ';
+                                  elseif ($sgrEvento->estado() == 'pendiente') echo ' fa-question text-primary ';
+                                  elseif ($sgrEvento->estado() == 'denegada')  echo ' fa-ban text-warning ';
+                        
+                                echo '"'; 
+                                echo ' aria-hidden="true">';
+                        echo '</span>';
+                      }
+            
+                      echo sgrDate::parsedatetime($sgrEvento->horaInicio(),'H:i:s','G:i'). '-' .sgrDate::parsedatetime($sgrEvento->horaFin(),'H:i:s','G:i');
+                      echo ' '. substr($sgrEvento->titulo(),0,45) .' ';
+                  echo '</a>';
+          echo '</div>';
+        }
+      echo '</div>';
+
+  echo '</div>';
+  }
+  else 
+    echo 'false';
+      //$body = '';
+  //return View::make('calendario.calendar')->with(compact('caption','head','body'));
       
-      $estados = Config::get('options.estadosEvento'); 
-      $datos = array('aFechas' => $aFechas, 'estados' => $estados);
-      
-      
-      $eventos = $recurso->eventos->filter(function($evento) use ($datos){
-        return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
-      });*/
-       /*   if (in_array($eventos[0],$eventos[1][0])) echo "po si está....";
-          else{
-            echo $eventos[0];
-            echo "<pre>";
-              var_dump($eventos[1][0]);
-            echo "</pre>";
-          }
-        */
+  
+  
+}));
+
+Route::get('test2',array('as'=>'test2',function(){
+  $id_recurso = 52;
+  $viewActive = 'month';
+  $day = '4';
+  $year = '2017';
+  $month = '1';
+  $fecha = new DateTime($year.'-'.$month.'-'.$day);
+  $recurso = Recurso::findOrFail($id_recurso);
+  $sgrRecurso = Factoria::getRecursoInstance($recurso);
+  $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+  $sgrDia = $sgrCalendario->sgrDia('6');
+  $time = $sgrDia->timestamp();
+  echo count($sgrDia->sgrEventos());
+  foreach($sgrDia->sgrEventos() as $sgrEvento){
+    echo $sgrEvento->tiporecurso();
+     var_dump(Config::get('string.'.$sgrEvento->tiporecurso()));
+     var_dump(Config::get('string.puesto'));
+    echo '<p  style="width=100%;text-align:center" class=" alert ';
+              if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin()))) echo ' alert-danger ';
+              elseif ($sgrEvento->estado() == 'aprobada') echo ' alert-success ';
+              elseif ($sgrEvento->estado() == 'pendiente') echo ' alert-danger ';
+    echo '">';
+    
+      echo ' Estado:<strong> Solicitud ';
+      if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin()))) echo ' Solapada ';
+      else echo ucfirst($sgrEvento->estado()); 
+      echo ' </strong>';
+
+      if ($sgrEvento->numeroItems() > 1) echo '(---'.$sgrEvento->numeroItems() . ' '. ucwords($sgrEvento->tiporecurso()) . '/s)';
+      else echo '('.$sgrEvento->recurso()->nombre.')';
+    echo '</p>';
+    
+    echo '<p style="width=100%;text-align:center">';
+      echo ucfirst(strftime('%a, %d de %B, ',$time)). ' '.sgrDate::parsedatetime($sgrEvento->horaInicio(),'H:i:s','G:i'). '-' .sgrDate::parsedatetime($sgrEvento->horaFin(),'H:i:s','G:i'). ' ';
+    echo '</p>';
+    
+    echo ' <p style="width=100%;text-align:center">';
+      echo $sgrEvento->actividad();
+    echo '</p>';
+
+    echo '<p style="width=100%;text-align:center">' .Config::get('options.tiporeserva')[$sgrEvento->repeticion()]. '</p>';
+
+    echo '<p style="width=100%;text-align:center">'. $sgrEvento->nombrePropietario() .' '. $sgrEvento->apellidosPropietario(). ' </p>';
+
+    echo '<hr />';
+    //$result .= htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('sgrEvento',$sgrEvento) );
+  }
   
 }));
 //Route::get('admin/user.html',array('uses' => 'UsersController@user','before' => array('auth','auth_ajax','capacidad:4,msg'))); //???

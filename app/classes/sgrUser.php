@@ -129,7 +129,7 @@ class sgrUser {
     $lastFriday = sgrCalendario::lastFriday(); //devuelve timestamp 
     $fm = date('Y-m-d',$fristMonday); //formato para la consulta sql (fechaIni en Inglés)
     $lf = date('Y-m-d',$lastFriday); //formato para la consulta sql (fechaFin en Inglés)
-    $events = $this->userEvents()->where('fechaEvento','>=',$fm)->where('fechaEvento','<=',$lf)->get();
+    $events = $this->user->eventos()->where('fechaEvento','>=',$fm)->where('fechaEvento','<=',$lf)->get();
     foreach ($events as $key => $event) {
       $nh = $nh + sgrDate::diffHours($event->horaInicio,$event->horaFin);
     }
@@ -224,6 +224,53 @@ class sgrUser {
 			}
 
 	}
+
+	/**
+    *   //Determina si un $timestamp es un dia disponible para que el usuario añada//edite//elimine reservas (depende del rol y de su relación con el recurso (gestor/validador/administrador)) ()
+    *   @param $timestamp int fecha a valorar
+    *   @return $isAviable boolean 
+    *
+  */
+  public function userPuedeReservar($timestamp,$idrecurso){
+    
+    $isAviable = false;
+    $intCurrentDate = $timestamp; //mktime(0,0,0,(int) $mon,(int) $day,(int) $year);
+    $capacidad = $this->user->capacidad;
+    switch ($capacidad) {
+      case '1': //alumnos
+        $intfristMondayAviable = sgrCalendario::fristMonday();
+        $intlastFridayAviable = sgrCalendario::lastFriday();
+        if ($intCurrentDate >= $intfristMondayAviable && $intCurrentDate <= $intlastFridayAviable) $isAviable = true;
+        break;  
+      case '2': //pdi & pas administración
+        $intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+        if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+        break;
+      case '3': //Técnicos MAV 
+      case '5': //Validadores
+      case '6': //administrador delegado (EE MAV)
+       
+        if ($this->user->recursosGestionados->contains($idrecurso) || $this->user->recursosAdministrados->contains($idrecurso)|| $this->user->recursosValidados->contains($idrecurso) ){       
+          $intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+          //$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+          if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+        }
+        else {
+          $intfristMondayAviable = sgrCalendario::fristMonday(); //Primer lunes disponible
+          //$intCurrentDate = mktime(0,0,0,(int) $mon,(int) $day,(int) $year); // fecha del evento a valorar
+          if ($intCurrentDate >= $intfristMondayAviable) $isAviable = true;
+        }
+
+        break;
+      case '4': //administradores SGR
+        $intfristdayAviable = strtotime('today'); //Hoy a las 00:00
+        if ($intCurrentDate >= $intfristdayAviable) $isAviable = true;
+        break;
+    }
+    return $isAviable;
+  }
+
+
   /**
    * Implementa requisito: Alumnos no pueden hacer reservas periodicas
    * @param void

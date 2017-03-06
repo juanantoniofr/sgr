@@ -67,9 +67,11 @@ class CalendarController extends BaseController {
 				break;
 		}
 	}
+
 	public static function caption($viewActive,$day,$nombreMes,$year){
 		return (string) View::make('calendario.allViews.caption')->with('view',$viewActive)->with('day',$day)->with('nombreMes',$nombreMes)->with('year',$year);
 		}
+	
 	public static function body($viewActive,$sgrCalendario){
 		
 		$diaActual = 1;

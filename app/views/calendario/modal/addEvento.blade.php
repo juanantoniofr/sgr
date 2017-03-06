@@ -163,19 +163,21 @@
             </div>
           </div>
           
-          <div style="display:none" id = "reservarPara">
+          <div  style="display:none" id = "reservarPara">
             <h4 style = "border-bottom:1px solid #bbb;color:#999;margin:0px;margin-bottom:10px;">Reserva diaria</h4>
+            
+
             <div class="form-group" id="reservadoPor">
               <label for="reservadoPor"  class="control-label col-md-2" >Reservado por</label>   
               <div class = "col-md-10">  
-                <input type="text" name = "reservadoPor" id = "reservadoPor" class="form-control" value="{{$sgrUser->username()}}"  readonly  />
+                <input type="text" name="reservadoPor" id = "reservadoPor" class="form-control" value="{{$sgrUser->id()}}"  readonly  />
               </div>             
             </div>
 
             <div class="form-group" id="reservarParaUvus" >
               <label for="reservarParaUvus"  class="control-label col-md-2" >Reservar para</label>   
               <div class = "col-md-10">  
-                <input type="text" name = "reservarParaUvus" class="form-control" value="" placeholder="Escriba UVUS o inserte tarjeta" id = "reservadoPara"  />
+                <input type="text" name="reservarParaUvus" class="form-control" value="{{$sgrUser->username()}}" placeholder="Escriba UVUS o inserte tarjeta" id="reservadoPara"  />
               </div>             
             </div>
            

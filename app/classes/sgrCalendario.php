@@ -92,7 +92,12 @@ class sgrCalendario {
 	*/
 	public function sgrDia($numDia){
 		
-		if (array_key_exists($numDia, $this->diasMes))	return $this->diasMes[$numDia];
+		foreach ($this->sgrWeeks as $sgrWeek) {
+			foreach ($sgrWeek->sgrDays() as $sgrDay) {
+				if ((int) $sgrDay->numerodia() == (int) $numDia) return $sgrDay;
+			}
+		}
+		
 		return false;
 	}
 

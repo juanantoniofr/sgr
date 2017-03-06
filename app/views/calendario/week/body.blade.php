@@ -22,9 +22,9 @@
         
       @endfor
 
-      @foreach ($sgrDia->events() as $event)
+      @foreach($sgrDia->sgrEventos() as $sgrEvento)
           
-          {{ (string) View::make('calendario.week.divEvents')->with('event',$event)->with('sgrDia',$sgrDia) }}
+          {{ (string) View::make('calendario.week.divEvents')->with('sgrEvento',$sgrEvento)->with('sgrDia',$sgrDia) }}
 
       @endforeach 
     </div>

@@ -31,17 +31,21 @@ $(function(e){
 			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
+			console.log($("select#recurse option:selected").data('numeroitems'));
 			if($("select#recurse option:selected").data('numeroitems') > 0){
 				$.ajax({
 					type:"GET",
 					url:"getitems",
 					data:{ idrecurso:$("select#recurse option:selected").val()},
 					success: function($result){
-						$('#selectItems').fadeIn('fast',function(){
-							$('#items').html($result.listoptions);
-							$("select#items option:first").prop("selected", "selected");
-							$('select#items').change();
-						});
+						console.log($result);
+						if($result.listoptions != ''){
+							$('#selectItems').fadeIn('fast',function(){
+								$('#items').html($result.listoptions);
+								$("select#items option:first").prop("selected", "selected");
+								$('select#items').change();
+							});
+						}
 					},
 					error: function(xhr, ajaxOptions, thrownError){
 						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
@@ -1086,7 +1090,7 @@ $(function(e){
 		if ($('select#recurse option:selected').data('atendido')) $('#reservarPara').fadeIn();	
 		else {
 			$('#reservarPara').fadeOut();
-			$('#fm_addEvent input[name="reservarParaUvus"]').val('');	
+			//$('#fm_addEvent input[name="reservarParaUvus"]').val('');	
 		}
 		//msg itemsdisponibles
 		
@@ -1121,8 +1125,8 @@ $(function(e){
 		//Día de la semana
 		setCheckBoxActive($fecha);
 		//Set id recurso
-		console.log('item=' + $('select#items option:selected').val());
-		console.log('recurso=' + $('select#recurse option:selected').val());
+		//console.log('item=' + $('select#items option:selected').val());
+		//console.log('recurso=' + $('select#recurse option:selected').val());
 		$('#fm_addEvent input[name|="id_recurso"]').val($('select#recurse option:selected').val());
 		if (undefined != $('select#items option:selected').val() && $('select#items option:selected').val() != 0)
 			$('#fm_addEvent input[name|="id_recurso"]').val($('select#items option:selected').val());

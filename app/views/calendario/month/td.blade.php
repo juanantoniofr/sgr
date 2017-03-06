@@ -1,5 +1,5 @@
 <div 
-  class = "day month @if($sgrDia->reservable(Auth::user()->id) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" >
+  class = "day month @if($sgrDia->sgrRecurso()->userPuedeReservar($sgrDia->timestamp(),Auth::user()) && !$sgrDia->festivo()) formlaunch @else disable @endif @if($sgrDia->festivo()) festivo @endif" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" >
 
   <div class="titleEvents"><small>{{ $sgrDia->numerodia() }}</small></div>
   
@@ -27,7 +27,7 @@
             data-html="true" 
             data-title="{{ sgrDate::parsedatetime($sgrEvento->horaInicio() ,'H:i:s', 'G:i') }} - {{ sgrDate::parsedatetime($sgrEvento->horaFin(), 'H:i:s', 'G:i') }}
                         {{ $sgrEvento->titulo() }}" 
-            data-content="{{htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('event',$sgrEvento->evento()) )}}"
+            data-content="{{htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('sgrEvento',$sgrEvento) )}}"
             data-toggle="popover"
             data-trigger="focus"    
         >

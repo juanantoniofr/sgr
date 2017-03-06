@@ -4,7 +4,7 @@ class sgrDia {
 	private $timestamp; //timestamp de la fecha
 	private $eventos;//array de objetos de tipo Eventos
 	private $sgrEventos = array(); // array de objetos tipo sgrEventos
-	private $sgrRecurso = array();
+	private $sgrRecurso;
 	private $esDomingo;
 	private $esSabado;
 	
@@ -26,6 +26,7 @@ class sgrDia {
 
 		$this->sgrRecurso = $sgrRecurso;
 		if (!empty($sgrRecurso)) {
+			//getEventos($fini = '',$estados = array(),$ffin = '')
 			$this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);
 			foreach ($this->eventos as $evento) {
 				$this->sgrEventos[] = new sgrEvento($evento);
@@ -57,14 +58,17 @@ class sgrDia {
 
 	public function sgrEventos(){
 		return $this->sgrEventos;
+		//$fini = $this->timestamp;
+		//$ffin = $this->timestamp;
+		//return $this->sgrRecurso->getEventos($fini,array(),$ffin);
 	}
 
-	public function left($event){
+	public function left($sgrEvento){
 		$left = 0;
 		$numeroDeEventosSolapaIntervalo = 0;
 		$indiceEnEventosQueSolapaIntervalo = 0;
-		$eventos = $this->eventos->filter(function($evento) use ($event){
-			return ( strtotime($evento->horaInicio) < strtotime($event->horaFin) && strtotime($event->horaFin) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($event->horaInicio) && strtotime($evento->horaFin) > strtotime($event->horaInicio));
+		$eventos = $this->eventos->filter(function($evento) use ($sgrEvento){
+			return ( strtotime($evento->horaInicio) < strtotime($sgrEvento->horaFin()) && strtotime($sgrEvento->horaFin()) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($sgrEvento->horaInicio()) && strtotime($evento->horaFin) > strtotime($sgrEvento->horaInicio()));
 		});
 		
 		$numeroDeEventosSolapaIntervalo = $eventos->count();
@@ -72,7 +76,7 @@ class sgrDia {
 		$encontrado = false;
 		$indice = 0;
 		foreach ($eventos as $evento) {
-			if ($evento->id != $event->id && !$encontrado) $indice++;
+			if ($evento->id != $sgrEvento->id() && !$encontrado) $indice++;
 			else $encontrado = true;
 		}
 		if ($encontrado) $indiceEnEventosQueSolapaIntervalo = $indice;
@@ -84,22 +88,22 @@ class sgrDia {
 		return floor($left);
 	}
 
-	public function width($event){
+	public function width($sgrEvento){
 		$width = 95;
 		$numeroDeEventosSolapaIntervalo = 0;
 		$indiceEnEventosQueSolapaIntervalo = 0;
 
 		
 
-		$eventos = $this->eventos->filter(function($evento) use ($event){
-			return ( strtotime($evento->horaInicio) < strtotime($event->horaFin) && strtotime($event->horaFin) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($event->horaInicio) && strtotime($evento->horaFin) > strtotime($event->horaInicio));
+		$eventos = $this->eventos->filter(function($evento) use ($sgrEvento){
+			return ( strtotime($evento->horaInicio) < strtotime($sgrEvento->horaFin()) && strtotime($sgrEvento->horaFin()) <= strtotime($evento->horaFin)  ) || (strtotime($evento->horaInicio) <= strtotime($sgrEvento->horaInicio()) && strtotime($evento->horaFin) > strtotime($sgrEvento->horaInicio()));
 		});
 		
 		$numeroDeEventosSolapaIntervalo = $eventos->count();
 
 		$encontrado = false;
 		foreach ($eventos as $evento) {
-			if ($evento->id != $event->id && !$encontrado) $indiceEnEventosQueSolapaIntervalo++;
+			if ($evento->id != $sgrEvento->id() && !$encontrado) $indiceEnEventosQueSolapaIntervalo++;
 			else $encontrado = true;
 		}
 
@@ -109,18 +113,6 @@ class sgrDia {
 		$width = $indiceEnEventosQueSolapaIntervalo +  ( 95 / $razon);
 		return floor($width);
 	}
-
-
-	/**
-		*
-		* @return boolean true|false 
-	*/
-	public function  reservable($id_user){
-		$reservable = false;
-		$user = User::findOrFail($id_user);
-		$reservable = $user->isDayAviable($this->timestamp(),$this->sgrRecurso->recurso()->id);
-		return $reservable;
-	}	
 
 	/**
 		* Devuelve una abreviatura de tres letras del día de la semana en español

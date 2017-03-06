@@ -108,6 +108,8 @@ class sgrEvento {
 			$id_serie = $this->getIdUnique(); //identificador de la serie de eventos (reservas periodicas, o puntuales sobre varios equipos o puestos)
 
 			$datosdesdeform = Input::all();
+			//return Input::all();
+			$datosdesdeform['reservarParaUvus'] = User::where('username','=',Input::get('reservarParaUvus'))->first()->id;
 			$result['idEvents'] = $sgrRecurso->addEvento($datosdesdeform,$id_serie);
 			
 			/* fin de lo nuevo */
@@ -117,6 +119,7 @@ class sgrEvento {
 
 			//Msg confirmación al usuario (add reserva)
 			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
+			
 			if ($event->estado == 'aprobada'){
 				$result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
 			}
@@ -129,7 +132,7 @@ class sgrEvento {
 				$sgrMail->notificaNuevoEvento($event);
 			}*/
 		}
-		return Input::all();
+		//return Input::all();
 		return $result;
 	}
 	/*
@@ -238,6 +241,14 @@ class sgrEvento {
 		return $this->evento->estado;
 	}
 
+	public function actividad(){
+		return $this->evento->actividad;
+	}
+
+	public function repeticion(){
+		return $this->evento->repeticion;
+	}
+
 	//devuelve true si hay el evenyo fue finalizado o false en caso contrario
   public function finalizado(){
     return $this->evento->finalizacion()->count() > 0;
@@ -251,12 +262,63 @@ class sgrEvento {
   	return $this->evento->id;
   }
 
+  public function recursoId(){
+  	return $this->evento->recurso_id;
+  }
+
   public function titulo(){
   	return $this->evento->titulo;
   }
 
+  public function fechaEvento(){
+  	return $this->evento->fechaEvento;
+  }
+
   public function evento(){
   	return $this->evento;
+  }
+
+  public function userId(){
+  	return $this->evento->user_id;
+  }
+
+  public function nombrePropietario(){
+  	return $this->evento->user->nombre;
+  }
+
+  public function apellidosPropietario(){
+  	return $this->evento->user->apellidos;
+  }
+
+  public function reservadoporId(){
+  	return $this->evento->reservadoPor_id;
+  }
+
+  public function user(){
+  	return $this->evento->user;
+  }
+
+  /**
+    * Devevelve el número de recurso (equipos o espacios reservados por un evento)
+  */
+
+  public function numeroItems(){
+  	return Evento::where('evento_id','=',$this->evento->evento_id)->groupBy('recurso_id')->count();
+  }
+
+  public function recurso(){
+  	return $this->evento->recurso;
+  }
+
+
+	//devuelve true si hay la reserva fue finalizada y false en caso contrario
+  public function finalizada(){
+    return $this->evento->finalizacion()->count() > 0;
+  } 
+
+
+  public function tiporecurso(){
+  	return $this->evento->recurso->tipo;
   }
 
 	private function editEvents($fechaInicio,$fechaFin,$idSerie){
@@ -288,6 +350,10 @@ class sgrEvento {
 		return $result;
 	}
 
+	public function numeroHoras(){
+    return (strtotime($this->evento->horaFin) - strtotime($this->evento->horaInicio)) / (60*60) ;
+  }
+	
 	
 	private function superaHoras(){
 		
@@ -316,8 +382,37 @@ class sgrEvento {
 		return $supera;
 	}
 
+	/**
+    * Los eventos se podrán anular hasta el día anterior a su fecha de realización.
+    * @param $idUser int identificador de usuario para comprobar si tiene permiso para anular el evento
+    * @return boolean
+  */
+  public function esAnulable($idUser){
+    //$idUser no existe 
+    if (User::where('id','=',$idUser)->count() == 0) return false;
+    //$idUser no es propietario y no ha reservado para otro
+    if ($this->evento->user_id != $idUser && $this->evento->reservadoPor_id != $idUser) return false;
+    //la fecha del evento permite anular (igual para todos los usuarios)
+    $hoy = strtotime('today');
+    $timestamp = strtotime($this->evento->fechaEvento);
+    if ($timestamp > $hoy) return true;
+    
+    return false;
+  }
 	
-	
+	/**
+    * determina si un evento puede ser finalizado 
+    * @return boolean
+  */
+  public function esFinalizable(){
+    $eventoEsFinalizable = false;
+    
+    if ( strtotime($this->evento->fechaEvento) == strtotime(date('Y-m-d')) && strtotime($this->evento->horaFin) > strtotime(date('H:i')) ) $eventoEsFinalizable = true;
+    
+    return $eventoEsFinalizable;
+  }
+
+  
 	/*private function delEvents(){
 		$result = '';
 		$eventToDel = Evento::find(Input::get('idEvento'))->first();

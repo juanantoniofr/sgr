@@ -69,7 +69,7 @@
 		*/
 		public function itemsVisiblesParaCapacidad($capacidad = ''){
 			$visibles = array();
-			if ($this->recurso->esVisible($capacidad)) $visibles[] = $this->recurso;
+			if ($this->esVisible($capacidad)) $visibles[] = $this->recurso;
 			return $visibles;
 		}
 
@@ -143,7 +143,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function attach_gestor($id){
-			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->attach($id);
+			if (!$this->recurso->gestores->contains($id)) {
+				$this->recurso->gestores()->attach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 
@@ -152,7 +155,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function attach_administrador($id){
-			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->attach($id);
+			if (!$this->recurso->administradores->contains($id)) {
+				$this->recurso->administradores()->attach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 
@@ -161,7 +167,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function attach_validador($id){
-			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->attach($id);
+			if (!$this->recurso->validadores->contains($id)) {
+				$this->recurso->validadores()->attach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 
@@ -170,7 +179,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_gestor($id){
-			if (!$this->recurso->gestores->contains($id)) $this->recurso->gestores()->detach($id);
+			if ($this->recurso->gestores->contains($id)) {
+				$this->recurso->gestores()->detach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 
@@ -179,7 +191,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_administrador($id){
-			if (!$this->recurso->administradores->contains($id)) $this->recurso->administradores()->detach($id);
+			if ($this->recurso->administradores->contains($id)) {
+				$this->recurso->administradores()->detach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 		/**
@@ -187,7 +202,10 @@
 			* @param $id int identificador de usuario
 		*/
 		public function detach_validador($id){
-			if (!$this->recurso->validadores->contains($id)) $this->recurso->validadores()->detach($id);
+			if ($this->recurso->validadores->contains($id)) {
+				$this->recurso->validadores()->detach($id);
+				$this->recurso->save();
+			}
 			return true;
 		}	
 		/**
@@ -198,6 +216,7 @@
 			$this->recurso->gestores()->detach();
 			$this->recurso->administradores()->detach();
 			$this->recurso->validadores()->detach();
+			$this->recurso->save();
 			return true;
 		}	
 
@@ -293,18 +312,21 @@
 		//Eventos
 		public function addEvento($datosevento,$id_serie,$tsfechaevento = ''){
 			$evento = new Evento;
-			if (empty($tsfechaevento)) $fechaEvento = $datosevento['fEvento'];
+			if (empty($tsfechaevento)) $fechaEvento = date('Y-m-d',strtotime($datosevento['fEvento']));
 			else $fechaEvento = date('Y-m-d',$tsfechaevento);
 			$evento->evento_id 				= $id_serie;
 			$evento->titulo						= $datosevento['titulo'];
 			$evento->actividad				= $datosevento['actividad'];
 			$evento->recurso_id				= $this->recurso->id;
 			$evento->fechaEvento 			= $fechaEvento;
-			$evento->fechaInicio 			= $datosevento['fInicio'];
-			//$evento->repeticion 			= $datosevento['repetir'];	
-			$evento->repeticion 			= 0; //??????	
+			$evento->fechaInicio 			= date('Y-m-d',strtotime($datosevento['fInicio']));
+			if ($datosevento['repetir'] == 'SR')
+			 	$evento->repeticion 		= 0; 
+			else
+				$evento->repeticion 		= 1; 
 			$evento->diasRepeticion 	= json_encode($datosevento['dias']);
-			$evento->fechaFin 				= $datosevento['fFin'];
+			$evento->dia 							= date('w',strtotime($datosevento['fEvento']));//0=domingo, 6=sábado
+			$evento->fechaFin 				= date('Y-m-d',strtotime($datosevento['fFin']));
 			$evento->user_id					= $datosevento['reservarParaUvus'];
 			$evento->reservadoPor_id	= $datosevento['reservadoPor'];
 			$evento->estado 					= 'aprobada'; //???
@@ -349,5 +371,13 @@
 			});
 			return $eventos;
 		}	
+
+		
+		public function userPuedeReservar($timestamp,$user){
+		
+			$sgrUser = new sgrUser($user);
+			return $sgrUser->userPuedeReservar($timestamp,$this->recurso->id);
+		}
+  
   }
 ?>
