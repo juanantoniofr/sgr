@@ -2,15 +2,17 @@
 class sgrMail {
 	
 	private $mailAdminSGR = 'juanantonio.fr@gmail.com';
-	private $subject =	array(	'addEvento'		=> 'Nueva solicitud de reserva',
+	private $subject =	array(	
+								'addEvento'		=> 'Nueva solicitud de reserva',
 								'editEvento'	=> 'Modificación de solicitud de reserva',
 								'delEvento'		=> 'Eliminación de evento',
-								'aprobar'		=> 'Solicitud aprobada',
-								'denegar'		=> 'Solicitud denegada',
+								'aprobar'			=> 'Solicitud aprobada',
+								'denegar'			=> 'Solicitud denegada',
 								'registro'		=> 'Nueva solicitud de registro pendiente',
 								'caducada'		=> 'Cuenta caducada',
 								'contacto'		=> 'Notificación formulario de contacto',
-								'activacion'	=> 'Usuario UVUS activado en SGR (Sistema de Gestión de Reservas fcom)',
+								'activa'			=> 'Usuario UVUS activado en SGR (Sistema de Gestión de Reservas fcom)',
+								'desactiva'		=> 'Usuario UVUS desactivado en SGR (Sistema de Gestión de Reservas fcom)',
 								'deshabilita'	=> 'Espacio o medio deshabilitado',
 								'habilita'		=> 'Espacio o medio habilitado',
 							);
@@ -64,18 +66,36 @@ class sgrMail {
 		}//fin foreach			
 	}//fin notificahabilitaRecurso	
 
-	public function notificaActivacionUVUS($idUser){
+	public function notificaActivacionCuenta($idUser){
 
 		//Subject 
-		$s = date('d-m-Y H:i') .': '.$this->subject['activacion'];
+		$s = date('d-m-Y H:i') .': '.$this->subject['activa'];
 		//Notifica solicitante
 		$user = User::find($idUser);
-		$data = array('user' => serialize($user));
+		$data = array('user' 	=> serialize($user));
 
 		if (!empty($user)){
 			$mailUser = $user->email;
 			if ( !empty($mailUser) ){
 				Mail::queue(array('html'=>'emails.activaUvus'),$data,function($m) use ($mailUser,$s){
+				$m->to($mailUser)->subject($s);
+			});
+			}		
+		}
+	}
+
+	public function notificaDesactivacionCuenta($idUser){
+
+		//Subject 
+		$s = date('d-m-Y H:i') .': '.$this->subject['desactiva'];
+		//Notifica solicitante
+		$user = User::find($idUser);
+		$data = array('user' 	=> serialize($user));
+
+		if (!empty($user)){
+			$mailUser = $user->email;
+			if ( !empty($mailUser) ){
+				Mail::queue(array('html'=>'emails.desactivaUvus'),$data,function($m) use ($mailUser,$s){
 				$m->to($mailUser)->subject($s);
 			});
 			}		

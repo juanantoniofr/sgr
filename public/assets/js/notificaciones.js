@@ -1,10 +1,10 @@
 $(function(e){
 
-/* marca branch master2 */
 	$('.list-group').on('click',function(e){// :)
-		$('form#activeUser input[name="username"]').val($(this).data('username'));
+		e.preventDefault();
+		e.stopPropagation();
+		$('form#activeUser input[name="username"]').val($(this).data('uvus'));
 		$('form#activeUser input[name="idnotificacion"]').val($(this).data('idnotificacion'));
-		$('form#activeUser input[name="id"]').val($(this).data('iduser'));
 		var $defaultCaducidad = new Date($(this).data('defaultcaducidad'));
 		configuredatepicker($defaultCaducidad);
 		m_hideMsg();
@@ -13,19 +13,17 @@ $(function(e){
 
 	$('#activar').on('click',function(e){
 		e.preventDefault();
-		$data = 'username=' + $('input:text[name=uvus]').val()+ '&' +$('form#activeUser').serialize();
+		$data = 'activar=1&'+$('form#activeUser').serialize();
 		showGifEspera();
 		$.ajax({
 			type:"POST",
-			url:"ajaxActiveUser",
+			url:"ajaxUpdateUser",
 			data: $data,
 			success: function(respuesta){
 				hideGifEspera();
-				$('#msgerror').fadeOut();
-				$('#textmsgsuccess').html('Usuario <b>'+$('input:text[name=uvus]').val()+'</b> activado con éxito');
-				$('#msgsuccess').fadeIn('slow');
-				//console.log($item);
-				$('form#activeUser').data('item').remove();
+				console.log(respuesta);
+				$('#msg').fadeOut().html(respuesta.msg).fadeIn('slow');
+				eliminadelalista('.list-group',respuesta.idnotificacion);
 			},
 			error: function(xhr, ajaxOptions, thrownError){
 				hideGifEspera();
@@ -37,18 +35,16 @@ $(function(e){
 
 	$('#desactivar').on('click',function(e){
 		e.preventDefault();
-		$data = 'username=' + $('input:text[name=uvus]').val()+ '&' +$('form#activeUser').serialize();
+		$data = 'activar=0&'+$('form#activeUser').serialize();
 		showGifEspera();
 		$.ajax({
 			type:"POST",
-			url:"ajaxDesactiveUser",
+			url:"ajaxUpdateUser",
 			data: $data,
 			success: function(respuesta){
 				hideGifEspera();
-				$('#msgerror').fadeOut();
-				$('#textmsgsuccess').html('Usuario <b>'+$('input:text[name=uvus]').val()+'</b> desactivado con éxito');
-				$('#msgsuccess').fadeIn('slow');
-				$('form#activeUser').data('item').remove();
+				$('#msg').fadeOut().html(respuesta.msg).fadeIn('slow');
+				eliminadelalista('.list-group',respuesta.idnotificacion);
 				},
 			error: function(xhr, ajaxOptions, thrownError){
 				hideGifEspera();
@@ -60,7 +56,7 @@ $(function(e){
 		
 	$('#borrar').on('click',function(e){
 		e.preventDefault();
-		$data = 'username=' + $('input:text[name=uvus]').val()+ '&' +$('form#activeUser').serialize();
+		$data = $('form#activeUser').serialize();
 		showGifEspera();
 		$.ajax({
 			type:"POST",
@@ -69,9 +65,9 @@ $(function(e){
 			success: function(respuesta){
 				hideGifEspera();
 				$('#msgerror').fadeOut();
-				$('#textmsgsuccess').html('Usuario <b>'+$('input:text[name=uvus]').val()+'</b> borrado con éxito');
+				$('#msg').html(respuesta.msg);
 				$('#msgsuccess').fadeIn('slow');
-				$('form#activeUser').data('item').remove();
+				
 			},
 			error: function(xhr, ajaxOptions, thrownError){
 				hideGifEspera();
@@ -82,6 +78,7 @@ $(function(e){
 	});	
 
 	function configuredatepicker($defaultDate){
+		console.log($defaultDate);
 		$("#datepickerCaducidad").datepicker({
 			showOtherMonths: true,
 	   	selectOtherMonths: true,
@@ -96,12 +93,13 @@ $(function(e){
 		$("#datepickerCaducidad").val($defaultDate.getDate() + '-' + ($defaultDate.getMonth() + 1) + '-' + $defaultDate.getFullYear());
 	}
 
-	function showGifEspera(){
-		$('#espera').css('display','inline').css('z-index','1000');
+	function eliminadelalista($classlista,$iditem){
+		$($classlista).each(function (){
+					console.log($(this));
+					console.log($iditem);
+					console.log($(this).data('idnotificacion'));
+						if ($iditem == $(this).data('idnotificacion')) $(this).fadeOut().remove();
+					});
 	}
-
-	function hideGifEspera(){
-		$('#espera').css('display','none').css('z-index','-1000');
-	}
-
+	
 });

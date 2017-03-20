@@ -22,7 +22,7 @@ return array (
 							 'deny' => 4,
 							 'request' => 5,
 							 ),
-  'fecha_caducidadAlumnos'  => '2017-9-30',
+  'fecha_caducidadAlumnos'  => '2017-09-30',
 	'fin_cursoAcademico' 	=> '2017-07-31',
 	'inicio_gestiondesatendida' => '2015-09-1',
 	'inicio_cursoAcademico' => '2016-09-26',

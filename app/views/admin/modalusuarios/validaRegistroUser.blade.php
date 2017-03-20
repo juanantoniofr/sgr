@@ -1,5 +1,5 @@
-<!-- marca branch master2 --><div class="modal fade" id="modalUser" >
-   <form class="form-horizontal" role="form" id = "activeUser" data-item=''>
+<div class="modal fade" id="modalUser" ><!-- modalusuarios -->
+   <form class="form-horizontal" role="form" id="activeUser"> <!-- data-item=''--> 
   <div class="modal-dialog">
     <div class="modal-content">
       
@@ -59,7 +59,7 @@
 
           <div class="form-group " id="m_activaUsuario_inputid">
             <span id="m_activaUsuario_textError_id" class="text-danger modal_spantexterror col-md-12  text-center "></span>
-            <input type="hidden" name="id" value="" />
+            <!--<input type="hidden" name="activar" value="0" />-->
           </div>
       </div><!-- ./modal-body -->
       

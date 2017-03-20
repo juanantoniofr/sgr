@@ -1,5 +1,5 @@
 <?php
-/* marca branch master2 */
+
 class NotificacionesController extends BaseController {
 
 	/**
@@ -7,9 +7,10 @@ class NotificacionesController extends BaseController {
 	*/
 	public function ajaxUpdateEstado(){ // :)
     //Output  
-    $respuesta = array( 'error'   => false,
-                        'errors'  => array(),
-                        'msg'     => '',  
+    $respuesta = array( 'error'           => false,
+                        'errors'          => array(),
+                        'msg'             => '',
+                        'idnotificacion'  => 0,  
                         );
 
     $rules = array(
@@ -19,11 +20,11 @@ class NotificacionesController extends BaseController {
     );
 
     $messages = array(
-          'required'          => 'El campo <strong>:attribute</strong> es obligatorio.',
+          'required'                  => 'El campo <strong>:attribute</strong> es obligatorio.',
           'idnotificacion.exists'     => Config::get('msg.idnotfound'),
-          'username.exists'   => Config::get('msg.usernamenotfound'),
-          'date'              => 'El campo <strong>:attribute</strong> debe ser una fecha válida',
-          'date_format'       => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
+          'username.exists'           => Config::get('msg.usernamenotfound'),
+          'date'                      => 'El campo <strong>:attribute</strong> debe ser una fecha válida',
+          'date_format'               => 'El campo <strong>:attribute</strong> debe tener el formato d-m-Y',
           );
 
     $validator = Validator::make(Input::all(), $rules, $messages);
@@ -33,7 +34,6 @@ class NotificacionesController extends BaseController {
         return $respuesta;
     }
     else{
-
       //Input
       $idnotificacion = Input::get('idnotificacion');
       $username = Input::get('username');
@@ -44,7 +44,7 @@ class NotificacionesController extends BaseController {
       $activar = Input::get('activar',0);
 
       $user = User::where('username','=',$username)->first();
-      $user->estado = $activar; //Activación cuenta
+      $user->estado = $activar; //Activación-desactivación de cuenta
       $user->colectivo = $colectivo;
       $user->capacidad = $capacidad;
       $user->observaciones = $observaciones;
@@ -55,18 +55,18 @@ class NotificacionesController extends BaseController {
       
       $user->save();
 
-      
       $this->cierraNotificacion($idnotificacion);
       //mail to User by Activate
       $sgrMail = new sgrMail();
-      $sgrMail->notificaActualizacionCuenta($user->id);            
+      if ($activar)   $sgrMail->notificaActivacionCuenta($user->id);            
+      else            $sgrMail->notificaDesactivacionCuenta($user->id);            
       
-      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success') . 'activar = '. $activar));
+      $respuesta['msg'] = (string) View::make('msg.success')->with(array('msg' => Config::get('msg.success')));
+      $respuesta['idnotificacion'] = $idnotificacion;
       return $respuesta;
 
     }
   }
- 	
 
   public function ajaxDelete(){ // :)
     //Input

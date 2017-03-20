@@ -1,4 +1,4 @@
-<!-- marca branch master2 --><?php $u = unserialize($user); ?>
+<?php $u = unserialize($user); ?>
 <h3>Notificación automática SGR (Sistema de reservas fcom)</h3>
 
 <h3>Activación cuenta UVUS {{$u->username}} </h3>

@@ -1,10 +1,11 @@
 <?php
-/* :) 5-1-2017 */
 class UsersController extends BaseController {
   
   private $offset = '10';
   private $order = 'asc';
   private $sortby = 'username';
+ 
+
   public function listar(){ //:)
     //Input  
     $veractivas = Input::get('veractivas',1);
@@ -31,6 +32,7 @@ class UsersController extends BaseController {
       
     return View::make('admin.usuarios.listado')->nest('tableUsuarios','admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas'))->nest('links','admin.usuarios.links',compact('usuarios','page'))->nest( 'dropdown','admin.dropdown',compact('sgrUser') )->nest('menuUsuarios','admin.usuarios.menu',compact('veractivas','colectivo','colectivos','perfil','perfiles'))->nest('modalAddUser','admin.modalusuarios.add')->nest('modalEditUser','admin.modalusuarios.edit')->nest('modalDeleteUser','admin.modalusuarios.delete');
   }
+
   public function ajaxGetUsuarios(){ // :)
     //Input
     $veractivas = Input::get('veractivas',1);
@@ -52,6 +54,7 @@ class UsersController extends BaseController {
     }
     return View::make('admin.usuarios.usuarios',compact('sgrUsuarios','sortby','order','veractivas','pagina'));
   }
+ 
   public function ajaxAdd(){ // :)
     
     //Output  
@@ -104,6 +107,7 @@ class UsersController extends BaseController {
         return $respuesta;
     }
   }
+ 
   public function ajaxEdit(){ //:)
     //Output  
     $respuesta = array( 'error'   => false,

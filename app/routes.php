@@ -1,5 +1,4 @@
 <?php
-/* :) 5-1-2017 routes */
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +143,10 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
     $alertLevel 	= 'danger';
   	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
   });
+
+Route::post('admin/testajax',array('as'=>'testajax',function(){
+  return Input::all();
+}));
 //**
 Route::get('test',array('as'=>'test',function(){
   $id_recurso = 52;

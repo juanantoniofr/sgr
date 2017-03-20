@@ -1,5 +1,4 @@
 <?php
-/* :) 5-1-2017 msg*/
 return array (
 
 	'success' 								=> 'Datos salvados con éxito....',
@@ -40,6 +39,8 @@ return array (
   'objectNoFoundpagetitle' 						=> 'Objeto no encontrado',
   'objectNoFoundpagetitlepaneltitle' 	=> 'Error: objeto no encontrado',
   'objectNoFoundmsg'									=> 'Objeto DB no encontrado',
+
+
 
 );
 

@@ -83,7 +83,7 @@
 {{HTML::script('assets/js/jquery-1.11.0.js')}}
 {{HTML::script('assets/js/jquery-ui.js')}}
 {{HTML::script('assets/js/bootstrap.min.js')}}
-
+{{HTML::script('assets/js/all.js')}}
 @yield('js')
 <!-- scripts -->  
 </body>
