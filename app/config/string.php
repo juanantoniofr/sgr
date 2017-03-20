@@ -3,7 +3,7 @@
 return array (
 
 	'espacio' 					=> 'Espacio',
-	'tipoequipos'				=> 'Modelo de equipo',
+	'tipoequipos'				=> 'Equipos',
 	'puesto'						=> 'Puesto',
 	'equipo'						=> 'Equipo',
 	'itemsespacio' 			=> 'Puesto',

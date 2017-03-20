@@ -28,7 +28,7 @@ class HomeController extends BaseController {
 						);
 
 		$messages = array(	'titulo.required'		=>	'El campo título es obligatorio...',
-							'texto.required'		=>	'El campo texto es obligatorio...',
+												'texto.required'		=>	'El campo texto es obligatorio...',
 							);
 
 		$validator = Validator::make(Input::all(), $rules, $messages);
@@ -53,15 +53,16 @@ class HomeController extends BaseController {
 		
 		if (Auth::check()){
 			$dropdown = Auth::user()->dropdownMenu();
-			return View::make('ayuda')->nest('dropdown',$dropdown);	
+			return View::make('ayuda')->with('dropdown',$dropdown);	
 		} 
 		else return View::make('ayuda'); 
 	}
 
 	public function contacto(){
 		if (Auth::check()){
-			$dropdown = Auth::user()->dropdownMenu();
-			return View::make('contacto')->nest('dropdown',$dropdown);	
+			$sgrUser = new sgrUser(Auth::user());
+			$dropdown = $sgrUser->dropdownMenu();
+			return View::make('contacto')->with('dropdown',$dropdown);	
 		} 
 		else return View::make('contacto');
 	}

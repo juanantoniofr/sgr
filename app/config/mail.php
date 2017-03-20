@@ -54,8 +54,8 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'uniticfcom@gmail.com', 'name' => 'SGR fcom'),
-	//'from' => array('address' => 'fcomunitic@gmail.com', 'name' => 'SGR fcom'),
+	//'from' => array('address' => 'uniticfcom@gmail.com', 'name' => 'SGR fcom'),
+	'from' => array('address' => 'fcomunitic@gmail.com', 'name' => 'SGR fcom'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -81,8 +81,8 @@ return array(
 	|
 	*/
 
-	'username' => 'uniticfcom@gmail.com',
-	//'username' => 'fcomunitic@gmail.com',
+	//'username' => 'uniticfcom@gmail.com',
+	'username' => 'fcomunitic@gmail.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -95,8 +95,8 @@ return array(
 	|
 	*/
 
-	//'password' =>  'p4ssunitic',//fcomunitic
-	'password' =>  'p4ss_un1t1c',//uniticfcom
+	'password' =>  'p4ssunitic',//fcomunitic
+	//'password' =>  'p4ss_un1t1c',//uniticfcom
 
 
 	/*
