@@ -8,6 +8,7 @@
     @if ($sgrDia->numeroDeEventos() > 4) <a style="display:none" class="cerrar" href="">Cerrar</a>@endif
     
     @foreach($sgrDia->sgrEventos() as $sgrEvento)
+      
       <div class="divEvent" data-fecha="{{date('j-n-Y',$sgrDia->timestamp())}}" data-hora="{{substr($sgrEvento->horaInicio(),0,2)}}">
         <a class = "linkpopover linkEvento linkpopover_month
                     @if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin()))) text-danger

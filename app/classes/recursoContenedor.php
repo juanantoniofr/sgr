@@ -300,7 +300,7 @@
 			
 			$aFechas = array($fini,$ffin);
 			if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
-			if (empty($ffin))	$aFechas[1] = Config::get('options.maxtimestamp');
+			if (empty($ffin))	$aFechas[1] = (int) Config::get('options.maxtimestamp');
 			
 
 			$datos = array('aFechas' => $aFechas, 'estados' => $estados);
@@ -309,7 +309,8 @@
 			$eventos = $this->recurso->eventosItems->filter(function($evento) use ($datos){
 				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
 			});
-			return $eventos->groupby('titulo');
+
+			return $eventos;//->groupby('titulo');
 		}
 
 		/**

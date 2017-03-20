@@ -28,8 +28,13 @@ class sgrDia {
 		if (!empty($sgrRecurso)) {
 			//getEventos($fini = '',$estados = array(),$ffin = '')
 			$this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);
-			foreach ($this->eventos as $evento) {
-				$this->sgrEventos[] = new sgrEvento($evento);
+			$oldserieId = '';
+      foreach ($this->eventos as $evento) {
+      	$newserieId = $evento->evento_id;
+          if ($newserieId != $oldserieId){
+            $oldserieId = $evento->evento_id;
+						$this->sgrEventos[] = new sgrEvento($evento);
+					}
 			}
 		}
 
@@ -58,9 +63,6 @@ class sgrDia {
 
 	public function sgrEventos(){
 		return $this->sgrEventos;
-		//$fini = $this->timestamp;
-		//$ffin = $this->timestamp;
-		//return $this->sgrRecurso->getEventos($fini,array(),$ffin);
 	}
 
 	public function left($sgrEvento){

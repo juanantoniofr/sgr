@@ -7,6 +7,7 @@ class sgrEvento {
 	public function __construct($evento = ''){
 			if (empty($evento)) $this->evento = new Evento;
 			else 								$this->evento = $evento;
+			
 			return $this;
 	}
 	

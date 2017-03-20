@@ -22,6 +22,27 @@ class sgrCalendario {
 		return $this;
 	}
 
+	/**
+		*
+		*	 Genera un array de objetos sgrWeek (semanas del mes)
+	*/
+	private function setSemanas(){
+		
+		$semanas = array();
+		$day = 1;
+		$i=0;
+		$timestamp = mktime(0,0,0,(int) $this->fecha->format('m'),1,(int) $this->fecha->format('Y'));
+		$maxday = date("t",$timestamp);
+		$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
+		do {
+			$day = $day + 7;
+		 	$i = $i + 1;
+		 	$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
+		} while ($day <= $maxday);
+		
+		return $this->sgrWeeks = $semanas;
+	}
+
 	//$fecha debe ser un objeto DateTime
 	public function setFecha($fecha){
 		$this->fecha = $fecha;
@@ -103,26 +124,7 @@ class sgrCalendario {
 
 
 //private functions
-	/**
-		*
-		*	 Genera un array de objetos sgrWeek (semanas del mes)
-	*/
-	private function setSemanas(){
-		
-		$semanas = array();
-		$day = 1;
-		$i=0;
-		$timestamp = mktime(0,0,0,(int) $this->fecha->format('m'),1,(int) $this->fecha->format('Y'));
-		$maxday = date("t",$timestamp);
-		$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
-		do {
-			$day = $day + 7;
-		 	$i = $i + 1;
-		 	$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
-		} while ($day <= $maxday);
-		
-		return $this->sgrWeeks = $semanas;
-	}
+	
 //**** ./private functions
 	
 	//static functions
