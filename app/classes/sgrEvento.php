@@ -3,14 +3,48 @@
 class sgrEvento {
 	
 	private $evento;
+	private $idserie;	
+	private $numeroitems;
+
 
 	public function __construct($evento = ''){
-			if (empty($evento)) $this->evento = new Evento;
-			else 								$this->evento = $evento;
+			if (empty($evento)) {
+				$this->evento = new Evento;
+				$this->idserie = $this->uniqueId();
+				$this->numeroitems = 0;
+			}
+			else	{
+				$this->evento = $evento;
+				$this->idserie = $this->serieId();
+				$this->numeroitems = $this->numeroItems();
+			}	
 			
 			return $this;
 	}
 	
+ 	/** //Devuelve el número de recurso (equipos o espacios reservados por un evento) */
+  public function numeroItems(){
+  	return Evento::where('evento_id','=',$this->evento->evento_id)->count();
+  }
+
+  public function serieId(){
+  	return $this->evento->evento_id;
+  }
+
+  //private functions
+	private function uniqueId(){
+		$idSerie = $this->getIdUnique();
+		return $idSerie;
+	}
+
+	private function getIdUnique(){
+		do {
+			$evento_id = md5(microtime());
+		} while (Evento::where('evento_id','=',$evento_id)->count() > 0);
+		
+		return $evento_id;
+	}
+
 	/**
 		* 
 	*/
@@ -255,10 +289,6 @@ class sgrEvento {
     return $this->evento->finalizacion()->count() > 0;
   } 
 
-  public function serieId(){
-  	return $this->evento->evento_id;
-  }
-
   public function id(){
   	return $this->evento->id;
   }
@@ -299,18 +329,9 @@ class sgrEvento {
   	return $this->evento->user;
   }
 
-  /**
-    * Devevelve el número de recurso (equipos o espacios reservados por un evento)
-  */
-
-  public function numeroItems(){
-  	return Evento::where('evento_id','=',$this->evento->evento_id)->groupBy('recurso_id')->count();
-  }
-
   public function recurso(){
   	return $this->evento->recurso;
   }
-
 
 	//devuelve true si hay la reserva fue finalizada y false en caso contrario
   public function finalizada(){
@@ -455,19 +476,7 @@ class sgrEvento {
 		return $result;
 	}
 
-	//private functions
-	private function uniqueId(){
-		$idSerie = $this->getIdUnique();
-		return $idSerie;
-	}
-
-	private function getIdUnique(){
-		do {
-			$evento_id = md5(microtime());
-		} while (Evento::where('evento_id','=',$evento_id)->count() > 0);
-		
-		return $evento_id;
-	}
+	
 
 	/**
  		* Determina si un nuevo evento en $idRecurso en $currentfecha, con hora inicio $hi, hora de finalización $hf, solapa con eventos con $condicionEstado existentes en BD

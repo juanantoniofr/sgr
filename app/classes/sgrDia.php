@@ -26,15 +26,10 @@ class sgrDia {
 
 		$this->sgrRecurso = $sgrRecurso;
 		if (!empty($sgrRecurso)) {
-			//getEventos($fini = '',$estados = array(),$ffin = '')
+			
 			$this->eventos = $this->sgrRecurso->getEventos($tsfecha,$estados = array(),$tsfecha);
-			$oldserieId = '';
       foreach ($this->eventos as $evento) {
-      	$newserieId = $evento->evento_id;
-          if ($newserieId != $oldserieId){
-            $oldserieId = $evento->evento_id;
-						$this->sgrEventos[] = new sgrEvento($evento);
-					}
+      	$this->sgrEventos[] = new sgrEvento($evento);
 			}
 		}
 
@@ -184,9 +179,22 @@ class sgrDia {
 		if (empty($timestampIni)) return false;
 		if (empty($timestampFin)) return false;
 		
-		foreach ($this->eventos as $evento) {
+		/*foreach ($this->eventos as $evento) {
 			if ( strtotime($evento->horaInicio) <= $timestampIni && strtotime($evento->horaFin) > $timestampIni && $evento->estado == Config::get('options.eventoAprobado') ) $numsolapes++;
 			if ( strtotime($evento->horaInicio) < $timestampFin && strtotime($evento->horaFin) > $timestampFin && $evento->estado == Config::get('options.eventoAprobado') ) $numsolapes++;
+		}
+		if ($numsolapes > 1) $haysolapes = true;*/
+		$estados = array( 'aprobada',
+											'pendiente',
+                    );
+		
+		$eventos = $this->sgrRecurso->getEventos($this->timestamp,$estados,$this->timestamp);
+		//$eventos = Evento::where('fechaEvento','=',date('Y-m-d'))
+		$eventos = $this->eventos;
+
+		foreach ($eventos as $evento) {
+			if ( strtotime($evento->horaInicio) <= $timestampIni && strtotime($evento->horaFin) > $timestampIni ) $numsolapes++;
+			if ( strtotime($evento->horaInicio) < $timestampFin && strtotime($evento->horaFin) > $timestampFin ) $numsolapes++;
 		}
 		if ($numsolapes > 1) $haysolapes = true;
 		return $haysolapes;

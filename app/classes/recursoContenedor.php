@@ -310,7 +310,7 @@
 				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
 			});
 
-			return $eventos;//->groupby('titulo');
+			return $eventos;
 		}
 
 		/**
