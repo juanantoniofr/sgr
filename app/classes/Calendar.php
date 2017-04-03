@@ -239,11 +239,11 @@ class Calendar {
 
         	
         	$muestraItem = '';
-        	if ($event->recursoOwn->tipo != 'espacio') {
+        	if ($event->recurso->tipo != 'espacio') {
         		$numRecursos = Evento::where('evento_id','=',$event->evento_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->count();
         		if ($numRecursos > 0) {
-        			$muestraItem =  ' ('.($numRecursos + 1). ' ' .$event->recursoOwn->tipo.'s)';}
-        		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
+        			$muestraItem =  ' ('.($numRecursos + 1). ' ' .$event->recurso->tipo.'s)';}
+        		else $muestraItem =  ' ('.$event->recurso->nombre.')';
         	}
 			
 
@@ -253,7 +253,7 @@ class Calendar {
         	($view != 'week') ? $strhi = Date::getstrHour($event->horaInicio).'-'. Date::getstrHour($event->horaFin) : $strhi = '';
         	$classPuedeEditar = '';
         	
-        	$own = Evento::find($event->id)->userOwn;
+        	$own = Evento::find($event->id)->reservadoPor;
     		
     		$showInfo = $self->setinfo($data,$event);
         	$textLink = '<p style ="'.$style.'"><i>'. $strhi.'</i> '.$showInfo .'</p>';
@@ -344,9 +344,9 @@ class Calendar {
 		$showInfo = 'No se ha seleccionado información a mostrar';
         $info = '';
         if ($data['titulo'] == 'true') 	$info = '-'.$event->titulo;
-        if ($data['nombre'] == 'true') 	$info .= '-'.$event->userOwn->nombre . ' ' . $event->userOwn->apellidos;
-        if ($data['colectivo'] == 'true') $info .= '-' .$event->userOwn->colectivo;
-		if ($data['total'] == 'true' && $event->total() > 0) $info .= '-' . $event->total() . ' ' .$event->recursoOwn->tipo . '/s';
+        if ($data['nombre'] == 'true') 	$info .= '-'.$event->reservadoPor->nombre . ' ' . $event->reservadoPor->apellidos;
+        if ($data['colectivo'] == 'true') $info .= '-' .$event->reservadoPor->colectivo;
+		if ($data['total'] == 'true' && $event->total() > 0) $info .= '-' . $event->total() . ' ' .$event->recurso->tipo . '/s';
 		if (!empty($info)) $showInfo = $info;
 
 		return $showInfo;
@@ -740,18 +740,17 @@ class Calendar {
 
         	
         	$muestraItem = '';
-        	if ($event->recursoOwn->tipo != 'espacio') {
+        	if ($event->recurso->tipo != 'espacio') {
         		$numRecursos = Evento::where('evento_id','=',$event->evento_id)->where('recurso_id','!=',$event->recurso_id)->where('fechaEvento','=',$event->fechaEvento)->where('horaInicio','=',$event->horaInicio)->count();
         		
 
 				//Bug PODController, quitar el año q viene
 				$userPOD = User::where('username','=','pod')->first(); 
-				//$eventoTest = Evento::whereIn('recurso_id',$alist_id)->where('fechaEvento','=',$strDate)->orderBy('horaInicio','asc')->groupby('evento_id')->first();
 				$idPOD = $userPOD->id;
 				$iduser = 0;
 				$iduser = $event->user_id;
 				if ( $iduser == $idPOD ) {
-					$recursos = Recurso::where('grupo_id','=',$event->recursoOwn->grupo_id)->get();
+					$recursos = Recurso::where('grupo_id','=',$event->recurso->grupo_id)->get();
 					$alist_id = array();
 					foreach($recursos as $recurso){
 						$alist_id[] = $recurso->id;
@@ -763,8 +762,8 @@ class Calendar {
 				//fin del bug
 
         		if ($numRecursos > 0) {
-        			$muestraItem =  ' ('.($numRecursos + 1). ' ' .$event->recursoOwn->tipo.'s)';}
-        		else $muestraItem =  ' ('.$event->recursoOwn->nombre.')';
+        			$muestraItem =  ' ('.($numRecursos + 1). ' ' .$event->recurso->tipo.'s)';}
+        		else $muestraItem =  ' ('.$event->recurso->nombre.')';
         	}
 			
 
@@ -775,13 +774,13 @@ class Calendar {
 				$periodoreservado = ', '. date('d-m-Y',strtotime($event->fechaEvento));
         	}
 
-        	$contenido = htmlentities('<p style="width=100%;text-align:center" class="'.$classEstado.'">Estado:<strong> '.ucfirst($event->estado).'</strong>'.$muestraItem.'</p><p style="width=100%;text-align:center">'.ucfirst(strftime('%a, %d de %B, ',$time)). Date::getstrHour($event->horaInicio).' - ' .Date::getstrHour($event->horaFin) .'</p><p style="width=100%;text-align:center">'.$event->actividad.'</p><p style="width=100%;text-align:center">'.$tipoReserva.'</p><p style="width=100%;text-align:center">'.$periodoreservado.'</p><p style="width=100%;text-align:center">'.$event->userOwn->nombre .' ' .$event->userOwn->apellidos. '</p>');
+        	$contenido = htmlentities('<p style="width=100%;text-align:center" class="'.$classEstado.'">Estado:<strong> '.ucfirst($event->estado).'</strong>'.$muestraItem.'</p><p style="width=100%;text-align:center">'.ucfirst(strftime('%a, %d de %B, ',$time)). Date::getstrHour($event->horaInicio).' - ' .Date::getstrHour($event->horaFin) .'</p><p style="width=100%;text-align:center">'.$event->actividad.'</p><p style="width=100%;text-align:center">'.$tipoReserva.'</p><p style="width=100%;text-align:center">'.$periodoreservado.'</p><p style="width=100%;text-align:center">'.$event->reservadoPor->nombre .' ' .$event->reservadoPor->apellidos. '</p>');
         	
         	($view != 'week') ? $strhi = Date::getstrHour($event->horaInicio).'-'. Date::getstrHour($event->horaFin) : $strhi = '';
         	$classPuedeEditar = '';
         	
         	$colorPOD = 'text-success';
-			if ($event->userOwn->username != 'pod') $colorPOD = '';
+			if ($event->reservadoPor->username != 'pod') $colorPOD = '';
         	if($self->puedeEditar(Auth::user()->id,$event->user_id) && $self->isDayAviable($day,$mon,$year)){
         		$contenido .= htmlentities('<hr />
         				<a class = "comprobante" href="'.URL::route('justificante',array('idEventos' => $event->evento_id)).'" data-id-evento="'.$event->id.'" data-id-serie="'.$event->evento_id.'" data-periodica="'.$event->repeticion.'" title="Comprobante" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>

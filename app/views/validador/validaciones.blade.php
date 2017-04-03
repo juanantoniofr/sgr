@@ -121,7 +121,7 @@
 				    							 <span data-toggle="tooltip" title="Aprobada" class="small"><strong>Inicio</strong>: {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaInicio)}}<br /><strong> Fin:</strong> {{Date::sgrStrftime('%A, %d de %B de %Y',$event->fechaFin)}}<br /><strong>Horario:</strong> {{$event->horaInicio}} a {{$event->horaFin}}<br /><strong>Dias:</strong> {{Date::sgrdiassemana($event->diasRepeticion)}}</span>
 				    						</td>
 				    						<td>
-				                        		<span aria-hidden="true" data-toggle="tooltip" title="Aprobada">{{$event->recursoOwn->nombre}}</span>
+				                        		<span aria-hidden="true" data-toggle="tooltip" title="Aprobada">{{$event->recurso->nombre}}</span>
 				                        	</td>
 				                        
 				                    @elseif($event->estado == 'denegada')
@@ -135,7 +135,7 @@
 				    						</td>
 				    						
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 				                        	</td>
 				                        
 			                    	@elseif($event->estado == 'pendiente' && !Calendar::hasSolapamientos($event->evento_id,$event->recurso_id))
@@ -149,7 +149,7 @@
 				                        	</td>
 				                        	
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 				                        	</td>
 				                        
 				                   	@elseif($event->estado == 'pendiente' && Calendar::hasSolapamientos($event->evento_id,$event->recurso_id))
@@ -166,14 +166,14 @@
 				    						</td>
 				    						
 				                        	<td>
-				                        		<span title="Click para aprobar o denegar... ">{{$event->recursoOwn->nombre}}</span>
+				                        		<span title="Click para aprobar o denegar... ">{{$event->recurso->nombre}}</span>
 				                        	</td>
 				                        
 				    			
 			                   		@endif
 			                    
 			    				        
-				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}</span></td>
+				                        <td><i class="fa fa-user fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->reservadoPor->apellidos}}, {{$event->reservadoPor->nombre}}</span></td>
 
 				                        <td><i class="fa fa-angle-double-right fa-fw "></i><span title="Click para aprobar o denegar... ">{{$event->titulo}}</span></td>
 				                        

@@ -16,9 +16,9 @@ class sgrCalendario {
 	function __construct($fecha,$sgrRecurso){
 		
 		$this->sgrRecurso = $sgrRecurso;
-		$this->fecha = $fecha;
-		$this->currentDay 	= $this->fecha->getTimestamp();
-		$this->setSemanas();
+		$this->fecha 			= $fecha;
+		$this->currentDay = $this->fecha->getTimestamp();
+		$this->sgrWeeks 	= $this->setSemanas();
 		return $this;
 	}
 
@@ -40,7 +40,7 @@ class sgrCalendario {
 		 	$semanas[$i] =  new sgrWeek($this->sgrRecurso,(int) $day,(int) $this->fecha->format('m'),(int) $this->fecha->format('Y'));
 		} while ($day <= $maxday);
 		
-		return $this->sgrWeeks = $semanas;
+		return $semanas;
 	}
 
 	//$fecha debe ser un objeto DateTime

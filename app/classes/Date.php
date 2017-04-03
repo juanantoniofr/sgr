@@ -1,7 +1,7 @@
 <?php
 
 class Date{
-	/* :) 1-5-2017 */
+	
 	/**
      * Devuelve $fecha en formato $farmatosalida
      * 
@@ -10,14 +10,14 @@ class Date{
      * @param $formatosalida string formato de salida para $fecha
      * @return $result datetime formateado según $formatosalida
     */
-    public static function parsedatetime($fecha,$formatoentrada,$formatosalida){
+  public static function parsedatetime($fecha,$formatoentrada,$formatosalida){
          
         $result = '';
  
         $date = DateTime::createFromFormat($formatoentrada,$fecha);
         $result = $date->format($formatosalida);
         return $result;
-    }
+  }
 
     
 	public static function diffHours($h1,$h2){ 

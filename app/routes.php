@@ -144,20 +144,11 @@ Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfControlle
   	return View::make('message')->with(compact('msg','pagetitle','paneltitle','alertLevel'));
   });
 
-Route::get('test3',array('as'=>'test3',function(){
-  $id_recurso = 52;
-  $viewActive = 'month';
-  $day = '6';
-  $year = '2017';
-  $month = '3';
-  $fecha = new DateTime($year.'-'.$month.'-'.$day);
-  $recurso = Recurso::findOrFail($id_recurso);
-  $sgrRecurso = Factoria::getRecursoInstance($recurso);
-  $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
+Route::post('test3',array('as'=>'test3',function(){
   
-  echo "<pre>";
-    var_dump($sgrCalendario);
-  echo "</pre>";
+  
+    return Input::all();
+  
 }));
 
 //**

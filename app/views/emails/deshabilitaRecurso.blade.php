@@ -45,7 +45,7 @@ table {
 </style>
 <h3>Notificación automática SGR (Sistema de reservas fcom)</h3>
 
-<h4>Se ha deshabilitado para su uso el recurso {{$e->recursoOwn->nombre}} </h4>
+<h4>Se ha deshabilitado para su uso el recurso {{$e->recurso->nombre}} </h4>
 
 <p> La reserva que acontinuación se detalla <b>puede ser que no se pueda realizar</b>. Puede contactar con la Unidad correspondiente (Administrador de Centro, Servicio MAV, o Unidad TIC) para más información.</p>
 
@@ -55,8 +55,8 @@ table {
 	<ul style ="list-style:none;padding:5px">
 		<li class = 'subtitle'><strong>Código:</strong> <span>{{$e->evento_id}}</span></li>
 		<li id = 'title'><strong>Título:</strong> <span>{{htmlentities($e->titulo)}}</span></li>
-		<li class = 'subtitle'><strong>Solicitada por:</strong> <span>{{$e->userOwn->nombre}} {{$e->userOwn->apellidos}} </span></li>
-		<li id = 'title'><strong>Espacio:</strong> <span>{{htmlentities($e->recursoOwn->nombre)}}</span></li>
+		<li class = 'subtitle'><strong>Solicitada por:</strong> <span>{{$e->reservadoPor->nombre}} {{$e->reservadoPor->apellidos}} </span></li>
+		<li id = 'title'><strong>Espacio:</strong> <span>{{htmlentities($e->recurso->nombre)}}</span></li>
 		<li class = 'first'><strong>Estado de la reserva:</strong> {{$e->estado}}</li>		
 		<li class = 'subtitle'><strong>Fecha de solicitud:</strong> <span>{{$e->created_at}}</span></li>
 	</ul>

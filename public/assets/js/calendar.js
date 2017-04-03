@@ -7,6 +7,43 @@ $(function(e){
 
 	onLoad();
 	
+	//Save new event to DB
+	function saveEvent(){
+		$('#message').fadeOut("slow");
+		$("button#save").addClass('disabled');
+		$data = $('#fm_addEvent').serialize();
+		$.ajax({
+    	type: "POST",
+    	url: "saveajaxevent",
+			data: $data,
+        success: function(respuesta){
+        	console.log(respuesta);
+        	if (respuesta['error'] == false){
+ 		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+			   		$("button#save").removeClass('disabled');
+			   		printCalendar();
+						$("#modalAdd").modal('hide');
+						$('#actionType').val('');
+ 		      }
+ 		      else {
+ 		      	$("button#save").removeClass('disabled');
+ 		      	$('.has-error').removeClass('has-error');
+ 		      	$('.is_slide').each(function(){$(this).slideUp();});
+ 		      	resetMsgErrors();
+ 		      	$.each(respuesta['msgErrors'],function(key,value){
+								$('#'+key).addClass('has-error');
+ 		       			$('#'+key+'_Error').html(value).fadeIn("slow");
+ 		       			$('#errorsModalAdd').slideDown("slow");
+ 		      	});
+	        }
+ 		    },
+				error: function(xhr, ajaxOptions, thrownError){
+						hideGifEspera();
+						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+					}
+    });
+	}
+
 	function whenChangeRecurseSelected(){
 		
 		//When change items selected
@@ -31,7 +68,6 @@ $(function(e){
 			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
 			$('#myModalLabel').html($str);
 			setLabelRecurseName();
-			console.log($("select#recurse option:selected").data('numeroitems'));
 			if($("select#recurse option:selected").data('numeroitems') > 0){
 				$.ajax({
 					type:"GET",
@@ -864,7 +900,6 @@ $(function(e){
 			$str += ' ' + $di.toLocaleString("es-ES",options_i) + ', ';
 		}
 		
-		console.log($('select#recurse option:selected').data('numeroitems'));
 		$textdisponibles = '';
 		if ($('select#recurse option:selected').data('numeroitems') > 0 && $('select#items option:selected').val() == 0){
 			$items = $('#allitems').data('numeroitems');
@@ -1272,43 +1307,5 @@ $(function(e){
 
 		});
 	}
-
-	//Save new event to DB
-	function saveEvent(){
-		$('#message').fadeOut("slow");
-		$("button#save").addClass('disabled');
-		$data = $('#fm_addEvent').serialize();
-		$.ajax({
-    	type: "POST",
-			url: "saveajaxevent",
-			data: $data,
-        success: function(respuesta){
-        	console.log(respuesta);
-        	if (respuesta['error'] == false){
- 		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
-			   		$("button#save").removeClass('disabled');
-			   		printCalendar();
-						$("#modalAdd").modal('hide');
-						$('#actionType').val('');
- 		      }
- 		      else {
- 		      	$("button#save").removeClass('disabled');
- 		      	$('.has-error').removeClass('has-error');
- 		      	$('.is_slide').each(function(){$(this).slideUp();});
- 		      	resetMsgErrors();
- 		      	$.each(respuesta['msgErrors'],function(key,value){
-								$('#'+key).addClass('has-error');
- 		       			$('#'+key+'_Error').html(value).fadeIn("slow");
- 		       			$('#errorsModalAdd').slideDown("slow");
- 		      	});
-	        }
- 		    },
-				error: function(xhr, ajaxOptions, thrownError){
-						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-					}
-    });
-	}
-
 
 });

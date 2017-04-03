@@ -16,15 +16,95 @@ class sgrEvento {
 			else	{
 				$this->evento = $evento;
 				$this->idserie = $this->serieId();
-				$this->numeroitems = $this->numeroItems();
+				$this->numeroitems = $evento->numeroRecursos();
 			}	
 			
 			return $this;
 	}
 	
+	//Save
+	public function save(){
+		$result = array('error' => false,
+										'ids' => array(),
+										'idsSolapamientos' => array(),
+										'msgErrors' => array(),
+										'msgSuccess' => '',
+										'data'	=> array(),);
+		$testDataForm = new Evento();
+				
+		if(!$testDataForm->validate(Input::all())){
+			$result['error'] = true;
+			$result['msgErrors'] = $testDataForm->errors();
+			$result['data']	= $testDataForm->getdata();
+		}
+		else {
+			$result['data'] = Input::all();
+			
+			/* nuevo */
+			$id = Input::get('id_recurso','');
+			$recurso = Recurso::findOrFail($id);
+			$sgrRecurso = Factoria::getRecursoInstance($recurso);
+			$id_serie = $this->getIdUnique(); //identificador de la serie de eventos (reservas periodicas, o puntuales sobre varios equipos o puestos)
+
+			$datosdesdeform = Input::all();
+			
+			$datosdesdeform['reservarParaUvus'] = User::where('username','=',Input::get('reservarParaUvus'))->first()->id;
+
+			
+			$repeticion = 0;
+			if (Input::get('repetir') == Config::get('options.repeticionSemanal')) 	$repeticion = 1; 
+			$datosdesdeform['repetir'] = $repeticion;
+			$dias = Input::get('dias');//array de dias de la semana (entrada formulario) donde 1 = lunes y 7 = domingo
+			$diasSemana = array('0' => 'Sunday', '1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
+
+
+			if($repeticion == 1){
+				
+				foreach ($dias as $dia) {
+					$tsInicio = strtotime($diasSemana[$dia],$this->getTimeStamp(Input::get('fInicio'),'-'));
+					$tsFin = $this->getTimeStamp(Input::get('fFin'),'-');
+					$tsIncremento = 7 * 24 * 60 * 60; //Una semana
+					$datosdesdeform['fInicio'] = date('Y-m-d',$tsInicio);
+					$datosdesdeform['fFin'] = date('Y-m-d',$tsFin);
+					
+					for($i = $tsInicio; $i <= $tsFin; $i = $i+$tsIncremento){
+						$datosdesdeform['fEvento'] = date('Y-m-d',$i);
+						$result['idEvents'] = $sgrRecurso->addEvento($datosdesdeform,$id_serie);						
+					}
+					
+				}
+			}
+			else{
+				$ts = $this->getTimeStamp(Input::get('fEvento'),'-');
+				$datosdesdeform['fInicio'] = date('Y-m-d',$ts);
+				$datosdesdeform['fFin'] = date('Y-m-d',$ts);
+				$datosdesdeform['fEvento'] = date('Y-m-d',$ts);
+				$result['idEvents'] = $sgrRecurso->addEvento($datosdesdeform,$id_serie);						
+			}
+			
+			//Msg confirmación al usuario (add reserva)
+			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
+			
+			if ($event->estado == 'aprobada'){
+				$result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
+			}
+			if ($event->estado == 'pendiente'){
+				$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
+			}
+			//notificar a validadores si espacio requiere validación
+			if ( $event->recurso->validacion() ){
+				$sgrMail = new sgrMail();
+				$sgrMail->notificaNuevoEvento($event);
+			}
+		}
+		
+		return $result;
+	}
+
+
  	/** //Devuelve el número de recurso (equipos o espacios reservados por un evento) */
   public function numeroItems(){
-  	return Evento::where('evento_id','=',$this->evento->evento_id)->count();
+  	return $this->numeroitems;//Evento::where('evento_id','=',$this->evento->evento_id)->groupby('recurso_id')->count();
   }
 
   public function serieId(){
@@ -118,58 +198,44 @@ class sgrEvento {
 		return true;
 	}
 
-	//Save
-	public function save(){
-		$result = array('error' => false,
-										'ids' => array(),
-										'idsSolapamientos' => array(),
-										'msgErrors' => array(),
-										'msgSuccess' => '',
-										'data'	=> array(),);
-		$testDataForm = new Evento();
-				
-		if(!$testDataForm->validate(Input::all())){
-			$result['error'] = true;
-			$result['msgErrors'] = $testDataForm->errors();
-			$result['data']	= $testDataForm->getdata();
-		}
-		else {
-			$result['data'] = Input::all();
-			
-			/* nuevo */
-			$id = Input::get('id_recurso','');
-			$recurso = Recurso::findOrFail($id);
-			$sgrRecurso = Factoria::getRecursoInstance($recurso);
-			$id_serie = $this->getIdUnique(); //identificador de la serie de eventos (reservas periodicas, o puntuales sobre varios equipos o puestos)
+	/*
+		Recibe una fecha en formato ES (d-m-Y)
+		devuelve el timeStamp correspondiente a esa fecha.
+	*/
+	private function getTimeStamp($fecha,$delimiter = '-'){
 
-			$datosdesdeform = Input::all();
-			//return Input::all();
-			$datosdesdeform['reservarParaUvus'] = User::where('username','=',Input::get('reservarParaUvus'))->first()->id;
-			$result['idEvents'] = $sgrRecurso->addEvento($datosdesdeform,$id_serie);
-			
-			/* fin de lo nuevo */
+		$f = explode($delimiter,$fecha);
+		//formato: mktime(hours,minutes,segundos,mes,día,año);
+		$result = mktime(0,0,0,$f[1],$f[0],$f[2]);
 
-			//$result['idEvents'] = $this->saveEvents(Input::all());
-
-
-			//Msg confirmación al usuario (add reserva)
-			$event = Evento::Where('evento_id','=',$result['idEvents'])->first();
-			
-			if ($event->estado == 'aprobada'){
-				$result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-			}
-			if ($event->estado == 'pendiente'){
-				$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $result['idEvents'])).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-			}
-			//notificar a validadores si espacio requiere validación
-			/*if ( $event->recurso->validacion() ){
-				$sgrMail = new sgrMail();
-				$sgrMail->notificaNuevoEvento($event);
-			}*/
-		}
-		//return Input::all();
 		return $result;
 	}
+
+	/**
+		* @param $fInicio:	fecha en formato dd-mm-yyyy
+		* @param $fFin:		fecha en formato dd-mm-yyyy
+		* @param $dWeek:		día de la semana en formato 0->domingo,1->lunes,.... 6->sábado
+		* @return	$numRepeticiones: Entero con el número de veces que se repite $dWeek entre $fInicio y $fFin 
+	*/
+	/*private function numRepeticiones($fInicio,$fFin,$dWeek){
+		
+		$numRepeticiones = 0;
+		$aDaysWeek = array('0' => 'Sunday', '1' => 'Monday','2' => 'Tuesday','3' => 'Wednesday','4' => 'Thursday','5' => 'Friday','6' => 'Saturday');
+		$self = new self();
+					
+		$startTime = strtotime($aDaysWeek[$dWeek],$self->getTimeStamp($fInicio,'-'));
+		$endTime = $self->getTimeStamp($fFin,'-');
+		$currentTime = $startTime;
+		
+		if ($startTime <= $endTime){
+			do {
+				$numRepeticiones++;
+				$nextTime = strtotime('Next ' . $aDaysWeek[$dWeek],$currentTime);
+				$currentTime = $nextTime;
+			} while($nextTime <= $endTime);	
+		}
+		return $numRepeticiones;
+	}*/
 	/*
 	private function saveEvents($data){
 		$dias = $data['dias']; //1->lunes...., 5->viernes

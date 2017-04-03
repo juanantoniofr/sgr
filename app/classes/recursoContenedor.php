@@ -1,10 +1,55 @@
 <?php
 
 	class recursoContenedor extends sgrRecurso {
-		/* :) 1-5-2017 */  
+		
 		//private $recurso;	//array obj recurso (espacio / tipoequipo)
 		//private $items = array(); //array obj recursoItem (puesto / equipo)
 		
+		//Eventos
+		public function addEvento($datosevento,$id_serie){
+			
+			foreach ($this->items as $item) {
+				$item->addEvento($datosevento,$id_serie);
+			}	
+			
+			return $id_serie;
+		}
+
+		/**
+			* //Devuelve los eventos entre $fechas con estado en $estado
+			* @param $fini int timestamp fecha inicial
+			*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
+			* @param $ffin int timestamp fecha final
+			*	@return Collection Objets type Evento 
+			*
+		*/
+		public function getEventos($fini = '',$estados = array(),$ffin = ''){//
+			/*
+				//sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado
+				'estadoEvento' => array('denegada',
+																'aprobada',
+																'pendiente',
+																'finalizada',
+																'anulada',
+																'liberada',)
+			*/
+			if (empty($estados)) $estados = Config::get('options.estadosEvento');   
+			
+			$aFechas = array($fini,$ffin);
+			if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
+			if (empty($ffin))	$aFechas[1] = (int) Config::get('options.maxtimestamp');
+			
+
+			$datos = array('aFechas' => $aFechas, 'estados' => $estados);
+			
+			
+			$eventos = $this->recurso->eventosItems/*->groupby('evento_id')*/->filter(function($evento) use ($datos){
+				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
+			});
+
+			return $eventos;
+		}
+
 		/**
 			*
 			* habilita recurso y todos sus items (puestos/equipos) para su reserva
@@ -262,56 +307,8 @@
 
 
 		
-		//Eventos
-
-		public function addEvento($datosevento,$id_serie){
-			
-			$tsfechainicio = strtotime($datosevento['fInicio']);
-			if ($datosevento['repetir'] == 'SR') $tsfechafin = $tsfechainicio;
-			else $tsfechafin = strtotime($datosevento['fFin']);
-			
-			$tsdia = 24 * 60 * 60;
-			for($i = $tsfechainicio; $i <= $tsfechafin;$i = $i + $tsdia) {
-				foreach ($this->items as $item) {
-						$item->addEvento($datosevento,$id_serie,$i);
-					}	
-			}
-			return $id_serie;
-		}
-		/**
-			* //Devuelve los eventos entre $fechas con estado en $estado
-			* @param $fini int timestamp fecha inicial
-			*	@param $estado array estado de los eventos a obtener (aprobada | denegada | pendiente)
-			* @param $ffin int timestamp fecha final
-			*	@return Collection Objets type Evento 
-			*
-		*/
-		public function getEventos($fini = '',$estados = array(),$ffin = ''){//
-			/*
-				//sino se especifica ningún estado para los eventos a obtener se obtienen todos independientemente de su estado
-				'estadoEvento' => array('denegada',
-																'aprobada',
-																'pendiente',
-																'finalizada',
-																'anulada',
-																'liberada',)
-			*/
-			if (empty($estados)) $estados = Config::get('options.estadosEvento');   
-			
-			$aFechas = array($fini,$ffin);
-			if (empty($fini)) $aFechas[0] = strtotime('1970-1-1');
-			if (empty($ffin))	$aFechas[1] = (int) Config::get('options.maxtimestamp');
-			
-
-			$datos = array('aFechas' => $aFechas, 'estados' => $estados);
-			
-			
-			$eventos = $this->recurso->eventosItems->filter(function($evento) use ($datos){
-				return strtotime($evento->fechaEvento) >= $datos['aFechas'][0] && strtotime($evento->fechaEvento) <= $datos['aFechas'][1] && in_array($evento->estado,$datos['estados']);
-			});
-
-			return $eventos;
-		}
+		
+		
 
 		/**
 	   	*

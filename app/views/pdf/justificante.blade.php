@@ -90,7 +90,7 @@ table {
 
 	<p id = "title">Título: <span>{{htmlentities($events->titulo)}}</span></p>
 	<p class = "subtitle">Código: <span>{{$events->evento_id}}</span></p>
-	<p class = "subtitle">Registrada por: <span>{{$events->userOwn->nombre .' '. $events->userOwn->apellidos}}</span></p>
+	<p class = "subtitle">Registrada por: <span>{{$events->reservadoPor->nombre .' '. $events->reservadoPor->apellidos}}</span></p>
 	<p class = "subtitle">Fecha de registro: <span>{{$created_at}}</span></p>
 
 
@@ -103,7 +103,7 @@ table {
 		
 		@foreach ($recursos as $recurso)	
 		
-			{{$recurso->recursoOwn->nombre}} <small>( {{$recurso->recursoOwn->grupo}} )</small>
+			{{$recurso->recurso->nombre}} <small>( {{$recurso->recurso->grupo}} )</small>
 			<br />
 		@endforeach
 		

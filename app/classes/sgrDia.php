@@ -47,7 +47,14 @@ class sgrDia {
 		
 		return $this;
 	}
-	
+	/**
+		* //Devuelve el número de eventos para $this
+		*
+	*/
+	public function numeroDeEventos(){
+
+		return count($this->sgrEventos);
+	}
 	/**
 		*	Devuelve un array de objetos Evento 
 		*	@return array objetos Evento
@@ -210,14 +217,7 @@ class sgrDia {
 		return $this->timestamp + (60 * 60 * (int) $hora) + (60 * (int) $minuto);		
 		}
 
-	/**
-		* //Devuelve el número de eventos para $this
-		*
-	*/
-	public function numeroDeEventos(){
-
-		return count($this->sgrEventos);
-	}
+	
 	//private
 	/**
 		* Determina si el día es festivo (domingo || sábabo)

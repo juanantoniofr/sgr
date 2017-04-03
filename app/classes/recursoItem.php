@@ -3,6 +3,34 @@
   
   	//private $recurso;
 		
+		//Eventos
+		public function addEvento($datosevento,$id_serie){
+			$evento = new Evento;
+			
+			$evento->evento_id 				= $id_serie;
+			$evento->titulo						= $datosevento['titulo'];
+			$evento->actividad				= $datosevento['actividad'];
+			$evento->recurso_id				= $this->recurso->id;
+			$evento->fechaEvento 			= $datosevento['fEvento'];
+			$evento->fechaInicio 			= $datosevento['fInicio'];
+			$evento->fechaFin 				= $datosevento['fFin'];
+			$evento->repeticion 			= $datosevento['repetir']; 
+			
+			$evento->diasRepeticion 	= json_encode($datosevento['dias']);
+			$evento->dia 							= date('w',strtotime($datosevento['fEvento']));//0=domingo, 6=sábado
+			
+			$evento->user_id					= $datosevento['reservarParaUvus'];
+			$evento->reservadoPor_id	= $datosevento['reservadoPor'];
+			$evento->estado 					= 'aprobada'; //???
+			$evento->horaInicio				= $datosevento['hInicio'];
+			$evento->horaFin				  = $datosevento['hFin'];
+
+			$evento->save();
+
+			return $id_serie;
+
+		}
+		
 		/**
 			* deshabilita recurso para su reserva
 			* @param $motivo string 
@@ -309,35 +337,7 @@
 			return true;
 		}
 
-		//Eventos
-		public function addEvento($datosevento,$id_serie,$tsfechaevento = ''){
-			$evento = new Evento;
-			if (empty($tsfechaevento)) $fechaEvento = date('Y-m-d',strtotime($datosevento['fEvento']));
-			else $fechaEvento = date('Y-m-d',$tsfechaevento);
-			$evento->evento_id 				= $id_serie;
-			$evento->titulo						= $datosevento['titulo'];
-			$evento->actividad				= $datosevento['actividad'];
-			$evento->recurso_id				= $this->recurso->id;
-			$evento->fechaEvento 			= $fechaEvento;
-			$evento->fechaInicio 			= date('Y-m-d',strtotime($datosevento['fInicio']));
-			if ($datosevento['repetir'] == 'SR')
-			 	$evento->repeticion 		= 0; 
-			else
-				$evento->repeticion 		= 1; 
-			$evento->diasRepeticion 	= json_encode($datosevento['dias']);
-			$evento->dia 							= date('w',strtotime($datosevento['fEvento']));//0=domingo, 6=sábado
-			$evento->fechaFin 				= date('Y-m-d',strtotime($datosevento['fFin']));
-			$evento->user_id					= $datosevento['reservarParaUvus'];
-			$evento->reservadoPor_id	= $datosevento['reservadoPor'];
-			$evento->estado 					= 'aprobada'; //???
-			$evento->horaInicio				= $datosevento['hInicio'];
-			$evento->horaFin				  = $datosevento['hFin'];
-
-			$evento->save();
-
-			return $id_serie;
-
-		}
+		
 		/**
 			* //Devuelve los eventos entre $fechas con estado en $estado
 			* @param $fini int timestamp fecha inicial

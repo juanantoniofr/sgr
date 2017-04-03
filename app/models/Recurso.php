@@ -39,7 +39,7 @@ class Recurso extends Eloquent {
   }
   public function eventosItems(){
   
-    return $this->hasManyThrough('Evento','Recurso','contenedor_id','recurso_id')->groupby('evento_id');
+    return $this->hasManyThrough('Evento','Recurso','contenedor_id','recurso_id')->groupby('fechaEvento')->groupby('evento_id');
   }
   /**
     *

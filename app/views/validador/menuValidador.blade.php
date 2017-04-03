@@ -34,7 +34,7 @@
                             @foreach($eventsByrecurso as $event)
                                 <option value="{{$event->recurso_id}}" 
                                     @if ($id_recurso == $event->recurso_id) selected="selected" @endif>
-                                    {{$event->recursoOwn->nombre}}
+                                    {{$event->recurso->nombre}}
                                 </option>
                             @endforeach
                         </select>
@@ -44,9 +44,9 @@
                         <select class="form-control" id="selectUser" name="id_user">
                             <option value="0" @if($id_user == 0) selected="selected" @endif>Todos los usuarios</option>
                             @foreach($eventsByUser as $event)
-                                <option value="{{$event->userOwn->id}}" 
-                                    @if($id_user == $event->userOwn->id)selected="selected" @endif>
-                                    {{$event->userOwn->apellidos}}, {{$event->userOwn->nombre}}
+                                <option value="{{$event->reservadoPor->id}}" 
+                                    @if($id_user == $event->reservadoPor->id)selected="selected" @endif>
+                                    {{$event->reservadoPor->apellidos}}, {{$event->reservadoPor->nombre}}
                                 </option>
                             @endforeach
                         </select>
