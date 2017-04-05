@@ -38,16 +38,16 @@
 
 	|
 		
-	<a href="#" id="edit_{{$sgrEvento->id()}}" data-id-evento="{{$sgrEvento->serieId()}}" data-id-serie="{{$sgrEvento->serieId()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Editar reserva"><span class="fa fa-pencil fa-fw text-success" aria-hidden="true"></span></a>
+	<a href="#" id="edit_{{$sgrEvento->id()}}" data-id="{{$sgrEvento->id()}}" data-idserie="{{$sgrEvento->serieId()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Editar reserva"><span class="fa fa-pencil fa-fw text-success" aria-hidden="true"></span></a>
 	|
 
-	<a href="#" id="delete" data-id-evento="{{$sgrEvento->id()}}" data-id-serie="{{$sgrEvento->serieId()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Eliminar reserva"><span class="fa fa-trash fa-fw text-success" aria-hidden="true"></span></a>
+	<a href="#" id="delete" data-id="{{$sgrEvento->id()}}" data-id-serie="{{$sgrEvento->serieId()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Eliminar reserva"><span class="fa fa-trash fa-fw text-success" aria-hidden="true"></span></a>
 	|
 @endif
 @if($sgrEvento->esAnulable(Auth::user()->id))
 	<!-- anular -->
-	<a  href="#"  class="anula" id="anula_{{$sgrEvento->id()}}" data-idevento="{{$sgrEvento->id()}}" data-idserie="{{$sgrEvento->serieId()}}" data-titulo="{{$sgrEvento->titulo()}}" data-usuario="{{$sgrEvento->nombrePropietario()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
+	<a  href="#"  class="anula" id="anula_{{$sgrEvento->id()}}" data-id="{{$sgrEvento->id()}}" data-idserie="{{$sgrEvento->serieId()}}" data-titulo="{{$sgrEvento->titulo()}}" data-usuario="{{$sgrEvento->nombrePropietario()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Anular reserva"><span class="fa fa-eraser fa-fw text-warning" aria-hidden="true"></span></a>
 @endif
 @if($sgrEvento->esFinalizable() && $sgrRecurso->atendidoPor(Auth::user()->id) )
-	<a  href="#" class="finaliza" id="finaliza_{{$sgrEvento->id()}}" data-id-evento="{{$sgrEvento->id()}}" data-id-serie="{{$sgrEvento->serieId()}}" data-titulo="{{$sgrEvento->titulo()}}" data-usuario="{{$sgrEvento->nombrePropietario()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>
+	<a  href="#" class="finaliza" id="finaliza_{{$sgrEvento->id()}}" data-id="{{$sgrEvento->id()}}" data-id-serie="{{$sgrEvento->serieId()}}" data-titulo="{{$sgrEvento->titulo()}}" data-usuario="{{$sgrEvento->nombrePropietario()}}" data-periodica="{{$sgrEvento->repeticion()}}" title="Finalizar reserva"><span class="fa fa-clock-o fa-fw text-warning" aria-hidden="true"></span></a>
 @endif

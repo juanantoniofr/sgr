@@ -203,7 +203,7 @@
        
         <div class="modal-footer">
           <div class="col-md-12 " style = "display:none" id = "editOptions">
-            <button type="button" class="btn btn-primary  optionedit" id="editOption1" data-id-serie="" data-id-evento="">Modificar evento</button>
+            <button type="button" class="btn btn-primary  optionedit" id="editOption1" data-idserie="" data-idevento="">Modificar evento</button>
           </div>
           <div class="col-lg-12" style="margin-top:10px">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>

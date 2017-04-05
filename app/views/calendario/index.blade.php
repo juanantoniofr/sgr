@@ -1,5 +1,4 @@
 @extends('layout')
- <!-- marca branch master2 -->
 @section('title')
     SGR: Calendarios
 @stop
@@ -62,11 +61,7 @@
  </div><!-- /#row -->
 </div><!-- /#page-wrapper -->
 
-<!-- Modal eliminar reserva -->
-{{$modalDeleteReserva or ''}}
-<!-- Modal añadir & editar reserva -->
-{{$modalAddReserva or ''}}
-<!-- ./modal addEvent & editEvent -->
+
 
 <!-- Modal print -->
 <div class="modal fade printModal-md " id="printModal" tabindex="-3" role="dialog" aria-labelledby="print" aria-hidden="true">
@@ -121,11 +116,13 @@
 <!-- ./modal print -->
 
 
- {{ $modalfinalizareserva  or '' }}
- {{ $modalanulareserva     or '' }}
- {{ $modaldescripcion      or '' }}
- {{ $modalMsg              or '' }}
- {{ $modalAtenderReserva   or '' }}
+{{ $modalDeleteReserva or ''}}
+{{ $modalAddReserva or ''}}
+{{ $modalfinalizareserva  or '' }}
+{{ $modalanulareserva     or '' }}
+{{ $modaldescripcion      or '' }}
+{{ $modalMsg              or '' }}
+{{ $modalAtenderReserva   or '' }}
  
 @stop
 

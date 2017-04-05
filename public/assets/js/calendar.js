@@ -8,41 +8,263 @@ $(function(e){
 	onLoad();
 	
 	//Save new event to DB
-	function saveEvent(){
-		$('#message').fadeOut("slow");
-		$("button#save").addClass('disabled');
-		$data = $('#fm_addEvent').serialize();
-		$.ajax({
-    	type: "POST",
-    	url: "saveajaxevent",
-			data: $data,
-        success: function(respuesta){
-        	console.log(respuesta);
-        	if (respuesta['error'] == false){
- 		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
-			   		$("button#save").removeClass('disabled');
-			   		printCalendar();
-						$("#modalAdd").modal('hide');
-						$('#actionType').val('');
- 		      }
- 		      else {
- 		      	$("button#save").removeClass('disabled');
- 		      	$('.has-error').removeClass('has-error');
- 		      	$('.is_slide').each(function(){$(this).slideUp();});
- 		      	resetMsgErrors();
- 		      	$.each(respuesta['msgErrors'],function(key,value){
-								$('#'+key).addClass('has-error');
- 		       			$('#'+key+'_Error').html(value).fadeIn("slow");
- 		       			$('#errorsModalAdd').slideDown("slow");
- 		      	});
-	        }
- 		    },
-				error: function(xhr, ajaxOptions, thrownError){
+		function saveEvent(){
+			$('#message').fadeOut("slow");
+			$("button#save").addClass('disabled');
+			$data = $('#fm_addEvent').serialize();
+			console.log($data);
+			$.ajax({
+	    	type: "POST",
+	    	url: "saveajaxevent",
+				data: $data,
+	        success: function(respuesta){
+	        	if (respuesta['error'] == false){
+	 		 				$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+				   		$("button#save").removeClass('disabled');
+				   		printCalendar();
+							$("#modalAdd").modal('hide');
+							$('#actionType').val('');
+	 		      }
+	 		      else {
+	 		      	$("button#save").removeClass('disabled');
+	 		      	$('.has-error').removeClass('has-error');
+	 		      	$('.is_slide').each(function(){$(this).slideUp();});
+	 		      	resetMsgErrors();
+	 		      	$.each(respuesta['msgErrors'],function(key,value){
+									$('#'+key).addClass('has-error');
+	 		       			$('#'+key+'_Error').html(value).fadeIn("slow");
+	 		       			$('#errorsModalAdd').slideDown("slow");
+	 		      	});
+		        }
+	 		    },
+					error: function(xhr, ajaxOptions, thrownError){
+							hideGifEspera();
+							alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+						}
+	    });
+		}
+
+		function setInitValueForModalAdd($horaInicio,$fechaInicio){
+			//Add or Edit
+			$('#actionType').val('');
+			//text header modal
+			var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
+			$('#myModalLabel').html($str);
+			//Show/Hide reservarPara	
+			if ($('select#recurse option:selected').data('atendido')) $('#reservarPara').fadeIn();	
+			else {
+				$('#reservarPara').fadeOut();
+				//$('#fm_addEvent input[name="reservarParaUvus"]').val('');	
+			}
+			//msg itemsdisponibles
+			
+			//reset error msg
+			resetMsgErrors();
+			$('#errorsModalAdd').slideUp();
+			$('#divfEvento').slideDown('slow');
+			//Cierra opciones de edición en ventana modal
+			$('#editOptions').hide();
+			//Título
+			$('#fm_addEvent input#newReservaTitle').val('');
+			//Hora inicial
+			$('select[name|="hInicio"] option').each(function(){$(this).prop('selected',false);});
+			$('select[name|="hInicio"] option[value="'+$horaInicio+'"]').prop('selected',true);
+			//Hora final = $horaInicio + 1
+			$hora = $horaInicio;
+			$aItem  = $hora.split(':');
+			$hf = parseInt($aItem[0]) + 1;
+			$strhf = $hf + ':30';
+			$('select[name|="hFin"] option').each(function(){$(this).prop('selected',false);});
+			$('select[name|="hFin"] option[value="'+$strhf+'"]').prop('selected',true); 
+			//Fechas
+			var $fecha = $fechaInicio;	
+			var $strf = parseDate($fecha);//$fecha
+			$('#datepickerFinicio').val($fecha);
+			$('#datepickerFinicio').prop('disabled',false);
+			$('#datepickerFevento').val($fecha);
+			$('#datepickerFfin').val(nextMonth(dateToformatES($fecha)));
+			//Periocidad
+			$('select[name|="repetir"] option').each(function(){$(this).prop('selected',false);});
+			$('#inputRepeticion').hide();
+			//Día de la semana
+			setCheckBoxActive($fecha);
+			//Set id recurso
+			$('#fm_addEvent input[name|="id_recurso"]').val($('select#recurse option:selected').val());
+			if (undefined != $('select#items option:selected').val() && $('select#items option:selected').val() != 0)
+				$('#fm_addEvent input[name|="id_recurso"]').val($('select#items option:selected').val());
+			//activa botón save
+			$("button#save").removeClass('disabled');
+			//Texto resumen
+			setResumen();
+		}
+
+		function setCheckBoxActive($fecha){
+			var fechaSelect = parseDate($fecha);
+			var $f = new Date(parseInt(fechaSelect[2]),parseInt(fechaSelect[1])-1,parseInt(fechaSelect[0]));
+			var num = $f.getDay(); //0-> domingo, 1-> lunues,....., 6->sábado
+			
+			
+			$("form#fm_addEvent input:checkbox").each(function(index,value){
+			
+				if ($(this).is(':checked')) $(this).prop('checked',false);
+				if (index === num) {
+				 	$(this).prop('checked',true);
+				}
+			
+			});
+		}
+	//fin add event
+
+	//edit events (DB & calendar view)
+		function editEvents($option,$idEvento,$idSerie){
+			$('#message').fadeOut("slow");
+			console.log('grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' +'option='+$option+'&'+'idEvento='+$idEvento+'&'+'idSerie='+$idSerie+'&'+$('#fm_addEvent').serialize());
+			$.ajax({
+			    type: "POST",
+					url: "editajaxevent",
+					data: 'grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' +'option='+$option+'&'+'idEvento='+$idEvento+'&'+'idSerie='+$idSerie+'&'+$('#fm_addEvent').serialize(),
+			    success: function(respuesta){
+			 		   	if (respuesta['error'] == false){
+			 					 		
+				 			$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
+					 		printCalendar();
+					 				 		   					 		       		
+							$("#modalAdd").modal('hide');
+							$('#actionType').val('');
+							
+					 	}
+				 		else {
+					 		$('.has-error').removeClass('has-error');
+					 		$('.is_slide').each(function(){$(this).slideUp();});
+					 		resetMsgErrors();
+					 		$.each(respuesta['msgErrors'],function(key,value){
+					 		    $('#'+key).addClass('has-error');
+		   		       			$('#'+key+'_Error').html(value).fadeIn("slow");
+					 		    $('#errorsModalAdd').slideDown("slow");
+					 		});
+						}
+
+					},
+					error: function(xhr, ajaxOptions, thrownError){
+							hideGifEspera();
+							alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
+					}
+		      	});
+		}
+
+		//Programa evento onCLick en el link editar de la ventana popover
+		function setLinkEditEvent($id){
+			var viewActive = '';
+			viewActive = $('#btnView .active').data('calendarView');
+		
+			$selector = 'a#edit';
+			if (viewActive == 'agenda') $selector = 'a#edit_agenda';
+			//alert('Selector = ' + $selector+'_'+$id);
+			//Programa el envento onClick en el enlace en la ventana popover para eliminar evento.
+			$($selector + '_' + $id).click(function(e){
+				e.preventDefault();
+				e.stopPropagation();
+				showGifEspera();
+				
+				$this = $(this);
+				$idEvento = $this.data('id');
+				$idSerie = $this.data('idserie');
+				console.log($this);
+				$('form#fm_addEvent > #editOption1').data('idevento',$idEvento);
+				$('form#fm_addEvent > #editOption1').data('idserie',$idSerie);
+				//Cargar datos del evento en al ventana Modal para editar el evento
+				hideGifEspera();
+				initModalEdit($idEvento,$idSerie);
+				$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
+				
+			});
+		}
+
+		function initModalEdit($idEvento,$idSerie){
+			//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
+			resetMsgErrors();
+			showGifEspera();
+			console.log($idEvento);
+			$('#actionType').val('edit');
+			$.ajax({
+	    	type: "GET",
+				url: "geteventbyId",
+				data: {'id':$idEvento},
+	      success: function($respuesta){
+	      	console.log($respuesta);
+	      	$evento = $respuesta['event'];
+	      	
+	      	//text header modal
+					$('#myModalLabel').html('<i class="fa fa-pencil fa-fw"></i> Editar evento: ' + $evento.titulo);
+
+	      	$usernameReservadoPara = $respuesta['usernameReservadoPara'];
+	      	$usernameReservadoPor = $respuesta['usernameReservadoPor'];
+	      	
+	      	//titulo
+					$('#fm_addEvent input#newReservaTitle').val($evento.titulo);
+					//Actividad
+					$('select[name|="actividad"] option').each(function(){
+							if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
+							else $(this).prop('selected',false);
+					});
+					$('#fm_addEvent input#reservadoPara').val($usernameReservadoPara);
+					$('#fm_addEvent input#reservadoPor').val($usernameReservadoPor);
+					//Fecha inicio: campo día
+					//hora inicio
+					$('select[name|="hInicio"] option').each(function(){
+							if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
+							else $(this).prop('selected',false);
+					});
+					//hora fin
+					$('select[name|="hFin"] option').each(function(){
+							if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
+							else $(this).prop('selected',false);
+					});
+					//repetir
+					console.log($("form#fm_addEvent input:checkbox"));
+					if ($evento.repeticion == '1'){
+						$('select[name|="repetir"]').val('CS');
+						$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
+						$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
+						$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
+						$aDias = eval($evento.diasRepeticion);
+						$("form#fm_addEvent input:checkbox").each(function(index,value){
+								$(this).prop('checked',false);
+								if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
+						});
+					}
+					else{
+						$('select[name|="repetir"]').val('SR');
+						$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
+						$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
+						$('#datepickerFfin').val(dateToformatES($evento.fechaInicio));
+						$("form#fm_addEvent input:checkbox").each(function(index,value){
+								$(this).prop('checked',false);
+								if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
+						});
+					}
+					$('select[name|="repetir"]').change();
+					setResumen();
+					$('button#save').hide();
+					$('#editOptions').show();
+					hideGifEspera();
+					$('#modalAdd').modal('show');
+	 			  },
+					error: function(xhr, ajaxOptions, thrownError){
 						hideGifEspera();
 						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
 					}
-    });
-	}
+	    	});
+			
+				
+				$('button#editOption1').off();
+				$('button#editOption1').click(function(){
+				$('#EditOption1').data('idEvento',$idEvento);
+				$('#EditOption1').data('idSerie',$idSerie);
+				editEvents('1',$idEvento,$idSerie);
+			});
+		}
+	//fin edit	event
 
 	function whenChangeRecurseSelected(){
 		
@@ -74,7 +296,6 @@ $(function(e){
 					url:"getitems",
 					data:{ idrecurso:$("select#recurse option:selected").val()},
 					success: function($result){
-						console.log($result);
 						if($result.listoptions != ''){
 							$('#selectItems').fadeIn('fast',function(){
 								$('#items').html($result.listoptions);
@@ -464,15 +685,12 @@ $(function(e){
 	function whenChangeInputInModalWindow(){
 
 		$( "#datepickerFevento" ).on('change',function(){
-			//setCheckBoxActive($(this).val());
 			$('#datepickerFinicio').val($(this).val());
 			setResumen();
 		});
 
 		$( "#datepickerFinicio" ).on('change',function(){
-			//setCheckBoxActive($(this).val());
 			$('#datepickerFevento').val($(this).val());
-			//$('#datepickerFfin').val(nextMonth(dateToformatES($(this).val())));
 			setResumen();
 		});
 		
@@ -492,19 +710,10 @@ $(function(e){
 			if ($('#newReservaRepetir').val() == 'CS') {
 				$('#inputRepeticion').slideDown('slow');
 				$('#divfEvento').slideUp('slow');
-				//$fecha = $('#datepickerFinicio').val();
-				//$('#datepickerFinicio').prop('disabled',false);
-				//$('#datepickerFevento').val($fecha);
-				//$('#datepickerFfin').val(nextMonth(dateToformatES($fecha)));
 			}
 			else {
 				$('#inputRepeticion').slideUp('slow');
 				$('#divfEvento').slideDown('slow');
-				//$fecha = $('#datepickerFinicio').val();
-				//$('#datepickerFinicio').prop('disabled',false);
-				//$('#datepickerFevento').val($fecha);
-				//$('#datepickerFfin').val(nextDay(dateToformatES($fecha)));
-				//console.log('fecha fin: ' + $('#datepickerFfin').val());
 			}
 			setResumen();
 		});
@@ -655,48 +864,6 @@ $(function(e){
       		});
 	}
 	
-	/*Action: 3. Edit event
-		********************************************************************************
-		********************************************************************************
-	*/
-
-	//edit events (DB & calendar view)
-	function editEvents($option,$idEvento,$idSerie){
-		$('#message').fadeOut("slow");
-		console.log('grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' +'option='+$option+'&'+'idEvento='+$idEvento+'&'+'idSerie='+$idSerie+'&'+$('#fm_addEvent').serialize());
-		$.ajax({
-		    type: "POST",
-				url: "editajaxevent",
-				data: 'grupo_id=' + $('select#selectGroupRecurse option:selected').val() + '&' +'option='+$option+'&'+'idEvento='+$idEvento+'&'+'idSerie='+$idSerie+'&'+$('#fm_addEvent').serialize(),
-		    success: function(respuesta){
-		 		   	if (respuesta['error'] == false){
-		 					 		
-			 			$('#message').html(respuesta['msgSuccess']).fadeIn("slow");
-				 		printCalendar();
-				 				 		   					 		       		
-						$("#modalAdd").modal('hide');
-						$('#actionType').val('');
-						
-				 	}
-			 		else {
-				 		$('.has-error').removeClass('has-error');
-				 		$('.is_slide').each(function(){$(this).slideUp();});
-				 		resetMsgErrors();
-				 		$.each(respuesta['msgErrors'],function(key,value){
-				 		    $('#'+key).addClass('has-error');
-	   		       			$('#'+key+'_Error').html(value).fadeIn("slow");
-				 		    $('#errorsModalAdd').slideDown("slow");
-				 		});
-					}
-
-				},
-				error: function(xhr, ajaxOptions, thrownError){
-						hideGifEspera();
-						alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-				}
-	      	});
-	}
-
 	function linkpopover(){
 		$('a.linkpopover').click(function(e){
 			e.preventDefault();
@@ -793,36 +960,6 @@ $(function(e){
 		$("#modalAnulareserva").modal('hide');
 	});
 
-
-	//Programa evento onCLick en el link editar de la ventana popover
-	function setLinkEditEvent($id){
-		var viewActive = '';
-		viewActive = $('#btnView .active').data('calendarView');
-	
-		$selector = 'a#edit';
-		if (viewActive == 'agenda') $selector = 'a#edit_agenda';
-		//alert('Selector = ' + $selector+'_'+$id);
-		//Programa el envento onClick en el enlace en la ventana popover para eliminar evento.
-		$($selector + '_' + $id).click(function(e){
-			e.preventDefault();
-			e.stopPropagation();
-			showGifEspera();
-			
-			$this = $(this);
-			$idEvento = $this.data('idEvento');
-			$idSerie = $this.data('idSerie');
-
-			$('#editOption1').data('idEvento',$idEvento);
-			$('#editOption1').data('idSerie',$idSerie);
-			//Cargar datos del evento en al ventana Modal para editar el evento
-			hideGifEspera();
-			initModalEdit($idEvento,$idSerie);
-			$($selector).parents('.divEvent').find('a.linkpopover').popover('hide');
-			
-		});
-		
-	}
-	
 	//Programa evento onCLick en el link eliminar de la ventana popover
 	function setLinkDeleteEvent(){
 		var viewActive = '';
@@ -847,19 +984,6 @@ $(function(e){
 		});
 	}
 	
-	function setCheckBoxActive($fecha){
-		var fechaSelect = parseDate($fecha);
-		var $f = new Date(parseInt(fechaSelect[2]),parseInt(fechaSelect[1])-1,parseInt(fechaSelect[0]));
-		var num = $f.getDay(); //0-> domingo, 1-> lunues,....., 6->sábado
-		$("input:checkbox").each(function(index,value){
-			//if ($(this).is(':checked') && $('#actionType').val() != 'edit') $(this).prop('checked',false);
-			if ($(this).is(':checked')) $(this).prop('checked',false);
-			if (index === num) {
-			 	$(this).prop('checked',true);}
-		});
-		//$('#datepickerFfin').val(nextDay(dateToformatES($fecha)));
-	}
-
 	function setResumen(){
 		//var options = {weekday: "long", year: "numeric", month: "long", day: "numeric"};
 		var options = {year: "numeric", month: "long", day: "numeric"};
@@ -1113,144 +1237,6 @@ $(function(e){
 
 	function hideGifEspera(){
 		$('#espera').css('display','none').css('z-index','-1000');
-	}
-
-	function setInitValueForModalAdd($horaInicio,$fechaInicio){
-		//Add or Edit?
-		$('#actionType').val('');
-		//text header modal
-		var $str = 'Nueva reserva: ' +  $('select#recurse option:selected').text();
-		$('#myModalLabel').html($str);
-		//Show/Hide reservarPara	
-		if ($('select#recurse option:selected').data('atendido')) $('#reservarPara').fadeIn();	
-		else {
-			$('#reservarPara').fadeOut();
-			//$('#fm_addEvent input[name="reservarParaUvus"]').val('');	
-		}
-		//msg itemsdisponibles
-		
-		//reset error msg
-		resetMsgErrors();
-		$('#errorsModalAdd').slideUp();
-		$('#divfEvento').slideDown('slow');
-		//Cierra opciones de edición en ventana modal
-		$('#editOptions').hide();
-		//Título
-		$('#fm_addEvent input#newReservaTitle').val('');
-		//Hora inicial
-		$('select[name|="hInicio"] option').each(function(){$(this).prop('selected',false);});
-		$('select[name|="hInicio"] option[value="'+$horaInicio+'"]').prop('selected',true);
-		//Hora final = $horaInicio + 1
-		$hora = $horaInicio;
-		$aItem  = $hora.split(':');
-		$hf = parseInt($aItem[0]) + 1;
-		$strhf = $hf + ':30';
-		$('select[name|="hFin"] option').each(function(){$(this).prop('selected',false);});
-		$('select[name|="hFin"] option[value="'+$strhf+'"]').prop('selected',true); 
-		//Fechas
-		var $fecha = $fechaInicio;	
-		var $strf = parseDate($fecha);//$fecha
-		$('#datepickerFinicio').val($fecha);
-		$('#datepickerFinicio').prop('disabled',false);
-		$('#datepickerFevento').val($fecha);
-		$('#datepickerFfin').val(nextMonth(dateToformatES($fecha)));
-		//Periocidad
-		$('select[name|="repetir"] option').each(function(){$(this).prop('selected',false);});
-		$('#inputRepeticion').hide();
-		//Día de la semana
-		setCheckBoxActive($fecha);
-		//Set id recurso
-		//console.log('item=' + $('select#items option:selected').val());
-		//console.log('recurso=' + $('select#recurse option:selected').val());
-		$('#fm_addEvent input[name|="id_recurso"]').val($('select#recurse option:selected').val());
-		if (undefined != $('select#items option:selected').val() && $('select#items option:selected').val() != 0)
-			$('#fm_addEvent input[name|="id_recurso"]').val($('select#items option:selected').val());
-		//activa botón save
-		$("button#save").removeClass('disabled');
-		//Texto resumen
-		setResumen();
-	}
-
-	function initModalEdit($idEvento,$idSerie){
-		//By Ajax obtenmos los datos del evento para rellenar los campos del formulario de edición		
-		resetMsgErrors();
-		showGifEspera();
-		$('#actionType').val('edit');
-		$.ajax({
-    	type: "GET",
-			url: "geteventbyId",
-			data: {'id':$idEvento},
-      success: function($respuesta){
-      	$evento = $respuesta['event'];
-      	
-      	//text header modal
-				$('#myModalLabel').html('<i class="fa fa-pencil fa-fw"></i> Editar evento: ' + $evento.titulo);
-
-      	$usernameReservadoPara = $respuesta['usernameReservadoPara'];
-      	$usernameReservadoPor = $respuesta['usernameReservadoPor'];
-      	//$('#contentModalAdd').html($respuesta);
-      	//titulo
-				$('#fm_addEvent input#newReservaTitle').val($evento.titulo);
-				//Actividad
-				$('select[name|="actividad"] option').each(function(){
-						if ($(this).val() == $evento.actividad) $(this).prop('selected',true);
-						else $(this).prop('selected',false);
-				});
-				$('#fm_addEvent input#reservadoPara').val($usernameReservadoPara);
-				$('#fm_addEvent input#reservadoPor').val($usernameReservadoPor);
-				//Fecha inicio: campo día
-				//hora inicio
-				$('select[name|="hInicio"] option').each(function(){
-						if (compareTime($(this).val(),$evento.horaInicio) == 0) $(this).prop('selected',true);
-						else $(this).prop('selected',false);
-				});
-				//hora fin
-				$('select[name|="hFin"] option').each(function(){
-						if (compareTime($(this).val(),$evento.horaFin) == 0) $(this).prop('selected',true);
-						else $(this).prop('selected',false);
-				});
-				//repetir
-				if ($evento.repeticion == '1'){
-					$('select[name|="repetir"]').val('CS');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
-					$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFfin').val(dateToformatES($evento.fechaFin));
-					$aDias = eval($evento.diasRepeticion);
-					$("input:checkbox").each(function(index,value){
-							$(this).prop('checked',false);
-							if ($.inArray($(this).val(),$aDias) != -1)	$(this).prop('checked',true);
-					});
-				}
-				else{
-					$('select[name|="repetir"]').val('SR');
-					$('#datepickerFinicio').val(dateToformatES($evento.fechaInicio));
-					$('#datepickerFevento').val(dateToformatES($evento.fechaEvento));
-					$('#datepickerFfin').val(dateToformatES($evento.fechaInicio));
-					$("input:checkbox").each(function(index,value){
-							$(this).prop('checked',false);
-							if ( $(this).val() == $evento.dia )  $(this).prop('checked',true);
-					});
-				}
-				$('select[name|="repetir"]').change();
-				setResumen();
-				$('button#save').hide();
-				$('#editOptions').show();
-				hideGifEspera();
-				$('#modalAdd').modal('show');
- 			  },
-				error: function(xhr, ajaxOptions, thrownError){
-					hideGifEspera();
-					alert(xhr.responseText + ' (codeError: ' + xhr.status +')');
-				}
-    	});
-		
-			
-			$('button#editOption1').off();
-			$('button#editOption1').click(function(){
-			$('#EditOption1').data('idEvento',$idEvento);
-			$('#EditOption1').data('idSerie',$idSerie);
-			editEvents('1',$idEvento,$idSerie);
-		});
 	}
 
 	function activeButtonNuevaReserva(){

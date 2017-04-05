@@ -22,6 +22,91 @@ class sgrEvento {
 			return $this;
 	}
 	
+	//Edit
+	public function edit($datos){
+		$result = array('error' => false,
+										'msgSuccess' => '',
+										'idsDeleted' => array(),
+										'msgErrors' => array());
+		//Controlar errores en el formulario
+		$testDataForm = new Evento();
+		if(!$testDataForm->validate($datos)){
+				$result['error'] = true;
+				$result['msgErrors'] = $testDataForm->errors();
+			}
+		//Si no hay errores
+		else{
+			
+			//si el usuario es alumno: comprobamos req2 (MAX HORAS = 12 a la semana en cualquier espacio o medio )	
+			$sgrUser = new sgrUser(Auth::user());
+			if ($sgrUser->isUserSgr() && $this->superaHoras()){
+				$result['error'] = true;
+				$error = array('hFin' =>'Se supera el máximo de horas a la semana.. (12h)');	
+				$result['msgErrors'] = $error;	
+			}
+			else {
+				$idSerie = Input::get('idSerie');
+				$fechaInicio = Input::get('fInicio');
+				$fechaFin = Input::get('fFin');
+				//Borrar todos los eventos a modificar
+				$event = Evento::find(Input::get('idEvento'));
+				if (Input::get('id_recurso') == 0){
+					Evento::where('evento_id','=',Input::get('idSerie'))->forceDelete();
+				}
+				else {
+					Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->forceDelete();
+				}
+				//Añadir los nuevos
+				$result['idEvents'] = $this->editEvents($fechaInicio,$fechaFin,$idSerie);
+
+				//Msg confirmación al usuario (edición de evento)
+				$newEvent = Evento::Where('evento_id','=',$idSerie)->first();
+				if ($newEvent->estado == 'aprobada') $result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
+				if ($newEvent->estado == 'pendiente')
+					$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
+				
+				//notificar a validadores si espacio requiere validación
+				if ( $event->recurso->validacion() ){
+					$sgrMail = new sgrMail();
+					$sgrMail->notificaEdicionEvento($newEvent);
+				}
+				
+
+			} //fin else	
+		}
+		
+		return $result;			
+	} 
+
+	private function editEvents($fechaInicio,$fechaFin,$idSerie){
+		
+		$result = '';
+		
+		$repetir = Input::get('repetir');	
+		$dias = Input::get('dias'); //1->lunes...., 5->viernes
+		if ($repetir == 'SR') { //SR == sin repetición (no periódico)
+			//$dias = array(date('N',sgrDate::gettimestamp($fechaInicio,'d-m-Y')));
+			$dias = array(date('N',strtotime($fechaInicio)));
+			$fechaFin = $fechaInicio;
+		}
+							
+		foreach ($dias as $dWeek) {
+							
+			if (Input::get('repetir') == 'SR') $nRepeticiones = 1;
+			else { $nRepeticiones = sgrDate::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
+							
+			for($j=0;$j<$nRepeticiones;$j++){
+				$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);//return timestamp
+				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);//return string Y-m-d
+				$result = $this->save(Input::all(),$currentfecha,$idSerie);
+			}
+						
+		}				
+
+		
+		return $result;
+	}
+	
 	//Save
 	public function save(){
 		$result = array('error' => false,
@@ -31,7 +116,6 @@ class sgrEvento {
 										'msgSuccess' => '',
 										'data'	=> array(),);
 		$testDataForm = new Evento();
-				
 		if(!$testDataForm->validate(Input::all())){
 			$result['error'] = true;
 			$result['msgErrors'] = $testDataForm->errors();
@@ -49,7 +133,7 @@ class sgrEvento {
 			$datosdesdeform = Input::all();
 			
 			$datosdesdeform['reservarParaUvus'] = User::where('username','=',Input::get('reservarParaUvus'))->first()->id;
-
+			$datosdesdeform['reservadoPor'] = User::where('username','=',Input::get('reservadoPor'))->first()->id;
 			
 			$repeticion = 0;
 			if (Input::get('repetir') == Config::get('options.repeticionSemanal')) 	$repeticion = 1; 
@@ -265,63 +349,6 @@ class sgrEvento {
 		return $sgrRecurso->addEvent($data,$currentfecha,$evento_id);//addEvent devuelve el identificador del evento añadido
 	}*/
 
-	//Edit
-	public function edit(){
-		$result = array('error' => false,
-										'msgSuccess' => '',
-										'idsDeleted' => array(),
-										'msgErrors' => array());
-		//Controlar errores en el formulario
-		$testDataForm = new Evento();
-		if(!$testDataForm->validate(Input::all())){
-				$result['error'] = true;
-				$result['msgErrors'] = $testDataForm->errors();
-			}
-		//Si no hay errores
-		else{
-			
-			//si el usuario es alumno: comprobamos req2 (MAX HORAS = 12 a la semana en cualquier espacio o medio )	
-			$sgrUser = new sgrUser(Auth::user());
-			if ($sgrUser->isUserSgr() && $this->superaHoras()){
-				$result['error'] = true;
-				$error = array('hFin' =>'Se supera el máximo de horas a la semana.. (12h)');	
-				$result['msgErrors'] = $error;	
-			}
-			else {
-				$idSerie = Input::get('idSerie');
-				$fechaInicio = Input::get('fInicio');
-				$fechaFin = Input::get('fFin');
-				//Borrar todos los eventos a modificar
-				$event = Evento::find(Input::get('idEvento'));
-				if (Input::get('id_recurso') == 0){
-					Evento::where('evento_id','=',Input::get('idSerie'))->forceDelete();
-				}
-				else {
-					Evento::where('evento_id','=',Input::get('idSerie'))->where('recurso_id','=',Input::get('id_recurso'))->forceDelete();
-				}
-				//Añadir los nuevos
-				$result['idEvents'] = $this->editEvents($fechaInicio,$fechaFin,$idSerie);
-
-				//Msg confirmación al usuario (edición de evento)
-				$newEvent = Evento::Where('evento_id','=',$idSerie)->first();
-				if ($newEvent->estado == 'aprobada') $result['msgSuccess'] = '<strong class="alert alert-info" > Reserva registrada con éxito. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-				if ($newEvent->estado == 'pendiente')
-					$result['msgSuccess'] = '<strong class="alert alert-danger" >Reserva pendiente de validación. Puede <a target="_blank" href="'.route('justificante',array('idEventos' => $newEvent->evento_id)).'">imprimir comprobante</a> de la misma si lo desea.</strong>';
-				
-				//notificar a validadores si espacio requiere validación
-				if ( $event->recurso->validacion() ){
-					$sgrMail = new sgrMail();
-					$sgrMail->notificaEdicionEvento($newEvent);
-				}
-				
-
-			} //fin else	
-		}
-		
-		return $result;			
-	} 
-		
-
 	/**
 		* Devuelve horaInicio (H:m:s) como H:m
 		*
@@ -408,35 +435,6 @@ class sgrEvento {
   public function tiporecurso(){
   	return $this->evento->recurso->tipo;
   }
-
-	private function editEvents($fechaInicio,$fechaFin,$idSerie){
-		
-		$result = '';
-		
-		$repetir = Input::get('repetir');	
-		$dias = Input::get('dias'); //1->lunes...., 5->viernes
-		if ($repetir == 'SR') { //SR == sin repetición (no periódico)
-			//$dias = array(date('N',sgrDate::gettimestamp($fechaInicio,'d-m-Y')));
-			$dias = array(date('N',strtotime($fechaInicio)));
-			$fechaFin = $fechaInicio;
-		}
-							
-		foreach ($dias as $dWeek) {
-							
-			if (Input::get('repetir') == 'SR') $nRepeticiones = 1;
-			else { $nRepeticiones = sgrDate::numRepeticiones($fechaInicio,$fechaFin,$dWeek);}
-							
-			for($j=0;$j<$nRepeticiones;$j++){
-				$startDate = sgrDate::timeStamp_fristDayNextToDate($fechaInicio,$dWeek);//return timestamp
-				$currentfecha = sgrDate::fechaEnesimoDia($startDate,$j);//return string Y-m-d
-				$result = $this->saveEvent(Input::all(),$currentfecha,$idSerie);
-			}
-						
-		}				
-
-		
-		return $result;
-	}
 
 	public function numeroHoras(){
     return (strtotime($this->evento->horaFin) - strtotime($this->evento->horaInicio)) / (60*60) ;

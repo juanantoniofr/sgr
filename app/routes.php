@@ -10,6 +10,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 | and give it the Closure to execute when that URI is requested.
 |
 */
+//EventoController
+  Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));   
+  Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
+  Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+  Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
+  Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
+  Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
+  Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
+//***
+
+
 //msg a usuario :)
   Route::get('msg',array('as' => 'msg',function(){ 
   	$pagetitle   = Config::get('msg.pagetitlefilterCapacidad');
@@ -115,15 +126,7 @@ Route::get('admin/logs.html',array('as' => 'logs.html',function(){
 //PdfController routes *****************************
 Route::get('justificante', array('as' => 'justificante', 'uses' => 'PdfController@build'));
 
-//EventoController
-  Route::post('saveajaxevent',array('uses' => 'EventoController@save','before' => array('auth','ajax_check')));		
-  Route::post('editajaxevent',array('uses' => 'EventoController@edit','before' => array('auth','ajax_check')));
-  Route::get('geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
-  Route::get('tecnico/geteventbyId',array('uses' => 'EventoController@getbyId','before' => array('auth','ajax_check')));
-  Route::post('delajaxevent',array('uses' => 'EventoController@del','before' => array('auth','ajax_check')));
-  Route::post('finalizaevento',array('uses' => 'EventoController@finalizar','before' => array('auth','ajax_check')));
-  Route::post('anulaevento',array('uses' => 'EventoController@anular','before' => array('auth','ajax_check')));
-//***
+
 //Atención de eventos
   Route::get('tecnico/getUserEvents',array(	'uses' => 'EventoController@getUserEvents','before' => array('auth','capacidad:3-4,msg')));
   Route::post('tecnico/saveAtencion',array('uses' => 'EventoController@atender','before' => array('auth','capacidad:3-4,msg')));
@@ -153,101 +156,15 @@ Route::post('test3',array('as'=>'test3',function(){
 
 //**
 Route::get('test',array('as'=>'test',function(){
-  $id_recurso = 52;
-  $viewActive = 'month';
-  $day = '6';
-  $year = '2017';
-  $month = '3';
-  $fecha = new DateTime($year.'-'.$month.'-'.$day);
-  $recurso = Recurso::findOrFail($id_recurso);
-  $sgrRecurso = Factoria::getRecursoInstance($recurso);
-  $sgrCalendario = new sgrCalendario($fecha,$sgrRecurso);
-  
-  echo "<pre>";
-    //var_dump($sgrCalendario);
-  echo "</pre>";
-  $sgrDia = $sgrCalendario->sgrDia('6');
-  if ($sgrDia != false){
-  //View::make('calendario.month.td')->with('sgrDia',$sgrDia)
-  echo '<div'; 
+ $event = Evento::findOrFail(676);
     
-    echo '  class = "day month ';
-    if($sgrDia->sgrRecurso()->userPuedeReservar($sgrDia->timestamp(),Auth::user()) && !$sgrDia->festivo())
-      echo ' formlaunch ';
-    else 
-      echo ' disable ';
-    if($sgrDia->festivo()) 
-      echo  ' festivo ';
-    echo '" data-fecha=" ' .date('j-n-Y',$sgrDia->timestamp()). ' " >';
-    
-      echo '<div class="titleEvents"><small>' . $sgrDia->numerodia() .'</small></div>';
-
-      echo '<div class="divEvents" data-numero-de-eventos="' .$sgrDia->numeroDeEventos(). '">';
-
-        if ($sgrDia->numeroDeEventos() > 4) echo '<a style="display:none" class="cerrar" href="">Cerrar</a>';
-        $oldserieId = '';
-        foreach($sgrDia->sgrEventos() as $sgrEvento){
-          $newserieId = $sgrEvento->serieId();
-          if ($newserieId != $oldserieId){
-              $oldserieId = $sgrEvento->serieId();
-            echo '<div class="divEvent" data-fecha="' .date('j-n-Y',$sgrDia->timestamp()). '" data-hora="' .substr($sgrEvento->horaInicio(),0,2). '">';
-
-              echo '<a class = "linkpopover linkEvento linkpopover_month ';
-                    if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin()))) echo ' text-danger ';
-                    else
-                      if($sgrEvento->estado() == 'aprobada' && !$sgrEvento->finalizado()) echo  ' text-success ';
-                        elseif($sgrEvento->finalizado())  echo ' text-info ';
-                        elseif ($sgrEvento->estado() == 'pendiente') echo ' text-info ';
-                        elseif ($sgrEvento->estado() == 'denegada')  echo ' text-warning ';
-                    echo $sgrEvento->serieId() . ' ' . $sgrEvento->id()  . '"';
-                    echo 'id="' . $sgrEvento->id(). '"';
-                    echo ' data-id-serie="'.$sgrEvento->serieId().'" '; 
-                    echo ' data-id="'.$sgrEvento->id().'"';
-                    echo ' href="" ';
-                    echo ' rel="popover" ';
-                    echo ' data-html="true" ';
-                    echo ' data-title="'. sgrDate::parsedatetime($sgrEvento->horaInicio() ,'H:i:s', 'G:i') . '-' . sgrDate::parsedatetime($sgrEvento->horaFin(), 'H:i:s', 'G:i') . ' ' . $sgrEvento->titulo() .'"';
-                    echo ' data-content=" ' .htmlentities( (string) View::make('calendario.allViews.tooltip')->with('sgrDia',$sgrDia)->with('sgrRecurso',$sgrDia->sgrRecurso())->with('time',$sgrDia->timestamp())->with('sgrEvento',$sgrEvento) ) . '"';
-                    
-                    echo '>';
-                      if ($sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) && $sgrEvento->estado() != 'aprobada')
-                          echo '<span title="Solicitud con solapamiento" class="fa fa-exclamation fa-fw text-danger" aria-hidden="true"></span>';
-                      else
-                      {
-                        echo '<span  title="Solicitud ';
-                                if ( $sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) ) echo ' solapada ';
-                                else echo $sgrEvento->estado() .'"'; 
-                                echo 'class=" fa fa-fw ';
-                                if ( $sgrDia->haySolape(strtotime($sgrEvento->horaInicio()),strtotime($sgrEvento->horaFin())) ) echo ' fa-ban text-danger ';
-                                else
-                                  if($sgrEvento->estado() == 'aprobada' && !$sgrEvento->finalizado()) echo 'fa-check text-success ';
-                                  elseif($sgrEvento->finalizado())  echo ' fa-clock-o text-info ';
-                                  elseif ($sgrEvento->estado() == 'pendiente') echo ' fa-question text-primary ';
-                                  elseif ($sgrEvento->estado() == 'denegada')  echo ' fa-ban text-warning ';
-                        
-                                echo '"'; 
-                                echo ' aria-hidden="true">';
-                        echo '</span>';
-                      }
-            
-                      echo sgrDate::parsedatetime($sgrEvento->horaInicio(),'H:i:s','G:i'). '-' .sgrDate::parsedatetime($sgrEvento->horaFin(),'H:i:s','G:i');
-                      echo ' '. substr($sgrEvento->titulo(),0,45) .' ';
-                  echo '</a>';
-            echo '</div>';
-          }
-        }
-      
-      echo '</div>';//fin div eventos
-
-  echo '</div>';
-  }
-  else 
-    echo 'false';
-      //$body = '';
-  //return View::make('calendario.calendar')->with(compact('caption','head','body'));
-      
-  
-  
+    $result['event'] = $event->toArray();
+    $result['usernameReservadoPara'] = $event->user->username;
+   // $result['usernameReservadoPor'] = $event->reservadoPor->username;
+    //$result['nombreRecursoReservado'] = $event->recurso->nombre;
+    echo "<pre>";
+    var_dump($result);
+    echo "</pre>";
 }));
 
 Route::get('test2',array('as'=>'test2',function(){

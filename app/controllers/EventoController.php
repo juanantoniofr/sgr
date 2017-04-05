@@ -1,5 +1,5 @@
 <?php
-/* marca branch master2 */
+
 class EventoController extends BaseController {
 
 	public function save(){
@@ -13,12 +13,32 @@ class EventoController extends BaseController {
 
 	public function edit(){
 		$sgrEvento = new sgrEvento;
-
-		$result = $sgrEvento->edit();
+		$datos = Input::all();
+		$result = $sgrEvento->edit($datos);
 
 		return $result;
 	}
 
+	/**
+	 * //Devulve los datos de un evennto dado su identificador ($id) 
+	 * @param $id int (identificador de evento)
+	 * @return $result array 
+	*/
+	public function getbyId(){
+		$result = array('event' => array(),
+										'usernameReservadoPor' => '',
+										'usernameReservadoPara' => '',
+										'nombreRecursoReservado' => '',);
+		$event = Evento::findOrFail(Input::get('id'));
+		
+		$result['event'] = $event->toArray();
+		$result['usernameReservadoPara'] = $event->user->username;
+		$result['usernameReservadoPor'] = $event->reservadoPor->username;
+		$result['nombreRecursoReservado'] = $event->recurso->nombre;
+		return $result;		
+	}
+
+	//del
 	public function del(){
 		
 		$sgrEvento = new sgrEvento;
@@ -57,23 +77,7 @@ class EventoController extends BaseController {
 		//return "success";
 	}
 
-	/**
-	 * //Devulve los datos de un evennto dado su identificador ($id) 
-	 * @param $id int (identificador de evento)
-	 * @return $result array 
-	*/
-	public function getbyId(){
-		$result = array('event' => array(),
-						'usernameReservadoPor' => '',
-						'usernameReservadoPara' => '',
-						'nombreRecursoReservado' => '',);
-		$event = Evento::findOrFail(Input::get('id'));
-		$result['event'] = $event->toArray();
-		$result['usernameReservadoPara'] = $event->user->username;
-		$result['usernameReservadoPor'] = $event->reservadoPor->username;
-		$result['nombreRecursoReservado'] = $event->recurso->nombre;
-		return $result;		
-	}
+	
 
 	/**
 	* Devuelve evento de usuario dado su username (uvus) para su atención: debe cumplirse:
