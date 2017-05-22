@@ -95,8 +95,8 @@ return array(
 	|
 	*/
 
-	'password' =>  'p4ssunitic',//fcomunitic
-	//'password' =>  'p4ss_un1t1c',//uniticfcom
+	'password' =>  '',//fcomunitic
+	//'password' =>  '',//uniticfcom
 
 
 	/*
